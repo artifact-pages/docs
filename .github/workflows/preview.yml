@@ -1,0 +1,147 @@
+# Publish pre-merge previews of the pages a pull request adds or changes, for
+# both sites, to https://artifact-pages.dev. Only pull requests from this
+# repository get a preview: a fork never reaches the credentials. The existing
+# dry-run in publish.yml stays; it validates the real publish, while this
+# workflow lets the owner read the changed pages before merging.
+#
+# Preview pages are written to the production bucket under each site's
+# _previews/ prefix and run like published HTML. Retention of old previews is a
+# rule on the R2 side (tasuku43/artifact-pages-admin), not set here.
+name: Preview
+
+on:
+  pull_request:
+    types: [opened, synchronize, reopened]
+
+permissions:
+  contents: read
+
+concurrency:
+  group: preview-${{ github.event.pull_request.number }}
+  cancel-in-progress: true
+
+jobs:
+  preview:
+    # Same-repository pull requests only. The preflight action rejects forks
+    # again before any credential is used.
+    if: github.event.pull_request.head.repo.full_name == github.repository
+    runs-on: ubuntu-24.04
+    # R2 credentials are secrets of the "preview" environment only.
+    environment: preview
+    strategy:
+      fail-fast: false
+      matrix:
+        site: [guide, architecture]
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          # The merge base with the default branch selects the changed pages.
+          fetch-depth: 0
+          ref: ${{ github.event.pull_request.head.sha }}
+          persist-credentials: false
+      - name: Verify same-repository pull request
+        uses: tasuku43/git-artifact-pages/actions/preview-preflight@5eab98a826b2234916aea5781d72b58365942fa0 # v0.1.2
+        with:
+          pull-request: ${{ github.event.pull_request.number }}
+      - name: Preview ${{ matrix.site }}
+        id: preview
+        uses: tasuku43/git-artifact-pages/actions/preview-publish@5eab98a826b2234916aea5781d72b58365942fa0 # v0.1.2
+        with:
+          site: ${{ matrix.site }}
+          source: sites/${{ matrix.site }}
+          head: ${{ github.event.pull_request.head.sha }}
+          # actions/checkout does not set origin/HEAD, the action's default.
+          default-ref: origin/${{ github.event.repository.default_branch }}
+          pull-request: ${{ github.event.pull_request.number }}
+          base-url: https://artifact-pages.dev
+          # The deployed registry decides eligibility; this config locates it.
+          config: github://tasuku43/artifact-pages-admin/artifact-pages.yaml
+        env:
+          CF_R2_ACCESS_KEY_ID: ${{ secrets.CF_R2_ACCESS_KEY_ID }}
+          CF_R2_SECRET_ACCESS_KEY: ${{ secrets.CF_R2_SECRET_ACCESS_KEY }}
+          CF_API_TOKEN: ${{ secrets.CF_API_TOKEN }}
+      - name: Record result
+        if: always()
+        env:
+          SITE: ${{ matrix.site }}
+          OUTCOME: ${{ steps.preview.outputs.outcome }}
+          GROUP_LIST_URL: ${{ steps.preview.outputs.group-list-url }}
+          DOCUMENTS: ${{ steps.preview.outputs.documents }}
+          ERROR: ${{ steps.preview.outputs.error }}
+        run: |
+          mkdir -p result
+          jq -n \
+            --arg site "$SITE" \
+            --arg outcome "${OUTCOME:-failed}" \
+            --arg groupListUrl "$GROUP_LIST_URL" \
+            --arg error "$ERROR" \
+            --argjson documents "${DOCUMENTS:-[]}" \
+            '{site: $site, outcome: $outcome, groupListUrl: $groupListUrl, error: $error, documents: $documents}' \
+            > "result/$SITE.json"
+          echo "### $SITE preview: ${OUTCOME:-failed} ($(jq length <<<"${DOCUMENTS:-[]}") pages)" >> "$GITHUB_STEP_SUMMARY"
+      - name: Upload result
+        if: always()
+        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
+        with:
+          name: preview-result-${{ matrix.site }}
+          path: result/${{ matrix.site }}.json
+          if-no-files-found: error
+          retention-days: 1
+
+  # Holds no R2 credentials. It only turns the saved results into one comment
+  # that is updated in place on every push.
+  comment:
+    needs: preview
+    if: always() && github.event.pull_request.head.repo.full_name == github.repository
+    runs-on: ubuntu-24.04
+    permissions:
+      pull-requests: write
+    steps:
+      - uses: actions/download-artifact@3e5f45b2cfb9172054b4087a40e8e0b5a5461e7c # v8.0.1
+        with:
+          pattern: preview-result-*
+          path: results
+          merge-multiple: true
+      - name: Create or update the preview comment
+        env:
+          GH_TOKEN: ${{ github.token }}
+          REPO: ${{ github.repository }}
+          PR: ${{ github.event.pull_request.number }}
+          SHA: ${{ github.event.pull_request.head.sha }}
+        run: |
+          marker='<!-- artifact-pages-preview -->'
+          {
+            echo "$marker"
+            echo "## Preview"
+            echo
+            echo "Changed pages at \`${SHA:0:7}\`. A preview is removed by the bucket's retention rule, not on merge."
+            for site in guide architecture; do
+              f="results/$site.json"
+              echo
+              echo "### $site"
+              if [ ! -f "$f" ]; then
+                echo "No result was recorded. See the workflow run."
+                continue
+              fi
+              case "$(jq -r .outcome "$f")" in
+                published)
+                  echo "[All previews of this change]($(jq -r .groupListUrl "$f"))"
+                  echo
+                  jq -r '.documents[] | "- [\(.title | gsub("[\\[\\]\\r\\n]"; " "))](\(.url)) `\(.path)`"' "$f"
+                  ;;
+                no-preview)
+                  echo "No page was added or changed."
+                  ;;
+                *)
+                  echo "Preview $(jq -r .outcome "$f"). See the workflow run."
+                  ;;
+              esac
+            done
+          } > body.md
+          id=$(gh api --paginate "repos/$REPO/issues/$PR/comments" \
+            --jq "[.[] | select(.user.login == \"github-actions[bot]\" and (.body | startswith(\"$marker\")))][0].id // empty" | head -n1)
+          if [ -n "$id" ]; then
+            gh api -X PATCH "repos/$REPO/issues/comments/$id" -F body=@body.md > /dev/null
+          else
+            gh api -X POST "repos/$REPO/issues/$PR/comments" -F body=@body.md > /dev/null
+          fi
