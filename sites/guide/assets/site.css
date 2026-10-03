@@ -714,3 +714,16 @@ td:first-child { white-space: nowrap; font-weight: 600; }
 .arch .page-head h1 { margin-bottom: 18px; }
 .arch .page-head .answer { max-width: var(--measure); }
 .ad-pre, .ad-pre text { white-space: pre; }
+
+/* ── 手順ごとの状態パネル（.state）：その手順までにできたものを積み上げて見せる。新しい行は + と強調、前の行は控えめ。静的で動かない ── */
+.timeline .state { margin: 14px 0 0; border: 1px solid var(--line-soft); border-radius: 10px; background: var(--paper); overflow: hidden; }
+.timeline .state figcaption { padding: 6px 12px; border-bottom: 1px solid var(--line-soft); color: var(--quiet); font: 600 10.5px/1.6 var(--mono); letter-spacing: .04em; }
+.timeline .state ul { margin: 0; padding: 6px 0; list-style: none; }
+.timeline .state li { display: grid; grid-template-columns: 22px minmax(0, 1fr); align-items: baseline; padding: 1px 12px 1px calc(12px + var(--d, 0) * 16px); border-left: 3px solid transparent; color: var(--quiet); font-size: 12px; line-height: 1.7; }
+.timeline .state li i { color: var(--accent); font: 700 12px/1.7 var(--mono); font-style: normal; text-align: center; }
+.timeline .state li code { min-width: 0; padding: 0; border: 0; background: none; color: inherit; font-size: inherit; overflow-wrap: anywhere; }
+.timeline .state li.new { border-left-color: var(--accent); background: var(--accent-wash); color: var(--ink); }
+.timeline .state li.new code { font-weight: 600; }
+@media (max-width: 520px) { .timeline .state li { padding-left: calc(8px + var(--d, 0) * 10px); } }
+.timeline .state li::before, .timeline .state li::after { content: none; display: none; }
+.timeline .state li { counter-increment: none; gap: 0; }
