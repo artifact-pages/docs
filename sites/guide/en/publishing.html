@@ -36,7 +36,8 @@
     <div class="callout" role="note">
       <span class="ico">BEFORE YOU START</span>
       <div>
-        <p><strong>Before you start, you need two things:</strong> the <code>artifact-pages</code> command, and a site that an admin has registered for your repository and directory. Ask the admin for the site ID and the deployment config to use.</p>
+        <p><strong>Before you start, you need two things:</strong> the <code>artifact-pages</code> command, and a site that an admin has registered for your repository and directory. Ask the admin for the site ID and the address of the admin repository's config.</p>
+        <p><strong>A satellite repository is just documents plus one workflow.</strong> It holds the published directory and a CI workflow, with no config file, no build step, and no sync step: it points at the admin repository's <code>artifact-pages.yaml</code> with a <a href="configuration.html#remote"><code>github://</code> locator</a>. The commands below leave out <code>--config</code> for brevity; pass it, or set <code>ARTIFACT_PAGES_CONFIG</code> to the locator, such as <code>github://acme/platform-admin/artifact-pages.yaml</code>.</p>
         <p>To install the CLI, see <a href="getting-started.html#install">Getting started</a>. The examples below use the illustrative <code>checkout</code> site, published from <code>docs/artifacts</code> in <code>acme/checkout</code>.</p>
       </div>
     </div>
@@ -92,7 +93,7 @@
           <tr><td><code>--site ID</code></td><td><span class="pill on">Required</span></td><td>The registered site ID. It is never inferred from the repository.</td></tr>
           <tr><td><code>--source DIR</code></td><td><span class="pill">Optional</span></td><td>The directory to publish. Its path from the repository root must equal the registered <code>sourcePath</code>. Defaults to that registered path.</td></tr>
           <tr><td><code>--fulltext</code></td><td><span class="pill">Optional</span></td><td>Also publish the data for page text search. Pass it every time (see below).</td></tr>
-          <tr><td><code>--config LOCATOR</code></td><td><span class="pill">Optional</span></td><td>The deployment config that names the delivery target. See <a href="configuration.html#precedence">Configuration</a> for how it is chosen when omitted.</td></tr>
+          <tr><td><code>--config LOCATOR</code></td><td><span class="pill">Optional</span></td><td>The deployment config that names the delivery target. A satellite repository passes the admin repository's <code>github://</code> locator; see <a href="configuration.html#remote">Remote config</a>. <a href="configuration.html#precedence">Configuration</a> explains how it is chosen when omitted.</td></tr>
           <tr><td><code>--dry-run</code></td><td><span class="pill">Optional</span></td><td>Show the changes without writing, deleting, or requesting a cache refresh.</td></tr>
           <tr><td><code>--format text|json</code></td><td><span class="pill">Optional</span></td><td><code>json</code> returns the complete change list, for CI.</td></tr>
         </tbody>
@@ -131,17 +132,17 @@
         <li><div><h3>On a pull request: plan</h3><p>Run with <code>--dry-run</code> and read-only credentials. The JSON result lists exactly what would change.</p>
           <div class="term" aria-label="Example CI dry-run command">
             <div class="term-head"><span>CI / PULL REQUEST</span><button class="copy-btn" type="button">Copy</button></div>
-<pre><span class="p">$</span> <span data-copy>artifact-pages <span class="v">site publish</span> --site checkout --source docs/artifacts --fulltext --dry-run --format json</span></pre>
+<pre><span class="p">$</span> <span data-copy>artifact-pages <span class="v">site publish</span> --site checkout --source docs/artifacts --config github://acme/platform-admin/artifact-pages.yaml --fulltext --dry-run --format json</span></pre>
           </div></div></li>
         <li><div><h3>After merge: publish</h3><p>Run the same command without <code>--dry-run</code>, using credentials that can write only this site.</p>
           <div class="term" aria-label="Example CI publish command">
             <div class="term-head"><span>CI / DEFAULT BRANCH</span><button class="copy-btn" type="button">Copy</button></div>
-<pre><span class="p">$</span> <span data-copy>artifact-pages <span class="v">site publish</span> --site checkout --source docs/artifacts --fulltext --format json</span></pre>
+<pre><span class="p">$</span> <span data-copy>artifact-pages <span class="v">site publish</span> --site checkout --source docs/artifacts --config github://acme/platform-admin/artifact-pages.yaml --fulltext --format json</span></pre>
           </div></div></li>
       </ol>
       <ul>
         <li><strong>Credentials</strong> stay in the CI secret store, never in the config file. A publishing job needs to read the site registry, to read and write only this site's files, its previews, its lock, and its cache-retry record (<code>_control/site-cache/&lt;site&gt;.json</code>), and to request a CDN cache refresh. See <a href="configuration.html#credentials">Configuration</a>.</li>
-        <li><strong>No copy of the admin config.</strong> The job can point <code>--config</code> at the admin repository's file with a <code>github://</code> locator pinned to a commit; see <a href="configuration.html#remote">remote config</a>. Eligibility is still checked against the registry on the delivery target.</li>
+        <li><strong>No config file in the repository.</strong> The job points <code>--config</code> at the admin repository's file with a <code>github://</code> locator, optionally pinned with <code>?ref=&lt;full commit SHA&gt;</code>; see <a href="configuration.html#remote">remote config</a>. Eligibility is still checked against the registry on the delivery target, not against the config.</li>
       </ul>
 
       <h3 id="github-actions">With GitHub Actions</h3>
@@ -176,7 +177,7 @@
         <span class="k">with</span>:
           <span class="k">site</span>: checkout
           <span class="k">source</span>: docs/artifacts
-          <span class="k">config</span>: github://acme/platform-admin/artifact-pages.yaml?ref=&lt;full commit SHA&gt;
+          <span class="k">config</span>: github://acme/platform-admin/artifact-pages.yaml   <span class="c"># the admin repository's config; no file in this repository</span>
           <span class="k">fulltext</span>: true
           <span class="k">dry-run</span>: ${{ github.event_name == 'pull_request' }}
         <span class="k">env</span>:
@@ -189,6 +190,7 @@
         <li><strong><code>fulltext: true</code> on every run.</strong> It defaults to <code>false</code>, and a publish without it removes the site's search data. Keeping it on the pull request run too makes the plan match what the merge publishes.</li>
         <li><strong>Two environments hold different secrets.</strong> <code>plan</code> and <code>production</code> are illustrative names: give <code>plan</code> read-only credentials (pull requests from forks get no secrets, so the plan fails there by design) and <code>production</code> credentials that can write only this site, and limit <code>production</code> to <code>main</code> in its settings. The variable names are the Cloudflare defaults; on AWS, assume a role through OIDC instead (add <code>id-token: write</code> to <code>permissions</code>).</li>
         <li><strong>One publish at a time.</strong> Only one publish can hold the site's lock, so the <code>concurrency</code> group runs one publish at a time (a newer push replaces a waiting one).</li>
+        <li><strong>Pinning the config</strong> is optional. Without <code>?ref=</code>, the admin repository's default branch is resolved to one commit for the whole run. Append <code>?ref=&lt;full commit SHA&gt;</code> to the locator to pin a commit.</li>
         <li><strong>A private admin repository</strong> is read with this workflow's token by default, which usually cannot read another repository. Pass a read-only token for the admin repository through the <code>github-token</code> input.</li>
         <li><strong>Results</strong> are available as outputs, such as <code>outcome</code> (<code>planned</code>, <code>published</code>, <code>no-op</code>, or <code>failed</code>), <code>changes_json</code>, and <code>result_json</code>.</li>
         <li><strong>Other Actions</strong> use the same tag: <code>tasuku43/git-artifact-pages/actions/admin</code> for <code>registry register</code>, <code>registry unregister</code>, and <code>app deploy</code>; <code>actions/preview-preflight</code> and <code>actions/preview-publish</code> for previews.</li>

@@ -83,3 +83,10 @@ Checked with Playwright (`guide-check.mjs`): all five guide pages in ja/en, ligh
 - L6: ja workflow YAML comments translated.
 - L7: copy-button wrapping at 400 px fixed in the shared CSS (see DOC-03).
 - Verified with the same Playwright pass as DOC-03 (no problems).
+
+## Satellite repositories use a remote config (2026-10-03, awaiting owner review)
+
+Owner decision: a satellite (site) repository has no config file. It points at the admin repository's config with `github://OWNER/ADMIN-REPO/artifact-pages.yaml` (optional `?ref=` to pin; without it the default branch is resolved once per invocation). Only a single repository that is both admin and site may keep a local path, presented as the exception. Status stays `In progress`: the revised pages need owner review again.
+
+- CI examples pass `--config github://acme/platform-admin/artifact-pages.yaml`; the GitHub Actions workflow's `config` line uses that form (pin with `?ref=<full SHA>` is an optional bullet). The `plan`/`production` environments, main-only production, and the SHA-pinned action hardening are unchanged. Before-you-start callout states the satellite shape.
+- Spec: [§22](https://github.com/tasuku43/git-artifact-pages/blob/main/docs/specification.md) (config locator; registry, not config, decides eligibility). Pages changed in ja and en. No new product behavior is stated.

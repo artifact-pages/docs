@@ -79,3 +79,10 @@ Independent review found no high issues. Applied:
 - L3: mise must be active in the shell (or its shims on `PATH`) for `artifact-pages` to be found.
 - L7 (shared): `.copy-btn` gets `flex: none; white-space: nowrap` in `shared/assets/site.css`; at 400 px every copy button on the ja guide pages is one line (21.6 px high).
 - Verification: `assets:sync`, `assets:check`, `npm test` (3/3) pass; both sites republished (dry-run first, `--fulltext`) from a committed tmp copy; Playwright 48 runs (12 guide pages × light/dark × 400/1280) clean, 58 same-origin links and anchors resolve; reader pager and page text search re-checked. The bare `app deploy` / `registry register` forms on the overview and Configuration are left unchanged pending the owner's decision.
+
+## Satellite repositories use a remote config (2026-10-03, awaiting owner review)
+
+Owner decision: a satellite (site) repository has no config file. It points at the admin repository's config with `github://OWNER/ADMIN-REPO/artifact-pages.yaml` (optional `?ref=` to pin; without it the default branch is resolved once per invocation). Only a single repository that is both admin and site may keep a local path, presented as the exception. Status stays `In progress`: the revised pages need owner review again.
+
+- Roles section defines satellite repositories and the "documents plus one workflow" shape; the local try-out stays (python3 -m http.server included) and is labelled as the single-repository exception; "Moving to a real delivery target" tells team repositories to use the `github://` locator and not carry the try-out config over.
+- Spec: [§22](https://github.com/tasuku43/git-artifact-pages/blob/main/docs/specification.md) (config locator; registry, not config, decides eligibility). Pages changed in ja and en. No new product behavior is stated.

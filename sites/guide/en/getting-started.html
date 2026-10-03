@@ -65,7 +65,7 @@
 
     <section class="doc-section" aria-labelledby="roles">
       <h2 id="roles">Two kinds of repository</h2>
-      <p>A deployment has one admin repository and any number of team repositories. The admin decides which sites exist; each team publishes only its own.</p>
+      <p>A deployment has one admin repository and any number of team repositories, also called satellite repositories. The admin decides which sites exist; each team publishes only its own.</p>
       <div class="split">
         <div class="pane">
           <span class="label">ADMIN REPOSITORY · ONE PER DEPLOYMENT</span>
@@ -73,12 +73,12 @@
           <p>Holds <code>artifact-pages.yaml</code>: the delivery target and the complete list of sites. Runs <code>app deploy</code> to install the reader app and <code>registry register</code> to register the sites, ideally only from reviewed changes.</p>
         </div>
         <div class="pane">
-          <span class="label">TEAM REPOSITORIES · ANY NUMBER · ONE OR MORE SITES EACH</span>
+          <span class="label">SATELLITE (TEAM) REPOSITORIES · ANY NUMBER · ONE OR MORE SITES EACH</span>
           <h3>Publish their own site</h3>
-          <p>Keep documents in one registered directory and run <code>site publish</code> for their site, usually from their own CI after merge. They need only the delivery target, never the site list; they can read the admin repository's file with a <a href="configuration.html#remote"><code>github://</code> locator</a>.</p>
+          <p>Keep documents in one registered directory and run <code>site publish</code> for their site, usually from their own CI after merge. A satellite repository is just documents plus one workflow: no config file, no build step, no sync step. It points at the admin repository's <code>artifact-pages.yaml</code> with a <a href="configuration.html#remote"><code>github://</code> locator</a>, so it never holds the delivery target or the site list.</p>
         </div>
       </div>
-      <p>Whether a repository may publish to a site is decided by the site registry on the delivery target, not by the team's config. For a try-out, one repository can play both roles, which is what the next section does.</p>
+      <p>Whether a repository may publish to a site is decided by the site registry on the delivery target, not by the team's config. The one exception is a single repository that is both admin and site, which may keep a local config. The try-out in the next section does that so everything fits on one machine; a team repository normally has no <code>artifact-pages.yaml</code>.</p>
     </section>
 
     <section class="doc-section" aria-labelledby="try">
@@ -93,7 +93,7 @@
 <span class="c"># Only if the repository has no commits yet</span>
 <span class="p">$</span> <span data-copy>git add -A &amp;&amp; git commit -m "Add a first page"</span></pre>
           </div></div></li>
-        <li><div><h3>Write <code>artifact-pages.yaml</code></h3><p>At the repository root, name the <code>local</code> target and register one site. <code>repository</code> must match the checkout's <code>origin</code> as <code>owner/repo</code>, and <code>sourcePath</code> is the directory, relative to the root. Add <code>.local/</code> to <code>.gitignore</code>: everything under it is generated.</p>
+        <li><div><h3>Write <code>artifact-pages.yaml</code></h3><p>Only because this one repository plays both roles, the config sits beside the pages. At the repository root, name the <code>local</code> target and register one site. <code>repository</code> must match the checkout's <code>origin</code> as <code>owner/repo</code>, and <code>sourcePath</code> is the directory, relative to the root. Add <code>.local/</code> to <code>.gitignore</code>: everything under it is generated.</p>
           <div class="term" aria-label="artifact-pages.yaml for the try-out">
             <div class="term-head"><span>artifact-pages.yaml / acme/checkout</span><button class="copy-btn" type="button">Copy</button></div>
 <pre><span class="k">schemaVersion</span>: 1
@@ -146,7 +146,7 @@
       <ul>
         <li><strong>Set up storage and a CDN</strong> in the provider itself: S3 and CloudFront on AWS, or R2 and the Cloudflare cache. Artifact Pages doesn't create them. Then switch <code>provider</code> and its block in the admin repository's file; see <a href="configuration.html#providers">delivery targets</a>.</li>
         <li><strong>From the admin repository</strong>, run <code>app deploy</code> and <code>registry register</code> with admin credentials taken from the environment, never written in the file (<a href="configuration.html#credentials">credentials</a>).</li>
-        <li><strong>From each team repository</strong>, publish after merge from CI with credentials that can write only that site. <a href="publishing.html#ci">Publishing</a> has a GitHub Actions workflow you can start from.</li>
+        <li><strong>From each team repository</strong>, publish after merge from CI with credentials that can write only that site. The repository needs no config file: the workflow's <code>config</code> input is <code>github://OWNER/ADMIN-REPO/artifact-pages.yaml</code>, and the local <code>artifact-pages.yaml</code> of the try-out is not carried over. <a href="publishing.html#ci">Publishing</a> has a GitHub Actions workflow you can start from.</li>
         <li><strong>Before anyone publishes</strong>, read <a href="access-and-trust.html">Access and trust</a>: published HTML runs as code, and limiting who can read belongs at the delivery edge.</li>
       </ul>
     </section>

@@ -30,7 +30,7 @@
         <p class="eyebrow">管理者向け</p>
         <h1>設定ファイル</h1>
       </div>
-      <p class="lead"><code>artifact-pages</code>のコマンドは、どれも1つのYAMLの設定ファイルを読みます。ふつうは管理リポジトリにある<code>artifact-pages.yaml</code>です。配信先と、登録コマンドで使うサイトの定義をここに書きます。</p>
+      <p class="lead"><code>artifact-pages</code>のコマンドは、どれも1つのYAMLの設定ファイルを読みます。ふつうは管理リポジトリにある<code>artifact-pages.yaml</code>です。配信先と、登録コマンドで使うサイトの定義をここに書きます。自分の文書を公開するだけのサテライトリポジトリには設定ファイルを置かず、<a href="#remote">管理リポジトリのファイルを指定</a>します。</p>
     </header>
 
     <section class="doc-section" aria-labelledby="file">
@@ -67,7 +67,7 @@
       <ol class="timeline">
         <li><div><h3><code>--config LOCATOR</code></h3><p>ローカルのパスか、<a href="#remote"><code>github://</code>の指定</a>。繰り返し指定すると、ローカルのファイルを<a href="#layers">重ね合わせ</a>ます。</p></div></li>
         <li><div><h3><code>ARTIFACT_PAGES_CONFIG</code></h3><p>指定を1つ入れた環境変数。</p></div></li>
-        <li><div><h3>いまのディレクトリの<code>artifact-pages.yaml</code></h3><p>既定のファイル。管理リポジトリで実行するなら、オプションはいりません。</p></div></li>
+        <li><div><h3>いまのディレクトリの<code>artifact-pages.yaml</code></h3><p>既定のファイル。管理リポジトリで実行するなら、オプションはいりません。サテライトリポジトリにこのファイルはなく、1番目か2番目を使います。</p></div></li>
         <li><div><h3>保存した既定の指定</h3><p><code>artifact-pages config set-default LOCATOR</code>で、ユーザーの設定ディレクトリに指定を1つ保存できます。保存されるのはこの指定だけで、認証情報は保存されません。</p></div></li>
       </ol>
       <p>配信先を使うコマンドは、使った配信先（バケットなど）を出力に表示します。どの配信先に対して実行したかを確かめられます。</p>
@@ -108,16 +108,22 @@
 
     <section class="doc-section" aria-labelledby="remote">
       <h2 id="remote">リモートの設定ファイル</h2>
-      <p>チームのリポジトリでは、管理リポジトリのファイルを写さずにそのまま使えます。<code>--config</code>に、コミットを固定した<code>github://</code>の指定を渡します。</p>
+      <p>サテライトリポジトリは、自分の設定ファイルを持ちません。<code>--config</code>（または<code>ARTIFACT_PAGES_CONFIG</code>、Actionの<code>config</code>入力）に、管理リポジトリのファイルを指す<code>github://</code>の指定を渡します。管理リポジトリ以外では、これが通常の形です。</p>
       <div class="term" aria-label="リモートの設定ファイルを指定する例">
+        <div class="term-head"><span>ターミナル / acme/checkout</span><button class="copy-btn" type="button">コピー</button></div>
+<pre><span class="p">$</span> <span data-copy>artifact-pages <span class="v">site publish</span> --site checkout --source docs/artifacts --config github://acme/platform-admin/artifact-pages.yaml --dry-run</span></pre>
+      </div>
+      <p>設定を1つのコミットに固定するときは<code>?ref=</code>を付けます。<code>?</code>を含むので、指定をクォートで囲みます。</p>
+      <div class="term" aria-label="コミットを固定したリモートの設定ファイルの例">
         <div class="term-head"><span>ターミナル / acme/checkout</span><button class="copy-btn" type="button">コピー</button></div>
 <pre><span class="p">$</span> <span data-copy>artifact-pages <span class="v">site publish</span> --site checkout --source docs/artifacts --config 'github://acme/platform-admin/artifact-pages.yaml?ref=0123456789abcdef0123456789abcdef01234567' --dry-run</span></pre>
       </div>
       <ul>
-        <li>形式は<code>github://OWNER/REPO/FILE?ref=REF</code>です。<code>FILE</code>を省くと<code>artifact-pages.yaml</code>を読みます。<code>ref</code>を省くと、デフォルトブランチをその時点のコミットに決め、コマンドの最後までそのコミットを使います。CIでは、実行の途中で配信先が変わらないよう、コミットのSHAを完全な形で固定してください。</li>
-        <li><code>?</code>を含むので、シェルではクォートで囲みます。プライベートリポジトリは<code>GITHUB_TOKEN</code>か<code>GH_TOKEN</code>で読みます。</li>
+        <li>形式は<code>github://OWNER/REPO/FILE?ref=REF</code>です。<code>FILE</code>を省くと<code>artifact-pages.yaml</code>を読みます。<code>ref</code>を省くと、デフォルトブランチをその時点のコミットに決め、コマンドの最後までそのコミットを使います。そのため、実行の途中で配信先が変わることはありません。設定そのものをリポジトリ側のレビューで変えたいときだけ、<code>ref</code>に完全なコミットSHAを指定します。</li>
+        <li><code>?ref=</code>を付けるときは、シェルではクォートで囲みます。プライベートリポジトリは<code>GITHUB_TOKEN</code>か<code>GH_TOKEN</code>で読みます。</li>
         <li>ファイルは実行のたびに取り直し、使ったコミットを出力に表示します。</li>
         <li>リモートの設定ファイルは、それだけで完結している必要があります。ほかのファイルとは重ねられません。</li>
+        <li>管理と公開を1つのリポジトリで兼ねる場合に限り、ローカルの<code>artifact-pages.yaml</code>を置いてもかまいません。これは例外です。</li>
         <li>この指定で決まるのは配信先だけです。そのリポジトリがサイトに公開してよいかどうかは、配信先にある登録情報で判断します。</li>
       </ul>
       <p class="note"><code>acme/platform-admin</code>は説明用の管理リポジトリです。</p>

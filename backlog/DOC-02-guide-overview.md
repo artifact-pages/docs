@@ -78,3 +78,10 @@ Introduce what Git Artifact Pages is and walk through the four roles (deploy the
 
 - Step 01 now shows `app deploy --dry-run` / `app deploy` without `--version`: the current CLI has no such option and deploys the web release matching its own version (spec §22 area, `app deploy --help`). The note says so and links GitHub Releases once. Supersedes the step 01 notes above.
 - The lead's bold sentence uses です/ます like the rest of the paragraph. Narrow step figures expose a `role="group"` name from their caption when scrollable.
+
+## Satellite repositories use a remote config (2026-10-03, awaiting owner review)
+
+Owner decision: a satellite (site) repository has no config file. It points at the admin repository's config with `github://OWNER/ADMIN-REPO/artifact-pages.yaml` (optional `?ref=` to pin; without it the default branch is resolved once per invocation). Only a single repository that is both admin and site may keep a local path, presented as the exception. Status stays `In progress`: the revised pages need owner review again.
+
+- Step 3 now says a satellite repository is "documents plus one workflow" (no config file, build or sync step), passes `--config github://acme/platform-admin/artifact-pages.yaml`, and names `tasuku43/artifact-pages-docs` as the reference satellite. Steps 1 and 2 (admin) are unchanged.
+- Spec: [§22](https://github.com/tasuku43/git-artifact-pages/blob/main/docs/specification.md) (config locator; registry, not config, decides eligibility). Pages changed in ja and en. No new product behavior is stated.

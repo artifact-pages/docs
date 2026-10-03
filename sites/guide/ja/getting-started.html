@@ -65,7 +65,7 @@
 
     <section class="doc-section" aria-labelledby="roles">
       <h2 id="roles">2種類のリポジトリ</h2>
-      <p>ひとつの環境には、管理リポジトリがひとつと、チームのリポジトリがいくつでもあります。どのサイトを置くかは管理者が決め、各チームは自分のサイトだけを公開します。</p>
+      <p>ひとつの環境には、管理リポジトリがひとつと、チームのリポジトリ（サテライトリポジトリ）がいくつでもあります。どのサイトを置くかは管理者が決め、各チームは自分のサイトだけを公開します。</p>
       <div class="split">
         <div class="pane">
           <span class="label">管理リポジトリ · 環境ごとにひとつ</span>
@@ -73,12 +73,12 @@
           <p><code>artifact-pages.yaml</code>に、配信先と、登録するサイトの一覧をすべて書きます。<code>app deploy</code>で閲覧アプリを置き、<code>registry register</code>でサイトを登録します。どちらもレビューを通った変更から実行するのが望ましい運用です。</p>
         </div>
         <div class="pane">
-          <span class="label">チームのリポジトリ · いくつでも · 1つ以上のサイトを公開</span>
+          <span class="label">サテライト（チーム）リポジトリ · いくつでも · 1つ以上のサイトを公開</span>
           <h3>自分のサイトを公開する</h3>
-          <p>登録されたディレクトリに文書を置き、自分のサイトに<code>site publish</code>を実行します。ふつうはマージ後に自分のCIから動かします。必要なのは配信先の設定だけで、サイトの一覧は要りません。管理リポジトリのファイルは<a href="configuration.html#remote"><code>github://</code>の指定</a>で読めます。</p>
+          <p>登録されたディレクトリに文書を置き、自分のサイトに<code>site publish</code>を実行します。ふつうはマージ後に自分のCIから動かします。サテライトリポジトリは、文書とワークフロー1つだけです。設定ファイルも、ビルドも、同期の手順もありません。管理リポジトリの<code>artifact-pages.yaml</code>を<a href="configuration.html#remote"><code>github://</code>の指定</a>で参照するので、配信先もサイトの一覧も自分では持ちません。</p>
         </div>
       </div>
-      <p>あるリポジトリがそのサイトに公開してよいかは、チームの設定ファイルではなく、配信先にあるサイトの登録情報で決まります。試すときはひとつのリポジトリで両方の役割を兼ねられます。次の節はその形で進めます。</p>
+      <p>あるリポジトリがそのサイトに公開してよいかは、チームの設定ファイルではなく、配信先にあるサイトの登録情報で決まります。例外は、管理と公開を1つのリポジトリで兼ねる場合で、ローカルの設定ファイルを置けます。次の節の試用は、手元で完結させるためにその形で進めます。チームのリポジトリには、ふつう<code>artifact-pages.yaml</code>を置きません。</p>
     </section>
 
     <section class="doc-section" aria-labelledby="try">
@@ -93,7 +93,7 @@
 <span class="c"># まだコミットがないリポジトリのときだけ</span>
 <span class="p">$</span> <span data-copy>git add -A &amp;&amp; git commit -m "Add a first page"</span></pre>
           </div></div></li>
-        <li><div><h3><code>artifact-pages.yaml</code>を書く</h3><p>リポジトリのルートに置き、配信先に<code>local</code>を指定して、サイトを1つ登録します。<code>repository</code>はチェックアウトの<code>origin</code>と同じ<code>owner/repo</code>に、<code>sourcePath</code>はルートからのディレクトリのパスにします。<code>.local/</code>の下はすべて生成物なので、<code>.gitignore</code>に加えておきます。</p>
+        <li><div><h3><code>artifact-pages.yaml</code>を書く</h3><p>1つのリポジトリが両方の役割を兼ねるので、設定ファイルを文書のそばに置きます。リポジトリのルートに置き、配信先に<code>local</code>を指定して、サイトを1つ登録します。<code>repository</code>はチェックアウトの<code>origin</code>と同じ<code>owner/repo</code>に、<code>sourcePath</code>はルートからのディレクトリのパスにします。<code>.local/</code>の下はすべて生成物なので、<code>.gitignore</code>に加えておきます。</p>
           <div class="term" aria-label="試すためのartifact-pages.yaml">
             <div class="term-head"><span>artifact-pages.yaml / acme/checkout</span><button class="copy-btn" type="button">コピー</button></div>
 <pre><span class="k">schemaVersion</span>: 1
@@ -146,7 +146,7 @@
       <ul>
         <li><strong>ストレージとCDNは、プロバイダ側で用意します。</strong>AWSならS3とCloudFront、CloudflareならR2とCloudflareのキャッシュです。Artifact Pagesはこれらを作りません。用意できたら、管理リポジトリのファイルの<code>provider</code>とその設定を切り替えます（「<a href="configuration.html#providers">配信先</a>」を参照）。</li>
         <li><strong>管理リポジトリからは</strong>、<code>app deploy</code>と<code>registry register</code>を管理者の認証情報で実行します。認証情報は環境変数から渡し、ファイルには書きません（「<a href="configuration.html#credentials">認証情報</a>」を参照）。</li>
-        <li><strong>チームのリポジトリからは</strong>、マージ後にCIから、そのサイトにだけ書き込める認証情報で公開します。「<a href="publishing.html#ci">サイトの公開</a>」に、そのまま使い始められるGitHub Actionsのワークフローがあります。</li>
+        <li><strong>チームのリポジトリからは</strong>、マージ後にCIから、そのサイトにだけ書き込める認証情報で公開します。リポジトリに設定ファイルは要りません。ワークフローの<code>config</code>入力に<code>github://OWNER/ADMIN-REPO/artifact-pages.yaml</code>を指定し、試用で使ったローカルの<code>artifact-pages.yaml</code>は持ち込みません。「<a href="publishing.html#ci">サイトの公開</a>」に、そのまま使い始められるGitHub Actionsのワークフローがあります。</li>
         <li><strong>誰かが公開する前に</strong>、「<a href="access-and-trust.html">信頼とアクセス制御</a>」を読んでください。公開したHTMLはコードとして動き、読める人の制限は配信側で行います。</li>
       </ul>
     </section>
