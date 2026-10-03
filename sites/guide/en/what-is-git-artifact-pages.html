@@ -155,7 +155,7 @@
         <section class="chapter" id="step-2" data-step="2" aria-labelledby="step-2-title">
           <span class="step-label">02 / REGISTER SITES <span class="role">Admin</span></span>
           <h3 id="step-2-title">Next, register the sites.</h3>
-          <p><strong>A site per team is the usual starting point</strong>, and one team can split sites by product. Each site has an ID, a display name, a source Git repository (<code>owner/repo</code>), and a directory (<code>sourcePath</code>). The admin lists them in the config file and registers them. A site can be registered before it has any documents.</p>
+          <p><strong>A site per team is the usual starting point</strong>, and one team can split sites by product. Each site has an ID, a display name, a source Git repository (<code>owner/repo</code>), and a directory (<code>sourcePath</code>). The admin lists them in the admin repository's config file and registers them. A site can be registered before it has any documents.</p>
           <div class="term" aria-label="Example site registration config">
             <div class="term-head"><span>artifact-pages.yaml / ADMIN REPOSITORY</span></div>
 <pre><span class="k">sites</span>:
@@ -183,15 +183,15 @@
         <section class="chapter" id="step-3" data-step="3" aria-labelledby="step-3-title">
           <span class="step-label">03 / PUBLISH FROM GIT <span class="role">Team repositories</span></span>
           <h3 id="step-3-title">Publish from each Git repository to its site.</h3>
-          <p>Each team's Git repository publishes with an explicit site and source directory. Every publish builds the index and places HTML, Markdown, CSS, and images as they are.</p>
+          <p>Each team's Git repository publishes with an explicit site and source directory. A satellite repository like this is just documents plus one workflow: no config file, no build step, no sync step. It reads the admin repository's config through a <code>github://</code> locator. Every publish builds the index and places HTML, Markdown, CSS, and images as they are.</p>
           <p>Publishing is independent per site. No central build assembles every site: each repository publishes only its own site, from its own CI, when its content changes, and never waits for another site to publish.</p>
           <div class="term" aria-label="Example site publish commands">
             <div class="term-head"><span>TERMINAL / acme/checkout</span><button class="copy-btn" type="button">Copy</button></div>
 <pre><span class="c"># docs/artifacts to the checkout site</span>
-<span class="p">$</span> <span data-copy>artifact-pages <span class="v">site publish</span> --site checkout --source docs/artifacts --dry-run</span>
-<span class="p">$</span> <span data-copy>artifact-pages <span class="v">site publish</span> --site checkout --source docs/artifacts</span></pre>
+<span class="p">$</span> <span data-copy>artifact-pages <span class="v">site publish</span> --site checkout --source docs/artifacts --config github://acme/platform-admin/artifact-pages.yaml --dry-run</span>
+<span class="p">$</span> <span data-copy>artifact-pages <span class="v">site publish</span> --site checkout --source docs/artifacts --config github://acme/platform-admin/artifact-pages.yaml</span></pre>
           </div>
-          <p class="note">Before writing, the publisher checks that the repository and directory match the registration on the delivery target. It never writes to another site. Running the same command from CI on merge is the expected workflow.</p>
+          <p class="note"><code>acme/platform-admin</code> is an illustrative admin repository; <a href="configuration.html#remote">Configuration</a> covers the locator. The reference example is <code>tasuku43/artifact-pages-docs</code>, which publishes these guides with only a workflow. Before writing, the publisher checks that the repository and directory match the registration on the delivery target. It never writes to another site. Running the same command from CI on merge is the expected workflow.</p>
         </section>
 
         <section class="chapter" id="step-4" data-step="4" aria-labelledby="step-4-title">

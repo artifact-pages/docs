@@ -30,7 +30,7 @@
         <p class="eyebrow">For admins</p>
         <h1>Configuration</h1>
       </div>
-      <p class="lead">Every <code>artifact-pages</code> command reads one YAML deployment config, usually <code>artifact-pages.yaml</code> in the admin repository. It names the delivery target and, for the registry commands, the complete set of sites.</p>
+      <p class="lead">Every <code>artifact-pages</code> command reads one YAML deployment config, usually <code>artifact-pages.yaml</code> in the admin repository. It names the delivery target and, for the registry commands, the complete set of sites. Satellite repositories, the ones that only publish their own documents, have no config file; they <a href="#remote">point at the admin repository's</a>.</p>
     </header>
 
     <section class="doc-section" aria-labelledby="file">
@@ -67,7 +67,7 @@
       <ol class="timeline">
         <li><div><h3><code>--config LOCATOR</code></h3><p>A local path or a <a href="#remote"><code>github://</code> locator</a>. Repeat it to stack local files as <a href="#layers">layers</a>.</p></div></li>
         <li><div><h3><code>ARTIFACT_PAGES_CONFIG</code></h3><p>An environment variable holding one locator.</p></div></li>
-        <li><div><h3><code>artifact-pages.yaml</code> in the current directory</h3><p>The default, so commands run in the admin repository need no option.</p></div></li>
+        <li><div><h3><code>artifact-pages.yaml</code> in the current directory</h3><p>The default, so commands run in the admin repository need no option. A satellite repository has no such file; it uses the first or second item.</p></div></li>
         <li><div><h3>Your saved default</h3><p>One locator saved in your user config directory with <code>artifact-pages config set-default LOCATOR</code>. Nothing else is saved there, and never credentials.</p></div></li>
       </ol>
       <p>Commands that use a delivery target print it (for example the bucket) in their output, so you can see which target a run used.</p>
@@ -108,16 +108,22 @@
 
     <section class="doc-section" aria-labelledby="remote">
       <h2 id="remote">Remote config</h2>
-      <p>A team's repository can use the admin repository's file without a copy. Point <code>--config</code> at it with a <code>github://</code> locator, pinned to a commit:</p>
+      <p>A satellite repository has no config file of its own. It points <code>--config</code> (or <code>ARTIFACT_PAGES_CONFIG</code>, or the Action's <code>config</code> input) at the admin repository's file with a <code>github://</code> locator. This is the normal form for any repository other than the admin one:</p>
       <div class="term" aria-label="Example remote config locator">
+        <div class="term-head"><span>TERMINAL / acme/checkout</span><button class="copy-btn" type="button">Copy</button></div>
+<pre><span class="p">$</span> <span data-copy>artifact-pages <span class="v">site publish</span> --site checkout --source docs/artifacts --config github://acme/platform-admin/artifact-pages.yaml --dry-run</span></pre>
+      </div>
+      <p>To pin the config to one commit, add <code>?ref=</code> and quote the locator because of the <code>?</code>:</p>
+      <div class="term" aria-label="Example pinned remote config locator">
         <div class="term-head"><span>TERMINAL / acme/checkout</span><button class="copy-btn" type="button">Copy</button></div>
 <pre><span class="p">$</span> <span data-copy>artifact-pages <span class="v">site publish</span> --site checkout --source docs/artifacts --config 'github://acme/platform-admin/artifact-pages.yaml?ref=0123456789abcdef0123456789abcdef01234567' --dry-run</span></pre>
       </div>
       <ul>
-        <li>The form is <code>github://OWNER/REPO/FILE?ref=REF</code>. Without <code>FILE</code>, <code>artifact-pages.yaml</code> is read. Without <code>ref</code>, the default branch is resolved to one commit for the whole command; pin a full commit SHA in CI so a run cannot change target midway.</li>
-        <li>Quote the locator in the shell because of the <code>?</code>. Private repositories are read with <code>GITHUB_TOKEN</code> or <code>GH_TOKEN</code>.</li>
+        <li>The form is <code>github://OWNER/REPO/FILE?ref=REF</code>. Without <code>FILE</code>, <code>artifact-pages.yaml</code> is read. Without <code>ref</code>, the default branch is resolved to one commit for the whole command, so a run cannot change target midway. Add <code>ref</code> with a full commit SHA only when you want the config itself to change by review in your repository.</li>
+        <li>Quote the locator in the shell when it has a <code>?ref=</code>. Private repositories are read with <code>GITHUB_TOKEN</code> or <code>GH_TOKEN</code>.</li>
         <li>The file is fetched again on every run, and the output shows the config commit it used.</li>
         <li>A remote config must be complete; it cannot be combined with other layers.</li>
+        <li>A single repository that is both admin and site may keep a local <code>artifact-pages.yaml</code> instead; that is the exception.</li>
         <li>It only tells the command where to deliver. Whether a repository may publish to a site is still decided by the registry on the delivery target.</li>
       </ul>
       <p class="note"><code>acme/platform-admin</code> is an illustrative admin repository.</p>

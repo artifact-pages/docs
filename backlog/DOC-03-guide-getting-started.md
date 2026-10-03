@@ -86,3 +86,10 @@ Independent review found no high issues. Applied:
 - Step 1 stays short and links to the product's Cloudflare guide until the provider setup page (DOC-14) exists.
 - The roles figure and its two panes were merged into one hub figure numbered like the walkthrough. Each step shows a conceptual state panel.
 - The local nginx example was checked with CLI v0.1.2: `app deploy`, `registry register` and `site publish --fulltext` against `local`, then `docker compose up`. `/`, `/checkout` and `/checkout/payment-flow.md` return the app shell; `/_indexes/sites.json` and the published page return 200; a missing artifact, `/_control` and `/_control/locks/...` return 404.
+
+## Satellite repositories use a remote config (2026-10-03, awaiting owner review)
+
+Owner decision: a satellite (site) repository has no config file. It points at the admin repository's config with `github://OWNER/ADMIN-REPO/artifact-pages.yaml` (optional `?ref=` to pin; without it the default branch is resolved once per invocation). Only a single repository that is both admin and site may keep a local path, presented as the exception. Status stays `In progress`: the revised pages need owner review again.
+
+- Rebased on 2026-10-04 after the Cloudflare rewrite: the roles text names team (satellite) repositories and their "documents plus one workflow" shape; step 5 passes the unpinned `github://` locator and mentions `?ref=` as optional. The local try-out is already the collapsed single-repository exception.
+- Spec: [§22](https://github.com/tasuku43/git-artifact-pages/blob/main/docs/specification.md) (config locator; registry, not config, decides eligibility). Pages changed in ja and en. No new product behavior is stated.
