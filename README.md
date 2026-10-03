@@ -11,7 +11,7 @@ Each site has Japanese (`ja/`) and English (`en/`) pages. This repository is a s
 
 ## Working on the pages
 
-- Shared CSS and JavaScript live in [`shared/assets/`](shared/assets/). Edit them there, then run `npm run assets:sync`; `npm run assets:check` and `npm test` verify the site copies and the sync script.
+- Each site is self-contained. Edit its own `sites/<site>/assets/` files directly; there is no shared source and no build or sync step. Sites may look different from one another.
 - The page queue and its conventions are in [`backlog/`](backlog/README.md).
 
 Product behavior is defined by the [specification](https://github.com/tasuku43/git-artifact-pages/blob/main/docs/specification.md) in the product repository; pages follow it.
