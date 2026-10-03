@@ -1,0 +1,172 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="description" content="Install the artifact-pages CLI, see what the admin repository and team repositories each do, and take one site from a directory in Git to the reader app on your own machine.">
+  <title>Getting started</title>
+  <script>
+    // Copy the reader app's theme (same-origin parent) before first paint; assets/site.js keeps it in sync.
+    (() => {
+      const root = document.documentElement;
+      root.classList.add('js');
+      try {
+        const theme = window.parent !== window && window.parent.document.documentElement.dataset.theme;
+        if (theme === 'light' || theme === 'dark') root.dataset.theme = theme;
+      } catch { /* cross-origin: fall back to prefers-color-scheme */ }
+    })();
+  </script>
+  <link rel="icon" href="data:,">
+  <link rel="stylesheet" href="../assets/site.css">
+  <script src="../assets/site.js" defer></script>
+</head>
+<body>
+  <a class="skip" href="#main">Skip to content</a>
+  <main id="main" class="wrap">
+    <nav class="lang-switch" aria-label="Language"><a href="../ja/getting-started.html" hreflang="ja" lang="ja">日本語</a><span aria-current="page">English</span></nav>
+
+    <header class="page-head">
+      <div>
+        <p class="eyebrow">For admins, first time</p>
+        <h1>Getting started</h1>
+      </div>
+      <p class="lead">Install the <code>artifact-pages</code> command, see what the admin repository and the team repositories each do, then take one site from a directory in Git to the reader app on your own machine. The try-out needs no cloud account.</p>
+    </header>
+
+    <section class="doc-section" aria-labelledby="install">
+      <h2 id="install">Install the CLI</h2>
+      <p>One command, <code>artifact-pages</code>, does all the work: it deploys the reader app, registers sites, and publishes them. It is a Go program built from its released source. There is no standalone binary to download.</p>
+      <h3 id="install-mise">With mise (recommended)</h3>
+      <p><a href="https://mise.jdx.dev/dev-tools/backends/go.html" target="_blank" rel="noopener">mise's Go backend</a> builds the command with <code>go install</code> and keeps the version you choose. <code>-g</code> installs it for your user, in every directory.</p>
+      <div class="term" aria-label="Install the CLI with mise">
+        <div class="term-head"><span>TERMINAL / mise</span><button class="copy-btn" type="button">Copy</button></div>
+<pre><span class="p">$</span> <span data-copy>mise use -g go:github.com/tasuku43/git-artifact-pages/cli/cmd/artifact-pages@x.y.z</span>
+<span class="p">$</span> <span data-copy>artifact-pages version</span></pre>
+      </div>
+      <ul>
+        <li><strong>Write the version without a leading <code>v</code></strong> (<code>x.y.z</code>), as <code>mise ls-remote go:github.com/tasuku43/git-artifact-pages/cli/cmd/artifact-pages</code> lists it. A very recent release may not be listed yet, because mise holds back new releases for a minimum age, but naming its version from GitHub Releases still installs it.</li>
+        <li><strong>It needs Go 1.26 or later.</strong> If you don't have Go yet, add <code>go@1.26</code> to the same <code>mise use</code> command and mise installs both.</li>
+        <li><strong>mise must be active in your shell</strong> (or its shims on your <code>PATH</code>) for <code>artifact-pages</code> to be found.</li>
+      </ul>
+      <h3 id="install-go">With <code>go install</code></h3>
+      <p>The same release without mise. Here the version is the release tag, with its <code>v</code>.</p>
+      <div class="term" aria-label="Install the CLI with go install">
+        <div class="term-head"><span>TERMINAL / go install</span><button class="copy-btn" type="button">Copy</button></div>
+<pre><span class="p">$</span> <span data-copy>go install github.com/tasuku43/git-artifact-pages/cli/cmd/artifact-pages@vX.Y.Z</span></pre>
+      </div>
+      <p class="note">Go puts the command in its <code>bin</code> directory (<code>go env GOBIN</code>, or <code>bin</code> under <code>go env GOPATH</code>); make sure it is on your <code>PATH</code>. <code>x.y.z</code> stands for a release version; releases are listed on <a href="https://github.com/tasuku43/git-artifact-pages/releases" target="_blank" rel="noopener">GitHub Releases</a>. A Homebrew formula is planned but not available yet.</p>
+      <div class="callout" role="note">
+        <span class="ico">ONE VERSION</span>
+        <div>
+          <p><strong>The CLI's version also picks the reader app's version.</strong> <code>artifact-pages version</code> shows both, and <code>app deploy</code> installs the app of the same release. To move the app to another release later, install that release's CLI and run <code>app deploy</code> again.</p>
+        </div>
+      </div>
+    </section>
+
+    <section class="doc-section" aria-labelledby="roles">
+      <h2 id="roles">Two kinds of repository</h2>
+      <p>A deployment has one admin repository and any number of team repositories. The admin decides which sites exist; each team publishes only its own.</p>
+      <div class="split">
+        <div class="pane">
+          <span class="label">ADMIN REPOSITORY · ONE PER DEPLOYMENT</span>
+          <h3>Owns the deployment</h3>
+          <p>Holds <code>artifact-pages.yaml</code>: the delivery target and the complete list of sites. Runs <code>app deploy</code> to install the reader app and <code>registry register</code> to register the sites, ideally only from reviewed changes.</p>
+        </div>
+        <div class="pane">
+          <span class="label">TEAM REPOSITORIES · ANY NUMBER · ONE OR MORE SITES EACH</span>
+          <h3>Publish their own site</h3>
+          <p>Keep documents in one registered directory and run <code>site publish</code> for their site, usually from their own CI after merge. They need only the delivery target, never the site list; they can read the admin repository's file with a <a href="configuration.html#remote"><code>github://</code> locator</a>.</p>
+        </div>
+      </div>
+      <p>Whether a repository may publish to a site is decided by the site registry on the delivery target, not by the team's config. For a try-out, one repository can play both roles, which is what the next section does.</p>
+    </section>
+
+    <section class="doc-section" aria-labelledby="try">
+      <h2 id="try">Try it on your machine</h2>
+      <p>The <code>local</code> provider writes everything to a directory instead of cloud storage, so the whole flow runs without an account. Besides the CLI you need Git, network access to download the reader app from GitHub Releases, and Python 3 (or any static file server) to view the result.</p>
+      <ol class="timeline">
+        <li><div><h3>Prepare a repository</h3><p>Use a Git checkout whose <code>origin</code> remote is on GitHub, with at least one commit and a directory that holds at least one <code>.html</code> or <code>.md</code> page. Publishing reads dates from Git history, so it fails in a repository with no commits; the pages themselves don't need to be committed. The examples use the illustrative <code>acme/checkout</code> and its <code>docs/artifacts</code>; use your own repository's <code>owner/repo</code> and directory instead.</p>
+          <div class="term" aria-label="Create a first page">
+            <div class="term-head"><span>TERMINAL / acme/checkout</span><button class="copy-btn" type="button">Copy</button></div>
+<pre><span class="p">$</span> <span data-copy>mkdir -p docs/artifacts</span>
+<span class="p">$</span> <span data-copy>printf '# Payment flow design\n\nHow a card payment moves through checkout.\n' &gt; docs/artifacts/payment-flow.md</span>
+<span class="c"># Only if the repository has no commits yet</span>
+<span class="p">$</span> <span data-copy>git add -A &amp;&amp; git commit -m "Add a first page"</span></pre>
+          </div></div></li>
+        <li><div><h3>Write <code>artifact-pages.yaml</code></h3><p>At the repository root, name the <code>local</code> target and register one site. <code>repository</code> must match the checkout's <code>origin</code> as <code>owner/repo</code>, and <code>sourcePath</code> is the directory, relative to the root. Add <code>.local/</code> to <code>.gitignore</code>: everything under it is generated.</p>
+          <div class="term" aria-label="artifact-pages.yaml for the try-out">
+            <div class="term-head"><span>artifact-pages.yaml / acme/checkout</span><button class="copy-btn" type="button">Copy</button></div>
+<pre><span class="k">schemaVersion</span>: 1
+<span class="k">provider</span>: local
+<span class="k">local</span>:
+  <span class="k">root</span>: .local/storage
+<span class="k">sites</span>:
+  <span class="k">checkout</span>:
+    <span class="k">name</span>: Payments / Checkout
+    <span class="k">repository</span>: acme/checkout
+    <span class="k">sourcePath</span>: docs/artifacts</pre>
+          </div></div></li>
+        <li><div><h3>Deploy the reader app</h3><p>Downloads the reader app of the CLI's release, verifies it, and writes <code>index.html</code> and <code>assets/</code> into <code>.local/storage</code>. Like the other commands here, it takes <code>--dry-run</code> to show the plan without writing.</p>
+          <div class="term" aria-label="Deploy the reader app locally">
+            <div class="term-head"><span>TERMINAL / acme/checkout</span><button class="copy-btn" type="button">Copy</button></div>
+<pre><span class="p">$</span> <span data-copy>artifact-pages <span class="v">app deploy</span> --config artifact-pages.yaml --dry-run</span>
+<span class="p">$</span> <span data-copy>artifact-pages <span class="v">app deploy</span> --config artifact-pages.yaml</span></pre>
+          </div></div></li>
+        <li><div><h3>Register the site</h3><p>Writes the site registry from the <code>sites</code> mapping. The site now exists, with no pages yet.</p>
+          <div class="term" aria-label="Register the site locally">
+            <div class="term-head"><span>TERMINAL / acme/checkout</span><button class="copy-btn" type="button">Copy</button></div>
+<pre><span class="p">$</span> <span data-copy>artifact-pages <span class="v">registry register</span> --config artifact-pages.yaml --dry-run</span>
+<span class="p">$</span> <span data-copy>artifact-pages <span class="v">registry register</span> --config artifact-pages.yaml</span></pre>
+          </div></div></li>
+        <li><div><h3>Publish</h3><p>Checks the repository and directory against the registration, then copies the pages and builds the site's index. <code>--fulltext</code> adds the data for page text search. Run the same command again and it reports <code>UP TO DATE</code>.</p>
+          <div class="term" aria-label="Publish the site locally">
+            <div class="term-head"><span>TERMINAL / acme/checkout</span><button class="copy-btn" type="button">Copy</button></div>
+<pre><span class="p">$</span> <span data-copy>artifact-pages <span class="v">site publish</span> --site checkout --source docs/artifacts --config artifact-pages.yaml --fulltext --dry-run</span>
+<span class="p">$</span> <span data-copy>artifact-pages <span class="v">site publish</span> --site checkout --source docs/artifacts --config artifact-pages.yaml --fulltext</span></pre>
+          </div></div></li>
+        <li><div><h3>Open the reader</h3><p>Serve the directory and open <code>http://localhost:8000/</code>. <strong>Choose a site</strong> lists Payments / Checkout; open it, pick the page, and try page text search with <kbd>⌘⇧F</kbd> / <kbd>Ctrl ⇧ F</kbd>.</p>
+          <div class="term" aria-label="Serve the local output">
+            <div class="term-head"><span>TERMINAL / acme/checkout</span><button class="copy-btn" type="button">Copy</button></div>
+<pre><span class="p">$</span> <span data-copy>python3 -m http.server 8000 --directory .local/storage</span></pre>
+          </div></div></li>
+      </ol>
+      <div class="callout warn" role="note">
+        <span class="ico">CHECK</span>
+        <div>
+          <p><strong>Start from <code>http://localhost:8000/</code> and move around inside the app.</strong> This simple server only serves files, so reloading an address such as <code>/checkout/payment-flow.md</code> returns 404 here. A delivery target set up for real use sends those addresses to the reader app.</p>
+          <p><strong>Pass <code>--fulltext</code> on every publish.</strong> A publish without it removes the site's search data.</p>
+        </div>
+      </div>
+      <p>To change the site, edit or remove files in the directory and run the same <code>site publish</code>. It uploads what changed and removes what is gone. To start over, delete <code>.local/storage</code>.</p>
+    </section>
+
+    <section class="doc-section" aria-labelledby="real">
+      <h2 id="real">Moving to a real delivery target</h2>
+      <p>The commands stay the same. What changes is where they write and who runs them.</p>
+      <ul>
+        <li><strong>Set up storage and a CDN</strong> in the provider itself: S3 and CloudFront on AWS, or R2 and the Cloudflare cache. Artifact Pages doesn't create them. Then switch <code>provider</code> and its block in the admin repository's file; see <a href="configuration.html#providers">delivery targets</a>.</li>
+        <li><strong>From the admin repository</strong>, run <code>app deploy</code> and <code>registry register</code> with admin credentials taken from the environment, never written in the file (<a href="configuration.html#credentials">credentials</a>).</li>
+        <li><strong>From each team repository</strong>, publish after merge from CI with credentials that can write only that site. <a href="publishing.html#ci">Publishing</a> has a GitHub Actions workflow you can start from.</li>
+        <li><strong>Before anyone publishes</strong>, read <a href="access-and-trust.html">Access and trust</a>: published HTML runs as code, and limiting who can read belongs at the delivery edge.</li>
+      </ul>
+    </section>
+
+    <section class="section" id="next-steps" aria-labelledby="next-title">
+      <div class="section-head">
+        <div><p class="eyebrow">Where to next</p><h2 id="next-title">After the first site</h2></div>
+      </div>
+      <ul class="cards four">
+        <li><a class="card" href="reading.html"><span class="tag">READERS</span><h3>Reading</h3><p>What you just opened: URLs, the screen, search, and switching sites.</p><span class="go">Reading →</span></a></li>
+        <li><a class="card" href="publishing.html"><span class="tag">TEAMS</span><h3>Publishing</h3><p>What goes in the directory, <code>site publish</code>, CI, and previews.</p><span class="go">Publishing →</span></a></li>
+        <li><a class="card" href="configuration.html"><span class="tag">ADMINS</span><h3>Configuration</h3><p>The full <code>artifact-pages.yaml</code>: delivery targets, credentials, and sites.</p><span class="go">Configuration →</span></a></li>
+        <li><a class="card" href="access-and-trust.html"><span class="tag">BEFORE YOU PUBLISH</span><h3>Access and trust</h3><p>Published HTML runs as code, and access control belongs at the delivery edge.</p><span class="go">Access and trust →</span></a></li>
+      </ul>
+    </section>
+
+    <nav class="pager" aria-label="Pages">
+      <a class="prev" href="what-is-git-artifact-pages.html"><small>Previous</small><strong>What is Git Artifact Pages?</strong></a>
+      <a class="next" href="reading.html"><small>Next</small><strong>Reading</strong></a>
+    </nav>
+  </main>
+</body>
+</html>

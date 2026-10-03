@@ -1,0 +1,11 @@
+{
+  "name": "artifact-pages-docs",
+  "private": true,
+  "type": "module",
+  "description": "Public documentation sites for Git Artifact Pages (guide and architecture).",
+  "scripts": {
+    "assets:sync": "node scripts/sync-site-assets.mjs",
+    "assets:check": "node scripts/sync-site-assets.mjs --check",
+    "test": "node --test scripts/sync-site-assets.test.mjs"
+  }
+}
