@@ -1,4 +1,4 @@
-/* Git Artifact Pages — ドキュメントサイト共通スタイル（正本は shared/assets/。各サイトへは npm run assets:sync で写す）
+/* Git Artifact Pages — ドキュメントサイト共通スタイル（このサイトが自分のコピーを持ち、直接編集します）
    色・線・角丸は閲覧アプリ（web/src/styles.css）のトークンに揃えています。
    ライト/ダークは prefers-color-scheme に追従し、<html data-theme="light|dark"> があればそれを優先します
    （閲覧アプリ内では site.js がアプリのテーマを写します）。各トークンは light-dark(ライト, ダーク) です。 */

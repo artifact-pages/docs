@@ -1,8 +1,7 @@
 /* Git Artifact Pages — ドキュメントサイト共通スクリプト
    すべて任意の強化です。JavaScriptが無効でも、全ページと図の全要素を読めます。
    <html lang> で日本語と英語の文言・例を切り替えます。
-   正本は shared/assets/ です。サイトごとに配信範囲（CSP）が分かれるため、各サイトの assets/ へは
-   npm run assets:sync で写し、直接編集しないでください（npm run assets:check で一致を確認できます）。 */
+   このサイトが自分の assets/ にこのファイルを持ち、直接編集します。他のサイトの assets/ とは共有しません。 */
 (() => {
   'use strict';
 

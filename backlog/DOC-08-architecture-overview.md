@@ -12,7 +12,7 @@ Explain the system shape: the stable application plane (`/index.html`, `/assets/
 
 ## Scope
 
-- Create `sites/architecture/{ja,en,assets}` using the shared assets from DOC-01.
+- Create `sites/architecture/{ja,en,assets}` with its own `assets/` (`site.css` and `site.js`), edited directly.
 - Register `architecture` with the name and description from the track README; publish.
 - The two planes, logical routes vs storage paths, and why there is no request-time server.
 - Links from the guide overview to this page.

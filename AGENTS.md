@@ -12,8 +12,6 @@ sites/
     ja/  en/  assets/
   architecture/   registered source directory (sourcePath: sites/architecture)
     ja/  en/  assets/
-shared/assets/    source of the shared site.css and site.js
-scripts/          asset sync and its test
 backlog/          one ticket per page (DOC-xx) and the queue README
 ~~~
 
@@ -26,11 +24,11 @@ Keep agent instruction files and anything that is not a published page outside `
 - Site IDs `guide` and `architecture` are referenced by cross-site links (`/guide/<lang>/…`, `/architecture/<lang>/…` with `target="_top"`); do not rename them.
 - Internal design notes, UI concepts and backlog records are not public sites.
 
-## Shared assets
+## Site assets
 
-- Edit only `shared/assets/`, then run `npm run assets:sync`. `npm run assets:check` fails when a site copy is missing or differs; `npm test` covers the sync script.
-- Each site keeps a committed copy in its own `assets/` and never loads another site's assets. Per-site CSP blocks cross-site asset paths only over plain HTTP (for example local nginx); over HTTPS its `https:` source matches every same-origin path, so CSP alone does not enforce this. The copies keep each site self-contained under both policies.
-- Pages reference the copy relative to their language directory, for example `../assets/site.css`.
+- Each site is self-contained: its own `sites/<site>/assets/` files (`site.css`, `site.js`) are edited directly. There is no shared source, no build or sync step, and no package manifest. Sites may look different from one another.
+- A site never loads another site's assets. Per-site CSP blocks cross-site asset paths only over plain HTTP (for example local nginx); over HTTPS its `https:` source matches every same-origin path, so CSP alone does not enforce this. Keeping each site self-contained works under both policies.
+- Pages reference their site's assets relative to their language directory, for example `../assets/site.css`.
 
 ## Translated pages
 

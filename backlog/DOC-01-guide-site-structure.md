@@ -6,14 +6,14 @@
 
 ## Purpose
 
-Replace the current top-level `en` and `ja` sites with one `guide` site that holds both languages, following [`AGENTS.md`](../AGENTS.md), and give the documentation sites a single source for shared CSS and JavaScript.
+Replace the current top-level `en` and `ja` sites with one `guide` site that holds both languages, following [`AGENTS.md`](../AGENTS.md), and give each documentation site its own `assets/` for CSS and JavaScript.
 
 ## Scope
 
 - Move `sites/{ja,en}/` to `sites/guide/{ja,en}/` with `git mv`, and use one `sites/guide/assets/`. Pages reference it as `../assets/…`; language-switch links stay relative.
-- Keep the shared `site.css` and `site.js` in one source location outside any registered site directory, with a script that copies them into each site's `assets/` and a check that fails when a copy differs.
+- Each site keeps its own `site.css` and `site.js` in its `assets/`, edited directly; there is no shared source, copy script, or consistency check, and sites may look different.
 - In `artifact-pages.yaml`, replace the `en` and `ja` registrations with `guide` (name and description from the [track README](README.md)); run `registry register` and `site publish --site guide` locally.
-- Update `AGENTS.md`: record the site lineup, mark the migration done, and describe the shared-asset source and copy step.
+- Update `AGENTS.md`: record the site lineup, mark the migration done, and describe the per-site assets rule.
 - Update the Storybook docs-site stories to the new paths.
 
 ## Out of scope
@@ -24,7 +24,7 @@ Replace the current top-level `en` and `ja` sites with one `guide` site that hol
 ## Acceptance criteria
 
 - [x] `sites/guide/{ja,en,assets}` exists; the top-level `ja` and `en` directories are gone.
-- [x] Shared assets have one source; the copy script and the consistency check both run, and the check fails on a modified copy.
+- [x] `sites/guide/assets/` holds the site's own `site.css` and `site.js`, and the pages reference them as `../assets/…`.
 - [x] Locally, `/guide/ja/what-is-git-artifact-pages.html` and `/guide/en/what-is-git-artifact-pages.html` open in the reader, their language switches work in both directions, and `/ja/…` and `/en/…` are no longer registered.
 - [x] Storybook docs-site stories load from the new paths.
 - [x] The owner reviewed and approved the change.
