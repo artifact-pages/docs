@@ -66,6 +66,14 @@
     <section class="doc-section" aria-labelledby="roles">
       <h2 id="roles">Two kinds of repository</h2>
       <p>A deployment has one admin repository and any number of team repositories. The admin decides which sites exist; each team publishes only its own.</p>
+      <ol class="flow long" style="--steps: 6" aria-label="From the admin repository to a team's publish and reading (in order)">
+        <li><strong>Admin repository</strong><p>Write the delivery target and the list of sites in <code>artifact-pages.yaml</code>.</p></li>
+        <li><strong><code>app deploy</code></strong><p>Places the reader app on the delivery target.</p></li>
+        <li><strong><code>registry register</code></strong><p>Writes the site registrations to the delivery target.</p></li>
+        <li><strong>Team repository</strong><p>Runs <code>site publish</code> from its own CI after a merge. <code>acme/checkout</code> is an illustrative example.</p></li>
+        <li><strong>Delivery target checks the registration</strong><p>It reads the registration stored on the delivery target, not the team's config. If they do not match, nothing is written.</p></li>
+        <li><strong>Read in the reader app</strong><p>The published site is read in the reader app that was placed.</p></li>
+      </ol>
       <div class="split">
         <div class="pane">
           <span class="label">ADMIN REPOSITORY · ONE PER DEPLOYMENT</span>

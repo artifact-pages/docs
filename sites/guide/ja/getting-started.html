@@ -66,6 +66,14 @@
     <section class="doc-section" aria-labelledby="roles">
       <h2 id="roles">2種類のリポジトリ</h2>
       <p>ひとつの環境には、管理リポジトリがひとつと、チームのリポジトリがいくつでもあります。どのサイトを置くかは管理者が決め、各チームは自分のサイトだけを公開します。</p>
+      <ol class="flow long" style="--steps: 6" aria-label="管理リポジトリからチームの公開、閲覧までの流れ（順番）">
+        <li><strong>管理リポジトリ</strong><p><code>artifact-pages.yaml</code>に配信先とサイトの一覧を書きます。</p></li>
+        <li><strong><code>app deploy</code></strong><p>閲覧アプリを配信先に置きます。</p></li>
+        <li><strong><code>registry register</code></strong><p>サイトの登録情報を配信先に書きます。</p></li>
+        <li><strong>チームのリポジトリ</strong><p>マージ後に自分のCIから<code>site publish</code>を実行します。例は説明用の<code>acme/checkout</code>です。</p></li>
+        <li><strong>配信先が登録を確認</strong><p>チームの設定ではなく、配信先にある登録情報を読みます。一致しなければ書き込みません。</p></li>
+        <li><strong>閲覧アプリで読む</strong><p>公開されたサイトを、置かれた閲覧アプリで読みます。</p></li>
+      </ol>
       <div class="split">
         <div class="pane">
           <span class="label">管理リポジトリ · 環境ごとにひとつ</span>

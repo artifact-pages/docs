@@ -519,6 +519,12 @@ td:first-child { white-space: nowrap; font-weight: 600; }
 .flow li::before { display: block; margin-bottom: 4px; color: var(--accent); font: 600 11px/1.5 var(--mono); letter-spacing: .04em; content: counter(flow, decimal-leading-zero); }
 .flow strong { display: block; color: var(--ink); font-size: 14px; font-weight: 650; }
 .flow p { margin: 4px 0 0; color: var(--muted); font-size: 13px; line-height: 1.75; }
+/* 6 steps need more room: stack vertically below 1040px */
+@media (max-width: 1040px) {
+  .flow.long { grid-template-columns: minmax(0, 1fr); }
+  .flow.long li + li { border-left: 0; border-top: 1px solid var(--line-soft); }
+  .flow.long li + li::after { left: 26px; top: -6px; transform: rotate(135deg); }
+}
 @media (max-width: 760px) {
   .flow { grid-template-columns: minmax(0, 1fr); }
   .flow li + li { border-left: 0; border-top: 1px solid var(--line-soft); }
