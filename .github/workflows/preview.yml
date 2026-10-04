@@ -1,10 +1,10 @@
 # Publish pre-merge previews of the pages a pull request adds or changes, for
 # both sites, to https://artifact-pages.dev. A preview runs only for pull
-# requests that carry the "preview" label and change a file under sites/, and
-# only for pull requests from this repository: a fork never reaches the
-# credentials. The existing
-# dry-run in publish.yml stays; it validates the real publish, while this
-# workflow lets the owner read the changed pages before merging.
+# requests that carry the "preview-artifact" label and change a file under
+# sites/, and only for pull requests from this repository: a fork never reaches
+# the credentials. The existing dry-run in publish.yml stays; it validates the
+# real publish, while this workflow lets the owner read the changed pages
+# before merging.
 #
 # Preview pages are written to the production bucket under each site's
 # _previews/ prefix and run like published HTML. Retention of old previews is a
@@ -22,18 +22,18 @@ permissions:
 
 concurrency:
   # Other labels get their own group so they cannot cancel a running preview.
-  group: preview-${{ github.event.pull_request.number }}${{ github.event.action == 'labeled' && github.event.label.name != 'preview' && format('-{0}', github.run_id) || '' }}
+  group: preview-${{ github.event.pull_request.number }}${{ github.event.action == 'labeled' && github.event.label.name != 'preview-artifact' && format('-{0}', github.run_id) || '' }}
   cancel-in-progress: true
 
 jobs:
   preview:
-    # Same-repository pull requests that carry the "preview" label. Labeling
+    # Same-repository pull requests that carry the "preview-artifact" label. Labeling
     # triggers a run only for that label. preview-publish verifies the pull
     # request again (forks, pull_request_target) before any credential is used.
     if: >-
       github.event.pull_request.head.repo.full_name == github.repository &&
-      contains(github.event.pull_request.labels.*.name, 'preview') &&
-      (github.event.action != 'labeled' || github.event.label.name == 'preview')
+      contains(github.event.pull_request.labels.*.name, 'preview-artifact') &&
+      (github.event.action != 'labeled' || github.event.label.name == 'preview-artifact')
     runs-on: ubuntu-24.04
     # R2 credentials are secrets of the "preview" environment only.
     environment: preview
