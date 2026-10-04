@@ -32,131 +32,39 @@ jobs:
     # request again (forks, pull_request_target) before any credential is used.
     if: >-
       github.event.pull_request.head.repo.full_name == github.repository &&
-      (github.event.action == 'labeled'
-        && github.event.label.name == 'preview'
-        || github.event.action != 'labeled'
-        && contains(github.event.pull_request.labels.*.name, 'preview'))
+      contains(github.event.pull_request.labels.*.name, 'preview') &&
+      (github.event.action != 'labeled' || github.event.label.name == 'preview')
     runs-on: ubuntu-24.04
     # R2 credentials are secrets of the "preview" environment only.
     environment: preview
     permissions:
       contents: read
-      pull-requests: read
+      pull-requests: write # read for PR verification, write for the preview comment
     strategy:
       fail-fast: false
       matrix:
         site: [guide, architecture]
     steps:
-      # Check out the base branch, not the pull request head: the action reads
-      # the head through its head input. Same-repository head commits arrive
-      # with the full fetch of all branches.
+      # Check out the base branch with full history. The action takes the
+      # pull request head SHA and origin/<base> from the event and fails with
+      # a clear error if either is missing.
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
           ref: ${{ github.event.pull_request.base.ref }}
           fetch-depth: 0
           persist-credentials: false
-      - name: Check the head commit is present
-        env:
-          HEAD_SHA: ${{ github.event.pull_request.head.sha }}
-        run: git cat-file -e "$HEAD_SHA^{commit}"
+      # Writes one comment per site and updates it on later pushes.
       - name: Preview ${{ matrix.site }}
-        id: preview
-        uses: tasuku43/git-artifact-pages/actions/preview-publish@5eab98a826b2234916aea5781d72b58365942fa0 # v0.1.2
+        uses: tasuku43/git-artifact-pages/actions/preview-publish@f0641159f192247e63dd37f1b0ac94cc606f4730 # main, tasuku43/git-artifact-pages#7
         with:
           site: ${{ matrix.site }}
           source: sites/${{ matrix.site }}
-          head: ${{ github.event.pull_request.head.sha }}
-          default-ref: origin/${{ github.event.pull_request.base.ref }}
           pull-request: ${{ github.event.pull_request.number }}
           base-url: https://artifact-pages.dev
           # The deployed registry decides eligibility; this config locates it.
           config: github://tasuku43/artifact-pages-admin/artifact-pages.yaml
+          comment: true
         env:
           CF_R2_ACCESS_KEY_ID: ${{ secrets.CF_R2_ACCESS_KEY_ID }}
           CF_R2_SECRET_ACCESS_KEY: ${{ secrets.CF_R2_SECRET_ACCESS_KEY }}
           CF_API_TOKEN: ${{ secrets.CF_API_TOKEN }}
-      - name: Record result
-        if: always()
-        env:
-          SITE: ${{ matrix.site }}
-          OUTCOME: ${{ steps.preview.outputs.outcome }}
-          GROUP_LIST_URL: ${{ steps.preview.outputs['group-list-url'] }}
-          DOCUMENTS: ${{ steps.preview.outputs.documents }}
-          ERROR: ${{ steps.preview.outputs.error }}
-        run: |
-          mkdir -p result
-          jq -n \
-            --arg site "$SITE" \
-            --arg outcome "${OUTCOME:-failed}" \
-            --arg groupListUrl "$GROUP_LIST_URL" \
-            --arg error "$ERROR" \
-            --argjson documents "${DOCUMENTS:-[]}" \
-            '{site: $site, outcome: $outcome, groupListUrl: $groupListUrl, error: $error, documents: $documents}' \
-            > "result/$SITE.json"
-          echo "### $SITE preview: ${OUTCOME:-failed} ($(jq length <<<"${DOCUMENTS:-[]}") pages)" >> "$GITHUB_STEP_SUMMARY"
-      - name: Upload result
-        if: always()
-        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
-        with:
-          name: preview-result-${{ matrix.site }}
-          path: result/${{ matrix.site }}.json
-          if-no-files-found: error
-          retention-days: 1
-
-  # Holds no R2 credentials. It only turns the saved results into one comment
-  # that is updated in place on every push.
-  comment:
-    needs: preview
-    if: always() && needs.preview.result != 'skipped'
-    runs-on: ubuntu-24.04
-    permissions:
-      pull-requests: write
-    steps:
-      - uses: actions/download-artifact@3e5f45b2cfb9172054b4087a40e8e0b5a5461e7c # v8.0.1
-        with:
-          pattern: preview-result-*
-          path: results
-          merge-multiple: true
-      - name: Create or update the preview comment
-        env:
-          GH_TOKEN: ${{ github.token }}
-          REPO: ${{ github.repository }}
-          PR: ${{ github.event.pull_request.number }}
-          SHA: ${{ github.event.pull_request.head.sha }}
-        run: |
-          marker='<!-- artifact-pages-preview -->'
-          {
-            echo "$marker"
-            echo "## Preview"
-            echo
-            echo "Changed pages at \`${SHA:0:7}\`. A preview is removed by the bucket's retention rule, not on merge."
-            for site in guide architecture; do
-              f="results/$site.json"
-              echo
-              echo "### $site"
-              if [ ! -f "$f" ]; then
-                echo "No result was recorded. See the workflow run."
-                continue
-              fi
-              case "$(jq -r .outcome "$f")" in
-                published)
-                  echo "[All previews of this change]($(jq -r .groupListUrl "$f"))"
-                  echo
-                  jq -r '.documents[] | "- [\(.title | gsub("[\\[\\]\\r\\n]"; " "))](\(.url)) `\(.path)`"' "$f"
-                  ;;
-                no-preview)
-                  echo "No page was added or changed."
-                  ;;
-                *)
-                  echo "Preview $(jq -r .outcome "$f"). See the workflow run."
-                  ;;
-              esac
-            done
-          } > body.md
-          id=$(gh api --paginate "repos/$REPO/issues/$PR/comments" \
-            --jq "[.[] | select(.user.login == \"github-actions[bot]\" and (.body | startswith(\"$marker\")))][0].id // empty" | head -n1)
-          if [ -n "$id" ]; then
-            gh api -X PATCH "repos/$REPO/issues/comments/$id" -F body=@body.md > /dev/null
-          else
-            gh api -X POST "repos/$REPO/issues/$PR/comments" -F body=@body.md > /dev/null
-          fi
