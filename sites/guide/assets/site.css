@@ -39,7 +39,11 @@
   --m-scrim: light-dark(rgba(24, 28, 32, .3), rgba(0, 0, 0, .52));
   --nav-h: 0px;
   --radius: 12px;
-  --measure: 720px; /* one reading column: prose, callouts, terminals, lists, page-head lead */
+  --measure: 880px; /* one column for prose and figures alike on doc pages */
+  --blue: light-dark(#2d5f93, #9cc4ea);
+  --blue-wash: light-dark(rgba(45, 95, 147, .07), rgba(156, 196, 234, .07));
+  --blue-line: light-dark(rgba(45, 95, 147, .28), rgba(156, 196, 234, .26));
+  --accent-line: light-dark(rgba(40, 107, 77, .3), rgba(169, 216, 193, .28));
   --mono: ui-monospace, SFMono-Regular, Menlo, Consolas, "Liberation Mono", monospace;
   --sans: -apple-system, BlinkMacSystemFont, "Segoe UI", "Hiragino Kaku Gothic ProN", "Hiragino Sans", "Yu Gothic UI", "Yu Gothic", Meiryo, "Noto Sans JP", sans-serif;
 }
@@ -377,6 +381,7 @@ button.am-filter:hover { background: var(--active); color: var(--ink); }
 
 /* ── 解説ページ（読者の体験など） ── */
 .doc-section { padding-block: clamp(36px, 5vw, 56px); border-top: 1px solid var(--line-soft); }
+.doc-section > * { max-width: var(--measure); }
 .doc-section > h2 { margin-bottom: 10px; }
 .doc-section > p, .doc-section > ul { max-width: var(--measure); color: var(--muted); }
 .doc-section > p strong, .doc-section li strong { color: var(--ink); }
@@ -519,12 +524,6 @@ td:first-child { white-space: nowrap; font-weight: 600; }
 .flow li::before { display: block; margin-bottom: 4px; color: var(--accent); font: 600 11px/1.5 var(--mono); letter-spacing: .04em; content: counter(flow, decimal-leading-zero); }
 .flow strong { display: block; color: var(--ink); font-size: 14px; font-weight: 650; }
 .flow p { margin: 4px 0 0; color: var(--muted); font-size: 13px; line-height: 1.75; }
-/* 6 steps need more room: stack vertically below 1040px */
-@media (max-width: 1040px) {
-  .flow.long { grid-template-columns: minmax(0, 1fr); }
-  .flow.long li + li { border-left: 0; border-top: 1px solid var(--line-soft); }
-  .flow.long li + li::after { left: 26px; top: -6px; transform: rotate(135deg); }
-}
 @media (max-width: 760px) {
   .flow { grid-template-columns: minmax(0, 1fr); }
   .flow li + li { border-left: 0; border-top: 1px solid var(--line-soft); }
@@ -715,15 +714,50 @@ td:first-child { white-space: nowrap; font-weight: 600; }
 .arch .page-head .answer { max-width: var(--measure); }
 .ad-pre, .ad-pre text { white-space: pre; }
 
-/* ── 手順ごとの状態パネル（.state）：その手順までにできたものを積み上げて見せる。新しい行は + と強調、前の行は控えめ。静的で動かない ── */
-.timeline .state { margin: 14px 0 0; border: 1px solid var(--line-soft); border-radius: 10px; background: var(--paper); overflow: hidden; }
-.timeline .state figcaption { padding: 6px 12px; border-bottom: 1px solid var(--line-soft); color: var(--quiet); font: 600 10.5px/1.6 var(--mono); letter-spacing: .04em; }
-.timeline .state ul { margin: 0; padding: 6px 0; list-style: none; }
-.timeline .state li { display: grid; grid-template-columns: 22px minmax(0, 1fr); align-items: baseline; padding: 1px 12px 1px calc(12px + var(--d, 0) * 16px); border-left: 3px solid transparent; color: var(--quiet); font-size: 12px; line-height: 1.7; }
-.timeline .state li i { color: var(--accent); font: 700 12px/1.7 var(--mono); font-style: normal; text-align: center; }
-.timeline .state li code { min-width: 0; padding: 0; border: 0; background: none; color: inherit; font-size: inherit; overflow-wrap: anywhere; }
-.timeline .state li.new { border-left-color: var(--accent); background: var(--accent-wash); color: var(--ink); }
-.timeline .state li.new code { font-weight: 600; }
-@media (max-width: 520px) { .timeline .state li { padding-left: calc(8px + var(--d, 0) * 10px); } }
-.timeline .state li::before, .timeline .state li::after { content: none; display: none; }
-.timeline .state li { counter-increment: none; gap: 0; }
+/* ── 役割の色：管理リポジトリは金、チームのリポジトリは緑、配信先は青、読む側は無彩色。.hub と .concept で共通 ── */
+.r-admin { --c: var(--gold); --w: var(--gold-wash); --l: var(--gold-line); }
+.r-team { --c: var(--accent); --w: var(--accent-wash); --l: var(--accent-line); }
+.r-store { --c: var(--blue); --w: var(--blue-wash); --l: var(--blue-line); }
+.r-read { --c: var(--muted); --w: var(--hover); --l: var(--line-strong); }
+.pane.r-admin, .pane.r-team { border-color: var(--l); }
+.pane.r-admin .label, .pane.r-team .label { color: var(--c); }
+.sn { display: inline-grid; flex: none; place-items: center; width: 20px; height: 20px; border: 1px solid var(--l, var(--line-strong)); border-radius: 50%; color: var(--c, var(--muted)); font: 600 10.5px/1 var(--mono); }
+
+/* ── 2種類のリポジトリ（.hub）：配信先を真ん中に、左右のリポジトリが書き込む。狭い画面では縦に積む ── */
+.hub { display: grid; grid-template-columns: minmax(0, 1fr) 44px minmax(0, 1.15fr) 44px minmax(0, 1fr); align-items: start; margin: 18px 0 0; }
+.hub-box { min-width: 0; overflow: hidden; border: 1px solid var(--l); border-radius: var(--radius); background: var(--paper); }
+.hub-h { display: flex; flex-wrap: wrap; justify-content: space-between; align-items: baseline; gap: 2px 8px; padding: 9px 14px; border-bottom: 1px solid var(--l); background: var(--w); color: var(--c); font-size: 13px; font-weight: 650; }
+.hub-h small { color: var(--quiet); font: 500 10.5px/1.5 var(--mono); }
+.hub ul { display: grid; gap: 8px; margin: 0; padding: 12px 14px 14px; list-style: none; }
+.hub-steps li { display: flex; gap: 8px; color: var(--muted); font-size: 12.5px; line-height: 1.7; }
+.hub-slots li { display: flex; align-items: center; gap: 8px; padding: 6px 10px; border: 1px dashed var(--l); border-radius: 8px; color: var(--ink); font-size: 12.5px; line-height: 1.5; }
+.hub-slots li em { margin-left: auto; color: var(--quiet); font: 10.5px var(--mono); font-style: normal; white-space: nowrap; }
+.hub-note { display: flex; gap: 8px; margin: 0; padding: 10px 14px 12px; border-top: 1px solid var(--line-soft); color: var(--muted); font-size: 12px; line-height: 1.7; }
+.hub-arrow { display: flex; flex-direction: column; align-items: center; gap: 2px; padding-top: 52px; color: var(--quiet); font: 600 10px/1.4 var(--mono); }
+.hub-arrow b { font-size: 18px; line-height: 1; }
+@media (max-width: 760px) {
+  .hub { grid-template-columns: minmax(0, 1fr); }
+  .hub-arrow { flex-direction: row; justify-content: center; gap: 6px; padding: 6px 0; }
+  .hub-arrow b { transform: rotate(90deg); }
+}
+
+/* ── 手順ごとの状態（.concept）：.hub と同じ色の箱に、できたもの（実線）、この手順でできたもの（強調）、まだのもの（破線）を並べる。静的で動かない ── */
+.timeline .concept { margin: 14px 0 0; overflow: hidden; border: 1px solid var(--line-soft); border-radius: 10px; background: var(--paper-2); }
+.timeline .concept figcaption { padding: 6px 12px; border-bottom: 1px solid var(--line-soft); color: var(--quiet); font: 600 10.5px/1.6 var(--mono); letter-spacing: .04em; }
+.concept-row { display: grid; grid-template-columns: minmax(0, 1fr) 22px minmax(0, 1.2fr) 22px minmax(0, .9fr); align-items: start; padding: 12px; }
+.concept .cbox { min-width: 0; overflow: hidden; border: 1px solid var(--l); border-radius: 8px; background: var(--paper); }
+.concept .cbox-h { display: flex; flex-wrap: wrap; justify-content: space-between; align-items: baseline; gap: 0 6px; padding: 5px 10px; border-bottom: 1px solid var(--l); background: var(--w); color: var(--c); font-size: 12px; font-weight: 650; line-height: 1.6; }
+.concept .cbox-h small { color: var(--quiet); font: 500 10px/1.6 var(--mono); }
+.timeline .concept ul { display: grid; gap: 5px; margin: 0; padding: 8px; list-style: none; }
+.timeline .concept li { display: flex; align-items: baseline; gap: 6px; padding: 3px 8px; border: 1px solid var(--l); border-radius: 6px; color: var(--muted); font-size: 12px; line-height: 1.6; }
+.timeline .concept li::before, .timeline .concept li::after { content: none; display: none; }
+.timeline .concept li { counter-increment: none; }
+.timeline .concept li em { margin-left: auto; color: var(--quiet); font: 10px/1.6 var(--mono); font-style: normal; white-space: nowrap; }
+.timeline .concept li.now { background: var(--w); box-shadow: inset 3px 0 0 var(--c); color: var(--ink); font-weight: 650; }
+.timeline .concept li.now em { color: var(--c); }
+.timeline .concept li.todo { border-style: dashed; border-color: var(--line-strong); color: var(--quiet); opacity: .75; }
+.concept-row > .to { padding-top: 6px; color: var(--quiet); font: 600 13px/1.6 var(--mono); text-align: center; }
+@media (max-width: 620px) {
+  .concept-row { grid-template-columns: minmax(0, 1fr); }
+  .concept-row > .to { padding: 2px 0; transform: rotate(90deg); }
+}
