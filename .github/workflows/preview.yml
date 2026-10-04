@@ -53,9 +53,11 @@ jobs:
           ref: ${{ github.event.pull_request.base.ref }}
           fetch-depth: 0
           persist-credentials: false
-      # Writes one comment per site and updates it on later pushes.
+      # Previews changed pages and pages whose local CSS, JS or images changed;
+      # a site with nothing to preview ends as no-preview, not an error. Writes
+      # one comment per site and updates it on later pushes.
       - name: Preview ${{ matrix.site }}
-        uses: tasuku43/git-artifact-pages/actions/preview-publish@f0641159f192247e63dd37f1b0ac94cc606f4730 # main, tasuku43/git-artifact-pages#7
+        uses: tasuku43/git-artifact-pages/actions/preview-publish@9eb228263efd17b3e9ebe39de365c0095a50a9da # main, tasuku43/git-artifact-pages#8
         with:
           site: ${{ matrix.site }}
           source: sites/${{ matrix.site }}
@@ -67,4 +69,3 @@ jobs:
         env:
           CF_R2_ACCESS_KEY_ID: ${{ secrets.CF_R2_ACCESS_KEY_ID }}
           CF_R2_SECRET_ACCESS_KEY: ${{ secrets.CF_R2_SECRET_ACCESS_KEY }}
-          CF_API_TOKEN: ${{ secrets.CF_API_TOKEN }}
