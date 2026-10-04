@@ -780,3 +780,19 @@ td:first-child { white-space: nowrap; font-weight: 600; }
 .more-body { padding: 4px 18px 18px; }
 .more-body > p { margin: 14px 0 0; color: var(--muted); font-size: 14px; }
 .more-body > .term { margin-top: 12px; }
+
+/* 手順6：配信先から、ブラウザで開いた閲覧アプリへ。閲覧アプリの見た目を縮めた静的な見本（読み上げは sr-only の一文） */
+.concept-row.rv { grid-template-columns: minmax(0, .8fr) 22px minmax(0, 1.6fr); }
+.rv-browser { min-width: 0; overflow: hidden; border: 1px solid var(--line-strong); border-radius: 8px; background: var(--m-surface); }
+.rv-bar { display: flex; align-items: center; gap: 5px; padding: 6px 10px; border-bottom: 1px solid var(--line-soft); background: var(--m-shell); }
+.rv-bar i { width: 7px; height: 7px; border-radius: 50%; background: var(--line-strong); flex: none; }
+.rv-bar code { min-width: 0; margin-left: 6px; padding: 1px 8px; overflow: hidden; border: 0; border-radius: 5px; background: var(--m-surface); color: var(--muted); font-size: 10.5px; text-overflow: ellipsis; white-space: nowrap; }
+.rv-body { display: grid; grid-template-columns: minmax(0, .9fr) minmax(0, 1.6fr); min-height: 96px; }
+.rv-side { display: flex; flex-direction: column; gap: 4px; padding: 10px; border-right: 1px solid var(--line-soft); font-size: 11px; line-height: 1.5; }
+.rv-side b { color: var(--ink); font-weight: 650; }
+.rv-side span { padding: 2px 6px; border-radius: 5px; color: var(--muted); }
+.rv-side span.on { background: var(--active); color: var(--ink); }
+.rv-doc { padding: 10px 12px; font-size: 11px; line-height: 1.6; }
+.rv-doc b { display: block; margin-bottom: 4px; color: var(--ink); font-size: 12.5px; }
+.timeline .concept .rv-doc p { margin: 0; color: var(--muted); font-size: 11px; line-height: 1.6; }
+@media (max-width: 620px) { .concept-row.rv { grid-template-columns: minmax(0, 1fr); } }
