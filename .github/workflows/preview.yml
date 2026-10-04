@@ -1,0 +1,70 @@
+# Publish pre-merge previews of the pages a pull request adds or changes, for
+# both sites, to https://artifact-pages.dev. A preview runs only for pull
+# requests that carry the "preview-artifact" label and change a file under
+# sites/, and only for pull requests from this repository: a fork never reaches
+# the credentials. The existing dry-run in publish.yml stays; it validates the
+# real publish, while this workflow lets the owner read the changed pages
+# before merging.
+#
+# Preview pages are written to the production bucket under each site's
+# _previews/ prefix and run like published HTML. Retention of old previews is a
+# rule on the R2 side (tasuku43/artifact-pages-admin), not set here.
+name: Preview
+
+on:
+  pull_request:
+    types: [labeled, synchronize, reopened]
+    # Also applies to "labeled": a PR that changes no sites/** file never runs.
+    paths: ['sites/**']
+
+permissions:
+  contents: read
+
+concurrency:
+  # Other labels get their own group so they cannot cancel a running preview.
+  group: preview-${{ github.event.pull_request.number }}${{ github.event.action == 'labeled' && github.event.label.name != 'preview-artifact' && format('-{0}', github.run_id) || '' }}
+  cancel-in-progress: true
+
+jobs:
+  preview:
+    # Same-repository pull requests that carry the "preview-artifact" label. Labeling
+    # triggers a run only for that label. preview-publish verifies the pull
+    # request again (forks, pull_request_target) before any credential is used.
+    if: >-
+      github.event.pull_request.head.repo.full_name == github.repository &&
+      contains(github.event.pull_request.labels.*.name, 'preview-artifact') &&
+      (github.event.action != 'labeled' || github.event.label.name == 'preview-artifact')
+    runs-on: ubuntu-24.04
+    # R2 credentials are secrets of the "preview" environment only.
+    environment: preview
+    permissions:
+      contents: read
+      pull-requests: write # read for PR verification, write for the preview comment
+    strategy:
+      fail-fast: false
+      matrix:
+        site: [guide, architecture]
+    steps:
+      # Check out the base branch with full history. The action takes the
+      # pull request head SHA and origin/<base> from the event and fails with
+      # a clear error if either is missing.
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          ref: ${{ github.event.pull_request.base.ref }}
+          fetch-depth: 0
+          persist-credentials: false
+      # Writes one comment per site and updates it on later pushes.
+      - name: Preview ${{ matrix.site }}
+        uses: tasuku43/git-artifact-pages/actions/preview-publish@f0641159f192247e63dd37f1b0ac94cc606f4730 # main, tasuku43/git-artifact-pages#7
+        with:
+          site: ${{ matrix.site }}
+          source: sites/${{ matrix.site }}
+          pull-request: ${{ github.event.pull_request.number }}
+          base-url: https://artifact-pages.dev
+          # The deployed registry decides eligibility; this config locates it.
+          config: github://tasuku43/artifact-pages-admin/artifact-pages.yaml
+          comment: true
+        env:
+          CF_R2_ACCESS_KEY_ID: ${{ secrets.CF_R2_ACCESS_KEY_ID }}
+          CF_R2_SECRET_ACCESS_KEY: ${{ secrets.CF_R2_SECRET_ACCESS_KEY }}
+          CF_API_TOKEN: ${{ secrets.CF_API_TOKEN }}

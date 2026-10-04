@@ -1,11 +1,15 @@
 # Publish the guide and architecture sites to https://artifact-pages.dev.
-# Pull requests run a dry-run publish; merges to main publish both sites. A
-# publish that changes nothing is a no-op. Page text
-# search needs fulltext: true on every publish, or its data is withdrawn.
+# Pull requests that change a site or this workflow run a dry-run publish;
+# merges to main publish both sites. A publish that changes nothing is a no-op.
+# Page text search needs fulltext: true on every publish, or its data is
+# withdrawn.
 name: Publish
 
 on:
   pull_request:
+    paths:
+      - 'sites/**'
+      - '.github/workflows/publish.yml'
   push:
     branches: [main]
   workflow_dispatch:
