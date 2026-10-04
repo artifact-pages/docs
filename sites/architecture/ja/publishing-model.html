@@ -136,7 +136,7 @@
           <li>配信先がローカルのストレージのときだけ、登録からソースのパスを求め、ストレージのディレクトリとソースが重ならないことをロックの前に確かめます。この時点の登録の読み取りは事前の確認で、正式な確認は3で行います。</li>
           <li>サイトのロック<code>_control/locks/sites/&lt;site&gt;.json</code>を条件付き書き込みで取ります。ドライランでは取りません。</li>
           <li><code>/_indexes/sites.json</code>をCDN経由ではなくオリジンから直接読み、サイトが登録されていること、チェックアウトのリポジトリとソースパスが登録と一致することを確かめます。</li>
-          <li>ソースのファイルを集め（通常のファイルだけ）、登録の名前と説明を使ってインデックス、メタデータ、（<code>--fulltext</code>のときは）検索データを一時ディレクトリに作ります。</li>
+          <li>ソースのファイルを集め（通常のファイルだけ）、登録の名前と説明を使ってインデックス、メタデータ、本文検索のデータを一時ディレクトリに作ります。</li>
           <li><code>_artifacts/&lt;site&gt;/</code>と<code>_indexes/&lt;site&gt;/</code>を最後まで一覧にし、あるべき各オブジェクトのダイジェストとヘッダーを比べます。プレビューの一覧と、残っているキャッシュ再試行の記録も読みます。ドライランはこの計画を表示して終わります。</li>
           <li>無効化するパスを<code>_control/site-cache/&lt;site&gt;.json</code>に保存します。</li>
           <li>新規と変更のファイルを書き込みます。</li>
@@ -173,7 +173,7 @@
 <span class="c"># 同じ計画を適用する</span>
 <span class="p">$ </span><span class="v">artifact-pages</span> site publish --site checkout</pre>
       </div>
-      <p class="note"><code>checkout</code>は説明用のサイトIDです。本文検索も公開するには、両方のコマンドに<code>--fulltext</code>を付けます。<a href="search.html">検索とインデックス</a>を参照してください。</p>
+      <p class="note"><code>checkout</code>は説明用のサイトIDです。どちらのコマンドも本文検索のデータを作ります。<a href="search.html">検索とインデックス</a>を参照してください。</p>
     </section>
 
     <section class="doc-section" aria-labelledby="ordering">
@@ -263,7 +263,7 @@
       </ul>
     </section>
 
-    <div class="callout guide"><span class="ico">ガイド</span><p>ドライランや<code>--fulltext</code>を含め、普段これらのコマンドをどう使うかはガイドの<a href="/guide/ja/publishing.html" target="_top">サイトの公開</a>にあります。アプリのデプロイから読むまでの全体の流れは<a href="/guide/ja/what-is-git-artifact-pages.html" target="_top">Git Artifact Pagesとは</a>にあります。</p></div>
+    <div class="callout guide"><span class="ico">ガイド</span><p>ドライランを含め、普段これらのコマンドをどう使うかはガイドの<a href="/guide/ja/publishing.html" target="_top">サイトの公開</a>にあります。アプリのデプロイから読むまでの全体の流れは<a href="/guide/ja/what-is-git-artifact-pages.html" target="_top">Git Artifact Pagesとは</a>にあります。</p></div>
 
     <nav class="pager" aria-label="ページ送り">
       <a class="prev" href="storage-layout.html"><small>前へ</small><strong>ストレージの構成</strong></a>

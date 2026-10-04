@@ -136,7 +136,7 @@
           <li>Only when the target is local storage: resolve the source path from the registry and check, before locking, that the storage directory and the source do not overlap. This early registry read is advisory; the authoritative check is step 3.</li>
           <li>Acquire the per-site lock <code>_control/locks/sites/&lt;site&gt;.json</code> with a conditional write. A dry run does not.</li>
           <li>Read <code>/_indexes/sites.json</code> from the origin, not through the CDN, and require that the site is registered and that the checkout's repository and source path match the registration.</li>
-          <li>Collect the source files (regular files only) and build the index, metadata and (with <code>--fulltext</code>) search data in a temporary directory, using the registered name and description.</li>
+          <li>Collect the source files (regular files only) and build the index, metadata and page text search data in a temporary directory, using the registered name and description.</li>
           <li>List <code>_artifacts/&lt;site&gt;/</code> and <code>_indexes/&lt;site&gt;/</code> completely and compare each desired object's digest and headers. The preview catalog and any outstanding cache retry record are read too. A dry run prints this plan and stops.</li>
           <li>Save the invalidation paths in <code>_control/site-cache/&lt;site&gt;.json</code>.</li>
           <li>Upload new and changed files.</li>
@@ -173,7 +173,7 @@
 <span class="c"># Apply the same plan</span>
 <span class="p">$ </span><span class="v">artifact-pages</span> site publish --site checkout</pre>
       </div>
-      <p class="note"><code>checkout</code> is an illustrative site ID. Add <code>--fulltext</code> to both commands to publish page text search; see <a href="search.html">Search and indexes</a>.</p>
+      <p class="note"><code>checkout</code> is an illustrative site ID. Both commands build page text search data; see <a href="search.html">Search and indexes</a>.</p>
     </section>
 
     <section class="doc-section" aria-labelledby="ordering">
@@ -263,7 +263,7 @@
       </ul>
     </section>
 
-    <div class="callout guide"><span class="ico">GUIDE</span><p>How to run these commands day to day, including dry runs and <code>--fulltext</code>, is in the guide's <a href="/guide/en/publishing.html" target="_top">Publishing</a>. The whole flow from deploying the app to reading is in <a href="/guide/en/what-is-git-artifact-pages.html" target="_top">What is Git Artifact Pages?</a></p></div>
+    <div class="callout guide"><span class="ico">GUIDE</span><p>How to run these commands day to day, including dry runs, is in the guide's <a href="/guide/en/publishing.html" target="_top">Publishing</a>. The whole flow from deploying the app to reading is in <a href="/guide/en/what-is-git-artifact-pages.html" target="_top">What is Git Artifact Pages?</a></p></div>
 
     <nav class="pager" aria-label="Pages">
       <a class="prev" href="storage-layout.html"><small>Previous</small><strong>Storage layout</strong></a>
