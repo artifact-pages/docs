@@ -108,7 +108,7 @@
             <text x="450" y="164">registry register</text>
             <text x="450" y="212">site publish</text>
             <text x="450" y="236">site publish</text>
-            <text x="450" y="260">site publish --fulltext</text>
+            <text x="450" y="260">site publish</text>
             <text x="450" y="380">site publish</text>
             <text x="450" y="404">site publish</text>
             <text x="450" y="452">preview publish</text>
@@ -139,7 +139,7 @@
         <summary>図の内容を文章で読む</summary>
         <ul>
           <li>アプリケーションプレーン：<code>/index.html</code>（アプリのシェル、毎回再検証）と<code>/assets/&lt;name&gt;-&lt;hash&gt;.*</code>（1年キャッシュ）。<code>app deploy</code>が書き込みます。</li>
-          <li>コンテンツプレーン：<code>registry register</code>が書く<code>/_indexes/sites.json</code>。<code>site publish</code>が書く<code>/_indexes/checkout/meta.json</code>、<code>index.json</code>、<code>--fulltext</code>を付けた場合の<code>search/manifest.json</code>・<code>root-&lt;sha256&gt;.gz</code>・<code>leaf-&lt;sha256&gt;.gz</code>。サイトのファイル一式は<code>/_artifacts/checkout/</code>、<code>preview publish</code>が書くプレビューは<code>/_previews/checkout/</code>にあります。</li>
+          <li>コンテンツプレーン：<code>registry register</code>が書く<code>/_indexes/sites.json</code>。<code>site publish</code>が書く<code>/_indexes/checkout/meta.json</code>、<code>index.json</code>、<code>search/manifest.json</code>・<code>root-&lt;sha256&gt;.gz</code>・<code>leaf-&lt;sha256&gt;.gz</code>。サイトのファイル一式は<code>/_artifacts/checkout/</code>、<code>preview publish</code>が書くプレビューは<code>/_previews/checkout/</code>にあります。</li>
           <li>非公開の領域：<code>/_control/locks/sites/checkout.json</code>と<code>/_control/site-cache/checkout.json</code>。読者には返しません。</li>
           <li>共有キャッシュは、JSONのインデックスとプレビューの一覧を最大60秒、成果物とプレビューのファイルを最大300秒、内容のハッシュを名前に持つアプリと検索のファイルを1年保持できます。</li>
         </ul>
@@ -236,7 +236,7 @@
             <circle class="ad-num" cx="36" cy="382" r="11"/><text class="ad-num-t" x="36" y="386" text-anchor="middle">5</text>
             <text class="ad-t" x="60" y="386">本文検索でEnterを押す</text>
             <text class="ad-m" x="60" y="408">GET search/manifest.json → root-&lt;sha256&gt;.gz → 必要なleafだけ</text>
-            <text class="ad-q" x="60" y="426">入力中は何も取得しません。--fulltext付きで公開したサイトだけです。</text>
+            <text class="ad-q" x="60" y="426">入力中は何も取得しません。</text>
 
             <circle class="ad-num" cx="36" cy="472" r="11"/><text class="ad-num-t" x="36" y="476" text-anchor="middle">6</text>
             <text class="ad-t" x="60" y="476">プレビューの一覧を開く</text>

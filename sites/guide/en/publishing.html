@@ -91,7 +91,6 @@
         <tbody>
           <tr><td><code>--site ID</code></td><td><span class="pill on">Required</span></td><td>The registered site ID. It is never inferred from the repository.</td></tr>
           <tr><td><code>--source DIR</code></td><td><span class="pill">Optional</span></td><td>The directory to publish. Its path from the repository root must equal the registered <code>sourcePath</code>. Defaults to that registered path.</td></tr>
-          <tr><td><code>--fulltext</code></td><td><span class="pill">Optional</span></td><td>Also publish the data for page text search. Pass it every time (see below).</td></tr>
           <tr><td><code>--config LOCATOR</code></td><td><span class="pill">Optional</span></td><td>The deployment config that names the delivery target. See <a href="configuration.html#precedence">Configuration</a> for how it is chosen when omitted.</td></tr>
           <tr><td><code>--dry-run</code></td><td><span class="pill">Optional</span></td><td>Show the changes without writing, deleting, or requesting a cache refresh.</td></tr>
           <tr><td><code>--format text|json</code></td><td><span class="pill">Optional</span></td><td><code>json</code> returns the complete change list, for CI.</td></tr>
@@ -102,15 +101,7 @@
 
     <section class="doc-section" aria-labelledby="page-text-search">
       <h2 id="page-text-search">Page text search</h2>
-      <p>Add <code>--fulltext</code> to publish the data that the reader's page text search uses. Readers of the site then get the search field in the sidebar and <kbd>⌘⇧F</kbd>.</p>
-      <div class="term" aria-label="Example publish with page text search">
-        <div class="term-head"><span>TERMINAL / acme/checkout</span><button class="copy-btn" type="button">Copy</button></div>
-<pre><span class="p">$</span> <span data-copy>artifact-pages <span class="v">site publish</span> --site checkout --source docs/artifacts --fulltext</span></pre>
-      </div>
-      <div class="callout warn" role="note">
-        <span class="ico">EVERY TIME</span>
-        <div><p><strong>Pass <code>--fulltext</code> on every publish.</strong> A publish without it removes the site's search data, and the sidebar shows <strong>Jump to a page…</strong> instead of the search field. There is no config setting that keeps it on, so put the flag in your publish script or CI job.</p></div>
-      </div>
+      <p><code>site publish</code> builds and publishes the data for the reader's page text search on every run; there is no option to leave it out. Readers of the site get the search field in the sidebar and <kbd>⌘⇧F</kbd>. A site published by an earlier version gets page text search when it is published again.</p>
       <p>What is searched: an HTML page's title and its static text, and a Markdown page's title and rendered text, including code blocks. Text that scripts create, image <code>alt</code> text, and paths are not searched. Text hidden only with CSS is still searched. To leave out navigation or other repeated text, mark its element with <code>hidden</code>, <code>aria-hidden="true"</code>, or <code>data-search-ignore</code>.</p>
     </section>
 
@@ -131,12 +122,12 @@
         <li><div><h3>On a pull request: plan</h3><p>Run with <code>--dry-run</code> and read-only credentials. The JSON result lists exactly what would change.</p>
           <div class="term" aria-label="Example CI dry-run command">
             <div class="term-head"><span>CI / PULL REQUEST</span><button class="copy-btn" type="button">Copy</button></div>
-<pre><span class="p">$</span> <span data-copy>artifact-pages <span class="v">site publish</span> --site checkout --source docs/artifacts --fulltext --dry-run --format json</span></pre>
+<pre><span class="p">$</span> <span data-copy>artifact-pages <span class="v">site publish</span> --site checkout --source docs/artifacts --dry-run --format json</span></pre>
           </div></div></li>
         <li><div><h3>After merge: publish</h3><p>Run the same command without <code>--dry-run</code>, using credentials that can write only this site.</p>
           <div class="term" aria-label="Example CI publish command">
             <div class="term-head"><span>CI / DEFAULT BRANCH</span><button class="copy-btn" type="button">Copy</button></div>
-<pre><span class="p">$</span> <span data-copy>artifact-pages <span class="v">site publish</span> --site checkout --source docs/artifacts --fulltext --format json</span></pre>
+<pre><span class="p">$</span> <span data-copy>artifact-pages <span class="v">site publish</span> --site checkout --source docs/artifacts --format json</span></pre>
           </div></div></li>
       </ol>
       <ul>
@@ -145,7 +136,7 @@
       </ul>
 
       <h3 id="github-actions">With GitHub Actions</h3>
-      <p>The root Action of the product repository, <code>tasuku43/git-artifact-pages</code>, runs the same <code>site publish</code>. It builds the CLI from the release you reference, and takes the options as inputs: <code>site</code> (required), <code>source</code>, <code>config</code>, <code>fulltext</code>, and <code>dry-run</code>. This workflow plans on pull requests and publishes after merge to <code>main</code>:</p>
+      <p>The root Action of the product repository, <code>tasuku43/git-artifact-pages</code>, runs the same <code>site publish</code>. It builds the CLI from the release you reference, and takes the options as inputs: <code>site</code> (required), <code>source</code>, <code>config</code>, and <code>dry-run</code>. This workflow plans on pull requests and publishes after merge to <code>main</code>:</p>
       <div class="term" aria-label="Example GitHub Actions workflow that publishes a site">
         <div class="term-head"><span>.github/workflows/publish-docs.yml / acme/checkout</span><button class="copy-btn" type="button">Copy</button></div>
 <pre><span class="k">name</span>: Publish docs
@@ -177,7 +168,6 @@
           <span class="k">site</span>: checkout
           <span class="k">source</span>: docs/artifacts
           <span class="k">config</span>: github://acme/platform-admin/artifact-pages.yaml?ref=&lt;full commit SHA&gt;
-          <span class="k">fulltext</span>: true
           <span class="k">dry-run</span>: ${{ github.event_name == 'pull_request' }}
         <span class="k">env</span>:
           <span class="k">CF_R2_ACCESS_KEY_ID</span>: ${{ secrets.CF_R2_ACCESS_KEY_ID }}
@@ -186,12 +176,11 @@
       </div>
       <ul>
         <li><strong>Reference an exact release tag</strong>, such as <code>@vX.Y.Z</code>; releases are listed on <a href="https://github.com/tasuku43/git-artifact-pages/releases" target="_blank" rel="noopener">GitHub Releases</a>. While versions are <code>0.x</code> there is no moving tag such as <code>@v0</code>. For the strictest pin, use the release's full commit SHA and keep the tag as a comment: <code>tasuku43/git-artifact-pages@&lt;full commit SHA&gt; # vX.Y.Z</code>.</li>
-        <li><strong><code>fulltext: true</code> on every run.</strong> It defaults to <code>false</code>, and a publish without it removes the site's search data. Keeping it on the pull request run too makes the plan match what the merge publishes.</li>
         <li><strong>Two environments hold different secrets.</strong> <code>plan</code> and <code>production</code> are illustrative names: give <code>plan</code> read-only credentials (pull requests from forks get no secrets, so the plan fails there by design) and <code>production</code> credentials that can write only this site, and limit <code>production</code> to <code>main</code> in its settings. The variable names are the Cloudflare defaults; on AWS, assume a role through OIDC instead (add <code>id-token: write</code> to <code>permissions</code>).</li>
         <li><strong>One publish at a time.</strong> Only one publish can hold the site's lock, so the <code>concurrency</code> group runs one publish at a time (a newer push replaces a waiting one).</li>
         <li><strong>A private admin repository</strong> is read with this workflow's token by default, which usually cannot read another repository. Pass a read-only token for the admin repository through the <code>github-token</code> input.</li>
-        <li><strong>Results</strong> are available as outputs, such as <code>outcome</code> (<code>planned</code>, <code>published</code>, <code>no-op</code>, or <code>failed</code>), <code>changes_json</code>, and <code>result_json</code>.</li>
-        <li><strong>Other Actions</strong> use the same tag: <code>tasuku43/git-artifact-pages/actions/admin</code> for <code>registry register</code>, <code>registry unregister</code>, and <code>app deploy</code>; <code>actions/preview-preflight</code> and <code>actions/preview-publish</code> for previews.</li>
+        <li><strong>Results</strong> are available as outputs, such as <code>outcome</code> (<code>planned</code>, <code>published</code>, <code>no-op</code>, or <code>failed</code>), <code>changes</code>, and <code>result</code>.</li>
+        <li><strong>Other Actions</strong> use the same tag: <code>tasuku43/git-artifact-pages/actions/admin</code> for <code>registry register</code>, <code>registry unregister</code>, and <code>app deploy</code>; <code>actions/preview-publish</code> for previews.</li>
       </ul>
       <p class="note"><code>acme/checkout</code> and <code>acme/platform-admin</code> are illustrative. Replace <code>vX.Y.Z</code> and <code>&lt;full commit SHA&gt;</code> with real values.</p>
     </section>
