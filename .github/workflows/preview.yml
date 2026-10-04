@@ -1,6 +1,8 @@
 # Publish pre-merge previews of the pages a pull request adds or changes, for
-# both sites, to https://artifact-pages.dev. Only pull requests from this
-# repository get a preview: a fork never reaches the credentials. The existing
+# both sites, to https://artifact-pages.dev. A preview runs only for pull
+# requests that carry the "preview" label and change a file under sites/, and
+# only for pull requests from this repository: a fork never reaches the
+# credentials. The existing
 # dry-run in publish.yml stays; it validates the real publish, while this
 # workflow lets the owner read the changed pages before merging.
 #
@@ -11,38 +13,52 @@ name: Preview
 
 on:
   pull_request:
-    types: [opened, synchronize, reopened]
+    types: [labeled, synchronize, reopened]
+    # Also applies to "labeled": a PR that changes no sites/** file never runs.
+    paths: ['sites/**']
 
 permissions:
   contents: read
 
 concurrency:
-  group: preview-${{ github.event.pull_request.number }}
+  # Other labels get their own group so they cannot cancel a running preview.
+  group: preview-${{ github.event.pull_request.number }}${{ github.event.action == 'labeled' && github.event.label.name != 'preview' && format('-{0}', github.run_id) || '' }}
   cancel-in-progress: true
 
 jobs:
   preview:
-    # Same-repository pull requests only. The preflight action rejects forks
-    # again before any credential is used.
-    if: github.event.pull_request.head.repo.full_name == github.repository
+    # Same-repository pull requests that carry the "preview" label. Labeling
+    # triggers a run only for that label. preview-publish verifies the pull
+    # request again (forks, pull_request_target) before any credential is used.
+    if: >-
+      github.event.pull_request.head.repo.full_name == github.repository &&
+      (github.event.action == 'labeled'
+        && github.event.label.name == 'preview'
+        || github.event.action != 'labeled'
+        && contains(github.event.pull_request.labels.*.name, 'preview'))
     runs-on: ubuntu-24.04
     # R2 credentials are secrets of the "preview" environment only.
     environment: preview
+    permissions:
+      contents: read
+      pull-requests: read
     strategy:
       fail-fast: false
       matrix:
         site: [guide, architecture]
     steps:
+      # Check out the base branch, not the pull request head: the action reads
+      # the head through its head input. Same-repository head commits arrive
+      # with the full fetch of all branches.
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
-          # The merge base with the default branch selects the changed pages.
+          ref: ${{ github.event.pull_request.base.ref }}
           fetch-depth: 0
-          ref: ${{ github.event.pull_request.head.sha }}
           persist-credentials: false
-      - name: Verify same-repository pull request
-        uses: tasuku43/git-artifact-pages/actions/preview-preflight@5eab98a826b2234916aea5781d72b58365942fa0 # v0.1.2
-        with:
-          pull-request: ${{ github.event.pull_request.number }}
+      - name: Check the head commit is present
+        env:
+          HEAD_SHA: ${{ github.event.pull_request.head.sha }}
+        run: git cat-file -e "$HEAD_SHA^{commit}"
       - name: Preview ${{ matrix.site }}
         id: preview
         uses: tasuku43/git-artifact-pages/actions/preview-publish@5eab98a826b2234916aea5781d72b58365942fa0 # v0.1.2
@@ -50,8 +66,7 @@ jobs:
           site: ${{ matrix.site }}
           source: sites/${{ matrix.site }}
           head: ${{ github.event.pull_request.head.sha }}
-          # actions/checkout does not set origin/HEAD, the action's default.
-          default-ref: origin/${{ github.event.repository.default_branch }}
+          default-ref: origin/${{ github.event.pull_request.base.ref }}
           pull-request: ${{ github.event.pull_request.number }}
           base-url: https://artifact-pages.dev
           # The deployed registry decides eligibility; this config locates it.
@@ -65,7 +80,7 @@ jobs:
         env:
           SITE: ${{ matrix.site }}
           OUTCOME: ${{ steps.preview.outputs.outcome }}
-          GROUP_LIST_URL: ${{ steps.preview.outputs.group-list-url }}
+          GROUP_LIST_URL: ${{ steps.preview.outputs['group-list-url'] }}
           DOCUMENTS: ${{ steps.preview.outputs.documents }}
           ERROR: ${{ steps.preview.outputs.error }}
         run: |
@@ -92,7 +107,7 @@ jobs:
   # that is updated in place on every push.
   comment:
     needs: preview
-    if: always() && github.event.pull_request.head.repo.full_name == github.repository
+    if: always() && needs.preview.result != 'skipped'
     runs-on: ubuntu-24.04
     permissions:
       pull-requests: write
