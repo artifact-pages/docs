@@ -1,8 +1,7 @@
 # Publish the guide and architecture sites to https://artifact-pages.dev.
 # Pull requests that change a site or this workflow run a dry-run publish;
 # merges to main publish both sites. A publish that changes nothing is a no-op.
-# Page text search needs fulltext: true on every publish, or its data is
-# withdrawn.
+# Every publish also builds the page text search data.
 name: Publish
 
 on:
@@ -37,13 +36,12 @@ jobs:
           persist-credentials: false
       - name: Publish ${{ matrix.site }}
         id: publish
-        uses: tasuku43/git-artifact-pages@v0.1.2
+        uses: tasuku43/git-artifact-pages@af75645985fa35797942005ed177ecb583249103 # main, tasuku43/git-artifact-pages#9
         with:
           site: ${{ matrix.site }}
           source: sites/${{ matrix.site }}
           # The deployed registry decides eligibility; this config locates it.
           config: github://tasuku43/artifact-pages-admin/artifact-pages.yaml
-          fulltext: "true"
           dry-run: ${{ github.event_name == 'pull_request' }}
         env:
           CF_R2_ACCESS_KEY_ID: ${{ secrets.CF_R2_ACCESS_KEY_ID }}
@@ -53,6 +51,6 @@ jobs:
         env:
           SITE: ${{ matrix.site }}
           OUTCOME: ${{ steps.publish.outputs.outcome }}
-          CHANGES: ${{ steps.publish.outputs.changes_json }}
+          CHANGES: ${{ steps.publish.outputs.changes }}
         run: |
           echo "### $SITE: $OUTCOME ($(jq length <<<"$CHANGES") changes)" >> "$GITHUB_STEP_SUMMARY"
