@@ -36,7 +36,8 @@
     <div class="callout" role="note">
       <span class="ico">前提</span>
       <div>
-        <p><strong>始める前に、次の2つが必要です。</strong><code>artifact-pages</code>コマンドと、管理者があなたのリポジトリとディレクトリに対して登録したサイトです。サイトのIDと使う設定ファイルは、管理者に確認してください。</p>
+        <p><strong>始める前に、次の2つが必要です。</strong><code>artifact-pages</code>コマンドと、管理者があなたのリポジトリとディレクトリに対して登録したサイトです。サイトのIDと、管理リポジトリの設定ファイルのアドレスは、管理者に確認してください。</p>
+        <p><strong>サテライトリポジトリは、文書とワークフロー1つだけです。</strong>置くのは公開するディレクトリとCIのワークフローで、設定ファイルも、ビルドも、同期の手順もありません。管理リポジトリの<code>artifact-pages.yaml</code>を<a href="configuration.html#remote"><code>github://</code>の指定</a>で参照します。以下のコマンドは短くするため<code>--config</code>を省いています。実際には<code>--config</code>で渡すか、環境変数<code>ARTIFACT_PAGES_CONFIG</code>に<code>github://acme/platform-admin/artifact-pages.yaml</code>のような指定を入れます。</p>
         <p>CLIの入れ方は「<a href="getting-started.html#install">はじめる</a>」を参照してください。以下の例では、<code>acme/checkout</code>の<code>docs/artifacts</code>から公開する、説明用の<code>checkout</code>サイトを使います。</p>
       </div>
     </div>
@@ -91,7 +92,7 @@
         <tbody>
           <tr><td><code>--site ID</code></td><td><span class="pill on">必須</span></td><td>登録されたサイトのID。リポジトリ名から推測はしません。</td></tr>
           <tr><td><code>--source DIR</code></td><td><span class="pill">任意</span></td><td>公開するディレクトリ。リポジトリのルートからのパスが、登録した<code>sourcePath</code>と一致する必要があります。省略すると登録されたパスを使います。</td></tr>
-          <tr><td><code>--config LOCATOR</code></td><td><span class="pill">任意</span></td><td>配信先を指定する設定ファイル。省略したときの選ばれ方は「<a href="configuration.html#precedence">設定ファイル</a>」を参照してください。</td></tr>
+          <tr><td><code>--config LOCATOR</code></td><td><span class="pill">任意</span></td><td>配信先を指定する設定ファイル。サテライトリポジトリは、管理リポジトリの<code>github://</code>の指定を渡します（<a href="configuration.html#remote">リモートの設定ファイル</a>）。省略したときの選ばれ方は「<a href="configuration.html#precedence">設定ファイル</a>」を参照してください。</td></tr>
           <tr><td><code>--dry-run</code></td><td><span class="pill">任意</span></td><td>書き込み、削除、キャッシュ更新の依頼をせずに、変更内容だけを表示します。</td></tr>
           <tr><td><code>--format text|json</code></td><td><span class="pill">任意</span></td><td><code>json</code>にすると、変更の全一覧を返します。CI向けです。</td></tr>
         </tbody>
@@ -122,17 +123,17 @@
         <li><div><h3>プルリクエストで：変更を確認する</h3><p>読み取り専用の認証情報で、<code>--dry-run</code>を付けて実行します。JSONの結果に、変わる内容がすべて出ます。</p>
           <div class="term" aria-label="CIでのドライランのコマンド例">
             <div class="term-head"><span>CI / プルリクエスト</span><button class="copy-btn" type="button">コピー</button></div>
-<pre><span class="p">$</span> <span data-copy>artifact-pages <span class="v">site publish</span> --site checkout --source docs/artifacts --dry-run --format json</span></pre>
+<pre><span class="p">$</span> <span data-copy>artifact-pages <span class="v">site publish</span> --site checkout --source docs/artifacts --config github://acme/platform-admin/artifact-pages.yaml --dry-run --format json</span></pre>
           </div></div></li>
         <li><div><h3>マージ後に：公開する</h3><p>このサイトだけに書き込める認証情報で、<code>--dry-run</code>を外して実行します。</p>
           <div class="term" aria-label="CIでの公開のコマンド例">
             <div class="term-head"><span>CI / デフォルトブランチ</span><button class="copy-btn" type="button">コピー</button></div>
-<pre><span class="p">$</span> <span data-copy>artifact-pages <span class="v">site publish</span> --site checkout --source docs/artifacts --format json</span></pre>
+<pre><span class="p">$</span> <span data-copy>artifact-pages <span class="v">site publish</span> --site checkout --source docs/artifacts --config github://acme/platform-admin/artifact-pages.yaml --format json</span></pre>
           </div></div></li>
       </ol>
       <ul>
         <li><strong>認証情報</strong>はCIのシークレットに置き、設定ファイルには書きません。公開のジョブに必要なのは、サイトの登録情報の読み取りと、このサイトのファイル・プレビュー・ロック・キャッシュ再試行の記録（<code>_control/site-cache/&lt;site&gt;.json</code>）の読み書き、それにCDNのキャッシュ更新の依頼だけです。「<a href="configuration.html#credentials">設定ファイル</a>」を参照してください。</li>
-        <li><strong>管理者の設定ファイルを写す必要はありません。</strong><code>--config</code>に、コミットを固定した<code>github://</code>の指定で管理リポジトリのファイルを渡せます（<a href="configuration.html#remote">リモートの設定ファイル</a>）。公開してよいかどうかは、その場合も配信先にある登録情報で確認します。</li>
+        <li><strong>リポジトリに設定ファイルは置きません。</strong>ジョブは<code>--config</code>に、管理リポジトリのファイルを指す<code>github://</code>の指定を渡します。必要なら<code>?ref=&lt;完全なコミットSHA&gt;</code>で固定できます（<a href="configuration.html#remote">リモートの設定ファイル</a>）。公開してよいかどうかは、設定ファイルではなく配信先にある登録情報で確認します。</li>
       </ul>
 
       <h3 id="github-actions">GitHub Actionsで実行する</h3>
@@ -167,7 +168,7 @@
         <span class="k">with</span>:
           <span class="k">site</span>: checkout
           <span class="k">source</span>: docs/artifacts
-          <span class="k">config</span>: github://acme/platform-admin/artifact-pages.yaml?ref=&lt;full commit SHA&gt;
+          <span class="k">config</span>: github://acme/platform-admin/artifact-pages.yaml   <span class="c"># 管理リポジトリの設定。このリポジトリにファイルは置かない</span>
           <span class="k">dry-run</span>: ${{ github.event_name == 'pull_request' }}
         <span class="k">env</span>:
           <span class="k">CF_R2_ACCESS_KEY_ID</span>: ${{ secrets.CF_R2_ACCESS_KEY_ID }}
@@ -178,6 +179,7 @@
         <li><strong>リリースのタグをそのまま指定します。</strong><code>@vX.Y.Z</code>のように書きます。リリースは<a href="https://github.com/tasuku43/git-artifact-pages/releases" target="_blank" rel="noopener">GitHub Releases</a>で確認できます。バージョンが<code>0.x</code>のあいだは、<code>@v0</code>のような動くタグはありません。いちばん厳密に固定するなら、リリースのコミットSHAを40文字で書き、タグをコメントに残します（<code>tasuku43/git-artifact-pages@&lt;full commit SHA&gt; # vX.Y.Z</code>）。</li>
         <li><strong>2つのEnvironmentで、別々のシークレットを持たせます。</strong><code>plan</code>と<code>production</code>は説明用の名前です。<code>plan</code>には読み取り専用の認証情報を、<code>production</code>にはこのサイトにだけ書き込める認証情報を置き、<code>production</code>は設定で<code>main</code>からだけ使えるようにします。変数名はCloudflareの既定値です。AWSでは鍵を置かず、OIDCでロールを引き受けます（<code>permissions</code>に<code>id-token: write</code>を加えます）。フォークからのプルリクエストにはシークレットが渡らないため、そこでは変更計画の確認が失敗します。これは意図した動作です。</li>
         <li><strong>公開は1つずつ実行します。</strong>サイトのロックを持てる公開は1つだけなので、<code>concurrency</code>のグループで公開を1つずつ実行します（待っている実行は、新しいプッシュの実行に置き換わります）。</li>
+        <li><strong>設定の固定</strong>は任意です。<code>?ref=</code>を付けないと、管理リポジトリのデフォルトブランチを実行の最初に1つのコミットに決め、その実行の最後まで使います。コミットを固定したいときは、指定の末尾に<code>?ref=&lt;完全なコミットSHA&gt;</code>を付けます。</li>
         <li><strong>管理リポジトリが非公開なら</strong>、既定ではこのワークフローのトークンで読みにいきますが、ふつうは別のリポジトリを読めません。管理リポジトリを読み取れるトークンを<code>github-token</code>の入力で渡します。</li>
         <li><strong>結果</strong>は出力で受け取れます。<code>outcome</code>（<code>planned</code>、<code>published</code>、<code>no-op</code>、<code>failed</code>）、<code>changes</code>、<code>result</code>などです。</li>
         <li><strong>ほかのAction</strong>も同じタグで使います。<code>registry register</code>、<code>registry unregister</code>、<code>app deploy</code>には<code>tasuku43/git-artifact-pages/actions/admin</code>を、プレビューには<code>actions/preview-publish</code>を使います。</li>

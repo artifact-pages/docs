@@ -155,7 +155,7 @@
         <section class="chapter" id="step-2" data-step="2" aria-labelledby="step-2-title">
           <span class="step-label">02 / サイトを登録 <span class="role">管理者</span></span>
           <h3 id="step-2-title">次に、サイトを登録する。</h3>
-          <p>サイトは、<strong>チームごとに持つのが基本</strong>です。同じチームでも、プロダクトごとに分けてかまいません。サイトには、ID、表示名、元になるGitリポジトリ（<code>owner/repo</code>）とディレクトリ（<code>sourcePath</code>）があり、管理者が設定ファイルに書いて登録します。まだ文書がなくても登録できます。</p>
+          <p>サイトは、<strong>チームごとに持つのが基本</strong>です。同じチームでも、プロダクトごとに分けてかまいません。サイトには、ID、表示名、元になるGitリポジトリ（<code>owner/repo</code>）とディレクトリ（<code>sourcePath</code>）があり、管理者が管理リポジトリの設定ファイルに書いて登録します。まだ文書がなくても登録できます。</p>
           <div class="term" aria-label="サイト登録の設定例">
             <div class="term-head"><span>artifact-pages.yaml / 管理リポジトリ</span></div>
 <pre><span class="k">sites</span>:
@@ -183,15 +183,15 @@
         <section class="chapter" id="step-3" data-step="3" aria-labelledby="step-3-title">
           <span class="step-label">03 / Gitから公開 <span class="role">各チームのリポジトリ</span></span>
           <h3 id="step-3-title">各Gitリポジトリから、担当サイトへ公開する。</h3>
-          <p>各チームのGitリポジトリが、担当するサイトと公開するディレクトリを明示して公開します。公開のたびにインデックスを作り、HTMLとMarkdown、CSSや画像をそのまま配置します。</p>
+          <p>各チームのGitリポジトリが、担当するサイトと公開するディレクトリを明示して公開します。このサテライトリポジトリは、文書とワークフロー1つだけです。設定ファイルも、ビルドも、同期の手順もなく、管理リポジトリの設定を<code>github://</code>の指定で読みます。公開のたびにインデックスを作り、HTMLとMarkdown、CSSや画像をそのまま配置します。</p>
           <p>公開はサイトごとに独立しています。全サイトをまとめて組み立てるビルドはなく、各リポジトリは自分のCIから、変更があったときに自分のサイトだけを公開します。ほかのサイトの公開を待つこともありません。</p>
           <div class="term" aria-label="サイト公開コマンド例">
             <div class="term-head"><span>ターミナル / acme/checkout</span><button class="copy-btn" type="button">コピー</button></div>
 <pre><span class="c"># docs/artifacts を、サイト checkout へ</span>
-<span class="p">$</span> <span data-copy>artifact-pages <span class="v">site publish</span> --site checkout --source docs/artifacts --dry-run</span>
-<span class="p">$</span> <span data-copy>artifact-pages <span class="v">site publish</span> --site checkout --source docs/artifacts</span></pre>
+<span class="p">$</span> <span data-copy>artifact-pages <span class="v">site publish</span> --site checkout --source docs/artifacts --config github://acme/platform-admin/artifact-pages.yaml --dry-run</span>
+<span class="p">$</span> <span data-copy>artifact-pages <span class="v">site publish</span> --site checkout --source docs/artifacts --config github://acme/platform-admin/artifact-pages.yaml</span></pre>
           </div>
-          <p class="note">書き込む前に、いまのリポジトリとディレクトリが、配信先に登録された内容と一致するかを確認します。他のサイトには書き込みません。マージ時にCIから同じコマンドを実行する運用を想定しています。</p>
+          <p class="note"><code>acme/platform-admin</code>は説明用の管理リポジトリです。指定の書き方は「<a href="configuration.html#remote">設定ファイル</a>」にあります。参照用の実例は<code>tasuku43/artifact-pages-docs</code>で、このガイドをワークフローだけで公開しています。書き込む前に、いまのリポジトリとディレクトリが、配信先に登録された内容と一致するかを確認します。他のサイトには書き込みません。マージ時にCIから同じコマンドを実行する運用を想定しています。</p>
         </section>
 
         <section class="chapter" id="step-4" data-step="4" aria-labelledby="step-4-title">

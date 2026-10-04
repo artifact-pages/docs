@@ -65,7 +65,7 @@
 
     <section class="doc-section" aria-labelledby="roles">
       <h2 id="roles">2種類のリポジトリ</h2>
-      <p>ひとつの環境には、管理リポジトリがひとつと、チームのリポジトリがいくつでもあります。サイトを増やしたいチームは、管理リポジトリにプルリクエストを出します。管理者がそれを承認してマージし、環境に反映します。各チームは、登録された自分のサイトだけを公開します。</p>
+      <p>ひとつの環境には、管理リポジトリがひとつと、チームのリポジトリ（サテライトリポジトリ）がいくつでもあります。サイトを増やしたいチームは、管理リポジトリにプルリクエストを出します。管理者がそれを承認してマージし、環境に反映します。各チームは、登録された自分のサイトだけを公開します。</p>
       <figure class="rel" aria-label="管理リポジトリに登録されたサイトと、それを公開するチームのリポジトリの関係">
         <div class="rel-grid">
           <div class="rel-admin-bg r-admin" aria-hidden="true"></div>
@@ -76,7 +76,7 @@
         </div>
         <figcaption><code>checkout</code>と<code>sre</code>は登録済みで、<code>billing</code>はサイトを追加するプルリクエストが出たところです。リポジトリはすべて説明用の例です。</figcaption>
       </figure>
-      <p>管理リポジトリは、配信先と、登録するサイトの一覧をすべて持ちます。管理者は、承認した変更から閲覧アプリを置き、サイトを登録します。チームのリポジトリに必要なのは配信先の設定だけで、サイトの一覧は要りません。管理リポジトリのファイルは<a href="configuration.html#remote"><code>github://</code>の指定</a>で読めます。あるリポジトリがそのサイトに公開してよいかは、チームの設定ファイルではなく、配信先にあるサイトの登録情報で決まります。</p>
+      <p>管理リポジトリは、配信先と、登録するサイトの一覧をすべて持ちます。管理者は、承認した変更から閲覧アプリを置き、サイトを登録します。チームのリポジトリに置くのは、文書とワークフロー1つだけです。設定ファイルは置かず、管理リポジトリの<code>artifact-pages.yaml</code>を<a href="configuration.html#remote"><code>github://</code>の指定</a>で読みます。あるリポジトリがそのサイトに公開してよいかは、チームの設定ファイルではなく、配信先にあるサイトの登録情報で決まります。</p>
     </section>
 
     <section class="doc-section" aria-labelledby="cloudflare">
@@ -119,11 +119,11 @@
 <span class="p">$</span> <span data-copy>artifact-pages <span class="v">registry register</span> --config artifact-pages.yaml</span></pre>
           </div>
           <figure class="concept" role="group" aria-label="手順4のあとの状態"><figcaption>手順4のあとの状態</figcaption><div class="concept-row"><div class="cbox r-admin"><div class="cbox-h">管理リポジトリ<small>acme/platform-admin</small></div><ul><li class="r-admin done">設定ファイル<span class="sr-only">（できている）</span><em aria-hidden="true">2</em></li></ul></div><span class="to" aria-hidden="true">→</span><div class="cbox r-store"><div class="cbox-h">配信先<small>Cloudflare</small></div><ul><li class="r-store done">ストレージとCDN<span class="sr-only">（できている）</span><em aria-hidden="true">1</em></li><li class="r-admin done">閲覧アプリ<span class="sr-only">（できている）</span><em aria-hidden="true">3</em></li><li class="r-admin now">サイトの登録情報<span class="sr-only">（この手順でできた）</span><em aria-hidden="true">この手順</em></li><li class="r-team todo">公開されたページ<span class="sr-only">（まだ）</span><em aria-hidden="true">5</em></li></ul></div><span class="to" aria-hidden="true">←</span><div class="cbox r-team"><div class="cbox-h">チームのリポジトリ<small>acme/checkout</small></div><ul><li class="r-team done">ページ<span class="sr-only">（できている）</span></li></ul></div></div></figure></div></li>
-        <li><div><h3>チームのリポジトリから公開する</h3><p><code>acme/checkout</code>の<code>docs/artifacts</code>に、<code>.html</code>か<code>.md</code>のページを1つ以上置きます。公開ではGitの履歴から日付を読むので、コミットが1つもないリポジトリでは失敗します。<code>--config</code>には、管理リポジトリのファイルをコミットを固定した<code>github://</code>の指定で渡します。CLIは配信先の登録情報を読み、リポジトリとディレクトリが登録どおりかを確かめてから、ページをコピーしてサイトのインデックスを作ります。本文検索のためのデータも毎回作ります。</p>
+        <li><div><h3>チームのリポジトリから公開する</h3><p><code>acme/checkout</code>の<code>docs/artifacts</code>に、<code>.html</code>か<code>.md</code>のページを1つ以上置きます。公開ではGitの履歴から日付を読むので、コミットが1つもないリポジトリでは失敗します。このリポジトリに設定ファイルは置かず、<code>--config</code>に管理リポジトリのファイルを指す<code>github://</code>の指定を渡します。<code>?ref=</code>で1つのコミットに固定することもできます。CLIは配信先の登録情報を読み、リポジトリとディレクトリが登録どおりかを確かめてから、ページをコピーしてサイトのインデックスを作ります。本文検索のためのデータも毎回作ります。</p>
           <div class="term" aria-label="チームのリポジトリから公開する">
             <div class="term-head"><span>ターミナル / acme/checkout</span><button class="copy-btn" type="button">コピー</button></div>
-<pre><span class="p">$</span> <span data-copy>artifact-pages <span class="v">site publish</span> --site checkout --source docs/artifacts --config 'github://acme/platform-admin/artifact-pages.yaml?ref=&lt;full commit SHA&gt;' --dry-run</span>
-<span class="p">$</span> <span data-copy>artifact-pages <span class="v">site publish</span> --site checkout --source docs/artifacts --config 'github://acme/platform-admin/artifact-pages.yaml?ref=&lt;full commit SHA&gt;'</span></pre>
+<pre><span class="p">$</span> <span data-copy>artifact-pages <span class="v">site publish</span> --site checkout --source docs/artifacts --config github://acme/platform-admin/artifact-pages.yaml --dry-run</span>
+<span class="p">$</span> <span data-copy>artifact-pages <span class="v">site publish</span> --site checkout --source docs/artifacts --config github://acme/platform-admin/artifact-pages.yaml</span></pre>
           </div>
           <p>必要な認証情報は、R2のアクセスキーとシークレット、サイトを変える実行で使うAPIトークンです。最初の1回は手元から実行してもかまいません。ふだんはマージ後にCIから実行します。そのまま使えるGitHub Actionsのワークフローが「<a href="publishing.html#github-actions">サイトの公開</a>」にあります。管理リポジトリが非公開なら、<code>GITHUB_TOKEN</code>か<code>GH_TOKEN</code>で読みます。</p>
           <figure class="concept" role="group" aria-label="手順5のあとの状態"><figcaption>手順5のあとの状態</figcaption><div class="concept-row"><div class="cbox r-admin"><div class="cbox-h">管理リポジトリ<small>acme/platform-admin</small></div><ul><li class="r-admin done">設定ファイル<span class="sr-only">（できている）</span><em aria-hidden="true">2</em></li></ul></div><span class="to" aria-hidden="true">→</span><div class="cbox r-store"><div class="cbox-h">配信先<small>Cloudflare</small></div><ul><li class="r-store done">ストレージとCDN<span class="sr-only">（できている）</span><em aria-hidden="true">1</em></li><li class="r-admin done">閲覧アプリ<span class="sr-only">（できている）</span><em aria-hidden="true">3</em></li><li class="r-admin done">サイトの登録情報<span class="sr-only">（できている）</span><em aria-hidden="true">4</em></li><li class="r-team now">公開されたページ<span class="sr-only">（この手順でできた）</span><em aria-hidden="true">この手順</em></li></ul></div><span class="to" aria-hidden="true">←</span><div class="cbox r-team"><div class="cbox-h">チームのリポジトリ<small>acme/checkout</small></div><ul><li class="r-team done">ページ<span class="sr-only">（できている）</span></li></ul></div></div></figure></div></li>
