@@ -65,22 +65,18 @@
 
     <section class="doc-section" aria-labelledby="roles">
       <h2 id="roles">2種類のリポジトリ</h2>
-      <p>ひとつの環境には、管理リポジトリがひとつと、チームのリポジトリがいくつでもあります。どのサイトを置くかは管理者が決め、各チームは自分のサイトだけを公開します。どちらも同じ配信先に書き込みます。</p>
-      <figure class="hub" role="group" aria-label="管理リポジトリとチームのリポジトリが、同じ配信先に書き込む関係">
-        <div class="hub-box r-admin"><div class="hub-h">管理リポジトリ<small>環境ごとにひとつ</small></div>
-          <p class="hub-desc">環境全体を受け持ちます。配信先と、登録するサイトの一覧をすべて持ちます。どちらのコマンドも、レビューを通った変更から実行するのが望ましい運用です。</p>
-          <ul class="hub-steps"><li><span class="sn">2</span><span><code>artifact-pages.yaml</code>に、配信先とサイトの一覧を書きます。</span></li><li><span class="sn">3</span><span><code>app deploy</code>で閲覧アプリを置きます。</span></li><li><span class="sn">4</span><span><code>registry register</code>でサイトを登録します。</span></li></ul></div>
-        <div class="hub-arrow" aria-hidden="true"><b>→</b>3·4</div>
-        <div class="hub-box r-store"><div class="hub-h">配信先<small>ストレージとCDN</small></div>
-          <ul class="hub-slots"><li class="r-store">ストレージとCDN（プロバイダ側で用意）<em aria-hidden="true">1</em></li><li class="r-admin">閲覧アプリ<em aria-hidden="true">← 3</em></li><li class="r-admin">サイトの登録情報<em aria-hidden="true">← 4</em></li><li class="r-team">サイトのページ<em aria-hidden="true">5 →</em></li></ul>
-          <p class="hub-note r-store">ページを受け取る前に、チームの設定ではなく配信先にある登録情報を読みます。一致しなければ書き込みません。</p>
-          <p class="hub-note r-read"><span class="sn">6</span><span>読む人は、ここに置かれた閲覧アプリでサイトを読みます。</span></p></div>
-        <div class="hub-arrow" aria-hidden="true"><b>←</b>5</div>
-        <div class="hub-box r-team"><div class="hub-h">チームのリポジトリ<small>いくつでも</small></div>
-          <p class="hub-desc">登録されたディレクトリに文書を置き、自分のサイトだけを公開します。1つのリポジトリから1つ以上のサイトを公開できます。必要なのは配信先の設定だけで、サイトの一覧は要りません。管理リポジトリのファイルは<a href="configuration.html#remote"><code>github://</code>の指定</a>で読めます。</p>
-          <ul class="hub-steps"><li><span class="sn">5</span><span>マージ後に自分のCIから<code>site publish</code>を実行します。</span></li></ul></div>
+      <p>ひとつの環境には、管理リポジトリがひとつと、チームのリポジトリがいくつでもあります。サイトを増やしたいチームは、管理リポジトリにプルリクエストを出します。管理者がそれを承認してマージし、環境に反映します。各チームは、登録された自分のサイトだけを公開します。</p>
+      <figure class="rel" aria-label="管理リポジトリに登録されたサイトと、それを公開するチームのリポジトリの関係">
+        <div class="rel-grid">
+          <div class="rel-admin-bg r-admin" aria-hidden="true"></div>
+          <div class="rel-h r-admin">管理リポジトリ<small>環境ごとにひとつ · <code>sites</code></small></div><div></div><div class="rel-h r-team">チームのリポジトリ<small>いくつでも</small></div>
+          <div class="rel-site"><code>checkout</code></div><div class="rel-link"><span>公開</span><b aria-hidden="true">←</b></div><div class="rel-repo"><code>acme/checkout</code></div>
+          <div class="rel-site"><code>sre</code></div><div class="rel-link"><span>公開</span><b aria-hidden="true">←</b></div><div class="rel-repo"><code>acme/sre</code></div>
+          <div class="rel-site pending"><code>billing</code><small>承認待ち</small></div><div class="rel-link pr"><span>追加のPR</span><b aria-hidden="true">←</b></div><div class="rel-repo"><code>acme/billing</code></div>
+        </div>
+        <figcaption><code>checkout</code>と<code>sre</code>は登録済みで、<code>billing</code>はサイトを追加するプルリクエストが出たところです。リポジトリはすべて説明用の例です。</figcaption>
       </figure>
-      <p>あるリポジトリがそのサイトに公開してよいかは、チームの設定ファイルではなく、配信先にあるサイトの登録情報で決まります。次の節では、図の番号の順に進めます。</p>
+      <p>管理リポジトリは、配信先と、登録するサイトの一覧をすべて持ちます。管理者は、承認した変更から閲覧アプリを置き、サイトを登録します。チームのリポジトリに必要なのは配信先の設定だけで、サイトの一覧は要りません。管理リポジトリのファイルは<a href="configuration.html#remote"><code>github://</code>の指定</a>で読めます。あるリポジトリがそのサイトに公開してよいかは、チームの設定ファイルではなく、配信先にあるサイトの登録情報で決まります。</p>
     </section>
 
     <section class="doc-section" aria-labelledby="cloudflare">

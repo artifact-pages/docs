@@ -65,22 +65,18 @@
 
     <section class="doc-section" aria-labelledby="roles">
       <h2 id="roles">Two kinds of repository</h2>
-      <p>A deployment has one admin repository and any number of team repositories. The admin decides which sites exist; each team publishes only its own. Both write to the same delivery target.</p>
-      <figure class="hub" role="group" aria-label="The admin repository and team repositories write to the same delivery target">
-        <div class="hub-box r-admin"><div class="hub-h">Admin repository<small>one per deployment</small></div>
-          <p class="hub-desc">Owns the deployment: the delivery target and the complete list of sites. Both commands are best run only from reviewed changes.</p>
-          <ul class="hub-steps"><li><span class="sn">2</span><span>Write the delivery target and the list of sites in <code>artifact-pages.yaml</code>.</span></li><li><span class="sn">3</span><span>Place the reader app with <code>app deploy</code>.</span></li><li><span class="sn">4</span><span>Register the sites with <code>registry register</code>.</span></li></ul></div>
-        <div class="hub-arrow" aria-hidden="true"><b>→</b>3·4</div>
-        <div class="hub-box r-store"><div class="hub-h">Delivery target<small>storage and CDN</small></div>
-          <ul class="hub-slots"><li class="r-store">Storage and CDN (set up at the provider)<em aria-hidden="true">1</em></li><li class="r-admin">Reader app<em aria-hidden="true">← 3</em></li><li class="r-admin">Site registry<em aria-hidden="true">← 4</em></li><li class="r-team">Site pages<em aria-hidden="true">5 →</em></li></ul>
-          <p class="hub-note r-store">Before accepting pages, it reads the registration stored here, not the team&#39;s config. If they do not match, nothing is written.</p>
-          <p class="hub-note r-read"><span class="sn">6</span><span>Readers read the site in the reader app placed here.</span></p></div>
-        <div class="hub-arrow" aria-hidden="true"><b>←</b>5</div>
-        <div class="hub-box r-team"><div class="hub-h">Team repository<small>any number</small></div>
-          <p class="hub-desc">Keeps documents in a registered directory and publishes only its own site; one repository can publish one or more sites. It needs only the delivery target, never the site list, and can read the admin repository&#39;s file with a <a href="configuration.html#remote"><code>github://</code> locator</a>.</p>
-          <ul class="hub-steps"><li><span class="sn">5</span><span>Runs <code>site publish</code> from its own CI after a merge.</span></li></ul></div>
+      <p>A deployment has one admin repository and any number of team repositories. A team that wants a new site opens a pull request against the admin repository; the admin approves and merges it and applies it to the deployment. Each team publishes only its own registered site.</p>
+      <figure class="rel" aria-label="Sites registered in the admin repository and the team repositories that publish them">
+        <div class="rel-grid">
+          <div class="rel-admin-bg r-admin" aria-hidden="true"></div>
+          <div class="rel-h r-admin">Admin repository<small>one per deployment · <code>sites</code></small></div><div></div><div class="rel-h r-team">Team repositories<small>any number</small></div>
+          <div class="rel-site"><code>checkout</code></div><div class="rel-link"><span>publishes</span><b aria-hidden="true">←</b></div><div class="rel-repo"><code>acme/checkout</code></div>
+          <div class="rel-site"><code>sre</code></div><div class="rel-link"><span>publishes</span><b aria-hidden="true">←</b></div><div class="rel-repo"><code>acme/sre</code></div>
+          <div class="rel-site pending"><code>billing</code><small>awaiting approval</small></div><div class="rel-link pr"><span>site request PR</span><b aria-hidden="true">←</b></div><div class="rel-repo"><code>acme/billing</code></div>
+        </div>
+        <figcaption><code>checkout</code> and <code>sre</code> are registered; <code>billing</code> has just opened a pull request to add its site. All repositories are illustrative.</figcaption>
       </figure>
-      <p>Whether a repository may publish to a site is decided by the site registry on the delivery target, not by the team&#39;s config. The next section follows the numbers in the figure.</p>
+      <p>The admin repository holds the delivery target and the complete list of sites. From approved changes, the admin places the reader app and registers the sites. A team repository needs only the delivery target, never the site list, and can read the admin repository&#39;s file with a <a href="configuration.html#remote"><code>github://</code> locator</a>. Whether a repository may publish to a site is decided by the site registry on the delivery target, not by the team&#39;s config.</p>
     </section>
 
     <section class="doc-section" aria-labelledby="cloudflare">
