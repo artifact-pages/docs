@@ -725,14 +725,17 @@ td:first-child { white-space: nowrap; font-weight: 600; }
 
 /* ── 2種類のリポジトリ（.rel）：管理リポジトリのサイトの一覧と、それぞれを公開するチームのリポジトリを行でつなぐ。管理側の箱は背景の要素で、行の上に重ねる ── */
 .rel { margin: 18px 0 0; }
-.rel-grid { position: relative; display: grid; grid-template-columns: minmax(0, 1fr) minmax(64px, 132px) minmax(0, 1fr); grid-auto-rows: auto; row-gap: 8px; }
+.rel-grid { position: relative; display: grid; grid-template-columns: minmax(0, 1fr) minmax(64px, 132px) minmax(0, 1fr); grid-template-rows: repeat(4, auto); row-gap: 8px; }
+.rel-grid > .r-admin, .rel-site { grid-column: 1; }
+.rel-link { grid-column: 2; }
+.rel-grid > .rel-h.r-team, .rel-repo { grid-column: 3; }
 .rel-admin-bg { grid-column: 1; grid-row: 1 / -1; border: 1px solid var(--l); border-radius: var(--radius); background: var(--w); }
 .rel-h { position: relative; display: flex; flex-wrap: wrap; justify-content: space-between; align-items: baseline; gap: 2px 8px; padding: 10px 14px 2px; color: var(--c); font-size: 13px; font-weight: 650; }
 .rel-h small { color: var(--quiet); font: 500 10.5px/1.5 var(--mono); }
 .rel-h small code { padding: 0; border: 0; background: none; color: inherit; font-size: inherit; }
 .rel-h.r-team { padding-inline: 2px; }
 .rel-site { position: relative; display: flex; flex-wrap: wrap; align-items: baseline; gap: 2px 8px; margin: 0 12px; padding: 7px 12px; border: 1px solid var(--gold-line); border-radius: 8px; background: var(--paper); font-size: 13px; }
-.rel-site:last-child, .rel-grid > .rel-site:nth-last-child(3) { margin-bottom: 12px; }
+.rel-site[style*="grid-row: 4"] { margin-bottom: 12px; }
 .rel-site.pending { border-style: dashed; background: transparent; }
 .rel-site small { color: var(--quiet); font-size: 11px; }
 .rel-site code, .rel-repo code { padding: 0; border: 0; background: none; font-size: 12.5px; overflow-wrap: anywhere; }

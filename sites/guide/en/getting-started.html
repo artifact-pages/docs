@@ -69,10 +69,10 @@
       <figure class="rel" aria-label="Sites registered in the admin repository and the team repositories that publish them">
         <div class="rel-grid">
           <div class="rel-admin-bg r-admin" aria-hidden="true"></div>
-          <div class="rel-h r-admin">Admin repository<small>one per deployment · <code>sites</code></small></div><div></div><div class="rel-h r-team">Team repositories<small>any number</small></div>
-          <div class="rel-site"><code>checkout</code></div><div class="rel-link"><span>publishes</span><b aria-hidden="true">←</b></div><div class="rel-repo"><code>acme/checkout</code></div>
-          <div class="rel-site"><code>sre</code></div><div class="rel-link"><span>publishes</span><b aria-hidden="true">←</b></div><div class="rel-repo"><code>acme/sre</code></div>
-          <div class="rel-site pending"><code>billing</code><small>awaiting approval</small></div><div class="rel-link pr"><span>site request PR</span><b aria-hidden="true">←</b></div><div class="rel-repo"><code>acme/billing</code></div>
+          <div class="rel-h r-admin" style="grid-row: 1">Admin repository<small>one per deployment · <code>sites</code></small></div><div class="rel-h r-team" style="grid-row: 1">Team repositories<small>any number</small></div>
+          <div class="rel-site" style="grid-row: 2"><code>checkout</code></div><div class="rel-link" style="grid-row: 2"><span>publishes</span><b aria-hidden="true">←</b></div><div class="rel-repo" style="grid-row: 2"><code>acme/checkout</code></div>
+          <div class="rel-site" style="grid-row: 3"><code>sre</code></div><div class="rel-link" style="grid-row: 3"><span>publishes</span><b aria-hidden="true">←</b></div><div class="rel-repo" style="grid-row: 3"><code>acme/sre</code></div>
+          <div class="rel-site pending" style="grid-row: 4"><code>billing</code><small>awaiting approval</small></div><div class="rel-link pr" style="grid-row: 4"><span>site request PR</span><b aria-hidden="true">←</b></div><div class="rel-repo" style="grid-row: 4"><code>acme/billing</code></div>
         </div>
         <figcaption><code>checkout</code> and <code>sre</code> are registered; <code>billing</code> has just opened a pull request to add its site. All repositories are illustrative.</figcaption>
       </figure>
