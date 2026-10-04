@@ -79,3 +79,10 @@ Independent review found no high issues. Applied:
 - L3: mise must be active in the shell (or its shims on `PATH`) for `artifact-pages` to be found.
 - L7 (shared): `.copy-btn` gets `flex: none; white-space: nowrap` in `shared/assets/site.css`; at 400 px every copy button on the ja guide pages is one line (21.6 px high).
 - Verification: `assets:sync`, `assets:check`, `npm test` (3/3) pass; both sites republished (dry-run first, `--fulltext`) from a committed tmp copy; Playwright 48 runs (12 guide pages × light/dark × 400/1280) clean, 58 same-origin links and anchors resolve; reader pager and page text search re-checked. The bare `app deploy` / `registry register` forms on the overview and Configuration are left unchanged pending the owner's decision.
+
+## Revision (2026-10-04, owner direction)
+
+- The walkthrough now uses Cloudflare instead of the `local` provider: set up the delivery target, write the admin repository's `artifact-pages.yaml`, `app deploy`, `registry register`, `site publish` from the team repository with a `github://` locator, and open the site. The `local` try-out moved into a collapsed section with an nginx config and `compose.yaml`.
+- Step 1 stays short and links to the product's Cloudflare guide until the provider setup page (DOC-14) exists.
+- The roles figure and its two panes were merged into one hub figure numbered like the walkthrough. Each step shows a conceptual state panel.
+- The local nginx example was checked with CLI v0.1.2: `app deploy`, `registry register` and `site publish --fulltext` against `local`, then `docker compose up`. `/`, `/checkout` and `/checkout/payment-flow.md` return the app shell; `/_indexes/sites.json` and the published page return 200; a missing artifact, `/_control` and `/_control/locks/...` return 404.

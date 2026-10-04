@@ -39,6 +39,11 @@
   --m-scrim: light-dark(rgba(24, 28, 32, .3), rgba(0, 0, 0, .52));
   --nav-h: 0px;
   --radius: 12px;
+  --measure: 880px; /* one column for prose and figures alike on doc pages */
+  --blue: light-dark(#2d5f93, #9cc4ea);
+  --blue-wash: light-dark(rgba(45, 95, 147, .07), rgba(156, 196, 234, .07));
+  --blue-line: light-dark(rgba(45, 95, 147, .28), rgba(156, 196, 234, .26));
+  --accent-line: light-dark(rgba(40, 107, 77, .3), rgba(169, 216, 193, .28));
   --mono: ui-monospace, SFMono-Regular, Menlo, Consolas, "Liberation Mono", monospace;
   --sans: -apple-system, BlinkMacSystemFont, "Segoe UI", "Hiragino Kaku Gothic ProN", "Hiragino Sans", "Yu Gothic UI", "Yu Gothic", Meiryo, "Noto Sans JP", sans-serif;
 }
@@ -119,9 +124,9 @@ h3 { margin: 0 0 8px; font-size: 16px; font-weight: 650; line-height: 1.55; lett
 .btn.ghost { background: transparent; color: var(--ink); border-color: var(--line-strong); }
 .btn.ghost:hover { background: var(--hover); opacity: 1; }
 .btn span[aria-hidden] { font-family: var(--mono); opacity: .7; }
-.page-head { display: grid; grid-template-columns: minmax(0, 1fr) minmax(280px, .55fr); gap: clamp(30px, 6vw, 80px); align-items: end; padding-block: clamp(44px, 6vw, 72px) clamp(32px, 4vw, 48px); }
+.page-head { display: grid; grid-template-columns: minmax(0, 1fr); gap: clamp(14px, 2vw, 20px); align-items: start; padding-block: clamp(44px, 6vw, 72px) clamp(32px, 4vw, 48px); }
 .page-head h1 { margin-bottom: 0; }
-.page-head .lead { margin: 0; }
+.page-head .lead { max-width: var(--measure); margin: 0; }
 @media (max-width: 860px) { .page-head { grid-template-columns: minmax(0, 1fr); align-items: start; } .section-head { display: block; } .section-head > p { margin-top: 10px; } }
 
 /* ── ヒーロー ── */
@@ -376,8 +381,9 @@ button.am-filter:hover { background: var(--active); color: var(--ink); }
 
 /* ── 解説ページ（読者の体験など） ── */
 .doc-section { padding-block: clamp(36px, 5vw, 56px); border-top: 1px solid var(--line-soft); }
+.doc-section > * { max-width: var(--measure); }
 .doc-section > h2 { margin-bottom: 10px; }
-.doc-section > p, .doc-section > ul { max-width: 700px; color: var(--muted); }
+.doc-section > p, .doc-section > ul { max-width: var(--measure); color: var(--muted); }
 .doc-section > p strong, .doc-section li strong { color: var(--ink); }
 .doc-section > * + .table-wrap, .doc-section > * + .app-mock, .doc-section > * + [data-reader-demo] { margin-top: 18px; }
 .doc-section > .table-wrap + p:not(.note) { margin-top: 14px; }
@@ -559,12 +565,12 @@ td:first-child { white-space: nowrap; font-weight: 600; }
 .d-ok-t { fill: var(--accent); font: 600 11px var(--sans); }
 .d-muted-box { fill: var(--paper-2); stroke: var(--line-strong); stroke-dasharray: 4 4; }
 
-.doc-section .callout { max-width: 760px; }
-.doc-section > .term { max-width: 760px; margin-top: 16px; }
+.doc-section .callout { max-width: var(--measure); }
+.doc-section > .term { max-width: var(--measure); margin-top: 16px; }
 .doc-section > .term + p, .doc-section > .flow + p, .doc-section > .mapping + p, .doc-section > .figure + p, .doc-section > .callout + p { margin-top: 16px; }
-.doc-section > .timeline { max-width: 760px; margin-top: 20px; }
+.doc-section > .timeline { max-width: var(--measure); margin-top: 20px; }
 .doc-section > .figure + ul, .doc-section > .mapping + ul, .doc-section > .split + ul, .doc-section > .timeline + ul, .doc-section > .table-wrap + ul { margin-top: 16px; }
-.doc-section > .checklist { max-width: 760px; margin-top: 14px; }
+.doc-section > .checklist { max-width: var(--measure); margin-top: 14px; }
 .doc-section > .split, .doc-section > .cards { margin-top: 18px; }
 .page-toc { display: flex; flex-wrap: wrap; gap: 6px; margin: 0 0 8px; padding: 0; list-style: none; }
 .page-toc a { display: inline-block; padding: 3px 10px; border: 1px solid var(--line); border-radius: 99px; color: var(--muted); font-size: 12.5px; text-decoration: none; }
@@ -584,7 +590,7 @@ td:first-child { white-space: nowrap; font-weight: 600; }
 @media (max-width: 560px) { .pager { grid-template-columns: 1fr; } .pager .next { grid-column: 1; text-align: left; } }
 .foot { display: grid; grid-template-columns: 1fr 2fr; gap: 40px; padding-block: 28px 56px; border-top: 1px solid var(--line-soft); }
 .foot strong { font-size: 13.5px; font-weight: 650; }
-.foot p { max-width: 700px; margin: 0; color: var(--muted); font-size: 12.5px; }
+.foot p { max-width: var(--measure); margin: 0; color: var(--muted); font-size: 12.5px; }
 @media (max-width: 720px) { .foot { grid-template-columns: 1fr; gap: 10px; } }
 
 @media (prefers-reduced-motion: reduce) {
@@ -621,7 +627,7 @@ td:first-child { white-space: nowrap; font-weight: 600; }
 .arch-pages a[aria-current] small { color: var(--accent); }
 @media (max-width: 900px) { .arch-pages ol { grid-template-columns: repeat(3, minmax(0, 1fr)); } }
 @media (max-width: 520px) { .arch-pages ol { grid-template-columns: repeat(2, minmax(0, 1fr)); } .arch-pages a { padding: 6px 8px 7px; } }
-.answer { max-width: 620px; margin: 0; padding: 2px 0 2px 18px; border-left: 3px solid var(--accent); color: var(--ink); font-size: 16px; font-weight: 500; line-height: 1.85; text-wrap: pretty; }
+.answer { max-width: var(--measure); margin: 0; padding: 2px 0 2px 18px; border-left: 3px solid var(--accent); color: var(--ink); font-size: 16px; font-weight: 500; line-height: 1.85; text-wrap: pretty; }
 .answer-label { display: block; margin-bottom: 4px; color: var(--accent); font: 600 10.5px/1.5 var(--mono); letter-spacing: .06em; text-transform: uppercase; }
 :lang(ja) .answer-label { font-family: var(--sans); letter-spacing: .04em; text-transform: none; }
 .answer code { padding: .04em .32em; border: 1px solid var(--line-soft); border-radius: 4px; background: var(--hover); font-size: .86em; }
@@ -643,7 +649,7 @@ td:first-child { white-space: nowrap; font-weight: 600; }
 .fig-text { border-top: 1px solid var(--line-soft); }
 .fig-text summary { padding: 9px 16px; color: var(--muted); font-size: 12.5px; cursor: pointer; }
 .fig-text summary:hover { color: var(--ink); }
-.fig-text ol, .fig-text ul { max-width: 760px; margin: 0; padding: 0 20px 14px 38px; color: var(--muted); font-size: 13px; line-height: 1.8; }
+.fig-text ol, .fig-text ul { max-width: var(--measure); margin: 0; padding: 0 20px 14px 38px; color: var(--muted); font-size: 13px; line-height: 1.8; }
 .fig-text li + li { margin-top: 4px; }
 /* 図の部品（色はすべてトークン。ライト/ダークの両方で読めます） */
 .ad-zone { fill: none; stroke: var(--line-strong); stroke-width: 1.2; stroke-dasharray: 5 5; }
@@ -686,7 +692,7 @@ td:first-child { white-space: nowrap; font-weight: 600; }
 .ad-bar.warn { fill: var(--gold); }
 
 /* 実証の状態：ローカルで実証済み / 一部をプロバイダーで確認 / 未実証 */
-.proof { display: grid; max-width: 860px; margin: 0; padding: 0; list-style: none; }
+.proof { display: grid; max-width: var(--measure); margin: 0; padding: 0; list-style: none; }
 .proof li { display: grid; grid-template-columns: 170px minmax(0, 1fr); gap: 4px 16px; padding: 12px 0; border-top: 1px solid var(--line-soft); color: var(--muted); font-size: 13.5px; line-height: 1.8; }
 .proof li:last-child { border-bottom: 1px solid var(--line-soft); }
 .proof strong { color: var(--ink); }
@@ -696,7 +702,7 @@ td:first-child { white-space: nowrap; font-weight: 600; }
 .arch .chip.sampled { background: var(--accent-wash); color: var(--accent); }
 .arch .chip.open { background: var(--gold-wash); color: var(--gold); }
 @media (max-width: 560px) { .proof li { grid-template-columns: minmax(0, 1fr); } }
-.arch .doc-section > ol { max-width: 700px; color: var(--muted); }
+.arch .doc-section > ol { max-width: var(--measure); color: var(--muted); }
 .arch .doc-section li strong { color: var(--ink); }
 .arch .term pre { white-space: pre; }
 .arch .term .s { color: var(--code-verb); }
@@ -705,5 +711,91 @@ td:first-child { white-space: nowrap; font-weight: 600; }
 .arch .cards .card .tag { color: var(--accent); }
 .arch .page-head { display: block; padding-block: clamp(30px, 5vw, 52px) clamp(24px, 3vw, 34px); }
 .arch .page-head h1 { margin-bottom: 18px; }
-.arch .page-head .answer { max-width: 780px; }
+.arch .page-head .answer { max-width: var(--measure); }
 .ad-pre, .ad-pre text { white-space: pre; }
+
+/* ── 役割の色：管理リポジトリは金、チームのリポジトリは緑、配信先は青、読む側は無彩色。.rel と .concept で共通 ── */
+.r-admin { --c: var(--gold); --w: var(--gold-wash); --l: var(--gold-line); }
+.r-team { --c: var(--accent); --w: var(--accent-wash); --l: var(--accent-line); }
+.r-store { --c: var(--blue); --w: var(--blue-wash); --l: var(--blue-line); }
+.r-read { --c: var(--muted); --w: var(--hover); --l: var(--line-strong); }
+.pane.r-admin, .pane.r-team { border-color: var(--l); }
+.pane.r-admin .label, .pane.r-team .label { color: var(--c); }
+.sn { display: inline-grid; flex: none; place-items: center; width: 20px; height: 20px; border: 1px solid var(--l, var(--line-strong)); border-radius: 50%; color: var(--c, var(--muted)); font: 600 10.5px/1 var(--mono); }
+
+/* ── 2種類のリポジトリ（.rel）：管理リポジトリのサイトの一覧と、それぞれを公開するチームのリポジトリを行でつなぐ。管理側の箱は背景の要素で、行の上に重ねる ── */
+.rel { margin: 18px 0 0; }
+.rel-grid { position: relative; display: grid; grid-template-columns: minmax(0, 1fr) minmax(64px, 132px) minmax(0, 1fr); grid-template-rows: repeat(4, auto); row-gap: 8px; }
+.rel-grid > .r-admin, .rel-site { grid-column: 1; }
+.rel-link { grid-column: 2; }
+.rel-grid > .rel-h.r-team, .rel-repo { grid-column: 3; }
+.rel-admin-bg { grid-column: 1; grid-row: 1 / -1; border: 1px solid var(--l); border-radius: var(--radius); background: var(--w); }
+.rel-h { position: relative; display: flex; flex-wrap: wrap; justify-content: space-between; align-items: baseline; gap: 2px 8px; padding: 10px 14px 2px; color: var(--c); font-size: 13px; font-weight: 650; }
+.rel-h small { color: var(--quiet); font: 500 10.5px/1.5 var(--mono); }
+.rel-h small code { padding: 0; border: 0; background: none; color: inherit; font-size: inherit; }
+.rel-h.r-team { padding-inline: 2px; }
+.rel-site { position: relative; display: flex; flex-wrap: wrap; align-items: baseline; gap: 2px 8px; margin: 0 12px; padding: 7px 12px; border: 1px solid var(--gold-line); border-radius: 8px; background: var(--paper); font-size: 13px; }
+.rel-site[style*="grid-row: 4"] { margin-bottom: 12px; }
+.rel-site.pending { border-style: dashed; background: transparent; }
+.rel-site small { color: var(--quiet); font-size: 11px; }
+.rel-site code, .rel-repo code { padding: 0; border: 0; background: none; font-size: 12.5px; overflow-wrap: anywhere; }
+.rel-link { display: flex; flex-direction: column; justify-content: center; align-items: center; gap: 0; min-width: 0; color: var(--accent); font: 600 10.5px/1.4 var(--sans); text-align: center; }
+.rel-link b { width: 100%; height: 0; border-top: 1.5px solid currentColor; font-size: 0; position: relative; }
+.rel-link b::before { position: absolute; left: -1px; top: -5px; width: 8px; height: 8px; border-left: 1.5px solid currentColor; border-bottom: 1.5px solid currentColor; transform: rotate(45deg); content: ""; }
+.rel-link span { padding-bottom: 3px; }
+.rel-link.pr { color: var(--gold); }
+.rel-link.pr b { border-top-style: dashed; }
+.rel-repo { display: flex; align-items: center; min-width: 0; padding: 7px 12px; border: 1px solid var(--accent-line); border-radius: 8px; background: var(--paper); }
+.rel figcaption { margin-top: 10px; color: var(--quiet); font-size: 12.5px; line-height: 1.7; }
+.doc-section > figure + p { margin-top: 18px; }
+@media (max-width: 520px) {
+  .rel-grid { grid-template-columns: minmax(0, 1fr) 44px minmax(0, 1fr); }
+  .rel-link span { display: none; }
+  .rel-h small { display: none; }
+}
+
+/* ── 手順ごとの状態（.concept）：役割の色の箱に、できたもの（実線）、この手順でできたもの（強調）、まだのもの（破線）を並べる。静的で動かない ── */
+.timeline .concept { margin: 14px 0 0; overflow: hidden; border: 1px solid var(--line-soft); border-radius: 10px; background: var(--paper-2); }
+.timeline .concept figcaption { padding: 6px 12px; border-bottom: 1px solid var(--line-soft); color: var(--quiet); font: 600 10.5px/1.6 var(--mono); letter-spacing: .04em; }
+.concept-row { display: grid; grid-template-columns: minmax(0, 1fr) 22px minmax(0, 1.3fr) 22px minmax(0, 1fr); align-items: start; padding: 12px; }
+.concept .cbox { min-width: 0; overflow: hidden; border: 1px solid var(--l); border-radius: 8px; background: var(--paper); }
+.concept .cbox-h { display: flex; flex-wrap: wrap; justify-content: space-between; align-items: baseline; gap: 0 6px; padding: 5px 10px; border-bottom: 1px solid var(--l); background: var(--w); color: var(--c); font-size: 12px; font-weight: 650; line-height: 1.6; }
+.concept .cbox-h small { color: var(--quiet); font: 500 10px/1.6 var(--mono); }
+.timeline .concept ul { display: grid; gap: 5px; margin: 0; padding: 8px; list-style: none; }
+.timeline .concept li { display: flex; align-items: baseline; gap: 6px; padding: 3px 8px; border: 1px solid var(--l); border-radius: 6px; color: var(--muted); font-size: 12px; line-height: 1.6; }
+.timeline .concept li::before, .timeline .concept li::after { content: none; display: none; }
+.timeline .concept li { counter-increment: none; }
+.timeline .concept li em { margin-left: auto; color: var(--quiet); font: 10px/1.6 var(--mono); font-style: normal; white-space: nowrap; }
+.timeline .concept li.now { border-color: var(--c); background: var(--w); color: var(--ink); font-weight: 650; }
+.timeline .concept li.now em { color: var(--c); }
+.timeline .concept li.todo { border-style: dashed; border-color: var(--line-strong); color: var(--quiet); opacity: .75; }
+.concept-row > .to { padding-top: 6px; color: var(--quiet); font: 600 13px/1.6 var(--mono); text-align: center; }
+@media (max-width: 620px) {
+  .concept-row { grid-template-columns: minmax(0, 1fr); }
+  .concept-row > .to { padding: 2px 0; transform: rotate(90deg); }
+}
+
+/* ── 折りたたみの補足（details.more）：本筋から外れる手順を閉じて置く ── */
+.doc-section > details.more { margin-top: 20px; overflow: hidden; border: 1px solid var(--line); border-radius: var(--radius); background: var(--paper); }
+.more > summary { padding: 12px 18px; color: var(--ink); font-size: 14px; font-weight: 600; cursor: pointer; }
+.more > summary:hover { background: var(--hover); }
+.more[open] > summary { border-bottom: 1px solid var(--line-soft); }
+.more-body { padding: 4px 18px 18px; }
+.more-body > p { margin: 14px 0 0; color: var(--muted); font-size: 14px; }
+.more-body > .term { margin-top: 12px; }
+
+/* 手順6：配信先から、ブラウザで開いた閲覧アプリへ。閲覧アプリの見た目を縮めた静的な見本（読み上げは sr-only の一文） */
+.concept-row.rv { grid-template-columns: minmax(0, .8fr) 22px minmax(0, 1.6fr); }
+.rv-browser { min-width: 0; overflow: hidden; border: 1px solid var(--line-strong); border-radius: 8px; background: var(--m-surface); }
+.rv-bar { display: flex; align-items: center; gap: 5px; padding: 6px 10px; border-bottom: 1px solid var(--line-soft); background: var(--m-shell); }
+.rv-bar i { width: 7px; height: 7px; border-radius: 50%; background: var(--line-strong); flex: none; }
+.rv-bar code { min-width: 0; margin-left: 6px; padding: 1px 8px; overflow: hidden; border: 0; border-radius: 5px; background: var(--m-surface); color: var(--muted); font-size: 10.5px; text-overflow: ellipsis; white-space: nowrap; }
+.rv-body { display: grid; grid-template-columns: minmax(0, .9fr) minmax(0, 1.6fr); min-height: 96px; }
+.rv-side { display: flex; flex-direction: column; gap: 4px; padding: 10px; border-right: 1px solid var(--line-soft); font-size: 11px; line-height: 1.5; }
+.rv-side b { color: var(--ink); font-weight: 650; }
+.rv-side span { padding: 2px 6px; border-radius: 5px; color: var(--muted); }
+.rv-side span.on { background: var(--active); color: var(--ink); }
+.rv-doc { padding: 10px 12px; font-size: 11px; line-height: 1.6; }
+.rv-doc b { display: block; margin-bottom: 4px; color: var(--ink); font-size: 12.5px; }
+.timeline .concept .rv-doc p { margin: 0; color: var(--muted); font-size: 11px; line-height: 1.6; }
+@media (max-width: 620px) { .concept-row.rv { grid-template-columns: minmax(0, 1fr); } }

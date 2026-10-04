@@ -39,6 +39,7 @@
   --m-scrim: light-dark(rgba(24, 28, 32, .3), rgba(0, 0, 0, .52));
   --nav-h: 0px;
   --radius: 12px;
+  --measure: 720px; /* one reading column: prose, callouts, terminals, lists, page-head lead */
   --mono: ui-monospace, SFMono-Regular, Menlo, Consolas, "Liberation Mono", monospace;
   --sans: -apple-system, BlinkMacSystemFont, "Segoe UI", "Hiragino Kaku Gothic ProN", "Hiragino Sans", "Yu Gothic UI", "Yu Gothic", Meiryo, "Noto Sans JP", sans-serif;
 }
@@ -119,9 +120,9 @@ h3 { margin: 0 0 8px; font-size: 16px; font-weight: 650; line-height: 1.55; lett
 .btn.ghost { background: transparent; color: var(--ink); border-color: var(--line-strong); }
 .btn.ghost:hover { background: var(--hover); opacity: 1; }
 .btn span[aria-hidden] { font-family: var(--mono); opacity: .7; }
-.page-head { display: grid; grid-template-columns: minmax(0, 1fr) minmax(280px, .55fr); gap: clamp(30px, 6vw, 80px); align-items: end; padding-block: clamp(44px, 6vw, 72px) clamp(32px, 4vw, 48px); }
+.page-head { display: grid; grid-template-columns: minmax(0, 1fr); gap: clamp(14px, 2vw, 20px); align-items: start; padding-block: clamp(44px, 6vw, 72px) clamp(32px, 4vw, 48px); }
 .page-head h1 { margin-bottom: 0; }
-.page-head .lead { margin: 0; }
+.page-head .lead { max-width: var(--measure); margin: 0; }
 @media (max-width: 860px) { .page-head { grid-template-columns: minmax(0, 1fr); align-items: start; } .section-head { display: block; } .section-head > p { margin-top: 10px; } }
 
 /* ── ヒーロー ── */
@@ -377,7 +378,7 @@ button.am-filter:hover { background: var(--active); color: var(--ink); }
 /* ── 解説ページ（読者の体験など） ── */
 .doc-section { padding-block: clamp(36px, 5vw, 56px); border-top: 1px solid var(--line-soft); }
 .doc-section > h2 { margin-bottom: 10px; }
-.doc-section > p, .doc-section > ul { max-width: 700px; color: var(--muted); }
+.doc-section > p, .doc-section > ul { max-width: var(--measure); color: var(--muted); }
 .doc-section > p strong, .doc-section li strong { color: var(--ink); }
 .doc-section > * + .table-wrap, .doc-section > * + .app-mock, .doc-section > * + [data-reader-demo] { margin-top: 18px; }
 .doc-section > .table-wrap + p:not(.note) { margin-top: 14px; }
@@ -559,12 +560,12 @@ td:first-child { white-space: nowrap; font-weight: 600; }
 .d-ok-t { fill: var(--accent); font: 600 11px var(--sans); }
 .d-muted-box { fill: var(--paper-2); stroke: var(--line-strong); stroke-dasharray: 4 4; }
 
-.doc-section .callout { max-width: 760px; }
-.doc-section > .term { max-width: 760px; margin-top: 16px; }
+.doc-section .callout { max-width: var(--measure); }
+.doc-section > .term { max-width: var(--measure); margin-top: 16px; }
 .doc-section > .term + p, .doc-section > .flow + p, .doc-section > .mapping + p, .doc-section > .figure + p, .doc-section > .callout + p { margin-top: 16px; }
-.doc-section > .timeline { max-width: 760px; margin-top: 20px; }
+.doc-section > .timeline { max-width: var(--measure); margin-top: 20px; }
 .doc-section > .figure + ul, .doc-section > .mapping + ul, .doc-section > .split + ul, .doc-section > .timeline + ul, .doc-section > .table-wrap + ul { margin-top: 16px; }
-.doc-section > .checklist { max-width: 760px; margin-top: 14px; }
+.doc-section > .checklist { max-width: var(--measure); margin-top: 14px; }
 .doc-section > .split, .doc-section > .cards { margin-top: 18px; }
 .page-toc { display: flex; flex-wrap: wrap; gap: 6px; margin: 0 0 8px; padding: 0; list-style: none; }
 .page-toc a { display: inline-block; padding: 3px 10px; border: 1px solid var(--line); border-radius: 99px; color: var(--muted); font-size: 12.5px; text-decoration: none; }
@@ -584,7 +585,7 @@ td:first-child { white-space: nowrap; font-weight: 600; }
 @media (max-width: 560px) { .pager { grid-template-columns: 1fr; } .pager .next { grid-column: 1; text-align: left; } }
 .foot { display: grid; grid-template-columns: 1fr 2fr; gap: 40px; padding-block: 28px 56px; border-top: 1px solid var(--line-soft); }
 .foot strong { font-size: 13.5px; font-weight: 650; }
-.foot p { max-width: 700px; margin: 0; color: var(--muted); font-size: 12.5px; }
+.foot p { max-width: var(--measure); margin: 0; color: var(--muted); font-size: 12.5px; }
 @media (max-width: 720px) { .foot { grid-template-columns: 1fr; gap: 10px; } }
 
 @media (prefers-reduced-motion: reduce) {
@@ -621,7 +622,7 @@ td:first-child { white-space: nowrap; font-weight: 600; }
 .arch-pages a[aria-current] small { color: var(--accent); }
 @media (max-width: 900px) { .arch-pages ol { grid-template-columns: repeat(3, minmax(0, 1fr)); } }
 @media (max-width: 520px) { .arch-pages ol { grid-template-columns: repeat(2, minmax(0, 1fr)); } .arch-pages a { padding: 6px 8px 7px; } }
-.answer { max-width: 620px; margin: 0; padding: 2px 0 2px 18px; border-left: 3px solid var(--accent); color: var(--ink); font-size: 16px; font-weight: 500; line-height: 1.85; text-wrap: pretty; }
+.answer { max-width: var(--measure); margin: 0; padding: 2px 0 2px 18px; border-left: 3px solid var(--accent); color: var(--ink); font-size: 16px; font-weight: 500; line-height: 1.85; text-wrap: pretty; }
 .answer-label { display: block; margin-bottom: 4px; color: var(--accent); font: 600 10.5px/1.5 var(--mono); letter-spacing: .06em; text-transform: uppercase; }
 :lang(ja) .answer-label { font-family: var(--sans); letter-spacing: .04em; text-transform: none; }
 .answer code { padding: .04em .32em; border: 1px solid var(--line-soft); border-radius: 4px; background: var(--hover); font-size: .86em; }
@@ -643,7 +644,7 @@ td:first-child { white-space: nowrap; font-weight: 600; }
 .fig-text { border-top: 1px solid var(--line-soft); }
 .fig-text summary { padding: 9px 16px; color: var(--muted); font-size: 12.5px; cursor: pointer; }
 .fig-text summary:hover { color: var(--ink); }
-.fig-text ol, .fig-text ul { max-width: 760px; margin: 0; padding: 0 20px 14px 38px; color: var(--muted); font-size: 13px; line-height: 1.8; }
+.fig-text ol, .fig-text ul { max-width: var(--measure); margin: 0; padding: 0 20px 14px 38px; color: var(--muted); font-size: 13px; line-height: 1.8; }
 .fig-text li + li { margin-top: 4px; }
 /* 図の部品（色はすべてトークン。ライト/ダークの両方で読めます） */
 .ad-zone { fill: none; stroke: var(--line-strong); stroke-width: 1.2; stroke-dasharray: 5 5; }
@@ -686,7 +687,7 @@ td:first-child { white-space: nowrap; font-weight: 600; }
 .ad-bar.warn { fill: var(--gold); }
 
 /* 実証の状態：ローカルで実証済み / 一部をプロバイダーで確認 / 未実証 */
-.proof { display: grid; max-width: 860px; margin: 0; padding: 0; list-style: none; }
+.proof { display: grid; max-width: var(--measure); margin: 0; padding: 0; list-style: none; }
 .proof li { display: grid; grid-template-columns: 170px minmax(0, 1fr); gap: 4px 16px; padding: 12px 0; border-top: 1px solid var(--line-soft); color: var(--muted); font-size: 13.5px; line-height: 1.8; }
 .proof li:last-child { border-bottom: 1px solid var(--line-soft); }
 .proof strong { color: var(--ink); }
@@ -696,7 +697,7 @@ td:first-child { white-space: nowrap; font-weight: 600; }
 .arch .chip.sampled { background: var(--accent-wash); color: var(--accent); }
 .arch .chip.open { background: var(--gold-wash); color: var(--gold); }
 @media (max-width: 560px) { .proof li { grid-template-columns: minmax(0, 1fr); } }
-.arch .doc-section > ol { max-width: 700px; color: var(--muted); }
+.arch .doc-section > ol { max-width: var(--measure); color: var(--muted); }
 .arch .doc-section li strong { color: var(--ink); }
 .arch .term pre { white-space: pre; }
 .arch .term .s { color: var(--code-verb); }
@@ -705,5 +706,5 @@ td:first-child { white-space: nowrap; font-weight: 600; }
 .arch .cards .card .tag { color: var(--accent); }
 .arch .page-head { display: block; padding-block: clamp(30px, 5vw, 52px) clamp(24px, 3vw, 34px); }
 .arch .page-head h1 { margin-bottom: 18px; }
-.arch .page-head .answer { max-width: 780px; }
+.arch .page-head .answer { max-width: var(--measure); }
 .ad-pre, .ad-pre text { white-space: pre; }
