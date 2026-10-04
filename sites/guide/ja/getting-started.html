@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <meta name="description" content="artifact-pagesのCLIを入れ、管理リポジトリとチームのリポジトリの役割を確認し、Gitのディレクトリから閲覧アプリでサイトを読むところまでを手元で試す。">
+  <meta name="description" content="artifact-pagesのCLIを入れ、管理リポジトリとチームのリポジトリの役割を確認し、Cloudflareを例に最初のサイトを公開して閲覧アプリで読むところまで進める。">
   <title>はじめる</title>
   <script>
     // Copy the reader app's theme (same-origin parent) before first paint; assets/site.js keeps it in sync.
@@ -30,7 +30,7 @@
         <p class="eyebrow">はじめて導入する管理者向け</p>
         <h1>はじめる</h1>
       </div>
-      <p class="lead"><code>artifact-pages</code>コマンドを入れ、管理リポジトリとチームのリポジトリがそれぞれ何をするかを確認してから、Gitのディレクトリにある文書を閲覧アプリで読むところまでを手元で試します。試すだけならクラウドのアカウントは要りません。</p>
+      <p class="lead"><code>artifact-pages</code>コマンドを入れ、管理リポジトリとチームのリポジトリがそれぞれ何をするかを確認してから、配信先にCloudflareを使う例で、最初のサイトを公開して閲覧アプリで読むところまで進めます。</p>
     </header>
 
     <section class="doc-section" aria-labelledby="install">
@@ -65,49 +65,97 @@
 
     <section class="doc-section" aria-labelledby="roles">
       <h2 id="roles">2種類のリポジトリ</h2>
-      <p>ひとつの環境には、管理リポジトリがひとつと、チームのリポジトリがいくつでもあります。どのサイトを置くかは管理者が決め、各チームは自分のサイトだけを公開します。</p>
+      <p>ひとつの環境には、管理リポジトリがひとつと、チームのリポジトリがいくつでもあります。どのサイトを置くかは管理者が決め、各チームは自分のサイトだけを公開します。どちらも同じ配信先に書き込みます。</p>
       <figure class="hub" role="group" aria-label="管理リポジトリとチームのリポジトリが、同じ配信先に書き込む関係">
         <div class="hub-box r-admin"><div class="hub-h">管理リポジトリ<small>環境ごとにひとつ</small></div>
-          <ul class="hub-steps"><li><span class="sn">1</span><span><code>artifact-pages.yaml</code>に、配信先とサイトの一覧を書きます。</span></li><li><span class="sn">2</span><span><code>app deploy</code>で閲覧アプリを置きます。</span></li><li><span class="sn">3</span><span><code>registry register</code>でサイトを登録します。</span></li></ul></div>
-        <div class="hub-arrow" aria-hidden="true"><b>→</b>2·3</div>
-        <div class="hub-box r-store"><div class="hub-h">配信先<small>ストレージ</small></div>
-          <ul class="hub-slots"><li class="r-admin">閲覧アプリ<em aria-hidden="true">← 2</em></li><li class="r-admin">サイトの登録情報<em aria-hidden="true">← 3</em></li><li class="r-team">サイトのページ<em aria-hidden="true">4 →</em></li></ul>
-          <p class="hub-note r-store"><span class="sn">5</span><span>ページを受け取る前に、チームの設定ではなく配信先にある登録情報を読みます。一致しなければ書き込みません。</span></p>
+          <p class="hub-desc">環境全体を受け持ちます。配信先と、登録するサイトの一覧をすべて持ちます。どちらのコマンドも、レビューを通った変更から実行するのが望ましい運用です。</p>
+          <ul class="hub-steps"><li><span class="sn">2</span><span><code>artifact-pages.yaml</code>に、配信先とサイトの一覧を書きます。</span></li><li><span class="sn">3</span><span><code>app deploy</code>で閲覧アプリを置きます。</span></li><li><span class="sn">4</span><span><code>registry register</code>でサイトを登録します。</span></li></ul></div>
+        <div class="hub-arrow" aria-hidden="true"><b>→</b>3·4</div>
+        <div class="hub-box r-store"><div class="hub-h">配信先<small>ストレージとCDN</small></div>
+          <ul class="hub-slots"><li class="r-store">ストレージとCDN（プロバイダ側で用意）<em aria-hidden="true">1</em></li><li class="r-admin">閲覧アプリ<em aria-hidden="true">← 3</em></li><li class="r-admin">サイトの登録情報<em aria-hidden="true">← 4</em></li><li class="r-team">サイトのページ<em aria-hidden="true">5 →</em></li></ul>
+          <p class="hub-note r-store">ページを受け取る前に、チームの設定ではなく配信先にある登録情報を読みます。一致しなければ書き込みません。</p>
           <p class="hub-note r-read"><span class="sn">6</span><span>読む人は、ここに置かれた閲覧アプリでサイトを読みます。</span></p></div>
-        <div class="hub-arrow" aria-hidden="true"><b>←</b>4</div>
+        <div class="hub-arrow" aria-hidden="true"><b>←</b>5</div>
         <div class="hub-box r-team"><div class="hub-h">チームのリポジトリ<small>いくつでも</small></div>
-          <ul class="hub-steps"><li><span class="sn">4</span><span>マージ後に自分のCIから<code>site publish</code>を実行します。例は説明用の<code>acme/checkout</code>です。</span></li></ul></div>
+          <p class="hub-desc">登録されたディレクトリに文書を置き、自分のサイトだけを公開します。1つのリポジトリから1つ以上のサイトを公開できます。必要なのは配信先の設定だけで、サイトの一覧は要りません。管理リポジトリのファイルは<a href="configuration.html#remote"><code>github://</code>の指定</a>で読めます。</p>
+          <ul class="hub-steps"><li><span class="sn">5</span><span>マージ後に自分のCIから<code>site publish</code>を実行します。</span></li></ul></div>
       </figure>
-      <div class="split">
-        <div class="pane r-admin">
-          <span class="label">管理リポジトリ · 環境ごとにひとつ</span>
-          <h3>環境全体を受け持つ</h3>
-          <p><code>artifact-pages.yaml</code>に、配信先と、登録するサイトの一覧をすべて書きます。<code>app deploy</code>で閲覧アプリを置き、<code>registry register</code>でサイトを登録します。どちらもレビューを通った変更から実行するのが望ましい運用です。</p>
-        </div>
-        <div class="pane r-team">
-          <span class="label">チームのリポジトリ · いくつでも · 1つ以上のサイトを公開</span>
-          <h3>自分のサイトを公開する</h3>
-          <p>登録されたディレクトリに文書を置き、自分のサイトに<code>site publish</code>を実行します。ふつうはマージ後に自分のCIから動かします。必要なのは配信先の設定だけで、サイトの一覧は要りません。管理リポジトリのファイルは<a href="configuration.html#remote"><code>github://</code>の指定</a>で読めます。</p>
-        </div>
-      </div>
-      <p>あるリポジトリがそのサイトに公開してよいかは、チームの設定ファイルではなく、配信先にあるサイトの登録情報で決まります。試すときはひとつのリポジトリで両方の役割を兼ねられます。次の節はその形で進めます。</p>
+      <p>あるリポジトリがそのサイトに公開してよいかは、チームの設定ファイルではなく、配信先にあるサイトの登録情報で決まります。次の節では、図の番号の順に進めます。</p>
     </section>
 
-    <section class="doc-section" aria-labelledby="try">
-      <h2 id="try">手元で試す</h2>
-      <p><code>local</code>プロバイダは、クラウドのストレージの代わりにローカルのディレクトリへすべてを書き込むので、アカウントなしで一連の流れを試せます。CLIのほかに、Git、GitHub Releasesから閲覧アプリを取得するためのネットワーク接続、結果を見るためのPython 3（または任意の静的ファイルサーバー）を用意してください。</p>
+    <section class="doc-section" aria-labelledby="cloudflare">
+      <h2 id="cloudflare">Cloudflareで始める</h2>
+      <p>配信先にCloudflareを使う例で、最初のサイトを読めるところまで進めます。管理リポジトリの<code>acme/platform-admin</code>と、チームのリポジトリの<code>acme/checkout</code>は説明用の例です。AWSでも流れとコマンドは同じで、変わるのは手順1と2です（<a href="#other-targets">ほかの配信先</a>）。</p>
       <ol class="timeline">
-        <li><div><h3>リポジトリを用意する</h3><p><code>origin</code>のリモートがGitHubにあるGitのチェックアウトに、<code>.html</code>か<code>.md</code>のページを1つ以上置いたディレクトリを用意します。公開ではGitの履歴から日付を読むので、コミットが1つもないリポジトリでは失敗します。コミットが1つ以上あれば、ページ自体はコミットしていなくてもかまいません。例では説明用の<code>acme/checkout</code>と、その<code>docs/artifacts</code>を使います。実際には自分のリポジトリの<code>owner/repo</code>とディレクトリに置き換えてください。</p>
-          <div class="term" aria-label="最初のページを作る">
-            <div class="term-head"><span>ターミナル / acme/checkout</span><button class="copy-btn" type="button">コピー</button></div>
-<pre><span class="p">$</span> <span data-copy>mkdir -p docs/artifacts</span>
-<span class="p">$</span> <span data-copy>printf '# Payment flow design\n\nHow a card payment moves through checkout.\n' &gt; docs/artifacts/payment-flow.md</span>
-<span class="c"># まだコミットがないリポジトリのときだけ</span>
-<span class="p">$</span> <span data-copy>git add -A &amp;&amp; git commit -m "Add a first page"</span></pre>
+        <li><div><h3>配信先を用意する</h3><p>非公開のR2のバケットをひとつ作り、読者が使うホスト名（例では<code>docs.example.com</code>）につなぎます。あわせて、閲覧アプリへの経路の振り分け、<code>/_control/</code>の遮断、キャッシュのルール、プレビューの保持期間を設定します。これらはArtifact Pagesのコマンドでは作らず、Terraformなどで用意します。製品リポジトリに、そのためのTerraformのモジュールがあります。管理者の認証情報として、R2のアクセスキーとシークレット、キャッシュを消す権限を持つAPIトークンも用意します。</p>
+          <p class="note">詳しい手順は、製品リポジトリの<a href="https://github.com/tasuku43/git-artifact-pages/blob/main/docs/guides/cloudflare-deployment.md" target="_blank" rel="noopener">Cloudflare deployment</a>（英語）を参照してください。</p>
+          
+          <figure class="concept" role="group" aria-label="手順1のあとの状態"><figcaption>手順1のあとの状態</figcaption><div class="concept-row"><div class="cbox r-admin"><div class="cbox-h">管理リポジトリ<small>acme/platform-admin</small></div><ul><li class="r-admin todo">設定ファイル<span class="sr-only">（まだ）</span><em aria-hidden="true">2</em></li></ul></div><span class="to" aria-hidden="true">→</span><div class="cbox r-store"><div class="cbox-h">配信先<small>Cloudflare</small></div><ul><li class="r-store now">ストレージとCDN<span class="sr-only">（この手順でできた）</span><em aria-hidden="true">この手順</em></li><li class="r-admin todo">閲覧アプリ<span class="sr-only">（まだ）</span><em aria-hidden="true">3</em></li><li class="r-admin todo">サイトの登録情報<span class="sr-only">（まだ）</span><em aria-hidden="true">4</em></li><li class="r-team todo">公開されたページ<span class="sr-only">（まだ）</span><em aria-hidden="true">5</em></li><li class="r-read todo">読める<span class="sr-only">（まだ）</span><em aria-hidden="true">6</em></li></ul></div><span class="to" aria-hidden="true">←</span><div class="cbox r-team"><div class="cbox-h">チームのリポジトリ<small>acme/checkout</small></div><ul><li class="r-team done">ページ<span class="sr-only">（できている）</span></li></ul></div></div></figure></div></li>
+        <li><div><h3>管理リポジトリに<code>artifact-pages.yaml</code>を書く</h3><p>配信先に<code>cloudflare</code>を指定し、公開するサイトを<code>sites</code>に並べます。<code>repository</code>はチームのリポジトリの<code>owner/repo</code>、<code>sourcePath</code>はそのルートからのディレクトリのパスです。バケットの名前が<code>artifact-pages</code>でなければ<code>bucket</code>も書きます（「<a href="configuration.html#provider-cloudflare">cloudflare</a>」を参照）。</p>
+          <div class="term" aria-label="管理リポジトリのartifact-pages.yaml">
+            <div class="term-head"><span>artifact-pages.yaml / acme/platform-admin</span><button class="copy-btn" type="button">コピー</button></div>
+<pre><span class="k">schemaVersion</span>: 1
+<span class="k">provider</span>: cloudflare
+<span class="k">cloudflare</span>:
+  <span class="k">accountId</span>: "&lt;32文字のアカウントID&gt;"
+  <span class="k">zoneId</span>: "&lt;32文字のゾーンID&gt;"
+  <span class="k">publicBaseURL</span>: https://docs.example.com
+<span class="k">sites</span>:
+  <span class="k">checkout</span>:
+    <span class="k">name</span>: Payments / Checkout
+    <span class="k">repository</span>: acme/checkout
+    <span class="k">sourcePath</span>: docs/artifacts</pre>
           </div>
-          <figure class="concept" role="group" aria-label="手順1のあとの状態"><figcaption>手順1のあとの状態</figcaption><div class="concept-row"><div class="cbox r-team"><div class="cbox-h">リポジトリ<small>acme/checkout</small></div><ul><li class="r-team now">ページ<span class="sr-only">（この手順でできた）</span><em aria-hidden="true">この手順</em></li><li class="r-admin todo">設定ファイル<span class="sr-only">（まだ）</span><em aria-hidden="true">2</em></li></ul></div><span class="to" aria-hidden="true">→</span><div class="cbox r-store"><div class="cbox-h">配信先<small>.local/storage</small></div><ul><li class="r-store todo">閲覧アプリ<span class="sr-only">（まだ）</span><em aria-hidden="true">3</em></li><li class="r-store todo">サイトの登録情報<span class="sr-only">（まだ）</span><em aria-hidden="true">4</em></li><li class="r-store todo">公開されたページ<span class="sr-only">（まだ）</span><em aria-hidden="true">5</em></li></ul></div><span class="to" aria-hidden="true">→</span><div class="cbox r-read"><div class="cbox-h">ブラウザ<small>localhost:8000</small></div><ul><li class="r-read todo">サイトを読む<span class="sr-only">（まだ）</span><em aria-hidden="true">6</em></li></ul></div></div></figure></div></li>
-        <li><div><h3><code>artifact-pages.yaml</code>を書く</h3><p>リポジトリのルートに置き、配信先に<code>local</code>を指定して、サイトを1つ登録します。<code>repository</code>はチェックアウトの<code>origin</code>と同じ<code>owner/repo</code>に、<code>sourcePath</code>はルートからのディレクトリのパスにします。<code>.local/</code>の下はすべて生成物なので、<code>.gitignore</code>に加えておきます。</p>
-          <div class="term" aria-label="試すためのartifact-pages.yaml">
+          <figure class="concept" role="group" aria-label="手順2のあとの状態"><figcaption>手順2のあとの状態</figcaption><div class="concept-row"><div class="cbox r-admin"><div class="cbox-h">管理リポジトリ<small>acme/platform-admin</small></div><ul><li class="r-admin now">設定ファイル<span class="sr-only">（この手順でできた）</span><em aria-hidden="true">この手順</em></li></ul></div><span class="to" aria-hidden="true">→</span><div class="cbox r-store"><div class="cbox-h">配信先<small>Cloudflare</small></div><ul><li class="r-store done">ストレージとCDN<span class="sr-only">（できている）</span><em aria-hidden="true">1</em></li><li class="r-admin todo">閲覧アプリ<span class="sr-only">（まだ）</span><em aria-hidden="true">3</em></li><li class="r-admin todo">サイトの登録情報<span class="sr-only">（まだ）</span><em aria-hidden="true">4</em></li><li class="r-team todo">公開されたページ<span class="sr-only">（まだ）</span><em aria-hidden="true">5</em></li><li class="r-read todo">読める<span class="sr-only">（まだ）</span><em aria-hidden="true">6</em></li></ul></div><span class="to" aria-hidden="true">←</span><div class="cbox r-team"><div class="cbox-h">チームのリポジトリ<small>acme/checkout</small></div><ul><li class="r-team done">ページ<span class="sr-only">（できている）</span></li></ul></div></div></figure></div></li>
+        <li><div><h3>閲覧アプリを置く</h3><p>管理リポジトリで、管理者の認証情報を環境変数に入れて実行します。CLIと同じリリースの閲覧アプリを取得して検証し、バケットに書き込みます。ここで使うほかのコマンドと同じく、<code>--dry-run</code>を付けると書き込まずに変更計画だけを表示します。</p>
+          <div class="term" aria-label="閲覧アプリを置く">
+            <div class="term-head"><span>ターミナル / acme/platform-admin</span><button class="copy-btn" type="button">コピー</button></div>
+<pre><span class="c"># 値はファイルに書かず、環境変数で渡す</span>
+<span class="p">$</span> export CF_R2_ACCESS_KEY_ID=… CF_R2_SECRET_ACCESS_KEY=… CF_API_TOKEN=…
+<span class="p">$</span> <span data-copy>artifact-pages <span class="v">app deploy</span> --config artifact-pages.yaml --dry-run</span>
+<span class="p">$</span> <span data-copy>artifact-pages <span class="v">app deploy</span> --config artifact-pages.yaml</span></pre>
+          </div>
+          <figure class="concept" role="group" aria-label="手順3のあとの状態"><figcaption>手順3のあとの状態</figcaption><div class="concept-row"><div class="cbox r-admin"><div class="cbox-h">管理リポジトリ<small>acme/platform-admin</small></div><ul><li class="r-admin done">設定ファイル<span class="sr-only">（できている）</span><em aria-hidden="true">2</em></li></ul></div><span class="to" aria-hidden="true">→</span><div class="cbox r-store"><div class="cbox-h">配信先<small>Cloudflare</small></div><ul><li class="r-store done">ストレージとCDN<span class="sr-only">（できている）</span><em aria-hidden="true">1</em></li><li class="r-admin now">閲覧アプリ<span class="sr-only">（この手順でできた）</span><em aria-hidden="true">この手順</em></li><li class="r-admin todo">サイトの登録情報<span class="sr-only">（まだ）</span><em aria-hidden="true">4</em></li><li class="r-team todo">公開されたページ<span class="sr-only">（まだ）</span><em aria-hidden="true">5</em></li><li class="r-read todo">読める<span class="sr-only">（まだ）</span><em aria-hidden="true">6</em></li></ul></div><span class="to" aria-hidden="true">←</span><div class="cbox r-team"><div class="cbox-h">チームのリポジトリ<small>acme/checkout</small></div><ul><li class="r-team done">ページ<span class="sr-only">（できている）</span></li></ul></div></div></figure></div></li>
+        <li><div><h3>サイトを登録する</h3><p><code>sites</code>の内容から、サイトの登録情報を配信先に書き込みます。これでサイトはできましたが、ページはまだありません。</p>
+          <div class="term" aria-label="サイトを登録する">
+            <div class="term-head"><span>ターミナル / acme/platform-admin</span><button class="copy-btn" type="button">コピー</button></div>
+<pre><span class="p">$</span> <span data-copy>artifact-pages <span class="v">registry register</span> --config artifact-pages.yaml --dry-run</span>
+<span class="p">$</span> <span data-copy>artifact-pages <span class="v">registry register</span> --config artifact-pages.yaml</span></pre>
+          </div>
+          <figure class="concept" role="group" aria-label="手順4のあとの状態"><figcaption>手順4のあとの状態</figcaption><div class="concept-row"><div class="cbox r-admin"><div class="cbox-h">管理リポジトリ<small>acme/platform-admin</small></div><ul><li class="r-admin done">設定ファイル<span class="sr-only">（できている）</span><em aria-hidden="true">2</em></li></ul></div><span class="to" aria-hidden="true">→</span><div class="cbox r-store"><div class="cbox-h">配信先<small>Cloudflare</small></div><ul><li class="r-store done">ストレージとCDN<span class="sr-only">（できている）</span><em aria-hidden="true">1</em></li><li class="r-admin done">閲覧アプリ<span class="sr-only">（できている）</span><em aria-hidden="true">3</em></li><li class="r-admin now">サイトの登録情報<span class="sr-only">（この手順でできた）</span><em aria-hidden="true">この手順</em></li><li class="r-team todo">公開されたページ<span class="sr-only">（まだ）</span><em aria-hidden="true">5</em></li><li class="r-read todo">読める<span class="sr-only">（まだ）</span><em aria-hidden="true">6</em></li></ul></div><span class="to" aria-hidden="true">←</span><div class="cbox r-team"><div class="cbox-h">チームのリポジトリ<small>acme/checkout</small></div><ul><li class="r-team done">ページ<span class="sr-only">（できている）</span></li></ul></div></div></figure></div></li>
+        <li><div><h3>チームのリポジトリから公開する</h3><p><code>acme/checkout</code>の<code>docs/artifacts</code>に、<code>.html</code>か<code>.md</code>のページを1つ以上置きます。公開ではGitの履歴から日付を読むので、コミットが1つもないリポジトリでは失敗します。<code>--config</code>には、管理リポジトリのファイルをコミットを固定した<code>github://</code>の指定で渡します。CLIは配信先の登録情報を読み、リポジトリとディレクトリが登録どおりかを確かめてから、ページをコピーしてサイトのインデックスを作ります。<code>--fulltext</code>を付けると、本文検索のためのデータも作ります。</p>
+          <div class="term" aria-label="チームのリポジトリから公開する">
+            <div class="term-head"><span>ターミナル / acme/checkout</span><button class="copy-btn" type="button">コピー</button></div>
+<pre><span class="p">$</span> <span data-copy>artifact-pages <span class="v">site publish</span> --site checkout --source docs/artifacts --config 'github://acme/platform-admin/artifact-pages.yaml?ref=&lt;full commit SHA&gt;' --fulltext --dry-run</span>
+<span class="p">$</span> <span data-copy>artifact-pages <span class="v">site publish</span> --site checkout --source docs/artifacts --config 'github://acme/platform-admin/artifact-pages.yaml?ref=&lt;full commit SHA&gt;' --fulltext</span></pre>
+          </div>
+          <p>必要な認証情報は、R2のアクセスキーとシークレット、サイトを変える実行で使うAPIトークンです。最初の1回は手元から実行してもかまいません。ふだんはマージ後にCIから実行します。そのまま使えるGitHub Actionsのワークフローが「<a href="publishing.html#github-actions">サイトの公開</a>」にあります。管理リポジトリが非公開なら、<code>GITHUB_TOKEN</code>か<code>GH_TOKEN</code>で読みます。</p>
+          <figure class="concept" role="group" aria-label="手順5のあとの状態"><figcaption>手順5のあとの状態</figcaption><div class="concept-row"><div class="cbox r-admin"><div class="cbox-h">管理リポジトリ<small>acme/platform-admin</small></div><ul><li class="r-admin done">設定ファイル<span class="sr-only">（できている）</span><em aria-hidden="true">2</em></li></ul></div><span class="to" aria-hidden="true">→</span><div class="cbox r-store"><div class="cbox-h">配信先<small>Cloudflare</small></div><ul><li class="r-store done">ストレージとCDN<span class="sr-only">（できている）</span><em aria-hidden="true">1</em></li><li class="r-admin done">閲覧アプリ<span class="sr-only">（できている）</span><em aria-hidden="true">3</em></li><li class="r-admin done">サイトの登録情報<span class="sr-only">（できている）</span><em aria-hidden="true">4</em></li><li class="r-team now">公開されたページ<span class="sr-only">（この手順でできた）</span><em aria-hidden="true">この手順</em></li><li class="r-read todo">読める<span class="sr-only">（まだ）</span><em aria-hidden="true">6</em></li></ul></div><span class="to" aria-hidden="true">←</span><div class="cbox r-team"><div class="cbox-h">チームのリポジトリ<small>acme/checkout</small></div><ul><li class="r-team done">ページ<span class="sr-only">（できている）</span></li></ul></div></div></figure></div></li>
+        <li><div><h3>ブラウザで開く</h3><p><code>https://docs.example.com/</code>を開きます。サイトの一覧（<strong>Choose a site</strong>）にPayments / Checkoutが出るので、開いてページを選び、<kbd>⌘⇧F</kbd> / <kbd>Ctrl ⇧ F</kbd>で本文検索も試してください。<code>/checkout/payment-flow.md</code>のようなアドレスで再読み込みしても、手順1の配信のルールが閲覧アプリに渡します。</p>
+          
+          <figure class="concept" role="group" aria-label="手順6のあとの状態"><figcaption>手順6のあとの状態</figcaption><div class="concept-row"><div class="cbox r-admin"><div class="cbox-h">管理リポジトリ<small>acme/platform-admin</small></div><ul><li class="r-admin done">設定ファイル<span class="sr-only">（できている）</span><em aria-hidden="true">2</em></li></ul></div><span class="to" aria-hidden="true">→</span><div class="cbox r-store"><div class="cbox-h">配信先<small>Cloudflare</small></div><ul><li class="r-store done">ストレージとCDN<span class="sr-only">（できている）</span><em aria-hidden="true">1</em></li><li class="r-admin done">閲覧アプリ<span class="sr-only">（できている）</span><em aria-hidden="true">3</em></li><li class="r-admin done">サイトの登録情報<span class="sr-only">（できている）</span><em aria-hidden="true">4</em></li><li class="r-team done">公開されたページ<span class="sr-only">（できている）</span><em aria-hidden="true">5</em></li><li class="r-read now">読める<span class="sr-only">（この手順でできた）</span><em aria-hidden="true">この手順</em></li></ul></div><span class="to" aria-hidden="true">←</span><div class="cbox r-team"><div class="cbox-h">チームのリポジトリ<small>acme/checkout</small></div><ul><li class="r-team done">ページ<span class="sr-only">（できている）</span></li></ul></div></div></figure></div></li>
+      </ol>
+      <div class="callout warn" role="note">
+        <span class="ico">確認</span>
+        <div>
+          <p><strong><code>--fulltext</code>は公開のたびに付けてください。</strong>付けずに公開すると、そのサイトの検索データが消えます。</p>
+        </div>
+      </div>
+      <p>サイトを変えるときは、ディレクトリのファイルを編集または削除して、同じ<code>site publish</code>を実行します。変わったファイルをアップロードし、なくなったファイルを取り除きます。</p>
+    </section>
+
+    <section class="doc-section" aria-labelledby="other-targets">
+      <h2 id="other-targets">ほかの配信先</h2>
+      <p>どの配信先でも、使うコマンドと手順3から6は同じです。変わるのは、配信先の用意と<code>artifact-pages.yaml</code>の<code>provider</code>の設定です。</p>
+      <ul>
+        <li><strong>AWS</strong>では、S3とCloudFrontを用意し、<code>provider: aws</code>を設定します（「<a href="configuration.html#provider-aws">aws</a>」を参照）。認証情報はAWSの標準の探し方に従い、CIではOIDCでロールを引き受けます。</li>
+        <li><strong>誰かが公開する前に</strong>、「<a href="access-and-trust.html">信頼とアクセス制御</a>」を読んでください。公開したHTMLはコードとして動き、読める人の制限は配信側で行います。</li>
+      </ul>
+      <details class="more">
+        <summary>手元で試す（<code>local</code>プロバイダ）</summary>
+        <div class="more-body">
+          <p><code>local</code>プロバイダは、クラウドのストレージの代わりにローカルのディレクトリへ書き込みます。アカウントなしで、ひとつのリポジトリに両方の役割を兼ねさせて流れを試せます。<code>repository</code>はチェックアウトの<code>origin</code>と同じ<code>owner/repo</code>にします。<code>.local/</code>の下は生成物なので、<code>.gitignore</code>に加えておきます。</p>
+          <div class="term" aria-label="手元で試すためのartifact-pages.yaml">
             <div class="term-head"><span>artifact-pages.yaml / acme/checkout</span><button class="copy-btn" type="button">コピー</button></div>
 <pre><span class="k">schemaVersion</span>: 1
 <span class="k">provider</span>: local
@@ -119,54 +167,40 @@
     <span class="k">repository</span>: acme/checkout
     <span class="k">sourcePath</span>: docs/artifacts</pre>
           </div>
-          <figure class="concept" role="group" aria-label="手順2のあとの状態"><figcaption>手順2のあとの状態</figcaption><div class="concept-row"><div class="cbox r-team"><div class="cbox-h">リポジトリ<small>acme/checkout</small></div><ul><li class="r-team done">ページ<span class="sr-only">（できている）</span><em aria-hidden="true">1</em></li><li class="r-admin now">設定ファイル<span class="sr-only">（この手順でできた）</span><em aria-hidden="true">この手順</em></li></ul></div><span class="to" aria-hidden="true">→</span><div class="cbox r-store"><div class="cbox-h">配信先<small>.local/storage</small></div><ul><li class="r-store todo">閲覧アプリ<span class="sr-only">（まだ）</span><em aria-hidden="true">3</em></li><li class="r-store todo">サイトの登録情報<span class="sr-only">（まだ）</span><em aria-hidden="true">4</em></li><li class="r-store todo">公開されたページ<span class="sr-only">（まだ）</span><em aria-hidden="true">5</em></li></ul></div><span class="to" aria-hidden="true">→</span><div class="cbox r-read"><div class="cbox-h">ブラウザ<small>localhost:8000</small></div><ul><li class="r-read todo">サイトを読む<span class="sr-only">（まだ）</span><em aria-hidden="true">6</em></li></ul></div></div></figure></div></li>
-        <li><div><h3>閲覧アプリを置く</h3><p>CLIと同じリリースの閲覧アプリを取得して検証し、<code>index.html</code>と<code>assets/</code>を<code>.local/storage</code>に書き込みます。ここで使うほかのコマンドと同じく、<code>--dry-run</code>を付けると書き込まずに変更計画だけを表示します。</p>
-          <div class="term" aria-label="閲覧アプリを手元に置く">
-            <div class="term-head"><span>ターミナル / acme/checkout</span><button class="copy-btn" type="button">コピー</button></div>
-<pre><span class="p">$</span> <span data-copy>artifact-pages <span class="v">app deploy</span> --config artifact-pages.yaml --dry-run</span>
-<span class="p">$</span> <span data-copy>artifact-pages <span class="v">app deploy</span> --config artifact-pages.yaml</span></pre>
-          </div>
-          <figure class="concept" role="group" aria-label="手順3のあとの状態"><figcaption>手順3のあとの状態</figcaption><div class="concept-row"><div class="cbox r-team"><div class="cbox-h">リポジトリ<small>acme/checkout</small></div><ul><li class="r-team done">ページ<span class="sr-only">（できている）</span><em aria-hidden="true">1</em></li><li class="r-admin done">設定ファイル<span class="sr-only">（できている）</span><em aria-hidden="true">2</em></li></ul></div><span class="to" aria-hidden="true">→</span><div class="cbox r-store"><div class="cbox-h">配信先<small>.local/storage</small></div><ul><li class="r-store now">閲覧アプリ<span class="sr-only">（この手順でできた）</span><em aria-hidden="true">この手順</em></li><li class="r-store todo">サイトの登録情報<span class="sr-only">（まだ）</span><em aria-hidden="true">4</em></li><li class="r-store todo">公開されたページ<span class="sr-only">（まだ）</span><em aria-hidden="true">5</em></li></ul></div><span class="to" aria-hidden="true">→</span><div class="cbox r-read"><div class="cbox-h">ブラウザ<small>localhost:8000</small></div><ul><li class="r-read todo">サイトを読む<span class="sr-only">（まだ）</span><em aria-hidden="true">6</em></li></ul></div></div></figure></div></li>
-        <li><div><h3>サイトを登録する</h3><p><code>sites</code>の内容から、サイトの登録情報を書き込みます。これでサイトはできましたが、ページはまだありません。</p>
-          <div class="term" aria-label="サイトを手元で登録する">
-            <div class="term-head"><span>ターミナル / acme/checkout</span><button class="copy-btn" type="button">コピー</button></div>
-<pre><span class="p">$</span> <span data-copy>artifact-pages <span class="v">registry register</span> --config artifact-pages.yaml --dry-run</span>
-<span class="p">$</span> <span data-copy>artifact-pages <span class="v">registry register</span> --config artifact-pages.yaml</span></pre>
-          </div>
-          <figure class="concept" role="group" aria-label="手順4のあとの状態"><figcaption>手順4のあとの状態</figcaption><div class="concept-row"><div class="cbox r-team"><div class="cbox-h">リポジトリ<small>acme/checkout</small></div><ul><li class="r-team done">ページ<span class="sr-only">（できている）</span><em aria-hidden="true">1</em></li><li class="r-admin done">設定ファイル<span class="sr-only">（できている）</span><em aria-hidden="true">2</em></li></ul></div><span class="to" aria-hidden="true">→</span><div class="cbox r-store"><div class="cbox-h">配信先<small>.local/storage</small></div><ul><li class="r-store done">閲覧アプリ<span class="sr-only">（できている）</span><em aria-hidden="true">3</em></li><li class="r-store now">サイトの登録情報<span class="sr-only">（この手順でできた）</span><em aria-hidden="true">この手順</em></li><li class="r-store todo">公開されたページ<span class="sr-only">（まだ）</span><em aria-hidden="true">5</em></li></ul></div><span class="to" aria-hidden="true">→</span><div class="cbox r-read"><div class="cbox-h">ブラウザ<small>localhost:8000</small></div><ul><li class="r-read todo">サイトを読む<span class="sr-only">（まだ）</span><em aria-hidden="true">6</em></li></ul></div></div></figure></div></li>
-        <li><div><h3>公開する</h3><p>リポジトリとディレクトリが登録どおりかを確かめてから、ページをコピーしてサイトのインデックスを作ります。<code>--fulltext</code>を付けると、本文検索のためのデータも作ります。同じコマンドをもう一度実行すると<code>UP TO DATE</code>と出ます。</p>
-          <div class="term" aria-label="サイトを手元で公開する">
-            <div class="term-head"><span>ターミナル / acme/checkout</span><button class="copy-btn" type="button">コピー</button></div>
-<pre><span class="p">$</span> <span data-copy>artifact-pages <span class="v">site publish</span> --site checkout --source docs/artifacts --config artifact-pages.yaml --fulltext --dry-run</span>
-<span class="p">$</span> <span data-copy>artifact-pages <span class="v">site publish</span> --site checkout --source docs/artifacts --config artifact-pages.yaml --fulltext</span></pre>
-          </div>
-          <figure class="concept" role="group" aria-label="手順5のあとの状態"><figcaption>手順5のあとの状態</figcaption><div class="concept-row"><div class="cbox r-team"><div class="cbox-h">リポジトリ<small>acme/checkout</small></div><ul><li class="r-team done">ページ<span class="sr-only">（できている）</span><em aria-hidden="true">1</em></li><li class="r-admin done">設定ファイル<span class="sr-only">（できている）</span><em aria-hidden="true">2</em></li></ul></div><span class="to" aria-hidden="true">→</span><div class="cbox r-store"><div class="cbox-h">配信先<small>.local/storage</small></div><ul><li class="r-store done">閲覧アプリ<span class="sr-only">（できている）</span><em aria-hidden="true">3</em></li><li class="r-store done">サイトの登録情報<span class="sr-only">（できている）</span><em aria-hidden="true">4</em></li><li class="r-store now">公開されたページ<span class="sr-only">（この手順でできた）</span><em aria-hidden="true">この手順</em></li></ul></div><span class="to" aria-hidden="true">→</span><div class="cbox r-read"><div class="cbox-h">ブラウザ<small>localhost:8000</small></div><ul><li class="r-read todo">サイトを読む<span class="sr-only">（まだ）</span><em aria-hidden="true">6</em></li></ul></div></div></figure></div></li>
-        <li><div><h3>閲覧アプリで開く</h3><p>ディレクトリを配信して<code>http://localhost:8000/</code>を開きます。サイトの一覧（<strong>Choose a site</strong>）にPayments / Checkoutが出るので、開いてページを選び、<kbd>⌘⇧F</kbd> / <kbd>Ctrl ⇧ F</kbd>で本文検索も試してください。</p>
-          <div class="term" aria-label="手元の出力を配信する">
-            <div class="term-head"><span>ターミナル / acme/checkout</span><button class="copy-btn" type="button">コピー</button></div>
-<pre><span class="p">$</span> <span data-copy>python3 -m http.server 8000 --directory .local/storage</span></pre>
-          </div>
-          <figure class="concept" role="group" aria-label="手順6のあとの状態"><figcaption>手順6のあとの状態</figcaption><div class="concept-row"><div class="cbox r-team"><div class="cbox-h">リポジトリ<small>acme/checkout</small></div><ul><li class="r-team done">ページ<span class="sr-only">（できている）</span><em aria-hidden="true">1</em></li><li class="r-admin done">設定ファイル<span class="sr-only">（できている）</span><em aria-hidden="true">2</em></li></ul></div><span class="to" aria-hidden="true">→</span><div class="cbox r-store"><div class="cbox-h">配信先<small>.local/storage</small></div><ul><li class="r-store done">閲覧アプリ<span class="sr-only">（できている）</span><em aria-hidden="true">3</em></li><li class="r-store done">サイトの登録情報<span class="sr-only">（できている）</span><em aria-hidden="true">4</em></li><li class="r-store done">公開されたページ<span class="sr-only">（できている）</span><em aria-hidden="true">5</em></li></ul></div><span class="to" aria-hidden="true">→</span><div class="cbox r-read"><div class="cbox-h">ブラウザ<small>localhost:8000</small></div><ul><li class="r-read now">サイトを読む<span class="sr-only">（この手順でできた）</span><em aria-hidden="true">この手順</em></li></ul></div></div></figure></div></li>
-      </ol>
-      <div class="callout warn" role="note">
-        <span class="ico">確認</span>
-        <div>
-          <p><strong><code>http://localhost:8000/</code>から開き、アプリの中で移動してください。</strong>この簡易サーバーはファイルを返すだけなので、<code>/checkout/payment-flow.md</code>のようなアドレスで再読み込みすると404になります。本番用に設定した配信先では、こうしたアドレスも閲覧アプリに渡ります。</p>
-          <p><strong><code>--fulltext</code>は公開のたびに付けてください。</strong>付けずに公開すると、そのサイトの検索データが消えます。</p>
-        </div>
-      </div>
-      <p>サイトを変えるときは、ディレクトリのファイルを編集または削除して、同じ<code>site publish</code>を実行します。変わったファイルをアップロードし、なくなったファイルを取り除きます。最初からやり直すときは<code>.local/storage</code>を削除します。</p>
-    </section>
+          <p>手順3から5のコマンドは同じで、認証情報は要りません。<code>--config</code>には<code>artifact-pages.yaml</code>を渡します。書き込まれたディレクトリを配信するには、<code>/checkout/payment-flow.md</code>のようなアドレスを閲覧アプリに渡し、<code>/_control/</code>を返さないサーバーが要ります。nginxなら次のとおりです。</p>
+          <div class="term" aria-label="手元で配信するnginxの設定">
+            <div class="term-head"><span>nginx.conf / acme/checkout</span><button class="copy-btn" type="button">コピー</button></div>
+<pre>server {
+  listen 80;
+  root /usr/share/nginx/html;
 
-    <section class="doc-section" aria-labelledby="real">
-      <h2 id="real">本番の配信先に移る</h2>
-      <p>使うコマンドは同じです。変わるのは書き込む先と、誰が実行するかです。</p>
-      <ul>
-        <li><strong>ストレージとCDNは、プロバイダ側で用意します。</strong>AWSならS3とCloudFront、CloudflareならR2とCloudflareのキャッシュです。Artifact Pagesはこれらを作りません。用意できたら、管理リポジトリのファイルの<code>provider</code>とその設定を切り替えます（「<a href="configuration.html#providers">配信先</a>」を参照）。</li>
-        <li><strong>管理リポジトリからは</strong>、<code>app deploy</code>と<code>registry register</code>を管理者の認証情報で実行します。認証情報は環境変数から渡し、ファイルには書きません（「<a href="configuration.html#credentials">認証情報</a>」を参照）。</li>
-        <li><strong>チームのリポジトリからは</strong>、マージ後にCIから、そのサイトにだけ書き込める認証情報で公開します。「<a href="publishing.html#ci">サイトの公開</a>」に、そのまま使い始められるGitHub Actionsのワークフローがあります。</li>
-        <li><strong>誰かが公開する前に</strong>、「<a href="access-and-trust.html">信頼とアクセス制御</a>」を読んでください。公開したHTMLはコードとして動き、読める人の制限は配信側で行います。</li>
-      </ul>
+  location = /_control { return 404; }
+  location ^~ /_control/ { return 404; }
+  location ^~ /_indexes/ { try_files $uri =404; }
+  location ^~ /_artifacts/ { try_files $uri =404; }
+  location ^~ /_previews/ { try_files $uri =404; }
+  location ^~ /assets/ { try_files $uri =404; }
+  location / { try_files $uri $uri/ /index.html; }
+}</pre>
+          </div>
+          <div class="term" aria-label="nginxを動かすcompose.yaml">
+            <div class="term-head"><span>compose.yaml / acme/checkout</span><button class="copy-btn" type="button">コピー</button></div>
+<pre><span class="k">services</span>:
+  <span class="k">web</span>:
+    <span class="k">image</span>: nginx:1.29-alpine
+    <span class="k">ports</span>:
+      - "127.0.0.1:8080:80"
+    <span class="k">volumes</span>:
+      - ./.local/storage:/usr/share/nginx/html:ro
+      - ./nginx.conf:/etc/nginx/conf.d/default.conf:ro</pre>
+          </div>
+          <div class="term" aria-label="nginxを起動する">
+            <div class="term-head"><span>ターミナル / acme/checkout</span><button class="copy-btn" type="button">コピー</button></div>
+<pre><span class="p">$</span> <span data-copy>docker compose up -d</span></pre>
+          </div>
+          <p><code>http://localhost:8080/</code>を開きます。これは試すための最小の設定です。サイトごとのCSPやキャッシュのヘッダーを含む例は、製品リポジトリの<a href="https://github.com/tasuku43/git-artifact-pages/blob/main/docker/nginx/default.conf" target="_blank" rel="noopener"><code>docker/nginx/default.conf</code></a>にあります。最初からやり直すときは<code>.local/storage</code>を削除します。</p>
+        </div>
+      </details>
     </section>
 
     <section class="section" id="next-steps" aria-labelledby="next-title">

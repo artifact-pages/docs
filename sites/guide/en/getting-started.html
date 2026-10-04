@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <meta name="description" content="Install the artifact-pages CLI, see what the admin repository and team repositories each do, and take one site from a directory in Git to the reader app on your own machine.">
+  <meta name="description" content="Install the artifact-pages CLI, see what the admin and team repositories each do, and publish and read a first site, using Cloudflare as the example.">
   <title>Getting started</title>
   <script>
     // Copy the reader app's theme (same-origin parent) before first paint; assets/site.js keeps it in sync.
@@ -30,7 +30,7 @@
         <p class="eyebrow">For admins, first time</p>
         <h1>Getting started</h1>
       </div>
-      <p class="lead">Install the <code>artifact-pages</code> command, see what the admin repository and the team repositories each do, then take one site from a directory in Git to the reader app on your own machine. The try-out needs no cloud account.</p>
+      <p class="lead">Install the <code>artifact-pages</code> command, see what the admin and team repositories each do, then publish a first site and read it in the reader app, using Cloudflare as the delivery target.</p>
     </header>
 
     <section class="doc-section" aria-labelledby="install">
@@ -65,49 +65,97 @@
 
     <section class="doc-section" aria-labelledby="roles">
       <h2 id="roles">Two kinds of repository</h2>
-      <p>A deployment has one admin repository and any number of team repositories. The admin decides which sites exist; each team publishes only its own.</p>
+      <p>A deployment has one admin repository and any number of team repositories. The admin decides which sites exist; each team publishes only its own. Both write to the same delivery target.</p>
       <figure class="hub" role="group" aria-label="The admin repository and team repositories write to the same delivery target">
         <div class="hub-box r-admin"><div class="hub-h">Admin repository<small>one per deployment</small></div>
-          <ul class="hub-steps"><li><span class="sn">1</span><span>Write the delivery target and the list of sites in <code>artifact-pages.yaml</code>.</span></li><li><span class="sn">2</span><span>Place the reader app with <code>app deploy</code>.</span></li><li><span class="sn">3</span><span>Register the sites with <code>registry register</code>.</span></li></ul></div>
-        <div class="hub-arrow" aria-hidden="true"><b>→</b>2·3</div>
-        <div class="hub-box r-store"><div class="hub-h">Delivery target<small>storage</small></div>
-          <ul class="hub-slots"><li class="r-admin">Reader app<em aria-hidden="true">← 2</em></li><li class="r-admin">Site registry<em aria-hidden="true">← 3</em></li><li class="r-team">Site pages<em aria-hidden="true">4 →</em></li></ul>
-          <p class="hub-note r-store"><span class="sn">5</span><span>Before accepting pages, it reads the registration stored here, not the team&#39;s config. If they do not match, nothing is written.</span></p>
+          <p class="hub-desc">Owns the deployment: the delivery target and the complete list of sites. Both commands are best run only from reviewed changes.</p>
+          <ul class="hub-steps"><li><span class="sn">2</span><span>Write the delivery target and the list of sites in <code>artifact-pages.yaml</code>.</span></li><li><span class="sn">3</span><span>Place the reader app with <code>app deploy</code>.</span></li><li><span class="sn">4</span><span>Register the sites with <code>registry register</code>.</span></li></ul></div>
+        <div class="hub-arrow" aria-hidden="true"><b>→</b>3·4</div>
+        <div class="hub-box r-store"><div class="hub-h">Delivery target<small>storage and CDN</small></div>
+          <ul class="hub-slots"><li class="r-store">Storage and CDN (set up at the provider)<em aria-hidden="true">1</em></li><li class="r-admin">Reader app<em aria-hidden="true">← 3</em></li><li class="r-admin">Site registry<em aria-hidden="true">← 4</em></li><li class="r-team">Site pages<em aria-hidden="true">5 →</em></li></ul>
+          <p class="hub-note r-store">Before accepting pages, it reads the registration stored here, not the team&#39;s config. If they do not match, nothing is written.</p>
           <p class="hub-note r-read"><span class="sn">6</span><span>Readers read the site in the reader app placed here.</span></p></div>
-        <div class="hub-arrow" aria-hidden="true"><b>←</b>4</div>
+        <div class="hub-arrow" aria-hidden="true"><b>←</b>5</div>
         <div class="hub-box r-team"><div class="hub-h">Team repository<small>any number</small></div>
-          <ul class="hub-steps"><li><span class="sn">4</span><span>Runs <code>site publish</code> from its own CI after a merge. <code>acme/checkout</code> is an illustrative example.</span></li></ul></div>
+          <p class="hub-desc">Keeps documents in a registered directory and publishes only its own site; one repository can publish one or more sites. It needs only the delivery target, never the site list, and can read the admin repository&#39;s file with a <a href="configuration.html#remote"><code>github://</code> locator</a>.</p>
+          <ul class="hub-steps"><li><span class="sn">5</span><span>Runs <code>site publish</code> from its own CI after a merge.</span></li></ul></div>
       </figure>
-      <div class="split">
-        <div class="pane r-admin">
-          <span class="label">ADMIN REPOSITORY · ONE PER DEPLOYMENT</span>
-          <h3>Owns the deployment</h3>
-          <p>Holds <code>artifact-pages.yaml</code>: the delivery target and the complete list of sites. Runs <code>app deploy</code> to install the reader app and <code>registry register</code> to register the sites, ideally only from reviewed changes.</p>
-        </div>
-        <div class="pane r-team">
-          <span class="label">TEAM REPOSITORIES · ANY NUMBER · ONE OR MORE SITES EACH</span>
-          <h3>Publish their own site</h3>
-          <p>Keep documents in one registered directory and run <code>site publish</code> for their site, usually from their own CI after merge. They need only the delivery target, never the site list; they can read the admin repository's file with a <a href="configuration.html#remote"><code>github://</code> locator</a>.</p>
-        </div>
-      </div>
-      <p>Whether a repository may publish to a site is decided by the site registry on the delivery target, not by the team's config. For a try-out, one repository can play both roles, which is what the next section does.</p>
+      <p>Whether a repository may publish to a site is decided by the site registry on the delivery target, not by the team&#39;s config. The next section follows the numbers in the figure.</p>
     </section>
 
-    <section class="doc-section" aria-labelledby="try">
-      <h2 id="try">Try it on your machine</h2>
-      <p>The <code>local</code> provider writes everything to a directory instead of cloud storage, so the whole flow runs without an account. Besides the CLI you need Git, network access to download the reader app from GitHub Releases, and Python 3 (or any static file server) to view the result.</p>
+    <section class="doc-section" aria-labelledby="cloudflare">
+      <h2 id="cloudflare">Start with Cloudflare</h2>
+      <p>This walkthrough uses Cloudflare as the delivery target and ends with a first site you can read. The admin repository <code>acme/platform-admin</code> and the team repository <code>acme/checkout</code> are illustrative. On AWS the flow and commands are the same; only steps 1 and 2 differ (<a href="#other-targets">Other delivery targets</a>).</p>
       <ol class="timeline">
-        <li><div><h3>Prepare a repository</h3><p>Use a Git checkout whose <code>origin</code> remote is on GitHub, with at least one commit and a directory that holds at least one <code>.html</code> or <code>.md</code> page. Publishing reads dates from Git history, so it fails in a repository with no commits; the pages themselves don't need to be committed. The examples use the illustrative <code>acme/checkout</code> and its <code>docs/artifacts</code>; use your own repository's <code>owner/repo</code> and directory instead.</p>
-          <div class="term" aria-label="Create a first page">
-            <div class="term-head"><span>TERMINAL / acme/checkout</span><button class="copy-btn" type="button">Copy</button></div>
-<pre><span class="p">$</span> <span data-copy>mkdir -p docs/artifacts</span>
-<span class="p">$</span> <span data-copy>printf '# Payment flow design\n\nHow a card payment moves through checkout.\n' &gt; docs/artifacts/payment-flow.md</span>
-<span class="c"># Only if the repository has no commits yet</span>
-<span class="p">$</span> <span data-copy>git add -A &amp;&amp; git commit -m "Add a first page"</span></pre>
+        <li><div><h3>Set up the delivery target</h3><p>Create one private R2 bucket and connect it to the hostname readers will use (<code>docs.example.com</code> in the examples). Also configure routing to the reader app, blocking of <code>/_control/</code>, cache rules and preview retention. Artifact Pages commands do not create these; set them up with Terraform or similar. The product repository has Terraform modules for this. For the admin, also prepare an R2 access key and secret and an API token that can purge the cache.</p>
+          <p class="note">For the detailed steps, see <a href="https://github.com/tasuku43/git-artifact-pages/blob/main/docs/guides/cloudflare-deployment.md" target="_blank" rel="noopener">Cloudflare deployment</a> in the product repository.</p>
+          
+          <figure class="concept" role="group" aria-label="State after step 1"><figcaption>State after step 1</figcaption><div class="concept-row"><div class="cbox r-admin"><div class="cbox-h">Admin repository<small>acme/platform-admin</small></div><ul><li class="r-admin todo">Config file<span class="sr-only"> (not yet)</span><em aria-hidden="true">2</em></li></ul></div><span class="to" aria-hidden="true">→</span><div class="cbox r-store"><div class="cbox-h">Delivery target<small>Cloudflare</small></div><ul><li class="r-store now">Storage and CDN<span class="sr-only"> (added in this step)</span><em aria-hidden="true">this step</em></li><li class="r-admin todo">Reader app<span class="sr-only"> (not yet)</span><em aria-hidden="true">3</em></li><li class="r-admin todo">Site registry<span class="sr-only"> (not yet)</span><em aria-hidden="true">4</em></li><li class="r-team todo">Published pages<span class="sr-only"> (not yet)</span><em aria-hidden="true">5</em></li><li class="r-read todo">Readable<span class="sr-only"> (not yet)</span><em aria-hidden="true">6</em></li></ul></div><span class="to" aria-hidden="true">←</span><div class="cbox r-team"><div class="cbox-h">Team repository<small>acme/checkout</small></div><ul><li class="r-team done">Pages<span class="sr-only"> (done)</span></li></ul></div></div></figure></div></li>
+        <li><div><h3>Write <code>artifact-pages.yaml</code> in the admin repository</h3><p>Name <code>cloudflare</code> as the delivery target and list the sites under <code>sites</code>. <code>repository</code> is the team repository&#39;s <code>owner/repo</code>, and <code>sourcePath</code> is the directory relative to its root. If the bucket is not named <code>artifact-pages</code>, add <code>bucket</code> (see <a href="configuration.html#provider-cloudflare">cloudflare</a>).</p>
+          <div class="term" aria-label="artifact-pages.yaml in the admin repository">
+            <div class="term-head"><span>artifact-pages.yaml / acme/platform-admin</span><button class="copy-btn" type="button">Copy</button></div>
+<pre><span class="k">schemaVersion</span>: 1
+<span class="k">provider</span>: cloudflare
+<span class="k">cloudflare</span>:
+  <span class="k">accountId</span>: "&lt;32-character account ID&gt;"
+  <span class="k">zoneId</span>: "&lt;32-character zone ID&gt;"
+  <span class="k">publicBaseURL</span>: https://docs.example.com
+<span class="k">sites</span>:
+  <span class="k">checkout</span>:
+    <span class="k">name</span>: Payments / Checkout
+    <span class="k">repository</span>: acme/checkout
+    <span class="k">sourcePath</span>: docs/artifacts</pre>
           </div>
-          <figure class="concept" role="group" aria-label="State after step 1"><figcaption>State after step 1</figcaption><div class="concept-row"><div class="cbox r-team"><div class="cbox-h">Repository<small>acme/checkout</small></div><ul><li class="r-team now">Page<span class="sr-only"> (added in this step)</span><em aria-hidden="true">this step</em></li><li class="r-admin todo">Config file<span class="sr-only"> (not yet)</span><em aria-hidden="true">2</em></li></ul></div><span class="to" aria-hidden="true">→</span><div class="cbox r-store"><div class="cbox-h">Delivery target<small>.local/storage</small></div><ul><li class="r-store todo">Reader app<span class="sr-only"> (not yet)</span><em aria-hidden="true">3</em></li><li class="r-store todo">Site registry<span class="sr-only"> (not yet)</span><em aria-hidden="true">4</em></li><li class="r-store todo">Published pages<span class="sr-only"> (not yet)</span><em aria-hidden="true">5</em></li></ul></div><span class="to" aria-hidden="true">→</span><div class="cbox r-read"><div class="cbox-h">Browser<small>localhost:8000</small></div><ul><li class="r-read todo">Read the site<span class="sr-only"> (not yet)</span><em aria-hidden="true">6</em></li></ul></div></div></figure></div></li>
-        <li><div><h3>Write <code>artifact-pages.yaml</code></h3><p>At the repository root, name the <code>local</code> target and register one site. <code>repository</code> must match the checkout's <code>origin</code> as <code>owner/repo</code>, and <code>sourcePath</code> is the directory, relative to the root. Add <code>.local/</code> to <code>.gitignore</code>: everything under it is generated.</p>
-          <div class="term" aria-label="artifact-pages.yaml for the try-out">
+          <figure class="concept" role="group" aria-label="State after step 2"><figcaption>State after step 2</figcaption><div class="concept-row"><div class="cbox r-admin"><div class="cbox-h">Admin repository<small>acme/platform-admin</small></div><ul><li class="r-admin now">Config file<span class="sr-only"> (added in this step)</span><em aria-hidden="true">this step</em></li></ul></div><span class="to" aria-hidden="true">→</span><div class="cbox r-store"><div class="cbox-h">Delivery target<small>Cloudflare</small></div><ul><li class="r-store done">Storage and CDN<span class="sr-only"> (done)</span><em aria-hidden="true">1</em></li><li class="r-admin todo">Reader app<span class="sr-only"> (not yet)</span><em aria-hidden="true">3</em></li><li class="r-admin todo">Site registry<span class="sr-only"> (not yet)</span><em aria-hidden="true">4</em></li><li class="r-team todo">Published pages<span class="sr-only"> (not yet)</span><em aria-hidden="true">5</em></li><li class="r-read todo">Readable<span class="sr-only"> (not yet)</span><em aria-hidden="true">6</em></li></ul></div><span class="to" aria-hidden="true">←</span><div class="cbox r-team"><div class="cbox-h">Team repository<small>acme/checkout</small></div><ul><li class="r-team done">Pages<span class="sr-only"> (done)</span></li></ul></div></div></figure></div></li>
+        <li><div><h3>Deploy the reader app</h3><p>Run this in the admin repository with the admin credentials in environment variables. It downloads the reader app of the CLI&#39;s release, verifies it, and writes it to the bucket. Like the other commands here, it takes <code>--dry-run</code> to show the plan without writing.</p>
+          <div class="term" aria-label="Deploy the reader app">
+            <div class="term-head"><span>Terminal / acme/platform-admin</span><button class="copy-btn" type="button">Copy</button></div>
+<pre><span class="c"># Pass values through the environment, never in a file</span>
+<span class="p">$</span> export CF_R2_ACCESS_KEY_ID=… CF_R2_SECRET_ACCESS_KEY=… CF_API_TOKEN=…
+<span class="p">$</span> <span data-copy>artifact-pages <span class="v">app deploy</span> --config artifact-pages.yaml --dry-run</span>
+<span class="p">$</span> <span data-copy>artifact-pages <span class="v">app deploy</span> --config artifact-pages.yaml</span></pre>
+          </div>
+          <figure class="concept" role="group" aria-label="State after step 3"><figcaption>State after step 3</figcaption><div class="concept-row"><div class="cbox r-admin"><div class="cbox-h">Admin repository<small>acme/platform-admin</small></div><ul><li class="r-admin done">Config file<span class="sr-only"> (done)</span><em aria-hidden="true">2</em></li></ul></div><span class="to" aria-hidden="true">→</span><div class="cbox r-store"><div class="cbox-h">Delivery target<small>Cloudflare</small></div><ul><li class="r-store done">Storage and CDN<span class="sr-only"> (done)</span><em aria-hidden="true">1</em></li><li class="r-admin now">Reader app<span class="sr-only"> (added in this step)</span><em aria-hidden="true">this step</em></li><li class="r-admin todo">Site registry<span class="sr-only"> (not yet)</span><em aria-hidden="true">4</em></li><li class="r-team todo">Published pages<span class="sr-only"> (not yet)</span><em aria-hidden="true">5</em></li><li class="r-read todo">Readable<span class="sr-only"> (not yet)</span><em aria-hidden="true">6</em></li></ul></div><span class="to" aria-hidden="true">←</span><div class="cbox r-team"><div class="cbox-h">Team repository<small>acme/checkout</small></div><ul><li class="r-team done">Pages<span class="sr-only"> (done)</span></li></ul></div></div></figure></div></li>
+        <li><div><h3>Register the site</h3><p>Writes the site registry from the <code>sites</code> mapping to the delivery target. The site now exists, with no pages yet.</p>
+          <div class="term" aria-label="Register the site">
+            <div class="term-head"><span>Terminal / acme/platform-admin</span><button class="copy-btn" type="button">Copy</button></div>
+<pre><span class="p">$</span> <span data-copy>artifact-pages <span class="v">registry register</span> --config artifact-pages.yaml --dry-run</span>
+<span class="p">$</span> <span data-copy>artifact-pages <span class="v">registry register</span> --config artifact-pages.yaml</span></pre>
+          </div>
+          <figure class="concept" role="group" aria-label="State after step 4"><figcaption>State after step 4</figcaption><div class="concept-row"><div class="cbox r-admin"><div class="cbox-h">Admin repository<small>acme/platform-admin</small></div><ul><li class="r-admin done">Config file<span class="sr-only"> (done)</span><em aria-hidden="true">2</em></li></ul></div><span class="to" aria-hidden="true">→</span><div class="cbox r-store"><div class="cbox-h">Delivery target<small>Cloudflare</small></div><ul><li class="r-store done">Storage and CDN<span class="sr-only"> (done)</span><em aria-hidden="true">1</em></li><li class="r-admin done">Reader app<span class="sr-only"> (done)</span><em aria-hidden="true">3</em></li><li class="r-admin now">Site registry<span class="sr-only"> (added in this step)</span><em aria-hidden="true">this step</em></li><li class="r-team todo">Published pages<span class="sr-only"> (not yet)</span><em aria-hidden="true">5</em></li><li class="r-read todo">Readable<span class="sr-only"> (not yet)</span><em aria-hidden="true">6</em></li></ul></div><span class="to" aria-hidden="true">←</span><div class="cbox r-team"><div class="cbox-h">Team repository<small>acme/checkout</small></div><ul><li class="r-team done">Pages<span class="sr-only"> (done)</span></li></ul></div></div></figure></div></li>
+        <li><div><h3>Publish from the team repository</h3><p>Put at least one <code>.html</code> or <code>.md</code> page in <code>docs/artifacts</code> of <code>acme/checkout</code>. Publishing reads dates from Git history, so it fails in a repository with no commits. Pass the admin repository&#39;s file to <code>--config</code> as a <code>github://</code> locator pinned to a commit. The CLI reads the registry on the delivery target, checks the repository and directory against it, then copies the pages and builds the site&#39;s index. <code>--fulltext</code> adds the data for page text search.</p>
+          <div class="term" aria-label="Publish from the team repository">
+            <div class="term-head"><span>Terminal / acme/checkout</span><button class="copy-btn" type="button">Copy</button></div>
+<pre><span class="p">$</span> <span data-copy>artifact-pages <span class="v">site publish</span> --site checkout --source docs/artifacts --config 'github://acme/platform-admin/artifact-pages.yaml?ref=&lt;full commit SHA&gt;' --fulltext --dry-run</span>
+<span class="p">$</span> <span data-copy>artifact-pages <span class="v">site publish</span> --site checkout --source docs/artifacts --config 'github://acme/platform-admin/artifact-pages.yaml?ref=&lt;full commit SHA&gt;' --fulltext</span></pre>
+          </div>
+          <p>It needs the R2 access key and secret, and the API token for runs that change the site. The first run can be from your machine; after that, run it from CI after merges. <a href="publishing.html#github-actions">Publishing</a> has a GitHub Actions workflow you can start from. If the admin repository is private, it is read with <code>GITHUB_TOKEN</code> or <code>GH_TOKEN</code>.</p>
+          <figure class="concept" role="group" aria-label="State after step 5"><figcaption>State after step 5</figcaption><div class="concept-row"><div class="cbox r-admin"><div class="cbox-h">Admin repository<small>acme/platform-admin</small></div><ul><li class="r-admin done">Config file<span class="sr-only"> (done)</span><em aria-hidden="true">2</em></li></ul></div><span class="to" aria-hidden="true">→</span><div class="cbox r-store"><div class="cbox-h">Delivery target<small>Cloudflare</small></div><ul><li class="r-store done">Storage and CDN<span class="sr-only"> (done)</span><em aria-hidden="true">1</em></li><li class="r-admin done">Reader app<span class="sr-only"> (done)</span><em aria-hidden="true">3</em></li><li class="r-admin done">Site registry<span class="sr-only"> (done)</span><em aria-hidden="true">4</em></li><li class="r-team now">Published pages<span class="sr-only"> (added in this step)</span><em aria-hidden="true">this step</em></li><li class="r-read todo">Readable<span class="sr-only"> (not yet)</span><em aria-hidden="true">6</em></li></ul></div><span class="to" aria-hidden="true">←</span><div class="cbox r-team"><div class="cbox-h">Team repository<small>acme/checkout</small></div><ul><li class="r-team done">Pages<span class="sr-only"> (done)</span></li></ul></div></div></figure></div></li>
+        <li><div><h3>Open it in a browser</h3><p>Open <code>https://docs.example.com/</code>. <strong>Choose a site</strong> lists Payments / Checkout; open it, pick the page, and try page text search with <kbd>⌘⇧F</kbd> / <kbd>Ctrl ⇧ F</kbd>. Reloading an address such as <code>/checkout/payment-flow.md</code> works too: the routing set up in step 1 hands it to the reader app.</p>
+          
+          <figure class="concept" role="group" aria-label="State after step 6"><figcaption>State after step 6</figcaption><div class="concept-row"><div class="cbox r-admin"><div class="cbox-h">Admin repository<small>acme/platform-admin</small></div><ul><li class="r-admin done">Config file<span class="sr-only"> (done)</span><em aria-hidden="true">2</em></li></ul></div><span class="to" aria-hidden="true">→</span><div class="cbox r-store"><div class="cbox-h">Delivery target<small>Cloudflare</small></div><ul><li class="r-store done">Storage and CDN<span class="sr-only"> (done)</span><em aria-hidden="true">1</em></li><li class="r-admin done">Reader app<span class="sr-only"> (done)</span><em aria-hidden="true">3</em></li><li class="r-admin done">Site registry<span class="sr-only"> (done)</span><em aria-hidden="true">4</em></li><li class="r-team done">Published pages<span class="sr-only"> (done)</span><em aria-hidden="true">5</em></li><li class="r-read now">Readable<span class="sr-only"> (added in this step)</span><em aria-hidden="true">this step</em></li></ul></div><span class="to" aria-hidden="true">←</span><div class="cbox r-team"><div class="cbox-h">Team repository<small>acme/checkout</small></div><ul><li class="r-team done">Pages<span class="sr-only"> (done)</span></li></ul></div></div></figure></div></li>
+      </ol>
+      <div class="callout warn" role="note">
+        <span class="ico">CHECK</span>
+        <div>
+          <p><strong>Pass <code>--fulltext</code> on every publish.</strong> A publish without it withdraws the site&#39;s search data.</p>
+        </div>
+      </div>
+      <p>To change the site, edit or delete files in the directory and run the same <code>site publish</code>. It uploads changed files and removes the ones that are gone.</p>
+    </section>
+
+    <section class="doc-section" aria-labelledby="other-targets">
+      <h2 id="other-targets">Other delivery targets</h2>
+      <p>On every delivery target the commands and steps 3 to 6 are the same. What changes is how the delivery target is set up and the <code>provider</code> settings in <code>artifact-pages.yaml</code>.</p>
+      <ul>
+        <li><strong>AWS</strong>: set up S3 and CloudFront and use <code>provider: aws</code> (see <a href="configuration.html#provider-aws">aws</a>). Credentials follow the standard AWS lookup; in CI, assume a role with OIDC.</li>
+        <li><strong>Before anyone publishes</strong>, read <a href="access-and-trust.html">Access and trust</a>. Published HTML runs as code, and restricting who can read belongs at the delivery edge.</li>
+      </ul>
+      <details class="more">
+        <summary>Try it on your machine (<code>local</code> provider)</summary>
+        <div class="more-body">
+          <p>The <code>local</code> provider writes to a local directory instead of cloud storage, so you can try the flow without an account, with one repository playing both roles. Set <code>repository</code> to the checkout&#39;s <code>origin</code> as <code>owner/repo</code>. Everything under <code>.local/</code> is generated; add it to <code>.gitignore</code>.</p>
+          <div class="term" aria-label="artifact-pages.yaml for a local try-out">
             <div class="term-head"><span>artifact-pages.yaml / acme/checkout</span><button class="copy-btn" type="button">Copy</button></div>
 <pre><span class="k">schemaVersion</span>: 1
 <span class="k">provider</span>: local
@@ -119,54 +167,40 @@
     <span class="k">repository</span>: acme/checkout
     <span class="k">sourcePath</span>: docs/artifacts</pre>
           </div>
-          <figure class="concept" role="group" aria-label="State after step 2"><figcaption>State after step 2</figcaption><div class="concept-row"><div class="cbox r-team"><div class="cbox-h">Repository<small>acme/checkout</small></div><ul><li class="r-team done">Page<span class="sr-only"> (done)</span><em aria-hidden="true">1</em></li><li class="r-admin now">Config file<span class="sr-only"> (added in this step)</span><em aria-hidden="true">this step</em></li></ul></div><span class="to" aria-hidden="true">→</span><div class="cbox r-store"><div class="cbox-h">Delivery target<small>.local/storage</small></div><ul><li class="r-store todo">Reader app<span class="sr-only"> (not yet)</span><em aria-hidden="true">3</em></li><li class="r-store todo">Site registry<span class="sr-only"> (not yet)</span><em aria-hidden="true">4</em></li><li class="r-store todo">Published pages<span class="sr-only"> (not yet)</span><em aria-hidden="true">5</em></li></ul></div><span class="to" aria-hidden="true">→</span><div class="cbox r-read"><div class="cbox-h">Browser<small>localhost:8000</small></div><ul><li class="r-read todo">Read the site<span class="sr-only"> (not yet)</span><em aria-hidden="true">6</em></li></ul></div></div></figure></div></li>
-        <li><div><h3>Deploy the reader app</h3><p>Downloads the reader app of the CLI's release, verifies it, and writes <code>index.html</code> and <code>assets/</code> into <code>.local/storage</code>. Like the other commands here, it takes <code>--dry-run</code> to show the plan without writing.</p>
-          <div class="term" aria-label="Deploy the reader app locally">
-            <div class="term-head"><span>TERMINAL / acme/checkout</span><button class="copy-btn" type="button">Copy</button></div>
-<pre><span class="p">$</span> <span data-copy>artifact-pages <span class="v">app deploy</span> --config artifact-pages.yaml --dry-run</span>
-<span class="p">$</span> <span data-copy>artifact-pages <span class="v">app deploy</span> --config artifact-pages.yaml</span></pre>
-          </div>
-          <figure class="concept" role="group" aria-label="State after step 3"><figcaption>State after step 3</figcaption><div class="concept-row"><div class="cbox r-team"><div class="cbox-h">Repository<small>acme/checkout</small></div><ul><li class="r-team done">Page<span class="sr-only"> (done)</span><em aria-hidden="true">1</em></li><li class="r-admin done">Config file<span class="sr-only"> (done)</span><em aria-hidden="true">2</em></li></ul></div><span class="to" aria-hidden="true">→</span><div class="cbox r-store"><div class="cbox-h">Delivery target<small>.local/storage</small></div><ul><li class="r-store now">Reader app<span class="sr-only"> (added in this step)</span><em aria-hidden="true">this step</em></li><li class="r-store todo">Site registry<span class="sr-only"> (not yet)</span><em aria-hidden="true">4</em></li><li class="r-store todo">Published pages<span class="sr-only"> (not yet)</span><em aria-hidden="true">5</em></li></ul></div><span class="to" aria-hidden="true">→</span><div class="cbox r-read"><div class="cbox-h">Browser<small>localhost:8000</small></div><ul><li class="r-read todo">Read the site<span class="sr-only"> (not yet)</span><em aria-hidden="true">6</em></li></ul></div></div></figure></div></li>
-        <li><div><h3>Register the site</h3><p>Writes the site registry from the <code>sites</code> mapping. The site now exists, with no pages yet.</p>
-          <div class="term" aria-label="Register the site locally">
-            <div class="term-head"><span>TERMINAL / acme/checkout</span><button class="copy-btn" type="button">Copy</button></div>
-<pre><span class="p">$</span> <span data-copy>artifact-pages <span class="v">registry register</span> --config artifact-pages.yaml --dry-run</span>
-<span class="p">$</span> <span data-copy>artifact-pages <span class="v">registry register</span> --config artifact-pages.yaml</span></pre>
-          </div>
-          <figure class="concept" role="group" aria-label="State after step 4"><figcaption>State after step 4</figcaption><div class="concept-row"><div class="cbox r-team"><div class="cbox-h">Repository<small>acme/checkout</small></div><ul><li class="r-team done">Page<span class="sr-only"> (done)</span><em aria-hidden="true">1</em></li><li class="r-admin done">Config file<span class="sr-only"> (done)</span><em aria-hidden="true">2</em></li></ul></div><span class="to" aria-hidden="true">→</span><div class="cbox r-store"><div class="cbox-h">Delivery target<small>.local/storage</small></div><ul><li class="r-store done">Reader app<span class="sr-only"> (done)</span><em aria-hidden="true">3</em></li><li class="r-store now">Site registry<span class="sr-only"> (added in this step)</span><em aria-hidden="true">this step</em></li><li class="r-store todo">Published pages<span class="sr-only"> (not yet)</span><em aria-hidden="true">5</em></li></ul></div><span class="to" aria-hidden="true">→</span><div class="cbox r-read"><div class="cbox-h">Browser<small>localhost:8000</small></div><ul><li class="r-read todo">Read the site<span class="sr-only"> (not yet)</span><em aria-hidden="true">6</em></li></ul></div></div></figure></div></li>
-        <li><div><h3>Publish</h3><p>Checks the repository and directory against the registration, then copies the pages and builds the site's index. <code>--fulltext</code> adds the data for page text search. Run the same command again and it reports <code>UP TO DATE</code>.</p>
-          <div class="term" aria-label="Publish the site locally">
-            <div class="term-head"><span>TERMINAL / acme/checkout</span><button class="copy-btn" type="button">Copy</button></div>
-<pre><span class="p">$</span> <span data-copy>artifact-pages <span class="v">site publish</span> --site checkout --source docs/artifacts --config artifact-pages.yaml --fulltext --dry-run</span>
-<span class="p">$</span> <span data-copy>artifact-pages <span class="v">site publish</span> --site checkout --source docs/artifacts --config artifact-pages.yaml --fulltext</span></pre>
-          </div>
-          <figure class="concept" role="group" aria-label="State after step 5"><figcaption>State after step 5</figcaption><div class="concept-row"><div class="cbox r-team"><div class="cbox-h">Repository<small>acme/checkout</small></div><ul><li class="r-team done">Page<span class="sr-only"> (done)</span><em aria-hidden="true">1</em></li><li class="r-admin done">Config file<span class="sr-only"> (done)</span><em aria-hidden="true">2</em></li></ul></div><span class="to" aria-hidden="true">→</span><div class="cbox r-store"><div class="cbox-h">Delivery target<small>.local/storage</small></div><ul><li class="r-store done">Reader app<span class="sr-only"> (done)</span><em aria-hidden="true">3</em></li><li class="r-store done">Site registry<span class="sr-only"> (done)</span><em aria-hidden="true">4</em></li><li class="r-store now">Published pages<span class="sr-only"> (added in this step)</span><em aria-hidden="true">this step</em></li></ul></div><span class="to" aria-hidden="true">→</span><div class="cbox r-read"><div class="cbox-h">Browser<small>localhost:8000</small></div><ul><li class="r-read todo">Read the site<span class="sr-only"> (not yet)</span><em aria-hidden="true">6</em></li></ul></div></div></figure></div></li>
-        <li><div><h3>Open the reader</h3><p>Serve the directory and open <code>http://localhost:8000/</code>. <strong>Choose a site</strong> lists Payments / Checkout; open it, pick the page, and try page text search with <kbd>⌘⇧F</kbd> / <kbd>Ctrl ⇧ F</kbd>.</p>
-          <div class="term" aria-label="Serve the local output">
-            <div class="term-head"><span>TERMINAL / acme/checkout</span><button class="copy-btn" type="button">Copy</button></div>
-<pre><span class="p">$</span> <span data-copy>python3 -m http.server 8000 --directory .local/storage</span></pre>
-          </div>
-          <figure class="concept" role="group" aria-label="State after step 6"><figcaption>State after step 6</figcaption><div class="concept-row"><div class="cbox r-team"><div class="cbox-h">Repository<small>acme/checkout</small></div><ul><li class="r-team done">Page<span class="sr-only"> (done)</span><em aria-hidden="true">1</em></li><li class="r-admin done">Config file<span class="sr-only"> (done)</span><em aria-hidden="true">2</em></li></ul></div><span class="to" aria-hidden="true">→</span><div class="cbox r-store"><div class="cbox-h">Delivery target<small>.local/storage</small></div><ul><li class="r-store done">Reader app<span class="sr-only"> (done)</span><em aria-hidden="true">3</em></li><li class="r-store done">Site registry<span class="sr-only"> (done)</span><em aria-hidden="true">4</em></li><li class="r-store done">Published pages<span class="sr-only"> (done)</span><em aria-hidden="true">5</em></li></ul></div><span class="to" aria-hidden="true">→</span><div class="cbox r-read"><div class="cbox-h">Browser<small>localhost:8000</small></div><ul><li class="r-read now">Read the site<span class="sr-only"> (added in this step)</span><em aria-hidden="true">this step</em></li></ul></div></div></figure></div></li>
-      </ol>
-      <div class="callout warn" role="note">
-        <span class="ico">CHECK</span>
-        <div>
-          <p><strong>Start from <code>http://localhost:8000/</code> and move around inside the app.</strong> This simple server only serves files, so reloading an address such as <code>/checkout/payment-flow.md</code> returns 404 here. A delivery target set up for real use sends those addresses to the reader app.</p>
-          <p><strong>Pass <code>--fulltext</code> on every publish.</strong> A publish without it removes the site's search data.</p>
-        </div>
-      </div>
-      <p>To change the site, edit or remove files in the directory and run the same <code>site publish</code>. It uploads what changed and removes what is gone. To start over, delete <code>.local/storage</code>.</p>
-    </section>
+          <p>Steps 3 to 5 use the same commands, with no credentials and <code>--config artifact-pages.yaml</code>. To serve the written directory you need a server that hands addresses such as <code>/checkout/payment-flow.md</code> to the reader app and never serves <code>/_control/</code>. With nginx:</p>
+          <div class="term" aria-label="nginx config for serving locally">
+            <div class="term-head"><span>nginx.conf / acme/checkout</span><button class="copy-btn" type="button">Copy</button></div>
+<pre>server {
+  listen 80;
+  root /usr/share/nginx/html;
 
-    <section class="doc-section" aria-labelledby="real">
-      <h2 id="real">Moving to a real delivery target</h2>
-      <p>The commands stay the same. What changes is where they write and who runs them.</p>
-      <ul>
-        <li><strong>Set up storage and a CDN</strong> in the provider itself: S3 and CloudFront on AWS, or R2 and the Cloudflare cache. Artifact Pages doesn't create them. Then switch <code>provider</code> and its block in the admin repository's file; see <a href="configuration.html#providers">delivery targets</a>.</li>
-        <li><strong>From the admin repository</strong>, run <code>app deploy</code> and <code>registry register</code> with admin credentials taken from the environment, never written in the file (<a href="configuration.html#credentials">credentials</a>).</li>
-        <li><strong>From each team repository</strong>, publish after merge from CI with credentials that can write only that site. <a href="publishing.html#ci">Publishing</a> has a GitHub Actions workflow you can start from.</li>
-        <li><strong>Before anyone publishes</strong>, read <a href="access-and-trust.html">Access and trust</a>: published HTML runs as code, and limiting who can read belongs at the delivery edge.</li>
-      </ul>
+  location = /_control { return 404; }
+  location ^~ /_control/ { return 404; }
+  location ^~ /_indexes/ { try_files $uri =404; }
+  location ^~ /_artifacts/ { try_files $uri =404; }
+  location ^~ /_previews/ { try_files $uri =404; }
+  location ^~ /assets/ { try_files $uri =404; }
+  location / { try_files $uri $uri/ /index.html; }
+}</pre>
+          </div>
+          <div class="term" aria-label="compose.yaml that runs nginx">
+            <div class="term-head"><span>compose.yaml / acme/checkout</span><button class="copy-btn" type="button">Copy</button></div>
+<pre><span class="k">services</span>:
+  <span class="k">web</span>:
+    <span class="k">image</span>: nginx:1.29-alpine
+    <span class="k">ports</span>:
+      - "127.0.0.1:8080:80"
+    <span class="k">volumes</span>:
+      - ./.local/storage:/usr/share/nginx/html:ro
+      - ./nginx.conf:/etc/nginx/conf.d/default.conf:ro</pre>
+          </div>
+          <div class="term" aria-label="Start nginx">
+            <div class="term-head"><span>Terminal / acme/checkout</span><button class="copy-btn" type="button">Copy</button></div>
+<pre><span class="p">$</span> <span data-copy>docker compose up -d</span></pre>
+          </div>
+          <p>Open <code>http://localhost:8080/</code>. This is a minimal configuration for trying things out; the product repository&#39;s <a href="https://github.com/tasuku43/git-artifact-pages/blob/main/docker/nginx/default.conf" target="_blank" rel="noopener"><code>docker/nginx/default.conf</code></a> adds per-site CSP and cache headers. To start over, delete <code>.local/storage</code>.</p>
+        </div>
+      </details>
     </section>
 
     <section class="section" id="next-steps" aria-labelledby="next-title">

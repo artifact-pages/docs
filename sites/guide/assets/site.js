@@ -213,7 +213,7 @@
   const GUIDE_PAGES = {
     ja: [
       ['Git Artifact Pagesとは', 'ja/what-is-git-artifact-pages.html', '各リポジトリから公開し、ひとつの場所で読む。'],
-      ['はじめる', 'ja/getting-started.html', 'CLIを入れ、手元で最初のサイトを公開して読む。'],
+      ['はじめる', 'ja/getting-started.html', 'CLIを入れ、Cloudflareを例に最初のサイトを公開して読む。'],
       ['読者の体験', 'ja/reading.html', 'URL、画面の構成、検索とサイトの切り替え。'],
       ['サイトの公開', 'ja/publishing.html', '公開するディレクトリ、site publish、CIとプレビュー。'],
       ['設定ファイル', 'ja/configuration.html', 'artifact-pages.yamlの選ばれ方、配信先、sites。'],
@@ -221,7 +221,7 @@
     ],
     en: [
       ['What is Git Artifact Pages?', 'en/what-is-git-artifact-pages.html', 'Publish from each repository. Read in one place.'],
-      ['Getting started', 'en/getting-started.html', 'Install the CLI, then publish and read a first site locally.'],
+      ['Getting started', 'en/getting-started.html', 'Install the CLI, then publish and read a first site on Cloudflare.'],
       ['Reading', 'en/reading.html', 'URLs, the screen, search, and switching sites.'],
       ['Publishing', 'en/publishing.html', 'The publishable directory, site publish, CI, and previews.'],
       ['Configuration', 'en/configuration.html', 'How artifact-pages.yaml is selected, delivery targets, and sites.'],
