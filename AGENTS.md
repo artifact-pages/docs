@@ -40,7 +40,7 @@ Keep agent instruction files and anything that is not a published page outside `
 
 ## Visual quality
 
-Pages are not previewed locally from this repository. Author them so that they hold up in both light and dark themes and at about 400 px width with no page-level horizontal scroll, and state in the pull request that this was checked in the markup and styles. The owner confirms the result on the real site. While `.github/workflows/publish.yml` pins a release older than tasuku43/git-artifact-pages#9, keep its `fulltext` input; on those releases a publish without it withdraws the site's page text search data. From that change on, every publish builds the search data and `--fulltext` is rejected, so pages never tell readers to pass it.
+Pages are not previewed locally from this repository. Author them so that they hold up in both light and dark themes and at about 400 px width with no page-level horizontal scroll, and state in the pull request that this was checked in the markup and styles. The owner confirms the result on the real site. Every publish builds the site's page text search data; `--fulltext` no longer exists (tasuku43/git-artifact-pages#9), so pages never tell readers to pass it.
 
 ## Backlog and issue tracking
 
