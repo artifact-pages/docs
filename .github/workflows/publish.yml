@@ -23,31 +23,21 @@ concurrency:
 jobs:
   publish:
     runs-on: ubuntu-24.04
+    # Credentials live in the production environment; pull requests (dry-run)
+    # run without it.
+    environment: ${{ github.event_name != 'pull_request' && 'production' || '' }}
     strategy:
       fail-fast: false
       max-parallel: 1
       matrix:
         site: [guide, architecture]
     steps:
-      # Short-lived (1 hour) installation token scoped to this job's needs;
-      # it is revoked when the job ends. The workflow token is used only for
-      # checkout and shallow deepening.
-      - name: Mint a GitHub App token
-        id: app-token
-        uses: actions/create-github-app-token@bcd2ba49218906704ab6c1aa796996da409d3eb1 # v3.2.0
-        with:
-          app-id: ${{ vars.ARTIFACT_PAGES_APP_ID }}
-          private-key: ${{ secrets.ARTIFACT_PAGES_APP_PRIVATE_KEY }}
-          owner: ${{ github.repository_owner }}
-          repositories: artifact-pages-admin
-          permission-contents: read
       - name: Publish ${{ matrix.site }}
         uses: artifact-pages/publish-action@v0.1.0
         with:
           site: ${{ matrix.site }}
           # The deployed registry decides eligibility; this config locates it.
-          config: github://tasuku43/artifact-pages-admin/artifact-pages.yaml
-          github-token: ${{ steps.app-token.outputs.token }}
+          config: github://artifact-pages/admin/artifact-pages.yaml
           # Real publish on main only; pull requests and other runs are a dry-run.
           publish-on: |
             push:refs/heads/main

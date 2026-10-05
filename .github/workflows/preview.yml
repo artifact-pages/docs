@@ -8,7 +8,7 @@
 #
 # Preview pages are written to the production bucket under each site's
 # _previews/ prefix and run like published HTML. Retention of old previews is a
-# rule on the R2 side (tasuku43/artifact-pages-admin), not set here.
+# rule on the R2 side (artifact-pages/admin), not set here.
 name: Preview
 
 on:
@@ -35,26 +35,17 @@ jobs:
       contains(github.event.pull_request.labels.*.name, 'preview-artifact') &&
       (github.event.action != 'labeled' || github.event.label.name == 'preview-artifact')
     runs-on: ubuntu-24.04
+    # Only same-repository, labeled pull requests get here; credentials live in
+    # the preview environment.
+    environment: preview
     permissions:
       contents: read
+      pull-requests: write # PR verification and the preview comment
     strategy:
       fail-fast: false
       matrix:
         site: [guide, architecture]
     steps:
-      # Short-lived (1 hour) installation token scoped to this job's needs;
-      # it is revoked when the job ends. The workflow token is used only for
-      # checkout and shallow deepening.
-      - name: Mint a GitHub App token
-        id: app-token
-        uses: actions/create-github-app-token@bcd2ba49218906704ab6c1aa796996da409d3eb1 # v3.2.0
-        with:
-          app-id: ${{ vars.ARTIFACT_PAGES_APP_ID }}
-          private-key: ${{ secrets.ARTIFACT_PAGES_APP_PRIVATE_KEY }}
-          owner: ${{ github.repository_owner }}
-          repositories: artifact-pages-admin,artifact-pages-docs
-          permission-contents: read
-          permission-pull-requests: write # PR verification and the preview comment
       # The action checks out the base branch itself and takes the pull request
       # number and head SHA from the event. It previews changed pages and pages
       # whose local CSS, JS or images changed; a site with nothing to preview
@@ -65,8 +56,7 @@ jobs:
         with:
           site: ${{ matrix.site }}
           # The deployed registry decides eligibility; this config locates it.
-          config: github://tasuku43/artifact-pages-admin/artifact-pages.yaml
-          github-token: ${{ steps.app-token.outputs.token }}
+          config: github://artifact-pages/admin/artifact-pages.yaml
           comment: true
         env:
           CF_R2_ACCESS_KEY_ID: ${{ secrets.CF_R2_ACCESS_KEY_ID }}
