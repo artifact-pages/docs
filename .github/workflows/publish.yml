@@ -29,13 +29,25 @@ jobs:
       matrix:
         site: [guide, architecture]
     steps:
+      # Short-lived (1 hour) installation token scoped to this job's needs;
+      # it is revoked when the job ends. The workflow token is used only for
+      # checkout and shallow deepening.
+      - name: Mint a GitHub App token
+        id: app-token
+        uses: actions/create-github-app-token@bcd2ba49218906704ab6c1aa796996da409d3eb1 # v3.2.0
+        with:
+          app-id: ${{ vars.ARTIFACT_PAGES_APP_ID }}
+          private-key: ${{ secrets.ARTIFACT_PAGES_APP_PRIVATE_KEY }}
+          owner: ${{ github.repository_owner }}
+          repositories: artifact-pages-admin
+          permission-contents: read
       - name: Publish ${{ matrix.site }}
         uses: tasuku43/git-artifact-pages@v0.2.0
         with:
           site: ${{ matrix.site }}
           # The deployed registry decides eligibility; this config locates it.
           config: github://tasuku43/artifact-pages-admin/artifact-pages.yaml
-          github-token: ${{ secrets.ADMIN_CONFIG_TOKEN }}
+          github-token: ${{ steps.app-token.outputs.token }}
           # Real publish on main only; pull requests and other runs are a dry-run.
           publish-on: |
             push:refs/heads/main
