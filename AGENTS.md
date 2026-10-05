@@ -1,6 +1,6 @@
 # Agent guidance — Artifact Pages documentation
 
-This repository holds the public, reader-facing documentation sites of [Git Artifact Pages](https://github.com/artifact-pages/artifact-pages): `guide` (adopt, publish, read) and `architecture` (how it works and why). It is a satellite repository: each site is published from here with `artifact-pages site publish`. The production registry, reader app deployment and publish workflow belong to `tasuku43/artifact-pages-admin`.
+This repository holds the public, reader-facing documentation sites of [Git Artifact Pages](https://github.com/artifact-pages/artifact-pages): `guide` (adopt, publish, read) and `architecture` (how it works and why). It is a satellite repository: each site is published from here with `artifact-pages site publish`. The production registry, reader app deployment and publish workflow belong to `artifact-pages/admin`.
 
 Facts come from the product repository. Read its [thesis](https://github.com/artifact-pages/artifact-pages/blob/main/docs/thesis.md), [specification](https://github.com/artifact-pages/artifact-pages/blob/main/docs/specification.md) and CLI help before writing. A page must not state behavior the specification or the CLI does not have.
 
