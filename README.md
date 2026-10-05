@@ -7,7 +7,7 @@ Public documentation for [Git Artifact Pages](https://github.com/tasuku43/git-ar
 | `guide` | [`sites/guide/`](sites/guide/) | Adopting, publishing and reading |
 | `architecture` | [`sites/architecture/`](sites/architecture/) | How it works and why |
 
-Each site has Japanese (`ja/`) and English (`en/`) pages. This repository is a satellite: it publishes its own sites with `artifact-pages site publish` (always with `--fulltext`). The registry, the reader app and the publish workflow are operated from `tasuku43/artifact-pages-admin`.
+Each site has Japanese (`ja/`) and English (`en/`) pages. This repository is a satellite: it publishes its own sites with `artifact-pages site publish` (the CLI always builds the full-text search data; the former `--fulltext` flag was removed and is now an unknown-flag error). The registry, the reader app and the publish workflow are operated from `tasuku43/artifact-pages-admin`.
 
 ## Working on the pages
 
