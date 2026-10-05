@@ -59,7 +59,7 @@
         <li><strong><code>index.html</code>は普通のページです。</strong><code>/checkout</code>を開くと表示されるのはサイトのトップページで、<code>index.html</code>ではありません。</li>
         <li><strong>それ以外のファイルは、公開されますが一覧には出ません。</strong>CSS、JavaScript、画像、フォント、JSONなどです。ページからは<code>img/flow.svg</code>や<code>../assets/report.css</code>のような相対リンクで読み込みます。<code>/assets/report.css</code>のように<code>/</code>から始まるリンクはサイトの外を指すので、読み込めません。</li>
         <li><strong>ページのタイトル</strong>は、HTMLなら<code>&lt;title&gt;</code>、Markdownなら最初の<code>#</code>見出しから取ります。どちらもなければファイル名を使い、<code>payment-flow.html</code>は「Payment Flow」になります。</li>
-        <li><strong>更新日とコミットした人</strong>はGitの履歴から取ります。作業ツリーで変更・追加したファイルは、ファイルの更新時刻がコミットの日時より新しければ、その時刻を更新日にします。Gitが無視するファイル（生成物など）も公開されます。その更新日は、ページのディレクトリ（その下を含む）にあるファイルのうち最も新しい更新時刻で、コミットした人は表示されません。</li>
+        <li><strong>更新日とコミットした人</strong>はGitの履歴から取ります。作業ツリーで変更・追加したファイルは、ファイルの更新時刻がコミットの日時より新しければ、その時刻を更新日にします。Gitが無視するファイル（生成物など）も公開されます。その更新日は、ページのディレクトリ（その下を含む）にあるファイルのうち最も新しい更新時刻で、コミットした人は表示されません。CIで浅いチェックアウトを使っても、ふつうは同じ日付になります。詳しくは<a href="#shallow">浅いチェックアウトと日付</a>をご覧ください。</li>
         <li><strong>シンボリックリンクがあると公開は失敗します。</strong><code>.git</code>フォルダは公開されません。</li>
       </ul>
       <div class="callout warn" role="note">
@@ -160,11 +160,8 @@
     <span class="c"># plan：読み取り専用の認証情報、production：このサイトだけに書き込める認証情報</span>
     <span class="k">environment</span>: ${{ github.event_name == 'pull_request' &amp;&amp; 'plan' || 'production' }}
     <span class="k">steps</span>:
-      - <span class="k">uses</span>: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 <span class="c"># v7.0.1</span>
-        <span class="k">with</span>:
-          <span class="k">fetch-depth</span>: 0              <span class="c"># 日付とコミットした人はGitの履歴から取る</span>
-          <span class="k">persist-credentials</span>: false
-      - <span class="k">uses</span>: tasuku43/git-artifact-pages@vX.Y.Z
+      <span class="c"># actions/checkoutのステップは不要：Actionがリポジトリを自分でチェックアウトする（浅いチェックアウト）</span>
+      - <span class="k">uses</span>: tasuku43/git-artifact-pages@v0.2.1
         <span class="k">with</span>:
           <span class="k">site</span>: checkout
           <span class="k">source</span>: docs/artifacts
@@ -176,15 +173,34 @@
           <span class="k">CF_API_TOKEN</span>: ${{ secrets.CF_API_TOKEN }}</pre>
       </div>
       <ul>
+        <li><strong>チェックアウトはActionが行います。</strong>既定（<code>checkout: auto</code>）では、ワークスペースがまだチェックアウトでなければ、<code>fetch-depth: 1</code>、認証情報を残さない設定で<code>actions/checkout</code>を実行します。前のステップでファイルが必要なときだけ、自分でチェックアウトのステップを置いてください。その場合、Actionは何もしません。<code>permissions: contents: read</code>で足ります。浅いチェックアウトが日付にどう影響するかは、<a href="#shallow">浅いチェックアウトと日付</a>にあります。</li>
         <li><strong>リリースのタグをそのまま指定します。</strong><code>@vX.Y.Z</code>のように書きます。リリースは<a href="https://github.com/tasuku43/git-artifact-pages/releases" target="_blank" rel="noopener">GitHub Releases</a>で確認できます。バージョンが<code>0.x</code>のあいだは、<code>@v0</code>のような動くタグはありません。いちばん厳密に固定するなら、リリースのコミットSHAを40文字で書き、タグをコメントに残します（<code>tasuku43/git-artifact-pages@&lt;full commit SHA&gt; # vX.Y.Z</code>）。</li>
-        <li><strong>2つのEnvironmentで、別々のシークレットを持たせます。</strong><code>plan</code>と<code>production</code>は説明用の名前です。<code>plan</code>には読み取り専用の認証情報を、<code>production</code>にはこのサイトにだけ書き込める認証情報を置き、<code>production</code>は設定で<code>main</code>からだけ使えるようにします。変数名はCloudflareの既定値です。AWSでは鍵を置かず、OIDCでロールを引き受けます（<code>permissions</code>に<code>id-token: write</code>を加えます）。フォークからのプルリクエストにはシークレットが渡らないため、そこでは変更計画の確認が失敗します。これは意図した動作です。</li>
+        <li><strong>2つのEnvironmentで、別々のシークレットを持たせます。</strong><code>plan</code>と<code>production</code>は説明用の名前です。<code>plan</code>には読み取り専用の認証情報を、<code>production</code>にはこのサイトにだけ書き込める認証情報を置き、<code>production</code>は設定で<code>main</code>からだけ使えるようにします。GitHub Freeの非公開リポジトリではEnvironmentのシークレットを使えません。<a href="configuration.html#remote-private">設定ファイル</a>のページを参照してください。変数名はCloudflareの既定値です。AWSでは鍵を置かず、OIDCでロールを引き受けます（<code>permissions</code>に<code>id-token: write</code>を加えます）。フォークからのプルリクエストにはシークレットが渡らないため、そこでは変更計画の確認が失敗します。これは意図した動作です。</li>
         <li><strong>公開は1つずつ実行します。</strong>サイトのロックを持てる公開は1つだけなので、<code>concurrency</code>のグループで公開を1つずつ実行します（待っている実行は、新しいプッシュの実行に置き換わります）。</li>
         <li><strong>設定の固定</strong>は任意です。<code>?ref=</code>を付けないと、管理リポジトリのデフォルトブランチを実行の最初に1つのコミットに決め、その実行の最後まで使います。コミットを固定したいときは、指定の末尾に<code>?ref=&lt;完全なコミットSHA&gt;</code>を付けます。</li>
-        <li><strong>管理リポジトリが非公開なら</strong>、既定ではこのワークフローのトークンで読みにいきますが、ふつうは別のリポジトリを読めません。管理リポジトリを読み取れるトークンを<code>github-token</code>の入力で渡します。</li>
+        <li><strong>管理リポジトリが非公開なら</strong>、既定ではこのワークフローのトークンで読みにいきますが、別の非公開リポジトリは読めません。管理リポジトリを読み取れるトークンを<code>github-token</code>の入力で渡します。GitHub Appでトークンを発行する方法は、<a href="configuration.html#remote-private">設定ファイル</a>のページにあります。</li>
         <li><strong>結果</strong>は出力で受け取れます。<code>outcome</code>（<code>planned</code>、<code>published</code>、<code>no-op</code>、<code>failed</code>）、<code>changes</code>、<code>result</code>などです。</li>
         <li><strong>ほかのAction</strong>も同じタグで使います。<code>registry register</code>、<code>registry unregister</code>、<code>app deploy</code>には<code>tasuku43/git-artifact-pages/actions/admin</code>を、プレビューには<code>actions/preview-publish</code>を使います。</li>
       </ul>
       <p class="note"><code>acme/checkout</code>と<code>acme/platform-admin</code>は説明用の例です。<code>vX.Y.Z</code>と<code>&lt;full commit SHA&gt;</code>は実際の値に置き換えてください。</p>
+
+      <h3 id="shallow">浅いチェックアウトと日付</h3>
+      <p>上のワークフローは、最新のコミットだけを取る浅いチェックアウトを使います。CLIは、古い履歴が必要になると、このワークフローのトークンを使って<code>origin</code>から自分で取得します。ドライランも同じように履歴を取得するので、変更計画は実際の公開と一致します。</p>
+      <ul>
+        <li><strong>更新日とコミットした人は、ふつうはフルクローンと同じになります。</strong>前回の公開から内容が変わっていないページは、公開済みのインデックスにある日付とコミットした人をそのまま引き継ぎます。ここでいう内容とは、ページ本体と、そのコミットが日付に影響するファイル（読み込むCSSや画像など）のことで、チェックサムで比べます。そのため、ページの更新日は、次の場合を除いて、内容が最後に変わった日になります。内容が変わったページは、チェックアウトにある履歴のうち最も新しいコミットから日付を決めます。その日付を信頼できるようになるまで、CLIが履歴を追加で取得します。</li>
+        <li><strong>違いが出るのは、バイト列を変えないコミットです。</strong>ページやそのファイルに触れていても、バイト列が同じで、しかもCLIが取得した履歴より古い位置にあるコミットは見えません。公開済みの内容へ戻すリバート、<code>touch</code>、内容を保ったままの履歴の書き換えがこれにあたります。ページには公開済みの日付とコミットした人が残ります。フルクローンなら、そのコミットの日時と作者が表示されます。</li>
+        <li><strong>深さを変えると日付が変わることがあります。</strong>日付は常に、チェックアウトから見える履歴で決まります。サイトの最初の公開や、前回の公開の状態がない、または検証できない場合は、先に履歴をすべて取得し、その履歴から日付を計算します。浅いチェックアウトとフルチェックアウトを切り替えたときに日付が変わるのは、バイト列を変えないコミットがある場合だけです。</li>
+        <li><strong>プレビューには影響しません。</strong>CLIは、デフォルトブランチとのマージベースが正確になるまで履歴を取得します。そのため、プレビューされるページはフルクローンと同じです。</li>
+      </ul>
+      <p>バイト列を変えないコミットも日付に反映したいときは、履歴をすべてチェックアウトします。Actionの<code>fetch-depth</code>を指定します。</p>
+      <div class="term" aria-label="履歴をすべてチェックアウトするActionの入力例">
+        <div class="term-head"><span>.github/workflows/publish-docs.yml / 履歴をすべて取得</span><button class="copy-btn" type="button">コピー</button></div>
+<pre>      - <span class="k">uses</span>: tasuku43/git-artifact-pages@v0.2.1
+        <span class="k">with</span>:
+          <span class="k">fetch-depth</span>: 0   <span class="c"># 履歴をすべて取得。大きなリポジトリではチェックアウトが遅くなる</span>
+          <span class="c"># ...site、source、config、dry-runは上の例と同じ</span></pre>
+      </div>
+      <p>トークンにリポジトリを読む権限がないなどで取得に失敗すると、公開は止まります。メッセージには、<code>fetch-depth: 0</code>を使うか、リポジトリを読めるトークンを渡すよう書かれます。誤った日付のまま公開を続けることはありません。</p>
     </section>
 
     <section class="doc-section" aria-labelledby="previews">

@@ -61,6 +61,8 @@ Batch of 2026-10-02: DOC-02 (reading-features revision), DOC-04–07 and DOC-08�
 | 12 | [DOC-12](DOC-12-architecture-trust-model.md) | architecture | `trust-model.html` | In progress |
 | 13 | [DOC-13](DOC-13-architecture-search.md) | architecture | `search.html` — name search and page text search | In progress |
 | 14 | [DOC-14](DOC-14-guide-provider-setup.md) | guide | Provider setup (AWS, Cloudflare) | Open |
+| 15 | [DOC-15](DOC-15-guide-shallow-checkout-dates.md) | guide | `publishing.html` revision — shallow checkouts and document dates | In progress |
+| 16 | [DOC-16](DOC-16-guide-private-config-github-app.md) | guide | GitHub App pattern for private configuration repositories (`configuration.html`) | In progress |
 
 ## Product observations from this work
 

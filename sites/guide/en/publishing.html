@@ -59,7 +59,7 @@
         <li><strong><code>index.html</code> is an ordinary page.</strong> <code>/checkout</code> opens the site's home page, not <code>index.html</code>.</li>
         <li><strong>Other files are published but not listed</strong>: CSS, JavaScript, images, fonts, JSON, and so on. Pages load them with relative links such as <code>img/flow.svg</code> or <code>../assets/report.css</code>. A root-relative link such as <code>/assets/report.css</code> points outside the site and breaks.</li>
         <li><strong>Titles</strong> come from an HTML page's <code>&lt;title&gt;</code> or a Markdown page's first <code>#</code> heading. Without one, the filename is used: <code>payment-flow.html</code> becomes “Payment Flow”.</li>
-        <li><strong>Dates and committers</strong> come from Git history. A file changed or added in the working tree uses its modification time when that is newer than its commit date. Files Git ignores, such as generated output, are still published; they take the newest modification time among the files in the page's directory and its subdirectories, and show no committer.</li>
+        <li><strong>Dates and committers</strong> come from Git history. A file changed or added in the working tree uses its modification time when that is newer than its commit date. Files Git ignores, such as generated output, are still published; they take the newest modification time among the files in the page's directory and its subdirectories, and show no committer. In CI with a shallow checkout the dates are the same in normal use; see <a href="#shallow">Shallow checkouts and dates</a>.</li>
         <li><strong>Symbolic links make publishing fail.</strong> The <code>.git</code> folder is never published.</li>
       </ul>
       <div class="callout warn" role="note">
@@ -160,11 +160,8 @@
     <span class="c"># plan: read-only credentials; production: write access to this site only</span>
     <span class="k">environment</span>: ${{ github.event_name == 'pull_request' &amp;&amp; 'plan' || 'production' }}
     <span class="k">steps</span>:
-      - <span class="k">uses</span>: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 <span class="c"># v7.0.1</span>
-        <span class="k">with</span>:
-          <span class="k">fetch-depth</span>: 0              <span class="c"># dates and committers come from Git history</span>
-          <span class="k">persist-credentials</span>: false
-      - <span class="k">uses</span>: tasuku43/git-artifact-pages@vX.Y.Z
+      <span class="c"># No actions/checkout step: the Action checks out the repository itself (shallow)</span>
+      - <span class="k">uses</span>: tasuku43/git-artifact-pages@v0.2.1
         <span class="k">with</span>:
           <span class="k">site</span>: checkout
           <span class="k">source</span>: docs/artifacts
@@ -176,15 +173,34 @@
           <span class="k">CF_API_TOKEN</span>: ${{ secrets.CF_API_TOKEN }}</pre>
       </div>
       <ul>
+        <li><strong>The Action checks out the repository for you.</strong> By default (<code>checkout: auto</code>) it runs <code>actions/checkout</code> with <code>fetch-depth: 1</code> and without persisted credentials, unless the workspace already is a checkout. Add your own checkout step only if an earlier step needs the files; the Action then leaves it alone. <code>permissions: contents: read</code> is enough. See <a href="#shallow">Shallow checkouts and dates</a> for what a shallow checkout means for dates.</li>
         <li><strong>Reference an exact release tag</strong>, such as <code>@vX.Y.Z</code>; releases are listed on <a href="https://github.com/tasuku43/git-artifact-pages/releases" target="_blank" rel="noopener">GitHub Releases</a>. While versions are <code>0.x</code> there is no moving tag such as <code>@v0</code>. For the strictest pin, use the release's full commit SHA and keep the tag as a comment: <code>tasuku43/git-artifact-pages@&lt;full commit SHA&gt; # vX.Y.Z</code>.</li>
-        <li><strong>Two environments hold different secrets.</strong> <code>plan</code> and <code>production</code> are illustrative names: give <code>plan</code> read-only credentials (pull requests from forks get no secrets, so the plan fails there by design) and <code>production</code> credentials that can write only this site, and limit <code>production</code> to <code>main</code> in its settings. The variable names are the Cloudflare defaults; on AWS, assume a role through OIDC instead (add <code>id-token: write</code> to <code>permissions</code>).</li>
+        <li><strong>Two environments hold different secrets.</strong> <code>plan</code> and <code>production</code> are illustrative names: give <code>plan</code> read-only credentials (pull requests from forks get no secrets, so the plan fails there by design) and <code>production</code> credentials that can write only this site, and limit <code>production</code> to <code>main</code> in its settings. Private repositories on GitHub Free cannot use environment secrets; see <a href="configuration.html#remote-private">Configuration</a>. The variable names are the Cloudflare defaults; on AWS, assume a role through OIDC instead (add <code>id-token: write</code> to <code>permissions</code>).</li>
         <li><strong>One publish at a time.</strong> Only one publish can hold the site's lock, so the <code>concurrency</code> group runs one publish at a time (a newer push replaces a waiting one).</li>
         <li><strong>Pinning the config</strong> is optional. Without <code>?ref=</code>, the admin repository's default branch is resolved to one commit for the whole run. Append <code>?ref=&lt;full commit SHA&gt;</code> to the locator to pin a commit.</li>
-        <li><strong>A private admin repository</strong> is read with this workflow's token by default, which usually cannot read another repository. Pass a read-only token for the admin repository through the <code>github-token</code> input.</li>
+        <li><strong>A private admin repository</strong> is read with this workflow's token by default, which cannot read another private repository. Pass a read-only token for the admin repository through the <code>github-token</code> input; <a href="configuration.html#remote-private">Configuration</a> shows how to mint one with a GitHub App.</li>
         <li><strong>Results</strong> are available as outputs, such as <code>outcome</code> (<code>planned</code>, <code>published</code>, <code>no-op</code>, or <code>failed</code>), <code>changes</code>, and <code>result</code>.</li>
         <li><strong>Other Actions</strong> use the same tag: <code>tasuku43/git-artifact-pages/actions/admin</code> for <code>registry register</code>, <code>registry unregister</code>, and <code>app deploy</code>; <code>actions/preview-publish</code> for previews.</li>
       </ul>
       <p class="note"><code>acme/checkout</code> and <code>acme/platform-admin</code> are illustrative. Replace <code>vX.Y.Z</code> and <code>&lt;full commit SHA&gt;</code> with real values.</p>
+
+      <h3 id="shallow">Shallow checkouts and dates</h3>
+      <p>The workflow above does a shallow checkout: only the latest commit. When the CLI needs older history, it fetches it from <code>origin</code> by itself, using this workflow's token. A dry run deepens in the same way, so the plan equals the real publish.</p>
+      <ul>
+        <li><strong>Dates and committers match a full clone in normal use.</strong> A document whose content has not changed since the last publish keeps the date and committer already in the published index. Its content is the document plus the files whose commits count toward its date, such as the CSS and images it loads, compared by checksum. So the date a page shows means when its content last changed, except in the case below. A document whose content did change gets its date from the newest commit in the history the checkout holds, and the CLI fetches more history until that date can be trusted.</li>
+        <li><strong>The one difference: commits that change no bytes.</strong> A commit that touches a document or its files without changing their bytes, and that lies beyond the history the CLI fetched, is not seen. Examples are a revert back to the published content, a <code>touch</code>, and a history rewrite that preserves content. The page keeps its published date and committer. A full clone would show the date and author of that commit.</li>
+        <li><strong>Changing the depth can change dates.</strong> Dates always come from the history the checkout can see. The first publish of a site, or a publish when the previous publish's state is missing or cannot be verified, fetches the full history first and computes dates from it. Moving between a shallow and a full checkout changes dates only where commits that change no bytes exist.</li>
+        <li><strong>Previews are not affected.</strong> The CLI deepens until the merge base with the default branch is exact, so the changed pages are the same as with a full clone.</li>
+      </ul>
+      <p>If commits that change no bytes must show up in the dates, check out the full history. Set <code>fetch-depth</code> on the Action:</p>
+      <div class="term" aria-label="Example Action input that checks out the full history">
+        <div class="term-head"><span>.github/workflows/publish-docs.yml / FULL HISTORY</span><button class="copy-btn" type="button">Copy</button></div>
+<pre>      - <span class="k">uses</span>: tasuku43/git-artifact-pages@v0.2.1
+        <span class="k">with</span>:
+          <span class="k">fetch-depth</span>: 0   <span class="c"># full history; slower checkout on large repositories</span>
+          <span class="c"># ...site, source, config, dry-run as above</span></pre>
+      </div>
+      <p>If the fetch fails, for example because the token cannot read the repository, the publish stops with a message that points to <code>fetch-depth: 0</code> or to a token that can read the repository. It never falls back to wrong dates.</p>
     </section>
 
     <section class="doc-section" aria-labelledby="previews">
