@@ -35,36 +35,38 @@ jobs:
       contains(github.event.pull_request.labels.*.name, 'preview-artifact') &&
       (github.event.action != 'labeled' || github.event.label.name == 'preview-artifact')
     runs-on: ubuntu-24.04
-    # R2 credentials are secrets of the "preview" environment only.
-    environment: preview
     permissions:
       contents: read
-      pull-requests: write # read for PR verification, write for the preview comment
     strategy:
       fail-fast: false
       matrix:
         site: [guide, architecture]
     steps:
-      # Check out the base branch with full history. The action takes the
-      # pull request head SHA and origin/<base> from the event and fails with
-      # a clear error if either is missing.
-      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+      # Short-lived (1 hour) installation token scoped to this job's needs;
+      # it is revoked when the job ends. The workflow token is used only for
+      # checkout and shallow deepening.
+      - name: Mint a GitHub App token
+        id: app-token
+        uses: actions/create-github-app-token@bcd2ba49218906704ab6c1aa796996da409d3eb1 # v3.2.0
         with:
-          ref: ${{ github.event.pull_request.base.ref }}
-          fetch-depth: 0
-          persist-credentials: false
-      # Previews changed pages and pages whose local CSS, JS or images changed;
-      # a site with nothing to preview ends as no-preview, not an error. Writes
-      # one comment per site and updates it on later pushes.
+          app-id: ${{ vars.ARTIFACT_PAGES_APP_ID }}
+          private-key: ${{ secrets.ARTIFACT_PAGES_APP_PRIVATE_KEY }}
+          owner: ${{ github.repository_owner }}
+          repositories: artifact-pages-admin,artifact-pages-docs
+          permission-contents: read
+          permission-pull-requests: write # PR verification and the preview comment
+      # The action checks out the base branch itself and takes the pull request
+      # number and head SHA from the event. It previews changed pages and pages
+      # whose local CSS, JS or images changed; a site with nothing to preview
+      # ends as no-preview, not an error. Writes one comment per site and
+      # updates it on later pushes.
       - name: Preview ${{ matrix.site }}
-        uses: tasuku43/git-artifact-pages/actions/preview-publish@9eb228263efd17b3e9ebe39de365c0095a50a9da # main, tasuku43/git-artifact-pages#8
+        uses: tasuku43/git-artifact-pages/actions/preview-publish@v0.2.0
         with:
           site: ${{ matrix.site }}
-          source: sites/${{ matrix.site }}
-          pull-request: ${{ github.event.pull_request.number }}
-          base-url: https://artifact-pages.dev
           # The deployed registry decides eligibility; this config locates it.
           config: github://tasuku43/artifact-pages-admin/artifact-pages.yaml
+          github-token: ${{ steps.app-token.outputs.token }}
           comment: true
         env:
           CF_R2_ACCESS_KEY_ID: ${{ secrets.CF_R2_ACCESS_KEY_ID }}

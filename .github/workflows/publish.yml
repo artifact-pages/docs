@@ -23,34 +23,36 @@ concurrency:
 jobs:
   publish:
     runs-on: ubuntu-24.04
-    environment: ${{ github.event_name != 'pull_request' && 'production' || '' }}
     strategy:
       fail-fast: false
       max-parallel: 1
       matrix:
         site: [guide, architecture]
     steps:
-      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+      # Short-lived (1 hour) installation token scoped to this job's needs;
+      # it is revoked when the job ends. The workflow token is used only for
+      # checkout and shallow deepening.
+      - name: Mint a GitHub App token
+        id: app-token
+        uses: actions/create-github-app-token@bcd2ba49218906704ab6c1aa796996da409d3eb1 # v3.2.0
         with:
-          fetch-depth: 0
-          persist-credentials: false
+          app-id: ${{ vars.ARTIFACT_PAGES_APP_ID }}
+          private-key: ${{ secrets.ARTIFACT_PAGES_APP_PRIVATE_KEY }}
+          owner: ${{ github.repository_owner }}
+          repositories: artifact-pages-admin
+          permission-contents: read
       - name: Publish ${{ matrix.site }}
-        id: publish
-        uses: tasuku43/git-artifact-pages@af75645985fa35797942005ed177ecb583249103 # main, tasuku43/git-artifact-pages#9
+        uses: tasuku43/git-artifact-pages@v0.2.0
         with:
           site: ${{ matrix.site }}
-          source: sites/${{ matrix.site }}
           # The deployed registry decides eligibility; this config locates it.
           config: github://tasuku43/artifact-pages-admin/artifact-pages.yaml
-          dry-run: ${{ github.event_name == 'pull_request' }}
+          github-token: ${{ steps.app-token.outputs.token }}
+          # Real publish on main only; pull requests and other runs are a dry-run.
+          publish-on: |
+            push:refs/heads/main
+            workflow_dispatch:refs/heads/main
         env:
           CF_R2_ACCESS_KEY_ID: ${{ secrets.CF_R2_ACCESS_KEY_ID }}
           CF_R2_SECRET_ACCESS_KEY: ${{ secrets.CF_R2_SECRET_ACCESS_KEY }}
           CF_API_TOKEN: ${{ secrets.CF_API_TOKEN }}
-      - name: Summarize
-        env:
-          SITE: ${{ matrix.site }}
-          OUTCOME: ${{ steps.publish.outputs.outcome }}
-          CHANGES: ${{ steps.publish.outputs.changes }}
-        run: |
-          echo "### $SITE: $OUTCOME ($(jq length <<<"$CHANGES") changes)" >> "$GITHUB_STEP_SUMMARY"
