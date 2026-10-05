@@ -120,13 +120,74 @@
       </div>
       <ul>
         <li>The form is <code>github://OWNER/REPO/FILE?ref=REF</code>. Without <code>FILE</code>, <code>artifact-pages.yaml</code> is read. Without <code>ref</code>, the default branch is resolved to one commit for the whole command, so a run cannot change target midway. Add <code>ref</code> with a full commit SHA only when you want the config itself to change by review in your repository.</li>
-        <li>Quote the locator in the shell when it has a <code>?ref=</code>. Private repositories are read with <code>GITHUB_TOKEN</code> or <code>GH_TOKEN</code>.</li>
+        <li>Quote the locator in the shell when it has a <code>?ref=</code>. Private repositories are read with <code>GITHUB_TOKEN</code> or <code>GH_TOKEN</code>; in the Actions, with the <code>github-token</code> input (see <a href="#remote-private">A private admin repository</a>).</li>
         <li>The file is fetched again on every run, and the output shows the config commit it used.</li>
         <li>A remote config must be complete; it cannot be combined with other layers.</li>
         <li>A single repository that is both admin and site may keep a local <code>artifact-pages.yaml</code> instead; that is the exception.</li>
         <li>It only tells the command where to deliver. Whether a repository may publish to a site is still decided by the registry on the delivery target.</li>
       </ul>
       <p class="note"><code>acme/platform-admin</code> is an illustrative admin repository.</p>
+    </section>
+
+    <section class="doc-section" aria-labelledby="remote-private">
+      <h2 id="remote-private">A private admin repository</h2>
+      <p>A site repository's workflow token (<code>GITHUB_TOKEN</code>) can read only that repository, so it cannot read a private admin repository. The Action's <code>github-token</code> input takes a token that can. A GitHub App installation token fits well: it belongs to the App rather than to a person, reaches only the repositories you install the App on, and each job mints its own short-lived token.</p>
+      <ol class="timeline">
+        <li><div><h3>Create a GitHub App</h3><p>Under <strong>Settings → Developer settings → GitHub Apps</strong> of the account or organization that owns the repositories. Turn <strong>Webhook → Active</strong> off; the App only issues tokens. Set the repository permissions to <strong>Contents: Read-only</strong> and <strong>Metadata: Read-only</strong>. Add <strong>Pull requests</strong> only for repositories that run previews: Read-only is enough for the pull-request check, and Read and write if previews post comments (<code>comment: true</code>). Then generate a private key (a <code>.pem</code> file).</p></div></li>
+        <li><div><h3>Install it on only the repositories that need it</h3><p>Choose <strong>Only select repositories</strong>: the admin repository and the site repositories that publish. Do not install it on all repositories.</p></div></li>
+        <li><div><h3>Store the App ID and key in each site repository</h3><p>Under <strong>Settings → Secrets and variables → Actions</strong>, add the App ID as a variable (<code>ARTIFACT_PAGES_APP_ID</code> below) and the private key as a secret (<code>ARTIFACT_PAGES_APP_PRIVATE_KEY</code>). The names are illustrative. The key is the only secret in this pattern; no token value is ever stored.</p></div></li>
+        <li><div><h3>Mint a token in the job and pass it as <code>github-token</code></h3><p>Add <code>actions/create-github-app-token</code> before the Action. Limit the token with <code>repositories</code> and <code>permission-*</code> to what this job needs.</p>
+          <div class="term" aria-label="Example workflow job that mints a GitHub App token for the config read">
+            <div class="term-head"><span>.github/workflows/publish-docs.yml / acme/checkout (excerpt)</span><button class="copy-btn" type="button">Copy</button></div>
+<pre><span class="k">permissions</span>:
+  <span class="k">contents</span>: read
+
+<span class="k">jobs</span>:
+  <span class="k">publish</span>:
+    <span class="k">runs-on</span>: ubuntu-24.04
+    <span class="k">steps</span>:
+      - <span class="k">name</span>: Mint a GitHub App token
+        <span class="k">id</span>: app-token
+        <span class="k">uses</span>: actions/create-github-app-token@bcd2ba49218906704ab6c1aa796996da409d3eb1 <span class="c"># v3.2.0</span>
+        <span class="k">with</span>:
+          <span class="k">app-id</span>: ${{ vars.ARTIFACT_PAGES_APP_ID }}
+          <span class="k">private-key</span>: ${{ secrets.ARTIFACT_PAGES_APP_PRIVATE_KEY }}
+          <span class="k">owner</span>: ${{ github.repository_owner }}
+          <span class="k">repositories</span>: platform-admin        <span class="c"># the admin repository only</span>
+          <span class="k">permission-contents</span>: read
+      - <span class="k">uses</span>: tasuku43/git-artifact-pages@v0.2.1
+        <span class="k">with</span>:
+          <span class="k">site</span>: checkout
+          <span class="k">source</span>: docs/artifacts
+          <span class="k">config</span>: github://acme/platform-admin/artifact-pages.yaml
+          <span class="k">github-token</span>: ${{ steps.app-token.outputs.token }}
+        <span class="k">env</span>:
+          <span class="k">CF_API_TOKEN</span>: ${{ secrets.CF_API_TOKEN }}
+          <span class="c"># provider credentials from secrets, as in the publishing example</span></pre>
+          </div></div></li>
+      </ol>
+      <ul>
+        <li><strong>Two tokens, two jobs.</strong> <code>github-token</code> reads the config. The history fetch that deepens a shallow checkout always uses the workflow token, which can read the site repository; <code>github-token</code> is never used for it. So <code>permissions: contents: read</code> stays enough for the workflow, and the App token for a publish job needs the admin repository only.</li>
+        <li><strong>Preview jobs need more.</strong> A preview job also uses <code>github-token</code> to check the pull request in the site repository and to post the comment. Mint it with <code>repositories: platform-admin,checkout</code>, <code>permission-contents: read</code> and <code>permission-pull-requests: write</code> (<code>read</code> if the job does not comment). The comment is then written by the App's bot account.</li>
+        <li><strong>Why not a personal access token?</strong> It is tied to one person's account and usually reaches more than the admin repository. A fine-grained token limited to <strong>Contents: Read-only</strong> on the admin repository should also work, but this route has not been verified.</li>
+        <li><strong>On GitHub Free</strong>, private repositories cannot use environment secrets or deployment branch policies. Store the secrets at repository scope and drop <code>environment:</code> from the workflow. Any workflow run in the repository can then read them, not only runs on <code>main</code>, so keep real publishing behind the Action's <code>publish-on</code> input and keep previews gated to same-repository pull requests. Review changes to workflow files like changes to credentials.</li>
+      </ul>
+      <p>If the config cannot be read, the error starts with <code>cannot read deployment config</code> followed by the locator, and the command exits with code <code>2</code>. The token is never printed.</p>
+      <div class="table-wrap"><table>
+        <thead><tr><th>The message says</th><th>Likely cause</th><th>What to do</th></tr></thead>
+        <tbody>
+          <tr><td><code>GitHub returned HTTP 404; … may be private and no token was provided</code></td><td>Local run with neither <code>GITHUB_TOKEN</code> nor <code>GH_TOKEN</code> set.</td><td>Set one to a token with <code>contents:read</code> on the admin repository.</td></tr>
+          <tr><td><code>GitHub returned HTTP 404, which it uses both for missing repositories and for private repositories the token cannot access</code></td><td>GitHub answers 404, not 403, for a private repository the token cannot see. In Actions, a run without <code>github-token</code> lands here too, because the workflow token is sent. Also a typo in the locator, an App not installed on the admin repository, a <code>repositories</code> list without it, or no Contents permission.</td><td>Check the locator. Check that the App is installed on the admin repository, that the minted token lists it in <code>repositories</code>, and that <code>permission-contents: read</code> is set. Pass the token as <code>github-token</code>.</td></tr>
+          <tr><td><code>the config path or ref does not exist in … (HTTP 404)</code></td><td>The repository was reached, but the file or <code>?ref=</code> is wrong.</td><td>Check the file name and the branch, tag, or commit SHA in the locator.</td></tr>
+          <tr><td><code>GitHub rejected the token (HTTP 401)</code></td><td>The token is invalid or expired. An App token lasts one hour.</td><td>Mint the token in the same job that uses it, and pass it unchanged.</td></tr>
+          <tr><td><code>GitHub denied access (HTTP 403); the token lacks permission</code></td><td>The token has no <code>contents:read</code> on the admin repository.</td><td>Grant Contents: Read-only to the App, and accept the new permission on its installation if GitHub asks.</td></tr>
+          <tr><td><code>GitHub denied access (HTTP 403) because the API rate limit is exhausted</code></td><td>The token's API rate limit is used up.</td><td>Wait for the limit to reset, or use a token with a higher limit.</td></tr>
+        </tbody>
+      </table></div>
+      <p>For example, a publish run on a hosted GitHub Actions runner without a usable token for a private admin repository printed (the message text was verified there with release v0.2.1):</p>
+      <div class="term" aria-label="Error message"><div class="term-head"><span>ERROR / HOSTED RUNNER, v0.2.1</span></div>
+<pre>error: cannot read deployment config github://tasuku43/artifact-pages-admin/artifact-pages.yaml: GitHub returned HTTP 404, which it uses both for missing repositories and for private repositories the token cannot access. Check the locator, and that the token (for example a GitHub App installation or fine-grained PAT) has contents:read on tasuku43/artifact-pages-admin.</pre></div>
+      <p class="note"><code>acme/platform-admin</code> and <code>acme/checkout</code> are illustrative repositories. <code>ARTIFACT_PAGES_APP_ID</code> and <code>ARTIFACT_PAGES_APP_PRIVATE_KEY</code> are illustrative names.</p>
     </section>
 
     <section class="doc-section" aria-labelledby="providers">

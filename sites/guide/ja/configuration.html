@@ -120,13 +120,74 @@
       </div>
       <ul>
         <li>形式は<code>github://OWNER/REPO/FILE?ref=REF</code>です。<code>FILE</code>を省くと<code>artifact-pages.yaml</code>を読みます。<code>ref</code>を省くと、デフォルトブランチをその時点のコミットに決め、コマンドの最後までそのコミットを使います。そのため、実行の途中で配信先が変わることはありません。設定そのものをリポジトリ側のレビューで変えたいときだけ、<code>ref</code>に完全なコミットSHAを指定します。</li>
-        <li><code>?ref=</code>を付けるときは、シェルではクォートで囲みます。プライベートリポジトリは<code>GITHUB_TOKEN</code>か<code>GH_TOKEN</code>で読みます。</li>
+        <li><code>?ref=</code>を付けるときは、シェルではクォートで囲みます。非公開リポジトリは<code>GITHUB_TOKEN</code>か<code>GH_TOKEN</code>で読みます。Actionsでは<code>github-token</code>入力で渡します（<a href="#remote-private">非公開の管理リポジトリを読む</a>を参照）。</li>
         <li>ファイルは実行のたびに取り直し、使ったコミットを出力に表示します。</li>
         <li>リモートの設定ファイルは、それだけで完結している必要があります。ほかのファイルとは重ねられません。</li>
         <li>管理と公開を1つのリポジトリで兼ねる場合に限り、ローカルの<code>artifact-pages.yaml</code>を置いてもかまいません。これは例外です。</li>
         <li>この指定で決まるのは配信先だけです。そのリポジトリがサイトに公開してよいかどうかは、配信先にある登録情報で判断します。</li>
       </ul>
       <p class="note"><code>acme/platform-admin</code>は説明用の管理リポジトリです。</p>
+    </section>
+
+    <section class="doc-section" aria-labelledby="remote-private">
+      <h2 id="remote-private">非公開の管理リポジトリを読む</h2>
+      <p>サイトのリポジトリのワークフローが持つトークン（<code>GITHUB_TOKEN</code>）で読めるのは、そのリポジトリだけです。そのため、非公開の管理リポジトリは読めません。Actionの<code>github-token</code>入力には、読めるトークンを渡します。GitHub Appのインストールトークンが向いています。トークンの持ち主は人ではなくAppで、届く範囲はAppをインストールしたリポジトリに限られます。また、ジョブごとに有効期間の短いトークンを発行できます。</p>
+      <ol class="timeline">
+        <li><div><h3>GitHub Appを作る</h3><p>リポジトリを持つアカウントまたはOrganizationの<strong>Settings → Developer settings → GitHub Apps</strong>から作ります。Appはトークンを発行するだけなので、<strong>Webhook → Active</strong>はオフにします。リポジトリの権限は<strong>Contents: Read-only</strong>と<strong>Metadata: Read-only</strong>です。<strong>Pull requests</strong>は、プレビューを実行するリポジトリ向けにだけ加えます。プルリクエストの確認にはRead-onlyで足り、プレビューでコメントを投稿する（<code>comment: true</code>）ならRead and writeが必要です。最後に、秘密鍵（<code>.pem</code>ファイル）を生成します。</p></div></li>
+        <li><div><h3>必要なリポジトリにだけインストールする</h3><p><strong>Only select repositories</strong>を選び、管理リポジトリと、公開を行うサイトのリポジトリだけを指定します。すべてのリポジトリには入れません。</p></div></li>
+        <li><div><h3>AppのIDと鍵をサイトのリポジトリに登録する</h3><p><strong>Settings → Secrets and variables → Actions</strong>で、App IDを変数（下の例では<code>ARTIFACT_PAGES_APP_ID</code>）に、秘密鍵をシークレット（<code>ARTIFACT_PAGES_APP_PRIVATE_KEY</code>）に登録します。名前は説明用です。この方法でシークレットとして持つのは鍵だけで、トークンの値を保存することはありません。</p></div></li>
+        <li><div><h3>ジョブの中でトークンを発行し、<code>github-token</code>に渡す</h3><p>Actionの前に<code>actions/create-github-app-token</code>を置きます。<code>repositories</code>と<code>permission-*</code>で、そのジョブに必要な範囲だけに絞ります。</p>
+          <div class="term" aria-label="設定ファイルを読むためにGitHub Appのトークンを発行するワークフローの例">
+            <div class="term-head"><span>.github/workflows/publish-docs.yml / acme/checkout（抜粋）</span><button class="copy-btn" type="button">コピー</button></div>
+<pre><span class="k">permissions</span>:
+  <span class="k">contents</span>: read
+
+<span class="k">jobs</span>:
+  <span class="k">publish</span>:
+    <span class="k">runs-on</span>: ubuntu-24.04
+    <span class="k">steps</span>:
+      - <span class="k">name</span>: Mint a GitHub App token
+        <span class="k">id</span>: app-token
+        <span class="k">uses</span>: actions/create-github-app-token@bcd2ba49218906704ab6c1aa796996da409d3eb1 <span class="c"># v3.2.0</span>
+        <span class="k">with</span>:
+          <span class="k">app-id</span>: ${{ vars.ARTIFACT_PAGES_APP_ID }}
+          <span class="k">private-key</span>: ${{ secrets.ARTIFACT_PAGES_APP_PRIVATE_KEY }}
+          <span class="k">owner</span>: ${{ github.repository_owner }}
+          <span class="k">repositories</span>: platform-admin        <span class="c"># 管理リポジトリだけ</span>
+          <span class="k">permission-contents</span>: read
+      - <span class="k">uses</span>: tasuku43/git-artifact-pages@v0.2.1
+        <span class="k">with</span>:
+          <span class="k">site</span>: checkout
+          <span class="k">source</span>: docs/artifacts
+          <span class="k">config</span>: github://acme/platform-admin/artifact-pages.yaml
+          <span class="k">github-token</span>: ${{ steps.app-token.outputs.token }}
+        <span class="k">env</span>:
+          <span class="k">CF_API_TOKEN</span>: ${{ secrets.CF_API_TOKEN }}
+          <span class="c"># プロバイダーの認証情報は、公開の例と同じくシークレットから渡す</span></pre>
+          </div></div></li>
+      </ol>
+      <ul>
+        <li><strong>トークンは用途ごとに2つあります。</strong><code>github-token</code>は設定ファイルを読むためのものです。浅いチェックアウトを深くする履歴の取得には、常にワークフローのトークンを使います。このトークンならサイトのリポジトリを読めます。<code>github-token</code>が履歴の取得に使われることはありません。したがって、ワークフローの権限は<code>contents: read</code>のままで足り、公開ジョブのAppトークンに必要なのは管理リポジトリだけです。</li>
+        <li><strong>プレビューのジョブには、もう少し権限が要ります。</strong>プレビューのジョブは、サイトのリポジトリのプルリクエストを確認し、コメントを投稿するときにも<code>github-token</code>を使います。トークンは<code>repositories: platform-admin,checkout</code>、<code>permission-contents: read</code>、<code>permission-pull-requests: write</code>で発行します（コメントしないジョブなら<code>read</code>で足ります）。コメントは、Appのボットアカウントの名前で投稿されます。</li>
+        <li><strong>個人用アクセストークンを使わない理由。</strong>個人用アクセストークンは特定の人のアカウントに結びつき、管理リポジトリ以外にも届くことが多いからです。管理リポジトリの<strong>Contents: Read-only</strong>だけに絞ったファイングレインドトークンでも読めるはずですが、この方法は検証していません。</li>
+        <li><strong>GitHub Freeでは、</strong>非公開リポジトリでEnvironmentのシークレットやデプロイ先のブランチ制限を使えません。シークレットはリポジトリのスコープに置き、ワークフローから<code>environment:</code>を外します。その場合、<code>main</code>以外で動くワークフローも含め、リポジトリ内のどのワークフローの実行からもシークレットを読めます。実際の公開はActionの<code>publish-on</code>入力で絞り、プレビューは同じリポジトリのプルリクエストに限ってください。ワークフローファイルの変更は、認証情報の変更と同じ扱いでレビューします。</li>
+      </ul>
+      <p>設定ファイルを読めないときのエラーは、<code>cannot read deployment config</code>に続けて指定した場所を示し、終了コードは<code>2</code>です。トークンは表示されません。</p>
+      <div class="table-wrap"><table>
+        <thead><tr><th>メッセージ</th><th>考えられる原因</th><th>対処</th></tr></thead>
+        <tbody>
+          <tr><td><code>GitHub returned HTTP 404; … may be private and no token was provided</code></td><td>ローカルで実行していて、<code>GITHUB_TOKEN</code>も<code>GH_TOKEN</code>も設定していません。</td><td>管理リポジトリの<code>contents:read</code>を持つトークンを、どちらかに設定します。</td></tr>
+          <tr><td><code>GitHub returned HTTP 404, which it uses both for missing repositories and for private repositories the token cannot access</code></td><td>トークンで見えない非公開リポジトリに対して、GitHubは403ではなく404を返します。Actionsで<code>github-token</code>を渡さない場合も、ワークフローのトークンが送られるため、このメッセージになります。ほかに、指定の誤り、管理リポジトリにAppを入れていない、<code>repositories</code>に管理リポジトリがない、Contentsの権限がない、などが考えられます。</td><td>指定を確認します。管理リポジトリにAppがインストールされていること、発行したトークンの<code>repositories</code>に管理リポジトリが入っていること、<code>permission-contents: read</code>を付けていることを確かめます。トークンは<code>github-token</code>に渡します。</td></tr>
+          <tr><td><code>the config path or ref does not exist in … (HTTP 404)</code></td><td>リポジトリには届いていますが、ファイルか<code>?ref=</code>が間違っています。</td><td>指定のファイル名と、ブランチ、タグ、コミットSHAを確認します。</td></tr>
+          <tr><td><code>GitHub rejected the token (HTTP 401)</code></td><td>トークンが無効か、期限切れです。Appのトークンの有効期間は1時間です。</td><td>トークンは、それを使うジョブの中で発行し、そのまま渡します。</td></tr>
+          <tr><td><code>GitHub denied access (HTTP 403); the token lacks permission</code></td><td>トークンが管理リポジトリの<code>contents:read</code>を持っていません。</td><td>AppにContents: Read-onlyを付与します。新しい権限の承認をGitHubに求められたら、インストール側で承認します。</td></tr>
+          <tr><td><code>GitHub denied access (HTTP 403) because the API rate limit is exhausted</code></td><td>トークンのAPIレート制限を使い切っています。</td><td>制限がリセットされるまで待つか、上限の高いトークンを使います。</td></tr>
+        </tbody>
+      </table></div>
+      <p>たとえば、非公開の管理リポジトリを読めるトークンがない状態で、GitHub Actionsのホステッドランナー上の公開を実行すると、次のメッセージが出ました（v0.2.1でこのメッセージ文をホステッドランナー上で確認しています）。</p>
+      <div class="term" aria-label="Error message"><div class="term-head"><span>ERROR / HOSTED RUNNER, v0.2.1</span></div>
+<pre>error: cannot read deployment config github://tasuku43/artifact-pages-admin/artifact-pages.yaml: GitHub returned HTTP 404, which it uses both for missing repositories and for private repositories the token cannot access. Check the locator, and that the token (for example a GitHub App installation or fine-grained PAT) has contents:read on tasuku43/artifact-pages-admin.</pre></div>
+      <p class="note"><code>acme/platform-admin</code>と<code>acme/checkout</code>は説明用のリポジトリです。<code>ARTIFACT_PAGES_APP_ID</code>と<code>ARTIFACT_PAGES_APP_PRIVATE_KEY</code>も説明用の名前です。</p>
     </section>
 
     <section class="doc-section" aria-labelledby="providers">
