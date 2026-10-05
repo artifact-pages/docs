@@ -1,8 +1,8 @@
 # Agent guidance — Artifact Pages documentation
 
-This repository holds the public, reader-facing documentation sites of [Git Artifact Pages](https://github.com/tasuku43/git-artifact-pages): `guide` (adopt, publish, read) and `architecture` (how it works and why). It is a satellite repository: each site is published from here with `artifact-pages site publish`. The production registry, reader app deployment and publish workflow belong to `tasuku43/artifact-pages-admin`.
+This repository holds the public, reader-facing documentation sites of [Git Artifact Pages](https://github.com/artifact-pages/artifact-pages): `guide` (adopt, publish, read) and `architecture` (how it works and why). It is a satellite repository: each site is published from here with `artifact-pages site publish`. The production registry, reader app deployment and publish workflow belong to `tasuku43/artifact-pages-admin`.
 
-Facts come from the product repository. Read its [thesis](https://github.com/tasuku43/git-artifact-pages/blob/main/docs/thesis.md), [specification](https://github.com/tasuku43/git-artifact-pages/blob/main/docs/specification.md) and CLI help before writing. A page must not state behavior the specification or the CLI does not have.
+Facts come from the product repository. Read its [thesis](https://github.com/artifact-pages/artifact-pages/blob/main/docs/thesis.md), [specification](https://github.com/artifact-pages/artifact-pages/blob/main/docs/specification.md) and CLI help before writing. A page must not state behavior the specification or the CLI does not have.
 
 ## Layout
 
@@ -40,7 +40,7 @@ Keep agent instruction files and anything that is not a published page outside `
 
 ## Visual quality
 
-Pages are not previewed locally from this repository. Author them so that they hold up in both light and dark themes and at about 400 px width with no page-level horizontal scroll, and state in the pull request that this was checked in the markup and styles. The owner confirms the result on the real site. Every publish builds the site's page text search data; `--fulltext` no longer exists (tasuku43/git-artifact-pages#9), so pages never tell readers to pass it.
+Pages are not previewed locally from this repository. Author them so that they hold up in both light and dark themes and at about 400 px width with no page-level horizontal scroll, and state in the pull request that this was checked in the markup and styles. The owner confirms the result on the real site. Every publish builds the site's page text search data; `--fulltext` no longer exists (artifact-pages/artifact-pages#9), so pages never tell readers to pass it.
 
 ## Backlog and issue tracking
 
