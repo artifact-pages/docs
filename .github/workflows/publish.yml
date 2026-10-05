@@ -42,7 +42,7 @@ jobs:
           repositories: artifact-pages-admin
           permission-contents: read
       - name: Publish ${{ matrix.site }}
-        uses: tasuku43/git-artifact-pages@v0.2.1
+        uses: artifact-pages/publish-action@v0.1.0
         with:
           site: ${{ matrix.site }}
           # The deployed registry decides eligibility; this config locates it.

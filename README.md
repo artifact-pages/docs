@@ -1,6 +1,6 @@
 # Artifact Pages documentation
 
-Public documentation for [Git Artifact Pages](https://github.com/tasuku43/git-artifact-pages), published as two Artifact Pages sites:
+Public documentation for [Git Artifact Pages](https://github.com/artifact-pages/artifact-pages), published as two Artifact Pages sites:
 
 | Site | Source | For |
 | --- | --- | --- |
@@ -14,4 +14,4 @@ Each site has Japanese (`ja/`) and English (`en/`) pages. This repository is a s
 - Each site is self-contained. Edit its own `sites/<site>/assets/` files directly; there is no shared source and no build or sync step. Sites may look different from one another.
 - The page queue and its conventions are in [`backlog/`](backlog/README.md).
 
-Product behavior is defined by the [specification](https://github.com/tasuku43/git-artifact-pages/blob/main/docs/specification.md) in the product repository; pages follow it.
+Product behavior is defined by the [specification](https://github.com/artifact-pages/artifact-pages/blob/main/docs/specification.md) in the product repository; pages follow it.
