@@ -1,11 +1,11 @@
 # DOC-17 — Guide: pinning and upgrading versions
 
-- Status: In progress
+- Status: Done
 - Assignee: Claude
 - Site: `guide`
 - Page: new `versions.html` in `ja/` and `en/` (title "Pinning and upgrading versions" / 「バージョンの固定と更新」), placed between `configuration.html` and `access-and-trust.html` in the pager chain; revisions to `getting-started.html`, `what-is-git-artifact-pages.html`, `configuration.html` and `publishing.html`
 - Audience: Admins who run a deployment (the admin repository) and need to choose, check and move the CLI and reader app versions
-- Depends on: product IMP-69 (config pins, version records, `config check`; merged) and IMP-70 (bootstrap CLI, `--cli-version`; product PR #58). The behavior described is not released yet, so merging this ticket's pull request publishes it before it exists in a release; the owner decides when it ships.
+- Depends on: product IMP-69 (config pins, version records, `config check`) and IMP-70 (bootstrap CLI, `--cli-version`), both merged. Published 2026-10-09 (docs PR #16) ahead of the first release that ships this behavior (product IMP-72), with owner consent.
 
 Product-side item: IMP-71 (operator guide part). Facts: product `docs/specification.md` §5.3 ("Version records", "Upgrading versions"), §19 ("Released CLI", "CLI selection", "Released web bundle", "Action repositories"), §22 (config keys `cli` and `web`, `config check`, `app deploy`, `--accept-breaking`, exit codes), and [TD17](https://github.com/artifact-pages/artifact-pages/blob/main/docs/backlog/technical-design/TD17-config-pinned-component-versions.md) for the design intent. The page states nothing the specification does not state.
 
@@ -36,9 +36,13 @@ Handle in a separate ticket after the first post-split release (IMP-72):
 
 ## Acceptance criteria
 
-- [ ] `ja` and `en` describe pinning, the normal and breaking upgrade orders, the override and the legacy flow as the specification does.
-- [ ] Every statement matches the specification (§5.3, §19, §22); nothing about rollback is claimed.
-- [ ] The revised pages no longer say that the CLI's version picks the reader app, or that the Action version picks the CLI.
-- [ ] Holds up in light and dark themes and at about 400px width without horizontal scrolling (markup reuses existing classes; no new CSS).
-- [ ] The behavior is released before this ships, or the owner accepts publishing it ahead of the release.
-- [ ] The owner reviewed and approved the pages.
+- [x] `ja` and `en` describe pinning, the normal and breaking upgrade orders, the override and the legacy flow as the specification does.
+- [x] Every statement matches the specification (§5.3, §19, §22); nothing about rollback is claimed.
+- [x] The revised pages no longer say that the CLI's version picks the reader app, or that the Action version picks the CLI.
+- [x] Holds up in light and dark themes and at about 400px width without horizontal scrolling (markup reuses existing classes; no new CSS).
+- [x] The behavior is released before this ships, or the owner accepts publishing it ahead of the release.
+- [x] The owner reviewed and approved the pages.
+
+## Result
+
+- 2026-10-09: published by docs PR #16 (`7d2ec772`) ahead of the IMP-72 release with owner consent; the owner reviewed the pages on the real site and approved them. Follow-up for stale guide content outside this page (old command names, install section, `tasuku43` URLs, publish Action inputs) is proposed for after the first split release.
