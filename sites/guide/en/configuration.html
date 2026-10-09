@@ -55,6 +55,7 @@
           <tr><td><code>schemaVersion</code></td><td><span class="pill on">Required</span></td><td>The integer <code>1</code>.</td></tr>
           <tr><td><code>provider</code></td><td><span class="pill on">Required</span></td><td>The delivery target: <code>local</code>, <code>aws</code>, or <code>cloudflare</code>. A shared base layer may omit it (see <a href="#layers">layers</a>).</td></tr>
           <tr><td><code>local</code> / <code>aws</code> / <code>cloudflare</code></td><td><span class="pill on">Required</span></td><td>Exactly the settings block that matches <code>provider</code>. See <a href="#providers">delivery targets</a>.</td></tr>
+          <tr><td><code>cli</code> / <code>web</code></td><td><span class="pill">Optional</span></td><td>Each holds an exact <code>version</code> (<code>MAJOR.MINOR.PATCH</code>): the CLI that runs and the reader app that <code>app deploy</code> installs. Set each in at most one layer. See <a href="versions.html">Pinning and upgrading versions</a>.</td></tr>
           <tr><td><code>sites</code></td><td><span class="pill">Optional</span></td><td>The sites to register, keyed by site ID. Required by <code>registry register</code> and <code>registry unregister</code>. See <a href="#sites">sites</a>.</td></tr>
         </tbody>
       </table></div>
@@ -102,6 +103,7 @@
         <li>Every layer has <code>schemaVersion: 1</code>. A layer that sets <code>provider</code> also has exactly the matching block.</li>
         <li>A later target <strong>replaces</strong> the earlier one as a whole; provider settings are never merged.</li>
         <li>A later layer without <code>sites</code> keeps the earlier list. A later layer with <code>sites</code> replaces the whole list, even when it is <code>{}</code>; sites are never merged one by one.</li>
+        <li><code>cli</code> and <code>web</code> may be set by only one layer, even when two layers give the same value; a second layer that sets either is an error. One layer may set both.</li>
         <li>Only repeated <code>--config</code> options make layers. Overlay files are never picked up automatically.</li>
       </ul>
     </section>
@@ -155,7 +157,7 @@
           <span class="k">owner</span>: ${{ github.repository_owner }}
           <span class="k">repositories</span>: platform-admin        <span class="c"># the admin repository only</span>
           <span class="k">permission-contents</span>: read
-      - <span class="k">uses</span>: tasuku43/git-artifact-pages@v0.2.1
+      - <span class="k">uses</span>: artifact-pages/publish-action@vX.Y.Z
         <span class="k">with</span>:
           <span class="k">site</span>: checkout
           <span class="k">source</span>: docs/artifacts
@@ -311,12 +313,12 @@
         <li>Deleted content can stay in caches for a short time, and pages a reader already opened cannot be recalled.</li>
         <li>If a crashed run leaves a lock, check it with <code>lock inspect --scope registry</code> (or <code>--site ID</code>) and, once you are sure nothing is running, release it with <code>lock recover … --observed-etag ETAG</code> using the value you saw.</li>
       </ul>
-      <p class="note">The same file also tells <code>app deploy</code> where to install the reader app. It installs the app of the same version as the CLI you run; releases are listed on <a href="https://github.com/tasuku43/git-artifact-pages/releases" target="_blank" rel="noopener">GitHub Releases</a>. To install the CLI and try the whole flow with <code>provider: local</code>, see <a href="getting-started.html">Getting started</a>.</p>
+      <p class="note">The same file also tells <code>app deploy</code> where to install the reader app. It installs the reader app release that <code>web.version</code> names; releases are listed on <a href="https://github.com/artifact-pages/artifact-pages/releases" target="_blank" rel="noopener">GitHub Releases</a>, and <a href="versions.html">Pinning and upgrading versions</a> covers upgrades. To install the CLI and try the whole flow with <code>provider: local</code>, see <a href="getting-started.html">Getting started</a>.</p>
     </section>
 
     <nav class="pager" aria-label="Pages">
       <a class="prev" href="publishing.html"><small>Previous</small><strong>Publishing</strong></a>
-      <a class="next" href="access-and-trust.html"><small>Next</small><strong>Access and trust</strong></a>
+      <a class="next" href="versions.html"><small>Next</small><strong>Pinning and upgrading versions</strong></a>
     </nav>
   </main>
 </body>

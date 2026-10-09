@@ -56,9 +56,9 @@
       </div>
       <p class="note">Go puts the command in its <code>bin</code> directory (<code>go env GOBIN</code>, or <code>bin</code> under <code>go env GOPATH</code>); make sure it is on your <code>PATH</code>. <code>x.y.z</code> stands for a release version; releases are listed on <a href="https://github.com/tasuku43/git-artifact-pages/releases" target="_blank" rel="noopener">GitHub Releases</a>. A Homebrew formula is planned but not available yet.</p>
       <div class="callout" role="note">
-        <span class="ico">ONE VERSION</span>
+        <span class="ico">VERSIONS</span>
         <div>
-          <p><strong>The CLI's version also picks the reader app's version.</strong> <code>artifact-pages version</code> shows both, and <code>app deploy</code> installs the app of the same release. To move the app to another release later, install that release's CLI and run <code>app deploy</code> again.</p>
+          <p><strong>The config picks the reader app and the CLI that runs.</strong> <code>web.version</code> in <code>artifact-pages.yaml</code> names the reader app release that <code>app deploy</code> installs, and the optional <code>cli.version</code> names the CLI. The two are released separately; <a href="versions.html">Pinning and upgrading versions</a> covers how to pin and upgrade them.</p>
         </div>
       </div>
     </section>
@@ -87,10 +87,12 @@
           <p class="note">For the detailed steps, see <a href="https://github.com/tasuku43/git-artifact-pages/blob/main/docs/guides/cloudflare-deployment.md" target="_blank" rel="noopener">Cloudflare deployment</a> in the product repository.</p>
           
           <figure class="concept" role="group" aria-label="State after step 1"><figcaption>State after step 1</figcaption><div class="concept-row"><div class="cbox r-admin"><div class="cbox-h">Admin repository<small>acme/platform-admin</small></div><ul><li class="r-admin todo">Config file<span class="sr-only"> (not yet)</span><em aria-hidden="true">2</em></li></ul></div><span class="to" aria-hidden="true">→</span><div class="cbox r-store"><div class="cbox-h">Delivery target<small>Cloudflare</small></div><ul><li class="r-store now">Storage and CDN<span class="sr-only"> (added in this step)</span><em aria-hidden="true">this step</em></li><li class="r-admin todo">Reader app<span class="sr-only"> (not yet)</span><em aria-hidden="true">3</em></li><li class="r-admin todo">Site registry<span class="sr-only"> (not yet)</span><em aria-hidden="true">4</em></li><li class="r-team todo">Published pages<span class="sr-only"> (not yet)</span><em aria-hidden="true">5</em></li></ul></div><span class="to" aria-hidden="true">←</span><div class="cbox r-team"><div class="cbox-h">Team repository<small>acme/checkout</small></div><ul><li class="r-team done">Pages<span class="sr-only"> (done)</span></li></ul></div></div></figure></div></li>
-        <li><div><h3>Write <code>artifact-pages.yaml</code> in the admin repository</h3><p>Name <code>cloudflare</code> as the delivery target and list the sites under <code>sites</code>. <code>repository</code> is the team repository&#39;s <code>owner/repo</code>, and <code>sourcePath</code> is the directory relative to its root. If the bucket is not named <code>artifact-pages</code>, add <code>bucket</code> (see <a href="configuration.html#provider-cloudflare">cloudflare</a>).</p>
+        <li><div><h3>Write <code>artifact-pages.yaml</code> in the admin repository</h3><p>Name <code>cloudflare</code> as the delivery target, name the reader app release in <code>web.version</code> (<code>x.y.z</code> stands for a release version), and list the sites under <code>sites</code>. <code>repository</code> is the team repository&#39;s <code>owner/repo</code>, and <code>sourcePath</code> is the directory relative to its root. If the bucket is not named <code>artifact-pages</code>, add <code>bucket</code> (see <a href="configuration.html#provider-cloudflare">cloudflare</a>).</p>
           <div class="term" aria-label="artifact-pages.yaml in the admin repository">
             <div class="term-head"><span>artifact-pages.yaml / acme/platform-admin</span><button class="copy-btn" type="button">Copy</button></div>
 <pre><span class="k">schemaVersion</span>: 1
+<span class="k">web</span>:
+  <span class="k">version</span>: x.y.z   <span class="c"># the reader app release step 3 installs</span>
 <span class="k">provider</span>: cloudflare
 <span class="k">cloudflare</span>:
   <span class="k">accountId</span>: "&lt;32-character account ID&gt;"
@@ -103,7 +105,7 @@
     <span class="k">sourcePath</span>: docs/artifacts</pre>
           </div>
           <figure class="concept" role="group" aria-label="State after step 2"><figcaption>State after step 2</figcaption><div class="concept-row"><div class="cbox r-admin"><div class="cbox-h">Admin repository<small>acme/platform-admin</small></div><ul><li class="r-admin now">Config file<span class="sr-only"> (added in this step)</span><em aria-hidden="true">this step</em></li></ul></div><span class="to" aria-hidden="true">→</span><div class="cbox r-store"><div class="cbox-h">Delivery target<small>Cloudflare</small></div><ul><li class="r-store done">Storage and CDN<span class="sr-only"> (done)</span><em aria-hidden="true">1</em></li><li class="r-admin todo">Reader app<span class="sr-only"> (not yet)</span><em aria-hidden="true">3</em></li><li class="r-admin todo">Site registry<span class="sr-only"> (not yet)</span><em aria-hidden="true">4</em></li><li class="r-team todo">Published pages<span class="sr-only"> (not yet)</span><em aria-hidden="true">5</em></li></ul></div><span class="to" aria-hidden="true">←</span><div class="cbox r-team"><div class="cbox-h">Team repository<small>acme/checkout</small></div><ul><li class="r-team done">Pages<span class="sr-only"> (done)</span></li></ul></div></div></figure></div></li>
-        <li><div><h3>Deploy the reader app</h3><p>Run this in the admin repository with the admin credentials in environment variables. It downloads the reader app of the CLI&#39;s release, verifies it, and writes it to the bucket. Like the other commands here, it takes <code>--dry-run</code> to show the plan without writing.</p>
+        <li><div><h3>Deploy the reader app</h3><p>Run this in the admin repository with the admin credentials in environment variables. It downloads the reader app release named by <code>web.version</code>, verifies it, and writes it to the bucket. Like the other commands here, it takes <code>--dry-run</code> to show the plan without writing.</p>
           <div class="term" aria-label="Deploy the reader app">
             <div class="term-head"><span>Terminal / acme/platform-admin</span><button class="copy-btn" type="button">Copy</button></div>
 <pre><span class="c"># Pass values through the environment, never in a file</span>
@@ -148,6 +150,8 @@
           <div class="term" aria-label="artifact-pages.yaml for a local try-out">
             <div class="term-head"><span>artifact-pages.yaml / acme/checkout</span><button class="copy-btn" type="button">Copy</button></div>
 <pre><span class="k">schemaVersion</span>: 1
+<span class="k">web</span>:
+  <span class="k">version</span>: x.y.z   <span class="c"># the reader app release step 3 installs</span>
 <span class="k">provider</span>: local
 <span class="k">local</span>:
   <span class="k">root</span>: .local/storage

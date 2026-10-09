@@ -137,7 +137,7 @@
       </ul>
 
       <h3 id="github-actions">GitHub Actionsで実行する</h3>
-      <p>製品リポジトリのルートにあるAction、<code>tasuku43/git-artifact-pages</code>は、同じ<code>site publish</code>を実行します。指定したリリースのソースからCLIをビルドし、オプションを入力として受け取ります。入力は<code>site</code>（必須）、<code>source</code>、<code>config</code>、<code>dry-run</code>です。次のワークフローは、プルリクエストでは変更計画だけを確認し、<code>main</code>へのマージ後に公開します。</p>
+      <p>公開用のAction、<code>artifact-pages/publish-action</code>は、同じ公開を実行します。最初にブートストラップのCLIをインストールし、そのうえで管理リポジトリの設定ファイルに書かれたリリースのCLIを動かします（「<a href="versions.html#actions">バージョンの固定と更新</a>」を参照）。オプションは入力として受け取ります。入力は<code>site</code>（必須）、<code>source</code>、<code>config</code>、<code>dry-run</code>です。次のワークフローは、プルリクエストでは変更計画だけを確認し、<code>main</code>へのマージ後に公開します。</p>
       <div class="term" aria-label="サイトを公開するGitHub Actionsのワークフロー例">
         <div class="term-head"><span>.github/workflows/publish-docs.yml / acme/checkout</span><button class="copy-btn" type="button">コピー</button></div>
 <pre><span class="k">name</span>: Publish docs
@@ -161,7 +161,7 @@
     <span class="k">environment</span>: ${{ github.event_name == 'pull_request' &amp;&amp; 'plan' || 'production' }}
     <span class="k">steps</span>:
       <span class="c"># actions/checkoutのステップは不要：Actionがリポジトリを自分でチェックアウトする（浅いチェックアウト）</span>
-      - <span class="k">uses</span>: tasuku43/git-artifact-pages@v0.2.1
+      - <span class="k">uses</span>: artifact-pages/publish-action@vX.Y.Z
         <span class="k">with</span>:
           <span class="k">site</span>: checkout
           <span class="k">source</span>: docs/artifacts
@@ -174,13 +174,13 @@
       </div>
       <ul>
         <li><strong>チェックアウトはActionが行います。</strong>既定（<code>checkout: auto</code>）では、ワークスペースがまだチェックアウトでなければ、<code>fetch-depth: 1</code>、認証情報を残さない設定で<code>actions/checkout</code>を実行します。前のステップでファイルが必要なときだけ、自分でチェックアウトのステップを置いてください。その場合、Actionは何もしません。<code>permissions: contents: read</code>で足ります。浅いチェックアウトが日付にどう影響するかは、<a href="#shallow">浅いチェックアウトと日付</a>にあります。</li>
-        <li><strong>リリースのタグをそのまま指定します。</strong><code>@vX.Y.Z</code>のように書きます。リリースは<a href="https://github.com/tasuku43/git-artifact-pages/releases" target="_blank" rel="noopener">GitHub Releases</a>で確認できます。バージョンが<code>0.x</code>のあいだは、<code>@v0</code>のような動くタグはありません。いちばん厳密に固定するなら、リリースのコミットSHAを40文字で書き、タグをコメントに残します（<code>tasuku43/git-artifact-pages@&lt;full commit SHA&gt; # vX.Y.Z</code>）。</li>
+        <li><strong>リリースのタグをそのまま指定します。</strong><code>@vX.Y.Z</code>のように書きます。各Actionは専用のリポジトリ（たとえば<code>artifact-pages/publish-action</code>）で、独自のタグを付けてリリースされます。バージョンが<code>0.x</code>のあいだは、<code>@v0</code>のような動くタグはありません。いちばん厳密に固定するなら、リリースのコミットSHAを40文字で書き、タグをコメントに残します（<code>artifact-pages/publish-action@&lt;full commit SHA&gt; # vX.Y.Z</code>）。Actionのバージョンは、動くCLIを決めません。それを決めるのは管理リポジトリの設定ファイルで、Actionが固定するのはブートストラップのCLIと、対応するCLIの範囲だけです。1回の実行だけ別のCLIで動かすときは、<code>cli-version</code>入力を使います。詳しくは「<a href="versions.html">バージョンの固定と更新</a>」を参照してください。</li>
         <li><strong>2つのEnvironmentで、別々のシークレットを持たせます。</strong><code>plan</code>と<code>production</code>は説明用の名前です。<code>plan</code>には読み取り専用の認証情報を、<code>production</code>にはこのサイトにだけ書き込める認証情報を置き、<code>production</code>は設定で<code>main</code>からだけ使えるようにします。GitHub Freeの非公開リポジトリではEnvironmentのシークレットを使えません。<a href="configuration.html#remote-private">設定ファイル</a>のページを参照してください。変数名はCloudflareの既定値です。AWSでは鍵を置かず、OIDCでロールを引き受けます（<code>permissions</code>に<code>id-token: write</code>を加えます）。フォークからのプルリクエストにはシークレットが渡らないため、そこでは変更計画の確認が失敗します。これは意図した動作です。</li>
         <li><strong>公開は1つずつ実行します。</strong>サイトのロックを持てる公開は1つだけなので、<code>concurrency</code>のグループで公開を1つずつ実行します（待っている実行は、新しいプッシュの実行に置き換わります）。</li>
         <li><strong>設定の固定</strong>は任意です。<code>?ref=</code>を付けないと、管理リポジトリのデフォルトブランチを実行の最初に1つのコミットに決め、その実行の最後まで使います。コミットを固定したいときは、指定の末尾に<code>?ref=&lt;完全なコミットSHA&gt;</code>を付けます。</li>
         <li><strong>管理リポジトリが非公開なら</strong>、既定ではこのワークフローのトークンで読みにいきますが、別の非公開リポジトリは読めません。管理リポジトリを読み取れるトークンを<code>github-token</code>の入力で渡します。GitHub Appでトークンを発行する方法は、<a href="configuration.html#remote-private">設定ファイル</a>のページにあります。</li>
         <li><strong>結果</strong>は出力で受け取れます。<code>outcome</code>（<code>planned</code>、<code>published</code>、<code>no-op</code>、<code>failed</code>）、<code>changes</code>、<code>result</code>などです。</li>
-        <li><strong>ほかのAction</strong>も同じタグで使います。<code>registry register</code>、<code>registry unregister</code>、<code>app deploy</code>には<code>tasuku43/git-artifact-pages/actions/admin</code>を、プレビューには<code>actions/preview-publish</code>を使います。</li>
+        <li><strong>ほかのAction</strong>は、別々のリポジトリで独自のタグを持ちます。レジストリには<code>artifact-pages/registry-action</code>、<code>app deploy</code>には<code>artifact-pages/app-deploy-action</code>、プレビューには<code>artifact-pages/preview-action</code>を使います。</li>
       </ul>
       <p class="note"><code>acme/checkout</code>と<code>acme/platform-admin</code>は説明用の例です。<code>vX.Y.Z</code>と<code>&lt;full commit SHA&gt;</code>は実際の値に置き換えてください。</p>
 
@@ -195,7 +195,7 @@
       <p>バイト列を変えないコミットも日付に反映したいときは、履歴をすべてチェックアウトします。Actionの<code>fetch-depth</code>を指定します。</p>
       <div class="term" aria-label="履歴をすべてチェックアウトするActionの入力例">
         <div class="term-head"><span>.github/workflows/publish-docs.yml / 履歴をすべて取得</span><button class="copy-btn" type="button">コピー</button></div>
-<pre>      - <span class="k">uses</span>: tasuku43/git-artifact-pages@v0.2.1
+<pre>      - <span class="k">uses</span>: artifact-pages/publish-action@vX.Y.Z
         <span class="k">with</span>:
           <span class="k">fetch-depth</span>: 0   <span class="c"># 履歴をすべて取得。大きなリポジトリではチェックアウトが遅くなる</span>
           <span class="c"># ...site、source、config、dry-runは上の例と同じ</span></pre>

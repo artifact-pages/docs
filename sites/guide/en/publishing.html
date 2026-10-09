@@ -137,7 +137,7 @@
       </ul>
 
       <h3 id="github-actions">With GitHub Actions</h3>
-      <p>The root Action of the product repository, <code>tasuku43/git-artifact-pages</code>, runs the same <code>site publish</code>. It builds the CLI from the release you reference, and takes the options as inputs: <code>site</code> (required), <code>source</code>, <code>config</code>, and <code>dry-run</code>. This workflow plans on pull requests and publishes after merge to <code>main</code>:</p>
+      <p>The publish Action, <code>artifact-pages/publish-action</code>, runs the same publish. It installs a bootstrap CLI and then runs the CLI release that the admin config names (see <a href="versions.html#actions">Pinning and upgrading versions</a>), and takes the options as inputs: <code>site</code> (required), <code>source</code>, <code>config</code>, and <code>dry-run</code>. This workflow plans on pull requests and publishes after merge to <code>main</code>:</p>
       <div class="term" aria-label="Example GitHub Actions workflow that publishes a site">
         <div class="term-head"><span>.github/workflows/publish-docs.yml / acme/checkout</span><button class="copy-btn" type="button">Copy</button></div>
 <pre><span class="k">name</span>: Publish docs
@@ -161,7 +161,7 @@
     <span class="k">environment</span>: ${{ github.event_name == 'pull_request' &amp;&amp; 'plan' || 'production' }}
     <span class="k">steps</span>:
       <span class="c"># No actions/checkout step: the Action checks out the repository itself (shallow)</span>
-      - <span class="k">uses</span>: tasuku43/git-artifact-pages@v0.2.1
+      - <span class="k">uses</span>: artifact-pages/publish-action@vX.Y.Z
         <span class="k">with</span>:
           <span class="k">site</span>: checkout
           <span class="k">source</span>: docs/artifacts
@@ -174,13 +174,13 @@
       </div>
       <ul>
         <li><strong>The Action checks out the repository for you.</strong> By default (<code>checkout: auto</code>) it runs <code>actions/checkout</code> with <code>fetch-depth: 1</code> and without persisted credentials, unless the workspace already is a checkout. Add your own checkout step only if an earlier step needs the files; the Action then leaves it alone. <code>permissions: contents: read</code> is enough. See <a href="#shallow">Shallow checkouts and dates</a> for what a shallow checkout means for dates.</li>
-        <li><strong>Reference an exact release tag</strong>, such as <code>@vX.Y.Z</code>; releases are listed on <a href="https://github.com/tasuku43/git-artifact-pages/releases" target="_blank" rel="noopener">GitHub Releases</a>. While versions are <code>0.x</code> there is no moving tag such as <code>@v0</code>. For the strictest pin, use the release's full commit SHA and keep the tag as a comment: <code>tasuku43/git-artifact-pages@&lt;full commit SHA&gt; # vX.Y.Z</code>.</li>
+        <li><strong>Reference an exact release tag</strong>, such as <code>@vX.Y.Z</code>; each Action is released in its own repository (for example <code>artifact-pages/publish-action</code>) with its own tags. While versions are <code>0.x</code> there is no moving tag such as <code>@v0</code>. For the strictest pin, use the release's full commit SHA and keep the tag as a comment: <code>artifact-pages/publish-action@&lt;full commit SHA&gt; # vX.Y.Z</code>. The Action's version does not choose the CLI that runs; the admin config does, and the Action only fixes the bootstrap CLI and the range of CLI versions it supports. To run a different CLI for one run, use the <code>cli-version</code> input. <a href="versions.html">Pinning and upgrading versions</a> has the details.</li>
         <li><strong>Two environments hold different secrets.</strong> <code>plan</code> and <code>production</code> are illustrative names: give <code>plan</code> read-only credentials (pull requests from forks get no secrets, so the plan fails there by design) and <code>production</code> credentials that can write only this site, and limit <code>production</code> to <code>main</code> in its settings. Private repositories on GitHub Free cannot use environment secrets; see <a href="configuration.html#remote-private">Configuration</a>. The variable names are the Cloudflare defaults; on AWS, assume a role through OIDC instead (add <code>id-token: write</code> to <code>permissions</code>).</li>
         <li><strong>One publish at a time.</strong> Only one publish can hold the site's lock, so the <code>concurrency</code> group runs one publish at a time (a newer push replaces a waiting one).</li>
         <li><strong>Pinning the config</strong> is optional. Without <code>?ref=</code>, the admin repository's default branch is resolved to one commit for the whole run. Append <code>?ref=&lt;full commit SHA&gt;</code> to the locator to pin a commit.</li>
         <li><strong>A private admin repository</strong> is read with this workflow's token by default, which cannot read another private repository. Pass a read-only token for the admin repository through the <code>github-token</code> input; <a href="configuration.html#remote-private">Configuration</a> shows how to mint one with a GitHub App.</li>
         <li><strong>Results</strong> are available as outputs, such as <code>outcome</code> (<code>planned</code>, <code>published</code>, <code>no-op</code>, or <code>failed</code>), <code>changes</code>, and <code>result</code>.</li>
-        <li><strong>Other Actions</strong> use the same tag: <code>tasuku43/git-artifact-pages/actions/admin</code> for <code>registry register</code>, <code>registry unregister</code>, and <code>app deploy</code>; <code>actions/preview-publish</code> for previews.</li>
+        <li><strong>Other Actions</strong> are separate repositories with their own tags: <code>artifact-pages/registry-action</code> for the registry, <code>artifact-pages/app-deploy-action</code> for <code>app deploy</code>, and <code>artifact-pages/preview-action</code> for previews.</li>
       </ul>
       <p class="note"><code>acme/checkout</code> and <code>acme/platform-admin</code> are illustrative. Replace <code>vX.Y.Z</code> and <code>&lt;full commit SHA&gt;</code> with real values.</p>
 
@@ -195,7 +195,7 @@
       <p>If commits that change no bytes must show up in the dates, check out the full history. Set <code>fetch-depth</code> on the Action:</p>
       <div class="term" aria-label="Example Action input that checks out the full history">
         <div class="term-head"><span>.github/workflows/publish-docs.yml / FULL HISTORY</span><button class="copy-btn" type="button">Copy</button></div>
-<pre>      - <span class="k">uses</span>: tasuku43/git-artifact-pages@v0.2.1
+<pre>      - <span class="k">uses</span>: artifact-pages/publish-action@vX.Y.Z
         <span class="k">with</span>:
           <span class="k">fetch-depth</span>: 0   <span class="c"># full history; slower checkout on large repositories</span>
           <span class="c"># ...site, source, config, dry-run as above</span></pre>

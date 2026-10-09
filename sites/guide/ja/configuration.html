@@ -55,6 +55,7 @@
           <tr><td><code>schemaVersion</code></td><td><span class="pill on">必須</span></td><td>整数の<code>1</code>。</td></tr>
           <tr><td><code>provider</code></td><td><span class="pill on">必須</span></td><td>配信先の種類。<code>local</code>、<code>aws</code>、<code>cloudflare</code>のいずれか。共通部分だけを書いた土台のファイルでは省略できます（<a href="#layers">重ね合わせ</a>）。</td></tr>
           <tr><td><code>local</code> / <code>aws</code> / <code>cloudflare</code></td><td><span class="pill on">必須</span></td><td><code>provider</code>に対応する設定のブロックを1つだけ書きます。<a href="#providers">配信先</a>を参照してください。</td></tr>
+          <tr><td><code>cli</code> / <code>web</code></td><td><span class="pill">任意</span></td><td>それぞれ正確な<code>version</code>（<code>MAJOR.MINOR.PATCH</code>）を持ち、動くCLIと、<code>app deploy</code>が置く閲覧アプリを決めます。それぞれ、書けるのは多くても1つのファイルです。「<a href="versions.html">バージョンの固定と更新</a>」を参照してください。</td></tr>
           <tr><td><code>sites</code></td><td><span class="pill">任意</span></td><td>登録するサイト。サイトIDをキーにします。<code>registry register</code>と<code>registry unregister</code>では必須です。<a href="#sites">sites</a>を参照してください。</td></tr>
         </tbody>
       </table></div>
@@ -102,6 +103,7 @@
         <li>どのファイルにも<code>schemaVersion: 1</code>を書きます。<code>provider</code>を書いたファイルには、対応するブロックも1つだけ書きます。</li>
         <li>あとのファイルの配信先は、前の配信先を<strong>まるごと置き換えます</strong>。プロバイダーの設定が混ざることはありません。</li>
         <li>あとのファイルに<code>sites</code>がなければ、前の一覧を引き継ぎます。<code>sites</code>があれば、<code>{}</code>であっても一覧全体を置き換えます。サイト単位で混ざることはありません。</li>
+        <li><code>cli</code>と<code>web</code>を書けるのは1つのファイルだけです。2つのファイルが同じ値でも、2つめのファイルが書くとエラーになります。1つのファイルに両方を書くのは問題ありません。</li>
         <li>重ね合わせになるのは、<code>--config</code>を繰り返したときだけです。上書き用のファイルを自動で探すことはありません。</li>
       </ul>
     </section>
@@ -155,7 +157,7 @@
           <span class="k">owner</span>: ${{ github.repository_owner }}
           <span class="k">repositories</span>: platform-admin        <span class="c"># 管理リポジトリだけ</span>
           <span class="k">permission-contents</span>: read
-      - <span class="k">uses</span>: tasuku43/git-artifact-pages@v0.2.1
+      - <span class="k">uses</span>: artifact-pages/publish-action@vX.Y.Z
         <span class="k">with</span>:
           <span class="k">site</span>: checkout
           <span class="k">source</span>: docs/artifacts
@@ -311,12 +313,12 @@
         <li>削除した中身がしばらくキャッシュに残ることがあり、読者がすでに開いたページは取り消せません。</li>
         <li>止まった実行がロックを残したときは、<code>lock inspect --scope registry</code>（サイトのロックなら<code>--site ID</code>）で確認します。何も実行されていないことを確かめてから、確認したときの値を<code>lock recover … --observed-etag ETAG</code>に渡して解除します。</li>
       </ul>
-      <p class="note">同じファイルは、閲覧アプリを置く<code>app deploy</code>でも配信先として使います。<code>app deploy</code>が置くのは、使っているCLIと同じバージョンのアプリです。リリースは<a href="https://github.com/tasuku43/git-artifact-pages/releases" target="_blank" rel="noopener">GitHub Releases</a>で確認できます。CLIの入れ方と、<code>provider: local</code>で一連の流れを試す手順は「<a href="getting-started.html">はじめる</a>」にあります。</p>
+      <p class="note">同じファイルは、閲覧アプリを置く<code>app deploy</code>でも配信先として使います。<code>app deploy</code>が置くのは、<code>web.version</code>で指定したリリースの閲覧アプリです。リリースは<a href="https://github.com/artifact-pages/artifact-pages/releases" target="_blank" rel="noopener">GitHub Releases</a>で確認でき、更新の手順は「<a href="versions.html">バージョンの固定と更新</a>」にあります。CLIの入れ方と、<code>provider: local</code>で一連の流れを試す手順は「<a href="getting-started.html">はじめる</a>」にあります。</p>
     </section>
 
     <nav class="pager" aria-label="ページ送り">
       <a class="prev" href="publishing.html"><small>前へ</small><strong>サイトの公開</strong></a>
-      <a class="next" href="access-and-trust.html"><small>次へ</small><strong>信頼とアクセス制御</strong></a>
+      <a class="next" href="versions.html"><small>次へ</small><strong>バージョンの固定と更新</strong></a>
     </nav>
   </main>
 </body>
