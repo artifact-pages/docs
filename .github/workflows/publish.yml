@@ -1,6 +1,8 @@
 # Publish the guide and architecture sites to https://artifact-pages.dev.
-# Pull requests that change a site or this workflow run a dry-run publish;
-# merges to main publish both sites. A publish that changes nothing is a no-op.
+# Pull requests that change a site or this workflow run a dry-run publish.
+# During the initial release rollout, main pushes stay in dry-run mode; a
+# workflow_dispatch on main remains the manual publish path. A publish that
+# changes nothing is a no-op.
 # Every publish also builds the page text search data.
 name: Publish
 
@@ -33,14 +35,13 @@ jobs:
         site: [guide, architecture]
     steps:
       - name: Publish ${{ matrix.site }}
-        uses: artifact-pages/publish-action@v0.1.0
+        uses: artifact-pages/publish-action@d59b7eceb7431c998bd2338eede1137081a141a2 # v0.1.0
         with:
           site: ${{ matrix.site }}
           # The deployed registry decides eligibility; this config locates it.
           config: github://artifact-pages/admin/artifact-pages.yaml
-          # Real publish on main only; pull requests and other runs are a dry-run.
+          # Keep automatic publication held until the rollout has been accepted.
           publish-on: |
-            push:refs/heads/main
             workflow_dispatch:refs/heads/main
         env:
           CF_R2_ACCESS_KEY_ID: ${{ secrets.CF_R2_ACCESS_KEY_ID }}
