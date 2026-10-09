@@ -52,7 +52,7 @@ jobs:
       # ends as no-preview, not an error. Writes one comment per site and
       # updates it on later pushes.
       - name: Preview ${{ matrix.site }}
-        uses: artifact-pages/preview-action@v0.1.0
+        uses: artifact-pages/preview-action@9961a1de43f1ac7e6deb6598b9cfbed9fdab7acb # v0.1.0
         with:
           site: ${{ matrix.site }}
           # The deployed registry decides eligibility; this config locates it.
