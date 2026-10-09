@@ -1,0 +1,166 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="description" content="How to pin the CLI and the reader app in the admin config, how sites and Actions follow, and how to upgrade, including breaking format changes.">
+  <title>Pinning and upgrading versions</title>
+  <script>
+    // Copy the reader app's theme (same-origin parent) before first paint; assets/site.js keeps it in sync.
+    (() => {
+      const root = document.documentElement;
+      root.classList.add('js');
+      try {
+        const theme = window.parent !== window && window.parent.document.documentElement.dataset.theme;
+        if (theme === 'light' || theme === 'dark') root.dataset.theme = theme;
+      } catch { /* cross-origin: fall back to prefers-color-scheme */ }
+    })();
+  </script>
+  <link rel="icon" href="data:,">
+  <link rel="stylesheet" href="../assets/site.css">
+  <script src="../assets/site.js" defer></script>
+</head>
+<body>
+  <a class="skip" href="#main">Skip to content</a>
+  <main id="main" class="wrap">
+    <nav class="lang-switch" aria-label="Language"><a href="../ja/versions.html" hreflang="ja" lang="ja">日本語</a><span aria-current="page">English</span></nav>
+
+    <header class="page-head">
+      <div>
+        <p class="eyebrow">For admins</p>
+        <h1>Pinning and upgrading versions</h1>
+      </div>
+      <p class="lead">The admin config names the CLI and the reader app a deployment runs. Change them in one place, check the change in a pull request, and every site follows on its next run. This page shows how to pin, upgrade, and handle a breaking change.</p>
+    </header>
+
+    <section class="doc-section" aria-labelledby="components">
+      <h2 id="components">What has a version</h2>
+      <p>Three kinds of component are released independently, each in its own tag series. A release of one does not release the others.</p>
+      <div class="table-wrap"><table>
+        <thead><tr><th>Component</th><th>Tag</th><th>What it is</th><th>Who chooses the version</th></tr></thead>
+        <tbody>
+          <tr><td>CLI</td><td><code>vX.Y.Z</code></td><td>The <code>artifact-pages</code> command, which publishes sites and deploys the app.</td><td>The config, <code>cli.version</code></td></tr>
+          <tr><td>Reader app (<code>web</code>)</td><td><code>web/vX.Y.Z</code></td><td>The bundle that <code>app deploy</code> installs for readers.</td><td>The config, <code>web.version</code></td></tr>
+          <tr><td>Each GitHub Action</td><td><code>publish-action/vX.Y.Z</code>, <code>preview-action/…</code>, <code>registry-action/…</code>, <code>app-deploy-action/…</code></td><td>A thin wrapper that runs the CLI in a workflow. Your workflow references it as <code>artifact-pages/publish-action@vX.Y.Z</code>.</td><td>Your workflow file</td></tr>
+        </tbody>
+      </table></div>
+      <p>CLI and reader app releases are listed on the <a href="https://github.com/artifact-pages/artifact-pages/releases" target="_blank" rel="noopener">GitHub Releases</a> of the product repository. Each Action is released in its own repository, so its tags are plain <code>vX.Y.Z</code> there. <code>x.y.z</code> stands for a release version throughout this page.</p>
+      <p class="note">Whether two versions work together is never decided from their numbers. The CLI and the app each carry the data formats they write and read, storage records what was actually written and deployed, and the commands compare those. While the product is <code>0.x</code> no compatibility is promised, so these checks are the only guard.</p>
+    </section>
+
+    <section class="doc-section" aria-labelledby="pin">
+      <h2 id="pin">Pin the versions in the config</h2>
+      <p>Add <code>cli</code> and <code>web</code> to the admin repository's <code>artifact-pages.yaml</code>:</p>
+      <div class="term" aria-label="Example config that pins the CLI and the reader app">
+        <div class="term-head"><span>artifact-pages.yaml / acme/platform-admin</span></div>
+<pre><span class="k">schemaVersion</span>: 1
+<span class="k">cli</span>:
+  <span class="k">version</span>: x.y.z   <span class="c"># the CLI every run uses</span>
+<span class="k">web</span>:
+  <span class="k">version</span>: x.y.z   <span class="c"># the reader app that app deploy installs</span>
+<span class="k">provider</span>: cloudflare
+<span class="c"># ... provider settings and sites as usual</span></pre>
+      </div>
+      <ul>
+        <li><strong>Exact versions only.</strong> Write <code>MAJOR.MINOR.PATCH</code>. A leading <code>v</code>, a range, <code>latest</code>, and pre-release or build suffixes are rejected with exit code 2.</li>
+        <li><strong>Set each key in one layer only.</strong> If you stack <a href="configuration.html#layers">layers</a>, <code>cli</code> and <code>web</code> may come from at most one of them, even when two layers name the same value. One layer may set both. The admin config is the natural place.</li>
+        <li><strong><code>cli.version</code> selects the CLI that runs.</strong> The installed <code>artifact-pages</code> reads the config first and, if it names another release, downloads that release, checks its checksum, and runs it with the same arguments. This applies to <code>app</code>, <code>site</code>, <code>registry</code>, <code>preview</code>, <code>lock</code>, and <code>config check</code>. Without <code>cli.version</code>, the installed CLI runs itself.</li>
+        <li><strong><code>web.version</code> selects the reader app.</strong> <code>app deploy</code> downloads release <code>web/vX.Y.Z</code> of the product repository, verifies it, and installs it. Downloads come only from official releases.</li>
+        <li><strong>A config that sets either key is pinned.</strong> That turns on the compatibility checks described below.</li>
+      </ul>
+    </section>
+
+    <section class="doc-section" aria-labelledby="follow">
+      <h2 id="follow">How sites follow</h2>
+      <p>Site repositories do not choose the CLI. On its next <code>site sync</code> (named <code>site publish</code> in the other guide pages, which are still to be revised) or <code>preview publish</code>, a site's workflow reads the admin config, which it already points to with a <a href="configuration.html#remote"><code>github://</code> locator</a>, and runs the CLI that config names. Raising <code>cli.version</code> once therefore moves every site, within each Action's supported range (<a href="#actions">see below</a>), with no pull request in the site repositories.</p>
+      <ul>
+        <li><strong>Writers check the deployed app.</strong> <code>registry sync</code>, <code>site sync</code>, and <code>preview publish</code> read what the deployed reader app can read and stop before writing if it cannot read a format this CLI writes. A CLI newer than the deployed app therefore cannot publish pages the app cannot show, unless you accept that explicitly with <code>registry sync --accept-breaking</code> (see <a href="#breaking">below</a>). If no app has been deployed yet, they check against the formats listed in the manifest of the <code>web.version</code> release. A legacy config is not checked.</li>
+        <li><strong>Previews cannot change the CLI.</strong> The preview Action resolves the CLI only after its trust preflight, and reads config layers owned by the repository from the trusted base commit, so a pull request cannot change which CLI runs by editing them. Explicit external operator files and remote locators keep their own authority.</li>
+      </ul>
+    </section>
+
+    <section class="doc-section" aria-labelledby="actions">
+      <h2 id="actions">What the Action version means</h2>
+      <p>An Action's version no longer decides which CLI runs. Each Action release records a <strong>bootstrap CLI</strong>, the release it installs first, and a <strong>supported range</strong> of CLI versions (<code>cliRange</code>, for example <code>&gt;=0.1.0 &lt;0.2.0</code>). The bootstrap reads the config and switches to the CLI the config names.</p>
+      <ul>
+        <li><strong>Keep pinning Actions to an exact tag</strong> (or a full commit SHA, which fixes the same data), as in <a href="publishing.html#github-actions">Publishing</a>. The pin fixes the bootstrap and the range.</li>
+        <li><strong>Upgrade an Action only when you need to.</strong> That is when the CLI you want lies outside its range. The run then fails with exit code 2, naming the version and the range, before anything is downloaded. Move to an Action release with a wider range first, then raise <code>cli.version</code>.</li>
+        <li><strong>Each run reports what ran.</strong> The Job Summary shows <code>CLI executed</code> with the version that actually ran. If the CLI could not be installed, it reads <code>CLI executed: none (installation failed)</code>.</li>
+      </ul>
+    </section>
+
+    <section class="doc-section" aria-labelledby="upgrade">
+      <h2 id="upgrade">Upgrade</h2>
+      <p>For a release that keeps the data formats readable, the upgrade is a change to the admin config:</p>
+      <ol class="timeline">
+        <li><div><h3>Bump the version in a pull request</h3><p>Change <code>cli.version</code>, <code>web.version</code>, or both in the admin repository. Keeping them current is your repository's job; an update bot in your repository can open these pull requests.</p></div></li>
+        <li><div><h3>Run <code>config check</code> in CI</h3><p>It runs under the CLI the config names. It fails, writing nothing, unless the new app reads every format that CLI writes and every format recorded in storage for the registry and each site. Sites that need a republish are listed. It needs <code>web.version</code> (exit code 2 without it).</p>
+          <div class="term" aria-label="Check a version change">
+            <div class="term-head"><span>CI / acme/platform-admin</span><button class="copy-btn" type="button">Copy</button></div>
+<pre><span class="p">$</span> <span data-copy>artifact-pages <span class="v">config check</span> --config artifact-pages.yaml</span></pre>
+          </div></div></li>
+        <li><div><h3>On merge, apply</h3><p>Run <code>registry sync</code>, then <code>app deploy</code> when <code>web.version</code> changed. Use <code>--dry-run</code> to see the plan first.</p>
+          <div class="term" aria-label="Apply a version change">
+            <div class="term-head"><span>CI / acme/platform-admin</span><button class="copy-btn" type="button">Copy</button></div>
+<pre><span class="p">$</span> <span data-copy>artifact-pages <span class="v">registry sync</span> --config artifact-pages.yaml</span>
+<span class="p">$</span> <span data-copy>artifact-pages <span class="v">app deploy</span> --config artifact-pages.yaml</span></pre>
+          </div></div></li>
+        <li><div><h3>Sites follow</h3><p>Each site uses the new CLI on its next sync or preview. Nothing is needed in the site repositories, unless the new CLI is outside their Actions' range (<a href="#actions">see above</a>).</p></div></li>
+      </ol>
+      <p><code>app deploy</code> also checks the other direction before it writes: the app it installs must read every format recorded in storage for the registry and for every registered site. If a record is missing, incomplete, or names a format the app cannot read, the command fails and lists each registry or site that needs a republish.</p>
+    </section>
+
+    <section class="doc-section" aria-labelledby="breaking">
+      <h2 id="breaking">A breaking format change</h2>
+      <p>Some releases change a data format that the deployed app cannot read. The normal checks refuse that on purpose, and <code>config check</code> is expected to fail for it, so this path skips <code>config check</code>. The three steps below, with their own checks, replace it. Accept the change explicitly, in this order:</p>
+      <ol class="timeline">
+        <li><div><h3><code>registry sync --accept-breaking</code></h3><p>Lets the new CLI write the registry although the deployed app cannot read it yet.</p></div></li>
+        <li><div><h3><code>app deploy --accept-breaking</code></h3><p>Installs the new app although stored sites and the registry are not yet in a format it reads, including records that are unknown or incomplete.</p></div></li>
+        <li><div><h3>Republish every site</h3><p>Run <code>site sync</code> for each site with the new CLI.</p></div></li>
+      </ol>
+      <div class="callout warn" role="note">
+        <span class="ico">READERS SEE IT</span>
+        <div>
+          <p><strong>Until a site is republished, readers see "needs to be republished" for it.</strong> Plan the three steps together and republish promptly.</p>
+          <p><code>--accept-breaking</code> exists only on <code>registry sync</code> and <code>app deploy</code>. It never overrides a version record with an unsupported <code>schemaVersion</code>, and <code>registry sync</code> never overrides an incomplete record. <code>site sync</code> and <code>preview publish</code> have no such flag.</p>
+        </div>
+      </div>
+    </section>
+
+    <section class="doc-section" aria-labelledby="override">
+      <h2 id="override">Run another CLI once</h2>
+      <p>To try a release in one site, or in an emergency, override the config's <code>cli.version</code> for a single run. Pick one of these:</p>
+      <div class="table-wrap"><table>
+        <thead><tr><th>Where</th><th>Form</th></tr></thead>
+        <tbody>
+          <tr><td>CLI flag</td><td><code>--cli-version x.y.z</code>, before or after the command name</td></tr>
+          <tr><td>Environment variable</td><td><code>ARTIFACT_PAGES_CLI_VERSION=x.y.z</code></td></tr>
+          <tr><td>Action input</td><td><code>cli-version: x.y.z</code></td></tr>
+        </tbody>
+      </table></div>
+      <ul>
+        <li><strong>Precedence:</strong> the flag, then the environment variable, then the Action input, then the config. The value must be an exact release version (exit code 2 otherwise).</li>
+        <li><strong>An override never skips a check.</strong> It only replaces which CLI runs; that CLI reads the same config and storage and runs the same compatibility checks.</li>
+        <li><strong>It must lie within the Action's range.</strong> Otherwise the run fails with exit code 2 before downloading.</li>
+        <li><strong>It is visible.</strong> The Job Summary adds <code>CLI override</code> with the source and, when the config names a version, that version.</li>
+      </ul>
+    </section>
+
+    <section class="doc-section" aria-labelledby="legacy">
+      <h2 id="legacy">A deployment without pins</h2>
+      <p>A config with neither <code>cli</code> nor <code>web</code> is <em>legacy</em>. It keeps the unpinned flow as long as storage has no app version record: no CLI switching, and <code>app deploy</code> without <code>web.version</code> installs the app of the CLI's own release, without format checks. That path resolves only for releases made before the series split, because later CLI releases carry no app bundle. Once an app version record exists in storage, the checks apply whatever the config says.</p>
+      <ul>
+        <li><strong>Set <code>web.version</code> when you adopt pinning.</strong> <code>app deploy</code> with <code>cli.version</code> but neither <code>web.version</code> nor <code>--archive</code> exits with code 2, and so does <code>config check</code> without <code>web.version</code>.</li>
+        <li><strong>Update the Actions and CLIs first.</strong> An older CLI rejects the unknown <code>cli</code> and <code>web</code> keys, so move to releases that understand them before the config adds the keys.</li>
+        <li><strong>Existing sites are unknown until they are republished.</strong> Data written before version records existed has no record, so <code>app deploy</code> and <code>config check</code> fail and list those sites. A republish creates the record. With <code>web.version</code> set, republish first, then deploy: run <code>registry sync</code>, then <code>site sync</code> for every site (while no app record exists, writers check against the manifest of the <code>web.version</code> release), then <code>app deploy</code>. Alternatively, follow the <a href="#breaking">breaking order</a> with <code>--accept-breaking</code>.</li>
+      </ul>
+      <p class="note"><code>acme/platform-admin</code> is an illustrative admin repository. Replace <code>x.y.z</code> and <code>vX.Y.Z</code> with real release versions.</p>
+    </section>
+
+    <nav class="pager" aria-label="Pages">
+      <a class="prev" href="configuration.html"><small>Previous</small><strong>Configuration</strong></a>
+      <a class="next" href="access-and-trust.html"><small>Next</small><strong>Access and trust</strong></a>
+    </nav>
+  </main>
+</body>
+</html>

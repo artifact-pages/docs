@@ -58,7 +58,7 @@
       <div class="callout" role="note">
         <span class="ico">バージョン</span>
         <div>
-          <p><strong>CLIのバージョンが、閲覧アプリのバージョンも決めます。</strong><code>artifact-pages version</code>には両方が出て、<code>app deploy</code>は同じリリースのアプリを置きます。あとでアプリを別のリリースにするときは、そのリリースのCLIを入れて<code>app deploy</code>をもう一度実行します。</p>
+          <p><strong>閲覧アプリと、動くCLIは、設定ファイルで決めます。</strong><code>artifact-pages.yaml</code>の<code>web.version</code>が、<code>app deploy</code>の置く閲覧アプリのリリースを決め、任意の<code>cli.version</code>がCLIを決めます。この2つは別々にリリースされます。固定のしかたと更新の手順は「<a href="versions.html">バージョンの固定と更新</a>」にあります。</p>
         </div>
       </div>
     </section>
@@ -87,10 +87,12 @@
           <p class="note">詳しい手順は、製品リポジトリの<a href="https://github.com/tasuku43/git-artifact-pages/blob/main/docs/guides/cloudflare-deployment.md" target="_blank" rel="noopener">Cloudflare deployment</a>（英語）を参照してください。</p>
           
           <figure class="concept" role="group" aria-label="手順1のあとの状態"><figcaption>手順1のあとの状態</figcaption><div class="concept-row"><div class="cbox r-admin"><div class="cbox-h">管理リポジトリ<small>acme/platform-admin</small></div><ul><li class="r-admin todo">設定ファイル<span class="sr-only">（まだ）</span><em aria-hidden="true">2</em></li></ul></div><span class="to" aria-hidden="true">→</span><div class="cbox r-store"><div class="cbox-h">配信先<small>Cloudflare</small></div><ul><li class="r-store now">ストレージとCDN<span class="sr-only">（この手順でできた）</span><em aria-hidden="true">この手順</em></li><li class="r-admin todo">閲覧アプリ<span class="sr-only">（まだ）</span><em aria-hidden="true">3</em></li><li class="r-admin todo">サイトの登録情報<span class="sr-only">（まだ）</span><em aria-hidden="true">4</em></li><li class="r-team todo">公開されたページ<span class="sr-only">（まだ）</span><em aria-hidden="true">5</em></li></ul></div><span class="to" aria-hidden="true">←</span><div class="cbox r-team"><div class="cbox-h">チームのリポジトリ<small>acme/checkout</small></div><ul><li class="r-team done">ページ<span class="sr-only">（できている）</span></li></ul></div></div></figure></div></li>
-        <li><div><h3>管理リポジトリに<code>artifact-pages.yaml</code>を書く</h3><p>配信先に<code>cloudflare</code>を指定し、公開するサイトを<code>sites</code>に並べます。<code>repository</code>はチームのリポジトリの<code>owner/repo</code>、<code>sourcePath</code>はそのルートからのディレクトリのパスです。バケットの名前が<code>artifact-pages</code>でなければ<code>bucket</code>も書きます（「<a href="configuration.html#provider-cloudflare">cloudflare</a>」を参照）。</p>
+        <li><div><h3>管理リポジトリに<code>artifact-pages.yaml</code>を書く</h3><p>配信先に<code>cloudflare</code>を指定し、置く閲覧アプリのリリースを<code>web.version</code>に書き（<code>x.y.z</code>はリリースのバージョンを表します）、公開するサイトを<code>sites</code>に並べます。<code>repository</code>はチームのリポジトリの<code>owner/repo</code>、<code>sourcePath</code>はそのルートからのディレクトリのパスです。バケットの名前が<code>artifact-pages</code>でなければ<code>bucket</code>も書きます（「<a href="configuration.html#provider-cloudflare">cloudflare</a>」を参照）。</p>
           <div class="term" aria-label="管理リポジトリのartifact-pages.yaml">
             <div class="term-head"><span>artifact-pages.yaml / acme/platform-admin</span><button class="copy-btn" type="button">コピー</button></div>
 <pre><span class="k">schemaVersion</span>: 1
+<span class="k">web</span>:
+  <span class="k">version</span>: x.y.z   <span class="c"># 手順3で置く閲覧アプリのリリース</span>
 <span class="k">provider</span>: cloudflare
 <span class="k">cloudflare</span>:
   <span class="k">accountId</span>: "&lt;32文字のアカウントID&gt;"
@@ -103,7 +105,7 @@
     <span class="k">sourcePath</span>: docs/artifacts</pre>
           </div>
           <figure class="concept" role="group" aria-label="手順2のあとの状態"><figcaption>手順2のあとの状態</figcaption><div class="concept-row"><div class="cbox r-admin"><div class="cbox-h">管理リポジトリ<small>acme/platform-admin</small></div><ul><li class="r-admin now">設定ファイル<span class="sr-only">（この手順でできた）</span><em aria-hidden="true">この手順</em></li></ul></div><span class="to" aria-hidden="true">→</span><div class="cbox r-store"><div class="cbox-h">配信先<small>Cloudflare</small></div><ul><li class="r-store done">ストレージとCDN<span class="sr-only">（できている）</span><em aria-hidden="true">1</em></li><li class="r-admin todo">閲覧アプリ<span class="sr-only">（まだ）</span><em aria-hidden="true">3</em></li><li class="r-admin todo">サイトの登録情報<span class="sr-only">（まだ）</span><em aria-hidden="true">4</em></li><li class="r-team todo">公開されたページ<span class="sr-only">（まだ）</span><em aria-hidden="true">5</em></li></ul></div><span class="to" aria-hidden="true">←</span><div class="cbox r-team"><div class="cbox-h">チームのリポジトリ<small>acme/checkout</small></div><ul><li class="r-team done">ページ<span class="sr-only">（できている）</span></li></ul></div></div></figure></div></li>
-        <li><div><h3>閲覧アプリを置く</h3><p>管理リポジトリで、管理者の認証情報を環境変数に入れて実行します。CLIと同じリリースの閲覧アプリを取得して検証し、バケットに書き込みます。ここで使うほかのコマンドと同じく、<code>--dry-run</code>を付けると書き込まずに変更計画だけを表示します。</p>
+        <li><div><h3>閲覧アプリを置く</h3><p>管理リポジトリで、管理者の認証情報を環境変数に入れて実行します。<code>web.version</code>で指定したリリースの閲覧アプリを取得して検証し、バケットに書き込みます。ここで使うほかのコマンドと同じく、<code>--dry-run</code>を付けると書き込まずに変更計画だけを表示します。</p>
           <div class="term" aria-label="閲覧アプリを置く">
             <div class="term-head"><span>ターミナル / acme/platform-admin</span><button class="copy-btn" type="button">コピー</button></div>
 <pre><span class="c"># 値はファイルに書かず、環境変数で渡す</span>
@@ -148,6 +150,8 @@
           <div class="term" aria-label="手元で試すためのartifact-pages.yaml">
             <div class="term-head"><span>artifact-pages.yaml / acme/checkout</span><button class="copy-btn" type="button">コピー</button></div>
 <pre><span class="k">schemaVersion</span>: 1
+<span class="k">web</span>:
+  <span class="k">version</span>: x.y.z   <span class="c"># 手順3で置く閲覧アプリのリリース</span>
 <span class="k">provider</span>: local
 <span class="k">local</span>:
   <span class="k">root</span>: .local/storage

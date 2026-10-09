@@ -1,0 +1,166 @@
+<!doctype html>
+<html lang="ja">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="description" content="管理リポジトリの設定ファイルでCLIと閲覧アプリのバージョンを固定する方法、サイトとActionの追従のしくみ、互換性のない変更を含む更新の手順。">
+  <title>バージョンの固定と更新</title>
+  <script>
+    // Copy the reader app's theme (same-origin parent) before first paint; assets/site.js keeps it in sync.
+    (() => {
+      const root = document.documentElement;
+      root.classList.add('js');
+      try {
+        const theme = window.parent !== window && window.parent.document.documentElement.dataset.theme;
+        if (theme === 'light' || theme === 'dark') root.dataset.theme = theme;
+      } catch { /* cross-origin: fall back to prefers-color-scheme */ }
+    })();
+  </script>
+  <link rel="icon" href="data:,">
+  <link rel="stylesheet" href="../assets/site.css">
+  <script src="../assets/site.js" defer></script>
+</head>
+<body>
+  <a class="skip" href="#main">本文へ移動</a>
+  <main id="main" class="wrap">
+    <nav class="lang-switch" aria-label="言語"><span aria-current="page">日本語</span><a href="../en/versions.html" hreflang="en" lang="en">English</a></nav>
+
+    <header class="page-head">
+      <div>
+        <p class="eyebrow">管理者向け</p>
+        <h1>バージョンの固定と更新</h1>
+      </div>
+      <p class="lead">運用中の環境が使うCLIと閲覧アプリのバージョンは、管理リポジトリの設定ファイルに書きます。変更は1か所で行い、プルリクエストで確認すれば、各サイトは次の実行から自動でそれに従います。このページでは、バージョンの固定、更新の手順、互換性のない変更があるときの進め方を説明します。</p>
+    </header>
+
+    <section class="doc-section" aria-labelledby="components">
+      <h2 id="components">バージョンを持つもの</h2>
+      <p>バージョンを持つ部品は3種類あり、それぞれ別のタグ系列でリリースされます。1つをリリースしても、ほかは変わりません。</p>
+      <div class="table-wrap"><table>
+        <thead><tr><th>部品</th><th>タグ</th><th>役割</th><th>バージョンを決めるもの</th></tr></thead>
+        <tbody>
+          <tr><td>CLI</td><td><code>vX.Y.Z</code></td><td>サイトを公開し、閲覧アプリを置く<code>artifact-pages</code>コマンド。</td><td>設定ファイルの<code>cli.version</code></td></tr>
+          <tr><td>閲覧アプリ（<code>web</code>）</td><td><code>web/vX.Y.Z</code></td><td><code>app deploy</code>が読者向けに置くバンドル。</td><td>設定ファイルの<code>web.version</code></td></tr>
+          <tr><td>GitHub Action（それぞれ）</td><td><code>publish-action/vX.Y.Z</code>、<code>preview-action/…</code>、<code>registry-action/…</code>、<code>app-deploy-action/…</code></td><td>ワークフローからCLIを動かす薄いラッパー。ワークフローでは<code>artifact-pages/publish-action@vX.Y.Z</code>のように参照します。</td><td>ワークフローのファイル</td></tr>
+        </tbody>
+      </table></div>
+      <p>CLIと閲覧アプリのリリースは、製品リポジトリの<a href="https://github.com/artifact-pages/artifact-pages/releases" target="_blank" rel="noopener">GitHub Releases</a>で確認できます。各Actionは専用のリポジトリでリリースされ、そこでのタグは<code>vX.Y.Z</code>の形です。このページの<code>x.y.z</code>はリリースのバージョンを表します。</p>
+      <p class="note">組み合わせて使えるかどうかは、バージョンの数字からは判断しません。CLIと閲覧アプリはそれぞれ、書き込むデータ形式と読めるデータ形式を持っています。ストレージには実際に書き込まれたもの、置かれているものが記録され、コマンドがそれらを突き合わせます。製品が<code>0.x</code>のあいだは互換性を約束しないため、この確認が唯一の防御です。</p>
+    </section>
+
+    <section class="doc-section" aria-labelledby="pin">
+      <h2 id="pin">設定ファイルで固定する</h2>
+      <p>管理リポジトリの<code>artifact-pages.yaml</code>に<code>cli</code>と<code>web</code>を足します。</p>
+      <div class="term" aria-label="CLIと閲覧アプリを固定する設定の例">
+        <div class="term-head"><span>artifact-pages.yaml / acme/platform-admin</span></div>
+<pre><span class="k">schemaVersion</span>: 1
+<span class="k">cli</span>:
+  <span class="k">version</span>: x.y.z   <span class="c"># すべての実行が使うCLI</span>
+<span class="k">web</span>:
+  <span class="k">version</span>: x.y.z   <span class="c"># app deployが置く閲覧アプリ</span>
+<span class="k">provider</span>: cloudflare
+<span class="c"># ... プロバイダーの設定とsitesは通常どおり</span></pre>
+      </div>
+      <ul>
+        <li><strong>正確なバージョンだけを書けます。</strong><code>MAJOR.MINOR.PATCH</code>の形にします。先頭の<code>v</code>、範囲指定、<code>latest</code>、プレリリースやビルドの接尾辞は受け付けず、終了コード2で失敗します。</li>
+        <li><strong>それぞれのキーは1つのファイルにだけ書きます。</strong>設定ファイルを<a href="configuration.html#layers">重ね合わせ</a>る場合、<code>cli</code>と<code>web</code>を書けるのは多くても1つのファイルです。2つのファイルが同じ値でもエラーになります。1つのファイルに両方を書くのは問題ありません。置き場所は管理リポジトリの設定ファイルが自然です。</li>
+        <li><strong><code>cli.version</code>が、実行されるCLIを決めます。</strong>インストール済みの<code>artifact-pages</code>は、まず設定ファイルを読みます。別のリリースが書かれていれば、そのリリースをダウンロードしてチェックサムを検証し、同じ引数で実行し直します。対象は<code>app</code>、<code>site</code>、<code>registry</code>、<code>preview</code>、<code>lock</code>、<code>config check</code>です。<code>cli.version</code>がなければ、インストール済みのCLIがそのまま動きます。</li>
+        <li><strong><code>web.version</code>が、閲覧アプリを決めます。</strong><code>app deploy</code>は、製品リポジトリのリリース<code>web/vX.Y.Z</code>を取得して検証し、配置します。取得先は公式のリリースに限られます。</li>
+        <li><strong>どちらかを書いた設定は、固定されたものとして扱われます。</strong>その場合、後述の互換性の確認が有効になります。</li>
+      </ul>
+    </section>
+
+    <section class="doc-section" aria-labelledby="follow">
+      <h2 id="follow">サイトが追従するしくみ</h2>
+      <p>サイトのリポジトリは、CLIを選びません。サイトのワークフローは、次の<code>site sync</code>（ほかのページではまだ改訂前の<code>site publish</code>という名前で書かれています）や<code>preview publish</code>で、<a href="configuration.html#remote"><code>github://</code>の指定</a>で参照している管理リポジトリの設定ファイルを読み、そこに書かれたCLIで動きます。<code>cli.version</code>を1回上げるだけで、各Actionの対応する範囲内であれば全サイトが移り、サイトのリポジトリにプルリクエストを出す必要はありません（<a href="#actions">後の節</a>）。</p>
+      <ul>
+        <li><strong>書き込む側は、配置済みの閲覧アプリを確認します。</strong><code>registry sync</code>、<code>site sync</code>、<code>preview publish</code>は、配置済みの閲覧アプリが読めるデータ形式を調べ、そのCLIが書く形式を読めなければ、書き込む前に止まります。そのため、閲覧アプリに表示できないページを新しいCLIが公開することはありません。ただし、<code>registry sync --accept-breaking</code>で明示的に受け入れた場合は別です（<a href="#breaking">後の節</a>）。閲覧アプリがまだ置かれていないときは、<code>web.version</code>のリリースのマニフェストに書かれた形式と照合します。レガシーの設定ファイルは確認されません。</li>
+        <li><strong>プレビューでCLIを変えることはできません。</strong>プレビューのActionは、信頼の事前確認のあとでCLIを決め、リポジトリが持つ設定ファイルは信頼できるベースのコミットから読みます。そのため、プルリクエストで書き換えても、動くCLIは変わりません。明示的に指定した外部の管理者用ファイルとリモートの指定は、それ自身の権限で読まれます。</li>
+      </ul>
+    </section>
+
+    <section class="doc-section" aria-labelledby="actions">
+      <h2 id="actions">Actionのバージョンの意味</h2>
+      <p>Actionのバージョンは、どのCLIが動くかを決めなくなりました。Actionの各リリースには、最初にインストールする<strong>ブートストラップのCLI</strong>と、対応する<strong>CLIの範囲</strong>（<code>cliRange</code>。例は<code>&gt;=0.1.0 &lt;0.2.0</code>）が記録されています。ブートストラップのCLIが設定ファイルを読み、そこに書かれたCLIに切り替えます。</p>
+      <ul>
+        <li><strong>Actionはこれまでどおり、正確なタグで固定します。</strong>コミットSHAを40文字で書く固定でも、同じリリースの情報が固定されます。書き方は「<a href="publishing.html#github-actions">サイトの公開</a>」にあります。固定されるのは、ブートストラップのCLIと範囲です。</li>
+        <li><strong>Actionを更新するのは、必要なときだけです。</strong>使いたいCLIがActionの範囲の外にあるときが、それにあたります。その場合、実行はダウンロードの前に、バージョンと範囲を示して終了コード2で失敗します。先に、範囲の広いActionのリリースに移ってから、<code>cli.version</code>を上げてください。</li>
+        <li><strong>実行のたびに、動いたCLIが記録されます。</strong>Job Summaryの<code>CLI executed</code>に、実際に動いたバージョンが出ます。CLIをインストールできなかったときは、<code>CLI executed: none (installation failed)</code>になります。</li>
+      </ul>
+    </section>
+
+    <section class="doc-section" aria-labelledby="upgrade">
+      <h2 id="upgrade">更新する</h2>
+      <p>データ形式がそのまま読めるリリースへの更新は、管理リポジトリの設定ファイルの変更で済みます。</p>
+      <ol class="timeline">
+        <li><div><h3>プルリクエストでバージョンを上げる</h3><p>管理リポジトリで<code>cli.version</code>、<code>web.version</code>、またはその両方を変えます。最新に保つ作業は、管理リポジトリ側で行ってください。このプルリクエストは、リポジトリに置いた更新用のボットに出させることもできます。</p></div></li>
+        <li><div><h3>CIで<code>config check</code>を実行する</h3><p>設定ファイルに書かれたCLIで動きます。新しい閲覧アプリが、そのCLIの書くすべての形式と、レジストリと各サイトについてストレージに記録されたすべての形式を読めなければ、何も書かずに失敗します。再公開が必要なサイトは一覧に出ます。<code>web.version</code>が必要で、なければ終了コード2になります。</p>
+          <div class="term" aria-label="バージョンの変更を確認する">
+            <div class="term-head"><span>CI / acme/platform-admin</span><button class="copy-btn" type="button">Copy</button></div>
+<pre><span class="p">$</span> <span data-copy>artifact-pages <span class="v">config check</span> --config artifact-pages.yaml</span></pre>
+          </div></div></li>
+        <li><div><h3>マージしたら反映する</h3><p><code>registry sync</code>を実行し、<code>web.version</code>を変えたときは続けて<code>app deploy</code>も実行します。先に<code>--dry-run</code>で計画を確認できます。</p>
+          <div class="term" aria-label="バージョンの変更を反映する">
+            <div class="term-head"><span>CI / acme/platform-admin</span><button class="copy-btn" type="button">Copy</button></div>
+<pre><span class="p">$</span> <span data-copy>artifact-pages <span class="v">registry sync</span> --config artifact-pages.yaml</span>
+<span class="p">$</span> <span data-copy>artifact-pages <span class="v">app deploy</span> --config artifact-pages.yaml</span></pre>
+          </div></div></li>
+        <li><div><h3>サイトが追従する</h3><p>各サイトは、次の同期かプレビューから新しいCLIを使います。サイトのリポジトリでの作業は要りません。ただし、新しいCLIがActionの範囲の外にあるときは別です（<a href="#actions">前の節</a>）。</p></div></li>
+      </ol>
+      <p><code>app deploy</code>は、書き込む前に逆向きの確認もします。配置する閲覧アプリが、レジストリと登録済みのすべてのサイトについてストレージに記録された形式をすべて読めなければなりません。記録がない、途中のまま、または閲覧アプリが読めない形式が記録されているときはコマンドが失敗し、再公開が必要なレジストリやサイトを一覧で示します。</p>
+    </section>
+
+    <section class="doc-section" aria-labelledby="breaking">
+      <h2 id="breaking">互換性のないデータ形式の変更</h2>
+      <p>リリースによっては、配置済みの閲覧アプリが読めないデータ形式に変わります。通常の確認はこれを意図的に拒否し、<code>config check</code>も失敗するのが想定どおりなので、この経路では<code>config check</code>を実行しません。次の3つの手順が、その代わりになります。次の順序で明示的に受け入れてください。</p>
+      <ol class="timeline">
+        <li><div><h3><code>registry sync --accept-breaking</code></h3><p>配置済みの閲覧アプリがまだ読めない形式でも、新しいCLIがレジストリを書き込めるようにします。</p></div></li>
+        <li><div><h3><code>app deploy --accept-breaking</code></h3><p>保存済みのサイトやレジストリが、新しい閲覧アプリの読める形式になっていなくても、新しいアプリを配置します。記録がないものや途中のものも対象です。</p></div></li>
+        <li><div><h3>すべてのサイトを再公開する</h3><p>サイトごとに、新しいCLIで<code>site sync</code>を実行します。</p></div></li>
+      </ol>
+      <div class="callout warn" role="note">
+        <span class="ico">読者に見えます</span>
+        <div>
+          <p><strong>再公開するまで、そのサイトを開いた読者には「needs to be republished」（再公開が必要）という表示が出ます。</strong>3つの手順はまとめて計画し、すぐに再公開してください。</p>
+          <p><code>--accept-breaking</code>があるのは<code>registry sync</code>と<code>app deploy</code>だけです。<code>schemaVersion</code>に対応していないバージョン記録は、このオプションでも受け入れられません。<code>registry sync</code>は、途中のまま残った記録も受け入れません。<code>site sync</code>と<code>preview publish</code>には、このオプションがありません。</p>
+        </div>
+      </div>
+    </section>
+
+    <section class="doc-section" aria-labelledby="override">
+      <h2 id="override">1回だけ別のCLIで動かす</h2>
+      <p>特定のサイトでリリースを試すときや、緊急のときは、設定ファイルの<code>cli.version</code>を1回の実行だけ上書きできます。次のどれかを使います。</p>
+      <div class="table-wrap"><table>
+        <thead><tr><th>指定する場所</th><th>書き方</th></tr></thead>
+        <tbody>
+          <tr><td>CLIのフラグ</td><td><code>--cli-version x.y.z</code>（コマンド名の前でも後でもかまいません）</td></tr>
+          <tr><td>環境変数</td><td><code>ARTIFACT_PAGES_CLI_VERSION=x.y.z</code></td></tr>
+          <tr><td>Actionの入力</td><td><code>cli-version: x.y.z</code></td></tr>
+        </tbody>
+      </table></div>
+      <ul>
+        <li><strong>優先順位は、フラグ、環境変数、Actionの入力、設定ファイルの順です。</strong>値は正確なリリースのバージョンでなければならず、そうでなければ終了コード2になります。</li>
+        <li><strong>上書きしても、確認は省かれません。</strong>変わるのは動くCLIだけで、そのCLIが同じ設定ファイルとストレージを読み、同じ互換性の確認を行います。</li>
+        <li><strong>Actionの範囲内でなければなりません。</strong>範囲の外なら、ダウンロードの前に終了コード2で失敗します。</li>
+        <li><strong>上書きは記録に残ります。</strong>Job Summaryに<code>CLI override</code>が加わり、指定の経路と、設定ファイルにバージョンがあればそのバージョンが出ます。</li>
+      </ul>
+    </section>
+
+    <section class="doc-section" aria-labelledby="legacy">
+      <h2 id="legacy">固定していない環境</h2>
+      <p><code>cli</code>も<code>web</code>も書いていない設定ファイルは、従来の形（レガシー）として扱われます。ストレージに閲覧アプリのバージョン記録がないあいだは、固定しない従来の流れのままです。CLIの切り替えはなく、<code>web.version</code>なしの<code>app deploy</code>は、そのCLI自身のリリースの閲覧アプリを、形式の確認なしで置きます。この経路が使えるのは、系列を分ける前のリリースだけです。それ以降のCLIのリリースには閲覧アプリのバンドルが含まれません。ストレージに閲覧アプリのバージョン記録ができたあとは、設定ファイルの内容にかかわらず確認が有効になります。</p>
+      <ul>
+        <li><strong>固定を始めるときは、<code>web.version</code>も書きます。</strong><code>cli.version</code>だけを書いて<code>web.version</code>も<code>--archive</code>も指定しない<code>app deploy</code>は、終了コード2で失敗します。<code>web.version</code>のない<code>config check</code>も同じです。</li>
+        <li><strong>先にActionとCLIを更新します。</strong>古いCLIは、知らない<code>cli</code>と<code>web</code>のキーを受け付けません。これらを理解するリリースに移ってから、設定ファイルにキーを足してください。</li>
+        <li><strong>既存のサイトは、再公開するまで「不明」と扱われます。</strong>バージョン記録ができる前に書かれたデータには記録がないため、<code>app deploy</code>と<code>config check</code>は、該当するサイトを一覧にして失敗します。再公開すると記録が作られます。<code>web.version</code>を書いたうえで、先に再公開してから配置します。<code>registry sync</code>、すべてのサイトの<code>site sync</code>、<code>app deploy</code>の順です（閲覧アプリの記録がないあいだ、書き込む側は<code>web.version</code>のリリースのマニフェストと照合します）。または、<code>--accept-breaking</code>を使う<a href="#breaking">互換性のない変更の順序</a>に従います。</li>
+      </ul>
+      <p class="note"><code>acme/platform-admin</code>は説明用の管理リポジトリです。<code>x.y.z</code>と<code>vX.Y.Z</code>は、実際のリリースのバージョンに置き換えてください。</p>
+    </section>
+
+    <nav class="pager" aria-label="ページ送り">
+      <a class="prev" href="configuration.html"><small>前へ</small><strong>設定ファイル</strong></a>
+      <a class="next" href="access-and-trust.html"><small>次へ</small><strong>信頼とアクセス制御</strong></a>
+    </nav>
+  </main>
+</body>
+</html>
