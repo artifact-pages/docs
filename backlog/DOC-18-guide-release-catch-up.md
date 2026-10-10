@@ -1,6 +1,6 @@
 # DOC-18 — Guide: catch up with the split release (command names, install, links)
 
-- Status: Blocked
+- Status: In progress
 - Assignee: Claude
 - Site: `guide`
 - Page: revisions to `getting-started.html`, `publishing.html`, `configuration.html` and `what-is-git-artifact-pages.html` in `ja/` and `en/`
@@ -24,3 +24,7 @@ Follow-up of [DOC-17](DOC-17-guide-versions.md): `versions.html` uses the curren
 - [ ] Every statement matches the specification and the released Actions (re-check the platform list against §19 and `release.yml`).
 - [ ] Holds up in light and dark themes and at about 400px width without horizontal scrolling.
 - [ ] The owner reviewed and approved the pages.
+
+## Progress (2026-10-10)
+
+The IMP-72 releases exist (CLI `v0.2.0`, `web/v0.1.0`, Actions `v0.1.0`), so the ticket is unblocked. All items under "Stale content to revise" are revised in both languages and the Action inputs and outputs were checked against the published `action.yml` files. The acceptance criteria stay open until review and owner approval. Not covered here: the `architecture` site still uses `site publish`, `registry register` and `registry unregister` in several pages; it needs its own ticket.

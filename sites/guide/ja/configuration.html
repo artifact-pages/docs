@@ -30,7 +30,7 @@
         <p class="eyebrow">管理者向け</p>
         <h1>設定ファイル</h1>
       </div>
-      <p class="lead"><code>artifact-pages</code>のコマンドは、どれも1つのYAMLの設定ファイルを読みます。ふつうは管理リポジトリにある<code>artifact-pages.yaml</code>です。配信先と、登録コマンドで使うサイトの定義をここに書きます。自分の文書を公開するだけのサテライトリポジトリには設定ファイルを置かず、<a href="#remote">管理リポジトリのファイルを指定</a>します。</p>
+      <p class="lead"><code>artifact-pages</code>のコマンドは、どれも1つのYAMLの設定ファイルを読みます。ふつうは管理リポジトリにある<code>artifact-pages.yaml</code>です。配信先と、<code>registry sync</code>で使うサイトの定義をここに書きます。自分の文書を公開するだけのサテライトリポジトリには設定ファイルを置かず、<a href="#remote">管理リポジトリのファイルを指定</a>します。</p>
     </header>
 
     <section class="doc-section" aria-labelledby="file">
@@ -56,7 +56,7 @@
           <tr><td><code>provider</code></td><td><span class="pill on">必須</span></td><td>配信先の種類。<code>local</code>、<code>aws</code>、<code>cloudflare</code>のいずれか。共通部分だけを書いた土台のファイルでは省略できます（<a href="#layers">重ね合わせ</a>）。</td></tr>
           <tr><td><code>local</code> / <code>aws</code> / <code>cloudflare</code></td><td><span class="pill on">必須</span></td><td><code>provider</code>に対応する設定のブロックを1つだけ書きます。<a href="#providers">配信先</a>を参照してください。</td></tr>
           <tr><td><code>cli</code> / <code>web</code></td><td><span class="pill">任意</span></td><td>それぞれ正確な<code>version</code>（<code>MAJOR.MINOR.PATCH</code>）を持ち、動くCLIと、<code>app deploy</code>が置く閲覧アプリを決めます。それぞれ、書けるのは多くても1つのファイルです。「<a href="versions.html">バージョンの固定と更新</a>」を参照してください。</td></tr>
-          <tr><td><code>sites</code></td><td><span class="pill">任意</span></td><td>登録するサイト。サイトIDをキーにします。<code>registry register</code>と<code>registry unregister</code>では必須です。<a href="#sites">sites</a>を参照してください。</td></tr>
+          <tr><td><code>sites</code></td><td><span class="pill">任意</span></td><td>登録するサイト。サイトIDをキーにします。<code>registry sync</code>では必須で、その全体が配信先に置くべき登録の内容になります。<a href="#sites">sites</a>を参照してください。</td></tr>
         </tbody>
       </table></div>
       <p class="note">ファイルは厳密に検査されます。知らないキー、重複したキー、複数のYAMLドキュメント、型の違う値は、無視されずにエラーになります。例のサイトは説明用です。</p>
@@ -97,7 +97,7 @@
       </div>
       <div class="term" aria-label="2つのファイルを重ねるコマンド">
         <div class="term-head"><span>ターミナル / 管理者</span><button class="copy-btn" type="button">コピー</button></div>
-<pre><span class="p">$</span> <span data-copy>artifact-pages <span class="v">registry register</span> --config artifact-pages.yaml --config .local/artifact-pages.local.yaml --dry-run</span></pre>
+<pre><span class="p">$</span> <span data-copy>artifact-pages <span class="v">registry sync</span> --config artifact-pages.yaml --config .local/artifact-pages.local.yaml --dry-run</span></pre>
       </div>
       <ul>
         <li>どのファイルにも<code>schemaVersion: 1</code>を書きます。<code>provider</code>を書いたファイルには、対応するブロックも1つだけ書きます。</li>
@@ -113,12 +113,12 @@
       <p>サテライトリポジトリは、自分の設定ファイルを持ちません。<code>--config</code>（または<code>ARTIFACT_PAGES_CONFIG</code>、Actionの<code>config</code>入力）に、管理リポジトリのファイルを指す<code>github://</code>の指定を渡します。管理リポジトリ以外では、これが通常の形です。</p>
       <div class="term" aria-label="リモートの設定ファイルを指定する例">
         <div class="term-head"><span>ターミナル / acme/checkout</span><button class="copy-btn" type="button">コピー</button></div>
-<pre><span class="p">$</span> <span data-copy>artifact-pages <span class="v">site publish</span> --site checkout --source docs/artifacts --config github://acme/platform-admin/artifact-pages.yaml --dry-run</span></pre>
+<pre><span class="p">$</span> <span data-copy>artifact-pages <span class="v">site sync</span> --site checkout --source docs/artifacts --config github://acme/platform-admin/artifact-pages.yaml --dry-run</span></pre>
       </div>
       <p>設定を1つのコミットに固定するときは<code>?ref=</code>を付けます。<code>?</code>を含むので、指定をクォートで囲みます。</p>
       <div class="term" aria-label="コミットを固定したリモートの設定ファイルの例">
         <div class="term-head"><span>ターミナル / acme/checkout</span><button class="copy-btn" type="button">コピー</button></div>
-<pre><span class="p">$</span> <span data-copy>artifact-pages <span class="v">site publish</span> --site checkout --source docs/artifacts --config 'github://acme/platform-admin/artifact-pages.yaml?ref=0123456789abcdef0123456789abcdef01234567' --dry-run</span></pre>
+<pre><span class="p">$</span> <span data-copy>artifact-pages <span class="v">site sync</span> --site checkout --source docs/artifacts --config 'github://acme/platform-admin/artifact-pages.yaml?ref=0123456789abcdef0123456789abcdef01234567' --dry-run</span></pre>
       </div>
       <ul>
         <li>形式は<code>github://OWNER/REPO/FILE?ref=REF</code>です。<code>FILE</code>を省くと<code>artifact-pages.yaml</code>を読みます。<code>ref</code>を省くと、デフォルトブランチをその時点のコミットに決め、コマンドの最後までそのコミットを使います。そのため、実行の途中で配信先が変わることはありません。設定そのものをリポジトリ側のレビューで変えたいときだけ、<code>ref</code>に完全なコミットSHAを指定します。</li>
@@ -186,9 +186,9 @@
           <tr><td><code>GitHub denied access (HTTP 403) because the API rate limit is exhausted</code></td><td>トークンのAPIレート制限を使い切っています。</td><td>制限がリセットされるまで待つか、上限の高いトークンを使います。</td></tr>
         </tbody>
       </table></div>
-      <p>たとえば、非公開の管理リポジトリを読めるトークンがない状態で、GitHub Actionsのホステッドランナー上の公開を実行すると、次のメッセージが出ました（v0.2.1でこのメッセージ文をホステッドランナー上で確認しています）。</p>
-      <div class="term" aria-label="Error message"><div class="term-head"><span>ERROR / HOSTED RUNNER, v0.2.1</span></div>
-<pre>error: cannot read deployment config github://tasuku43/artifact-pages-admin/artifact-pages.yaml: GitHub returned HTTP 404, which it uses both for missing repositories and for private repositories the token cannot access. Check the locator, and that the token (for example a GitHub App installation or fine-grained PAT) has contents:read on tasuku43/artifact-pages-admin.</pre></div>
+      <p>たとえば、非公開の管理リポジトリを読めるトークンがない状態で、GitHub Actionsのホステッドランナー上の公開を実行すると、次のメッセージが出ました（リポジトリ名は説明用のものに置き換えています）。</p>
+      <div class="term" aria-label="Error message"><div class="term-head"><span>ERROR / HOSTED RUNNER</span></div>
+<pre>error: cannot read deployment config github://acme/platform-admin/artifact-pages.yaml: GitHub returned HTTP 404, which it uses both for missing repositories and for private repositories the token cannot access. Check the locator, and that the token (for example a GitHub App installation or fine-grained PAT) has contents:read on acme/platform-admin.</pre></div>
       <p class="note"><code>acme/platform-admin</code>と<code>acme/checkout</code>は説明用のリポジトリです。<code>ARTIFACT_PAGES_APP_ID</code>と<code>ARTIFACT_PAGES_APP_PRIVATE_KEY</code>も説明用の名前です。</p>
     </section>
 
@@ -244,7 +244,7 @@
           <tr><td><code>accessKeyIdEnv</code>、<code>secretAccessKeyEnv</code></td><td><span class="pill">任意</span></td><td>R2のアクセスキーを入れる環境変数の名前。既定は<code>CF_R2_ACCESS_KEY_ID</code>と<code>CF_R2_SECRET_ACCESS_KEY</code>。</td></tr>
           <tr><td><code>apiTokenEnv</code></td><td><span class="pill">任意</span></td><td>キャッシュを消すときに使うAPIトークンの変数名。既定は<code>CF_API_TOKEN</code>。</td></tr>
           <tr><td><code>sessionTokenEnv</code></td><td><span class="pill">任意</span></td><td>R2の認証情報が一時的なものの場合に、セッショントークンを入れる変数名。</td></tr>
-          <tr><td><code>registryReaderAccessKeyIdEnv</code>、<code>registryReaderSecretAccessKeyEnv</code>、<code>registryReaderSessionTokenEnv</code></td><td><span class="pill">任意</span></td><td><code>site publish</code>と<code>preview publish</code>が、サイトの登録情報を読むときだけに使う、読み取り専用の別の認証情報。最初の2つは組で設定します。<a href="#credentials">認証情報</a>を参照してください。</td></tr>
+          <tr><td><code>registryReaderAccessKeyIdEnv</code>、<code>registryReaderSecretAccessKeyEnv</code>、<code>registryReaderSessionTokenEnv</code></td><td><span class="pill">任意</span></td><td><code>site sync</code>と<code>preview publish</code>が、サイトの登録情報を読むときだけに使う、読み取り専用の別の認証情報。最初の2つは組で設定します。<a href="#credentials">認証情報</a>を参照してください。</td></tr>
         </tbody>
       </table></div>
       <p class="note">値はすべて仮のものです。バケット、ホスト名、キャッシュのルール、プレビューの保持期間は、このファイルではなくCloudflareやAWS側（Terraformなど）で設定します。なお、コマンドは<code>gcp-local</code>というプロバイダーも受け付けますが、これはテスト用のエミュレーター向けで、本番の配信先ではありません。</p>
@@ -260,9 +260,9 @@
       <div class="table-wrap"><table>
         <thead><tr><th>コマンド</th><th>R2のアクセスキーとシークレット</th><th>登録情報の読み取り用</th><th>APIトークン</th></tr></thead>
         <tbody>
-          <tr><td><code>site publish</code></td><td><span class="pill on">必須</span></td><td>設定したときだけ使う</td><td>サイトを変える実行と、終わっていないキャッシュ削除をやり直す実行で必要。書き込む前に確認する</td></tr>
+          <tr><td><code>site sync</code></td><td><span class="pill on">必須</span></td><td>設定したときだけ使う</td><td>サイトを変える実行と、終わっていないキャッシュ削除をやり直す実行で必要。書き込む前に確認する</td></tr>
           <tr><td><code>preview publish</code></td><td><span class="pill on">必須</span></td><td>設定したときだけ使う</td><td>不要</td></tr>
-          <tr><td><code>registry register</code>、<code>registry unregister</code></td><td><span class="pill on">必須</span></td><td>使わない</td><td>登録情報を変える実行、サイトを削除する実行ではすべて必要。書き込む前に確認する</td></tr>
+          <tr><td><code>registry sync</code></td><td><span class="pill on">必須</span></td><td>使わない</td><td>登録情報を変える実行、サイトを削除する実行ではすべて必要。書き込む前に確認する</td></tr>
           <tr><td><code>app deploy</code></td><td><span class="pill on">必須</span></td><td>使わない</td><td>アプリを変える実行ではすべて必要。書き込む前に確認する</td></tr>
           <tr><td><code>lock inspect</code>、<code>lock recover</code></td><td><span class="pill on">必須</span></td><td>使わない</td><td>不要</td></tr>
           <tr><td><code>index build</code>、<code>config set-default</code></td><td>不要</td><td>使わない</td><td>不要</td></tr>
@@ -288,11 +288,11 @@
       <div class="callout warn" role="note">
         <span class="ico">全件を書く</span>
         <div>
-          <p><strong><code>sites</code>には、あるべきサイトをすべて書きます。</strong>一覧から消えたサイトは次の<code>registry register</code>で登録が外れ、公開したページ、インデックス、プレビューが削除されます。必ずドライランの結果を確かめてください。</p>
-          <p>登録コマンドで<code>sites</code>そのものを書かないとエラーになり、空の一覧としては扱われません。サイトを1つも置かないときは<code>sites: {}</code>と書きます。</p>
+          <p><strong><code>sites</code>には、あるべきサイトをすべて書きます。</strong>一覧から消えたサイトは次の<code>registry sync</code>で登録が取り下げられ、公開したページ、インデックス、プレビューが削除されます。必ずドライランの結果を確かめてください。</p>
+          <p><code>registry sync</code>で<code>sites</code>そのものを書かないとエラーになり、空の一覧としては扱われません。サイトを1つも置かないときは<code>sites: {}</code>と書きます。</p>
         </div>
       </div>
-      <p><code>sites</code>を読むのは登録コマンドだけです。<code>site publish</code>と<code>preview publish</code>は配信先にある登録情報を確認するので、チーム側の設定ファイルには配信先だけを書いておけば足ります。</p>
+      <p><code>sites</code>を読むのは<code>registry sync</code>だけです。<code>site sync</code>と<code>preview publish</code>は配信先にある登録情報を確認するので、チーム側の設定ファイルには配信先だけを書いておけば足ります。</p>
     </section>
 
     <section class="doc-section" aria-labelledby="registry">
@@ -301,15 +301,13 @@
       <div class="term" aria-label="登録のコマンド">
         <div class="term-head"><span>ターミナル / 管理者</span><button class="copy-btn" type="button">コピー</button></div>
 <pre><span class="c"># ファイルに合わせてサイトを追加・変更・削除する</span>
-<span class="p">$</span> <span data-copy>artifact-pages <span class="v">registry register</span> --dry-run</span>
-<span class="p">$</span> <span data-copy>artifact-pages <span class="v">registry register</span></span>
-<span class="c"># 1つのサイトだけ外すとき：先に sites から消してから</span>
-<span class="p">$</span> <span data-copy>artifact-pages <span class="v">registry unregister</span> --site billing --dry-run</span>
-<span class="p">$</span> <span data-copy>artifact-pages <span class="v">registry unregister</span> --site billing</span></pre>
+<span class="p">$</span> <span data-copy>artifact-pages <span class="v">registry sync</span> --dry-run</span>
+<span class="p">$</span> <span data-copy>artifact-pages <span class="v">registry sync</span></span></pre>
       </div>
       <ul>
-        <li><code>registry register</code>は、配信先の登録情報をファイルに合わせ、一覧から消えたサイトの中身を片付けます。</li>
-        <li><code>registry unregister --site ID</code>は、そのサイトがファイルから消えていることを前提にします。登録を外し、そのサイトの中身とプレビューを削除して、CDNにキャッシュの更新を依頼します。途中で止まっても、もう一度実行すれば続きから片付きます。</li>
+        <li><code>registry sync</code>は、配信先の登録情報をファイルに合わせます。<code>sites</code>の全体が、あるべき登録の内容として扱われるため、<code>sites</code>は必須です。</li>
+        <li><strong>サイトを外すには、<code>sites</code>から消して</strong><code>registry sync</code>を実行します。サイトの登録を解除する別のコマンドはありません。コマンドはそのサイトを取り下げ、中身とプレビューを削除して、CDNにキャッシュの更新を依頼します。片付ける内容は記録されるので、途中で止まっても、設定ファイルからそのサイトが消えたあとに実行した<code>registry sync</code>が続きを終わらせます。</li>
+        <li>変更がなければ結果は<code>no-op</code>、変更を反映できたときは<code>synced</code>です。</li>
         <li>削除した中身がしばらくキャッシュに残ることがあり、読者がすでに開いたページは取り消せません。</li>
         <li>止まった実行がロックを残したときは、<code>lock inspect --scope registry</code>（サイトのロックなら<code>--site ID</code>）で確認します。何も実行されていないことを確かめてから、確認したときの値を<code>lock recover … --observed-etag ETAG</code>に渡して解除します。</li>
       </ul>

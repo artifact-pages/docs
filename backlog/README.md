@@ -1,6 +1,6 @@
 # Documentation backlog
 
-Moved on 2026-10-03 from `docs/backlog/documentation/` in [tasuku43/git-artifact-pages](https://github.com/tasuku43/git-artifact-pages) together with the site sources (decision TD5 there). Ticket links to the specification, technical design and verification records point to that repository. The production registry and publish workflow live in `tasuku43/artifact-pages-admin`.
+Moved on 2026-10-03 from `docs/backlog/documentation/` in [artifact-pages/artifact-pages](https://github.com/artifact-pages/artifact-pages) (under its earlier owner) together with the site sources (decision TD5 there). Ticket links to the specification, technical design and verification records point to that repository. The production registry and publish workflow live in [artifact-pages/admin](https://github.com/artifact-pages/admin).
 
 Statuses follow the [shared backlog legend](../AGENTS.md#backlog-and-issue-tracking). This track covers the public, reader-facing documentation sites published from `sites/`. Internal design notes, UI concepts, and backlog records stay in their existing tracks and are not published as these sites.
 
@@ -64,11 +64,11 @@ Batch of 2026-10-02: DOC-02 (reading-features revision), DOC-04–07 and DOC-08�
 | 15 | [DOC-15](DOC-15-guide-shallow-checkout-dates.md) | guide | `publishing.html` revision — shallow checkouts and document dates | In progress |
 | 16 | [DOC-16](DOC-16-guide-private-config-github-app.md) | guide | GitHub App pattern for private configuration repositories (`configuration.html`) | In progress |
 | 17 | [DOC-17](DOC-17-guide-versions.md) | guide | `versions.html` — pinning and upgrading versions (and revisions to pages that described one product version) | Done |
-| 18 | [DOC-18](DOC-18-guide-release-catch-up.md) | guide | Revisions after the split release — command names, install, links | Blocked |
+| 18 | [DOC-18](DOC-18-guide-release-catch-up.md) | guide | Revisions after the split release — command names, install, links | In progress |
 
 ## Product observations from this work
 
-These surfaced while planning the sites. They are not yet product issues; file them in [issues](https://github.com/tasuku43/git-artifact-pages/blob/main/docs/backlog/issues/README.md) if the owner confirms them.
+These surfaced while planning the sites. They are not yet product issues; file them in [issues](https://github.com/artifact-pages/artifact-pages/blob/main/docs/backlog/issues/README.md) if the owner confirms them.
 
 - Registry site `name` and `description` cannot be localized, so a bilingual site shows one language in the picker and palette.
 - One site with `ja/` and `en/` mixes both languages in Browse, Recently updated, and page search. Language filtering is explicitly undecided in `AGENTS.md`.
