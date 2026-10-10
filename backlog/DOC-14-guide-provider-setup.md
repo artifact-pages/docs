@@ -38,4 +38,6 @@ Step 1 of [getting started](DOC-03-guide-getting-started.md) ("Set up the delive
 
 - Decision 2026-10-10: one page per provider; Cloudflare first (`setup-cloudflare.html`, both languages); AWS gets its own page with milestone M2. The Cloudflare draft says AWS setup is not yet covered.
 - The Terraform module source in the draft is the git form `git::https://github.com/artifact-pages/terraform-cloudflare-artifact-pages.git?ref=v0.1.0`, marked with `<!-- DOC-14: module source pending first module release -->` in both pages. Replace it when IMP-64 publishes the first module release and again when Registry publication happens.
+- Module README links point at the monorepo (`terraform/modules/cloudflare/README.md`) until the package repository is synced; each is marked `<!-- DOC-14: switch to package README after first module release -->`. Switch them after the first module release.
+- The Cloudflare page is a side page under getting started step 1 and has no previous/next pager.
 - Opened 2026-10-04 when getting started switched its walkthrough from the `local` provider to Cloudflare. Until this page exists, step 1 links to the product repository's Cloudflare guide.

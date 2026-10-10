@@ -58,26 +58,26 @@
       <ul>
         <li><strong>R2が使えるCloudflareアカウント。</strong>32文字のアカウントIDが必要です。</li>
         <li><strong>ホスト名を含むゾーン。</strong>読者が使うホスト名（例では<code>docs.example.com</code>）を含むDNSのゾーンが、そのアカウントにすでにある必要があります。32文字のゾーンIDが必要です。</li>
-        <li><strong>TerraformとCloudflareプロバイダ。</strong>モジュールが対応するのは、Terraform<code>&gt;= 1.5.0, &lt; 2.0.0</code>と、Cloudflareプロバイダ<code>&gt;= 5.24.0, &lt; 6.0.0</code>です。</li>
+        <li><strong>TerraformとCloudflareプロバイダー。</strong>Terraformは<code>&gt;= 1.5.0, &lt; 2.0.0</code>、Cloudflareプロバイダーは<code>&gt;= 5.24.0, &lt; 6.0.0</code>に対応しています。</li>
         <li><strong>プレビューの保持期間の決定。</strong><code>preview_retention_days</code>は1から36500までの整数（日数）で、必須です。保持期間はTerraformだけにあり、CLIの設定ファイルには書きません。</li>
       </ul>
     </section>
 
     <section class="doc-section" aria-labelledby="credentials">
       <h2 id="credentials">認証情報</h2>
-      <p>関わる認証情報は2種類あり、使うジョブが異なります。値は<code>.tf</code>ファイル、変数ファイル、設定ファイル、リポジトリのどこにも書かず、シークレット管理の仕組みやCIのシークレットで渡してください。</p>
+      <p>関わる認証情報は3つで、Terraformの実行とCLIで使い分けます。値は<code>.tf</code>ファイル、変数ファイル、設定ファイル、リポジトリのどこにも書かず、シークレット管理の仕組みやCIのシークレットで渡してください。</p>
       <div class="table-wrap"><table>
         <thead><tr><th>認証情報</th><th>使う場面</th><th>必要な権限</th></tr></thead>
         <tbody>
-          <tr><td>Terraform用のCloudflare APIトークン</td><td>Terraformの実行。プロバイダが<code>CLOUDFLARE_API_TOKEN</code>から読む</td><td>R2のストレージ、R2のカスタムドメイン、ライフサイクルルール、ゾーンのルールセットを管理する権限。具体的にはTransform Rules Edit、Cache Rules Edit、Config Rules Editです。<code>waf_custom_rules</code>を設定する場合はZone WAF Writeも必要です。CLIの認証情報とは別のものです。</td></tr>
+          <tr><td>Terraform用のCloudflare APIトークン</td><td>Terraformの実行。プロバイダーが<code>CLOUDFLARE_API_TOKEN</code>から読む</td><td>アカウント: Workers R2 Storage Edit（バケット、カスタムドメイン、<code>r2.dev</code>の設定、ライフサイクルルール）。ゾーン: Transform Rules Edit（リクエストとレスポンスヘッダーの変換）、Cache Rules Edit、Config Rules Edit。<code>waf_custom_rules</code>を設定する場合はZone WAF Edit（モジュールのREADMEでは<code>Zone WAF Write</code>）も必要です。CLIの認証情報とは別のものです。</td></tr>
           <tr><td>R2のアクセスキーとシークレット</td><td>CLI。管理者のジョブとチームのジョブ</td><td>バケットの読み書き。設定で名前を変えない限り、<code>CF_R2_ACCESS_KEY_ID</code>と<code>CF_R2_SECRET_ACCESS_KEY</code>から読みます。</td></tr>
-          <tr><td>CLI用のCloudflare APIトークン</td><td>CLI。内容を変える実行</td><td>ゾーンのキャッシュパージ。設定で名前を変えない限り、<code>CF_API_TOKEN</code>から読みます。ドライランと、変更のない実行では不要です。</td></tr>
+          <tr><td>CLI用のCloudflare APIトークン</td><td>CLI。キャッシュを消す必要がある実際の実行（<code>site sync</code>、<code>registry sync</code>、<code>app deploy</code>、内容を変える削除）</td><td>ゾーンのキャッシュを消す権限（Cache Purge）。設定で名前を変えない限り、<code>CF_API_TOKEN</code>から読みます。ドライランと、変更のない実行では不要です。</td></tr>
         </tbody>
       </table></div>
       <ul>
-        <li><strong>管理者のジョブ</strong>（<code>app deploy</code>、<code>registry sync</code>）は、R2のキーとキャッシュパージ用のトークンを使います。</li>
-        <li><strong>チームのジョブ</strong>（<code>site sync</code>）も同じ変数名を使いますが、渡す認証情報は自分のサイトのパスまで絞れます。<code>preview publish</code>に必要なのはR2のキーだけです。どのコマンドがどの認証情報を使うか、登録情報の読み取り専用の認証情報を分ける方法は、「<a href="configuration.html#credentials">設定ファイル</a>」にあります。</li>
-        <li><strong>キーの組の代わりにトークン1つ。</strong>R2の2つの変数がどちらも未設定なら、CLIはAPIトークンだけを使えます。そのトークンには、対象のバケットのWorkers R2 Storage Bucket Item Writeと、ゾーンのCache Purgeの権限が必要です。詳細は下にリンクした仕様書を参照してください。</li>
+        <li><strong>管理者のジョブ</strong>（<code>app deploy</code>、<code>registry sync</code>）は、R2のキーとキャッシュを消すためのトークンを使います。</li>
+        <li><strong>チームのジョブ</strong>（<code>site sync</code>）も同じ変数名を使いますが、渡す認証情報は自分のサイトのパスまで絞れます。内容を変える実際の<code>site sync</code>には、キャッシュを消すトークンも必要です。<code>preview publish</code>に必要なのはR2のキーだけです（中断した<code>preview remove</code>を再開する場合を除く）。どのコマンドがどの認証情報を使うか、登録情報の読み取り専用の認証情報を分ける方法は、「<a href="configuration.html#credentials">設定ファイル</a>」にあります。</li>
+        <li><strong>キーの組の代わりにトークン1つ。</strong>R2の2つの変数がどちらも未設定なら、CLIはAPIトークンだけを使えます。そのトークンには、対象のバケットのWorkers R2 Storage Bucket Item Writeと、ゾーンのCache Purgeの権限が必要です。CLI v0.2.0から使えます。この方式ではドライランも含め、毎回トークンを検証します。詳細は下にリンクした仕様書を参照してください。</li>
       </ul>
       <p class="note">チーム用に絞った認証情報のオブジェクト単位の権限は、製品リポジトリの<a href="https://github.com/artifact-pages/artifact-pages/blob/main/docs/guides/cloudflare-deployment.md" target="_blank" rel="noopener">Cloudflare deployment</a>（英語）にあります。トークン1つの設定は、<a href="https://github.com/artifact-pages/artifact-pages/blob/main/docs/specification.md" target="_blank" rel="noopener">仕様書</a>の「Cloudflare account-token credentials」にあります。</p>
     </section>
@@ -86,9 +86,20 @@
       <h2 id="module">モジュールを呼び出す</h2>
       <p>管理リポジトリ、またはその隣に、Cloudflare用のモジュールを呼び出す小さなTerraformのルートモジュールを書きます。次が最小の形で、<code>bucket_name</code>は省略でき、既定は<code>artifact-pages</code>です。<code>source</code>は、モジュールのパッケージ用リポジトリのリリースを指定しています。Terraform Registryでの公開は予定されており、公開後はこのページもRegistryのソースに切り替えます。</p>
       <div class="term" aria-label="最小のTerraformのルートモジュール">
-        <div class="term-head"><span>main.tf / acme/platform-admin</span><button class="copy-btn" type="button">Copy</button></div>
+        <div class="term-head"><span>main.tf / acme/platform-admin</span><button class="copy-btn" type="button">コピー</button></div>
 <!-- DOC-14: module source pending first module release -->
-<pre><span class="k">module</span> "artifact_pages" {
+<pre><span class="k">terraform</span> {
+  <span class="k">required_version</span> = "&gt;= 1.5.0, &lt; 2.0.0"
+
+  <span class="k">required_providers</span> {
+    <span class="k">cloudflare</span> = {
+      <span class="k">source</span>  = "cloudflare/cloudflare"
+      <span class="k">version</span> = "&gt;= 5.24.0, &lt; 6.0.0"
+    }
+  }
+}
+
+<span class="k">module</span> "artifact_pages" {
   <span class="k">source</span> = "git::https://github.com/artifact-pages/terraform-cloudflare-artifact-pages.git?ref=v0.1.0"
 
   <span class="k">account_id</span>             = var.cloudflare_account_id
@@ -104,17 +115,17 @@
   <span class="k">value</span> = module.artifact_pages.artifact_pages_deployment_config_yaml
 }</pre>
       </div>
-      <p>変数には、アカウントID、ゾーンID、スキーム・ポート・パスを含まないホスト名、保持日数を渡します。値はコミットしない変数ファイルに書いてください。入力項目の全体と、既定値や制約は、モジュールのREADMEの<strong>Inputs</strong>の表（<a href="https://github.com/artifact-pages/terraform-cloudflare-artifact-pages" target="_blank" rel="noopener">terraform-cloudflare-artifact-pages</a>、英語）にあります。</p>
+      <p>変数には、アカウントID、ゾーンID、スキーム・ポート・パスを含まないホスト名、保持日数を渡します。値はコミットしない変数ファイルに書いてください。入力項目の全体と、既定値や制約は、モジュールのREADMEの<strong>Inputs</strong>の表（<!-- DOC-14: switch to package README after first module release --><a href="https://github.com/artifact-pages/artifact-pages/blob/main/terraform/modules/cloudflare/README.md#inputs" target="_blank" rel="noopener">terraform-cloudflare-artifact-pages</a>、英語）にあります。</p>
     </section>
 
     <section class="doc-section" aria-labelledby="review">
       <h2 id="review">applyの前にプランを確認する</h2>
       <p>まず<code>terraform plan</code>を実行して中身を読みます。モジュールは設定のまとまりを丸ごと管理するため、すでにそのいくつかがあるゾーンやバケットでは、最初のapplyの前に対応が必要です。具体的な手順とインポートするアドレスは、モジュールのREADMEの<strong>Resource ownership and apply review</strong>にあります。</p>
       <ul>
-        <li><strong>ゾーンの既存のルール。</strong>モジュールは、ゾーンのtransform、cache、response-header、configurationの各ルールセットを丸ごと管理します。すでにあるものはインポートし、対応する<code>*_ruleset_name</code>に現在の名前を設定し、既存のルールをすべて、同じ順序で対応する<code>existing_*_rules</code>に渡してください。そうしないと、最初のapplyが失敗するか、ルールが置き換わります。ダッシュボードは最初のConfiguration Ruleを作るときにconfigurationのルールセットも作るため、それも確認してください。</li>
+        <li><strong>ゾーンの既存のルール。</strong>モジュールは、ゾーンのtransform、cache、response-header、configurationの各ルールセットを丸ごと管理します。すでにあるものは、まず対応する<code>*_ruleset_name</code>に現在の名前を設定し（ルールセットの名前は変更できず、違う名前にすると置き換えがプランされます）、次にインポートし、そのうえで既存のルールをすべて、同じ順序で対応する<code>existing_*_rules</code>に渡してください。そうしないと、最初のapplyが失敗するか、ルールが置き換わります。ダッシュボードは最初のConfiguration Ruleを作るときにconfigurationのルールセットも作るため、それも確認してください。<code>waf_custom_rules</code>を設定する場合は、カスタムファイアウォールのルールセット（<code>waf_custom_rules.ruleset_name</code>と<code>existing_rules</code>）にも同じ扱いが必要です。こちらは<code>prevent_destroy</code>が設定されています。</li>
         <li><strong>バケットの名前。</strong>既定の<code>artifact-pages</code>は予約されていません。同じ名前のバケットがアカウントにあると、作成に失敗します。モジュールは常にバケットを新しく作ります。既存のバケットを使う場合は、READMEの「Existing-bucket use」を参照してください。</li>
-        <li><strong>カスタムドメイン。</strong>プロバイダは、既存のR2のカスタムドメインをインポートできません。ホスト名がすでにつながっている場合は<code>connect_custom_domain = false</code>にし、その接続が有効で、望むTLSのバージョンであることを別に確認してください。</li>
-        <li><strong>ライフサイクルルール。</strong>モジュールは、バケットのライフサイクルルールの全体を管理します。残したい他のルールは<code>additional_lifecycle_rules</code>に渡してください。プロバイダはこのリソースのインポートも削除もできないため、Terraformから外してもルールはそのまま残ります。</li>
+        <li><strong>カスタムドメイン。</strong>プロバイダーは、既存のR2のカスタムドメインをインポートできません。ホスト名がすでにつながっている場合は<code>connect_custom_domain = false</code>にし、その接続が有効で、望むTLSのバージョンであることを別に確認してください。</li>
+        <li><strong>ライフサイクルルール。</strong>モジュールは、バケットのライフサイクルルールの全体を管理します。残したい他のルールは<code>additional_lifecycle_rules</code>に渡してください。プロバイダーはこのリソースのインポートも削除もできないため、Terraformから外してもルールはそのまま残ります。</li>
         <li><strong><code>r2.dev</code>は無効のまま。</strong>ダッシュボードで有効にすると、ホスト名の経路の振り分けを通らず、非公開の<code>/_control/*</code>のオブジェクトが見えてしまうおそれがあり、次のプランに差分が出ます。無効のままにしてください。</li>
         <li><strong>バケットは強制削除されません。</strong>削除する前に、中身を意図して空にするか移してください。モジュールを外してもバックアップにはならず、CLIが公開した内容が元に戻ることもありません。</li>
         <li><strong>費用。</strong>R2のストレージとリクエスト、カスタムドメイン、ルールは課金の対象になりえ、ルールにはプランごとの上限もあります。モジュールはアカウントごとの料金を見積もらないため、利用中のプランの料金と上限を確認してください。</li>
@@ -131,19 +142,20 @@
       <h2 id="outputs">出力からCLIの設定を埋める</h2>
       <p>applyのあと、モジュールの出力<code>artifact_pages_deployment_config_yaml</code>が、配信先のそのままコピーできるYAMLになります。含まれるのは秘密でない識別子と、実際のバケットの名前だけです。認証情報の変数名は、既定値（<code>CF_R2_ACCESS_KEY_ID</code>、<code>CF_R2_SECRET_ACCESS_KEY</code>、<code>CF_API_TOKEN</code>）なら省かれ、変更した場合に書き出されます。</p>
       <div class="term" aria-label="生成された設定を読み出す">
-        <div class="term-head"><span>Terminal / acme/platform-admin</span><button class="copy-btn" type="button">Copy</button></div>
+        <div class="term-head"><span>ターミナル / acme/platform-admin</span><button class="copy-btn" type="button">コピー</button></div>
 <pre><span class="p">$</span> <span data-copy>terraform output -raw artifact_pages_deployment_config_yaml</span></pre>
       </div>
       <div class="term" aria-label="生成される配信先の例">
         <div class="term-head"><span>出力 / 説明用の値</span></div>
-<pre><span class="k">schemaVersion</span>: 1
-<span class="k">provider</span>: cloudflare
-<span class="k">cloudflare</span>:
-  <span class="k">accountId</span>: "&lt;32-character account ID&gt;"
-  <span class="k">bucket</span>: artifact-pages
-  <span class="k">zoneId</span>: "&lt;32-character zone ID&gt;"
-  <span class="k">publicBaseURL</span>: https://docs.example.com</pre>
+<pre><span class="k">"cloudflare"</span>:
+  <span class="k">"accountId"</span>: "&lt;32-character account ID&gt;"
+  <span class="k">"bucket"</span>: "artifact-pages"
+  <span class="k">"publicBaseURL"</span>: "https://docs.example.com"
+  <span class="k">"zoneId"</span>: "&lt;32-character zone ID&gt;"
+<span class="k">"provider"</span>: "cloudflare"
+<span class="k">"schemaVersion"</span>: 1</pre>
       </div>
+      <p>キーは引用符つきで、アルファベット順に出力されます。YAMLとしては正しいので、写すときに整えてください。モジュールの呼び出しで<code>registry_reader</code>を設定した場合は、その環境変数名も出力されます。</p>
       <p>これらのキーを管理リポジトリの<code>artifact-pages.yaml</code>に写し、「<a href="getting-started.html">はじめる</a>」の手順2のように<code>web.version</code>と<code>sites</code>を加えます。各キーの意味は「<a href="configuration.html#provider-cloudflare">設定ファイル</a>」にあります。認証情報の値は、管理者のジョブとチームのジョブの環境に置き、ファイルには書きません。</p>
       <p class="note"><code>docs.example.com</code>とプレースホルダーは説明用の例です。生成される値は公開されている識別子で、秘密ではないため、管理リポジトリにコミットできます。</p>
     </section>
@@ -153,10 +165,6 @@
       <p>バケット、ホスト名、ルールの用意と設定ファイルの作成ができたら、「<a href="getting-started.html#cloudflare">はじめる</a>」の手順2に進み、閲覧アプリの配置とサイトの登録を行います。</p>
     </section>
 
-    <nav class="pager" aria-label="ページ送り">
-      <a class="prev" href="getting-started.html"><small>前へ</small><strong>はじめる</strong></a>
-      <a class="next" href="configuration.html"><small>次へ</small><strong>設定ファイル</strong></a>
-    </nav>
   </main>
 </body>
 </html>

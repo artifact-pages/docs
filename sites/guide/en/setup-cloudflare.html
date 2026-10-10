@@ -65,19 +65,19 @@
 
     <section class="doc-section" aria-labelledby="credentials">
       <h2 id="credentials">Credentials</h2>
-      <p>Two kinds of credential are involved, and they belong to different jobs. Never put a value in a <code>.tf</code> file, a variable file, a config file, or the repository; use a secret manager or CI secrets.</p>
+      <p>Three credentials are involved, for two jobs: Terraform and the CLI. Never put a value in a <code>.tf</code> file, a variable file, a config file, or the repository; use a secret manager or CI secrets.</p>
       <div class="table-wrap"><table>
         <thead><tr><th>Credential</th><th>Used by</th><th>What it needs</th></tr></thead>
         <tbody>
-          <tr><td>Cloudflare API token for Terraform</td><td>The Terraform run, read by the provider from <code>CLOUDFLARE_API_TOKEN</code></td><td>Permission to manage R2 storage, R2 custom domains and lifecycle rules, and the zone's rulesets: Transform Rules Edit, Cache Rules Edit, and Config Rules Edit. Setting <code>waf_custom_rules</code> also needs Zone WAF Write. It is separate from the CLI's credentials.</td></tr>
+          <tr><td>Cloudflare API token for Terraform</td><td>The Terraform run, read by the provider from <code>CLOUDFLARE_API_TOKEN</code></td><td>Account: Workers R2 Storage Edit (bucket, custom domain, <code>r2.dev</code> setting, lifecycle rules). Zone: Transform Rules Edit (request and response-header transforms), Cache Rules Edit, Config Rules Edit. Setting <code>waf_custom_rules</code> also needs Zone WAF Edit (named <code>Zone WAF Write</code> in the module README). It is separate from the CLI's credentials.</td></tr>
           <tr><td>R2 access key and secret</td><td>The CLI, in the admin job and in team jobs</td><td>Read and write access to the bucket. Read from <code>CF_R2_ACCESS_KEY_ID</code> and <code>CF_R2_SECRET_ACCESS_KEY</code> unless the config renames them.</td></tr>
-          <tr><td>Cloudflare API token for the CLI</td><td>The CLI, in any run that changes content</td><td>Cache purge for the zone. Read from <code>CF_API_TOKEN</code> unless the config renames it. Dry runs and runs with nothing to change do not need it.</td></tr>
+          <tr><td>Cloudflare API token for the CLI</td><td>The CLI, in a real run that must purge the cache (<code>site sync</code>, <code>registry sync</code>, <code>app deploy</code>, or a removal that changes content)</td><td>Cache purge for the zone. Read from <code>CF_API_TOKEN</code> unless the config renames it. Dry runs and runs with nothing to change do not need it.</td></tr>
         </tbody>
       </table></div>
       <ul>
         <li><strong>The admin job</strong> (<code>app deploy</code>, <code>registry sync</code>) uses the R2 key and the cache-purge token.</li>
-        <li><strong>A team job</strong> (<code>site sync</code>) uses the same variable names, but the credentials it is given can be narrower, down to its own site's paths. <code>preview publish</code> needs the R2 key only. Which command needs which credential, and the optional separate read-only credential for the registry, are in <a href="configuration.html#credentials">Configuration</a>.</li>
-        <li><strong>One token instead of a key pair.</strong> If the R2 variables are both unset, the CLI can use the API token alone, provided the token has the Workers R2 Storage Bucket Item Write permission for the bucket and Cache Purge for the zone. See the specification linked below.</li>
+        <li><strong>A team job</strong> (<code>site sync</code>) uses the same variable names, but the credentials it is given can be narrower, down to its own site's paths. A real <code>site sync</code> that changes the site also needs the cache-purge token. <code>preview publish</code> needs the R2 key only (unless it resumes an interrupted <code>preview remove</code>). Which command needs which credential, and the optional separate read-only credential for the registry, are in <a href="configuration.html#credentials">Configuration</a>.</li>
+        <li><strong>One token instead of a key pair.</strong> If the R2 variables are both unset, the CLI can use the API token alone, provided the token has the Workers R2 Storage Bucket Item Write permission for the bucket and Cache Purge for the zone. Available from CLI v0.2.0. In this mode the token is checked on every run, including dry runs. See the specification linked below.</li>
       </ul>
       <p class="note">The exact object-level permissions for scoped team credentials are in the product repository's <a href="https://github.com/artifact-pages/artifact-pages/blob/main/docs/guides/cloudflare-deployment.md" target="_blank" rel="noopener">Cloudflare deployment</a> guide (English); the single-token setup is in the <a href="https://github.com/artifact-pages/artifact-pages/blob/main/docs/specification.md" target="_blank" rel="noopener">specification</a>, section "Cloudflare account-token credentials".</p>
     </section>
@@ -88,7 +88,18 @@
       <div class="term" aria-label="Minimal Terraform root module">
         <div class="term-head"><span>main.tf / acme/platform-admin</span><button class="copy-btn" type="button">Copy</button></div>
 <!-- DOC-14: module source pending first module release -->
-<pre><span class="k">module</span> "artifact_pages" {
+<pre><span class="k">terraform</span> {
+  <span class="k">required_version</span> = "&gt;= 1.5.0, &lt; 2.0.0"
+
+  <span class="k">required_providers</span> {
+    <span class="k">cloudflare</span> = {
+      <span class="k">source</span>  = "cloudflare/cloudflare"
+      <span class="k">version</span> = "&gt;= 5.24.0, &lt; 6.0.0"
+    }
+  }
+}
+
+<span class="k">module</span> "artifact_pages" {
   <span class="k">source</span> = "git::https://github.com/artifact-pages/terraform-cloudflare-artifact-pages.git?ref=v0.1.0"
 
   <span class="k">account_id</span>             = var.cloudflare_account_id
@@ -104,14 +115,14 @@
   <span class="k">value</span> = module.artifact_pages.artifact_pages_deployment_config_yaml
 }</pre>
       </div>
-      <p>The variables are your account ID, zone ID, hostname without a scheme, port, or path, and retention days. Supply them in an untracked variable file. The full list of inputs, with defaults and rules, is the <strong>Inputs</strong> table in the module's README (<a href="https://github.com/artifact-pages/terraform-cloudflare-artifact-pages" target="_blank" rel="noopener">terraform-cloudflare-artifact-pages</a>).</p>
+      <p>The variables are your account ID, zone ID, hostname without a scheme, port, or path, and retention days. Supply them in an untracked variable file. The full list of inputs, with defaults and rules, is the <strong>Inputs</strong> table in the module's README (<!-- DOC-14: switch to package README after first module release --><a href="https://github.com/artifact-pages/artifact-pages/blob/main/terraform/modules/cloudflare/README.md#inputs" target="_blank" rel="noopener">terraform-cloudflare-artifact-pages</a>).</p>
     </section>
 
     <section class="doc-section" aria-labelledby="review">
       <h2 id="review">Review the plan before you apply</h2>
       <p>Run <code>terraform plan</code> first and read it. The module takes ownership of whole sets of settings, so a zone or bucket that already has some of them needs attention before the first apply. The module README's <strong>Resource ownership and apply review</strong> section has the exact steps and import addresses.</p>
       <ul>
-        <li><strong>Existing zone rules.</strong> The module owns the complete transform, cache, response-header, and configuration rulesets of the zone. If any of them already exists, import it, set the matching <code>*_ruleset_name</code> input to its current name, and pass all its existing rules through the matching <code>existing_*_rules</code> input in the same order. Otherwise the first apply fails or replaces them. The dashboard creates the configuration ruleset with its first Configuration Rule, so check that one too.</li>
+        <li><strong>Existing zone rules.</strong> The module owns the complete transform, cache, response-header, and configuration rulesets of the zone. If any of them already exists, first set the matching <code>*_ruleset_name</code> input to its current name (ruleset names cannot be changed, so a different name plans a replacement), then import it, then pass all its existing rules through the matching <code>existing_*_rules</code> input in the same order. Otherwise the first apply fails or replaces them. The dashboard creates the configuration ruleset with its first Configuration Rule, so check that one too. When you set <code>waf_custom_rules</code>, the same applies to the custom firewall ruleset (<code>waf_custom_rules.ruleset_name</code> and <code>existing_rules</code>). It has <code>prevent_destroy</code>.</li>
         <li><strong>The bucket name.</strong> The default <code>artifact-pages</code> is not reserved. If a bucket with the chosen name exists in the account, creation fails. The module always creates its bucket; to use an existing one, see "Existing-bucket use" in the README.</li>
         <li><strong>The custom domain.</strong> The provider cannot import an existing R2 custom domain. If the hostname is already connected, set <code>connect_custom_domain = false</code> and check separately that the connection is enabled with the TLS version you want.</li>
         <li><strong>Lifecycle rules.</strong> The module owns the bucket's complete lifecycle rule set. Pass every other rule you want to keep through <code>additional_lifecycle_rules</code>. The provider cannot import or destroy this resource, so removing it from Terraform leaves the rules in place.</li>
@@ -136,14 +147,15 @@
       </div>
       <div class="term" aria-label="Example of the generated target">
         <div class="term-head"><span>output / illustrative values</span></div>
-<pre><span class="k">schemaVersion</span>: 1
-<span class="k">provider</span>: cloudflare
-<span class="k">cloudflare</span>:
-  <span class="k">accountId</span>: "&lt;32-character account ID&gt;"
-  <span class="k">bucket</span>: artifact-pages
-  <span class="k">zoneId</span>: "&lt;32-character zone ID&gt;"
-  <span class="k">publicBaseURL</span>: https://docs.example.com</pre>
+<pre><span class="k">"cloudflare"</span>:
+  <span class="k">"accountId"</span>: "&lt;32-character account ID&gt;"
+  <span class="k">"bucket"</span>: "artifact-pages"
+  <span class="k">"publicBaseURL"</span>: "https://docs.example.com"
+  <span class="k">"zoneId"</span>: "&lt;32-character zone ID&gt;"
+<span class="k">"provider"</span>: "cloudflare"
+<span class="k">"schemaVersion"</span>: 1</pre>
       </div>
+      <p>The keys come out quoted and in alphabetical order. That is valid YAML; tidy it when you copy. If <code>registry_reader</code> is set in the module call, its environment variable names are written too.</p>
       <p>Copy these keys into <code>artifact-pages.yaml</code> in the admin repository, then add <code>web.version</code> and the <code>sites</code> mapping, as in step 2 of <a href="getting-started.html">Getting started</a>. The meaning of each key is in <a href="configuration.html#provider-cloudflare">Configuration</a>. Put the credential values in the environment of the admin job and the team jobs, never in the file.</p>
       <p class="note"><code>docs.example.com</code> and the placeholders are illustrative. The generated values are public identifiers, not secrets, so the file can be committed to the admin repository.</p>
     </section>
@@ -153,10 +165,6 @@
       <p>With the bucket, hostname, and rules in place and the config written, continue with <a href="getting-started.html#cloudflare">step 2 of Getting started</a>, then deploy the reader app and register the sites.</p>
     </section>
 
-    <nav class="pager" aria-label="Pages">
-      <a class="prev" href="getting-started.html"><small>Previous</small><strong>Getting started</strong></a>
-      <a class="next" href="configuration.html"><small>Next</small><strong>Configuration</strong></a>
-    </nav>
   </main>
 </body>
 </html>
