@@ -1,0 +1,162 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="description" content="What an admin prepares to use Cloudflare R2 as the delivery target: the Terraform module, the credentials, what to review before the first apply, and how its outputs fill the CLI config.">
+  <title>Setting up Cloudflare</title>
+  <script>
+    // Copy the reader app's theme (same-origin parent) before first paint; assets/site.js keeps it in sync.
+    (() => {
+      const root = document.documentElement;
+      root.classList.add('js');
+      try {
+        const theme = window.parent !== window && window.parent.document.documentElement.dataset.theme;
+        if (theme === 'light' || theme === 'dark') root.dataset.theme = theme;
+      } catch { /* cross-origin: fall back to prefers-color-scheme */ }
+    })();
+  </script>
+  <link rel="icon" href="data:,">
+  <link rel="stylesheet" href="../assets/site.css">
+  <script src="../assets/site.js" defer></script>
+</head>
+<body>
+  <a class="skip" href="#main">Skip to content</a>
+  <main id="main" class="wrap">
+    <nav class="lang-switch" aria-label="Language"><a href="../ja/setup-cloudflare.html" hreflang="ja" lang="ja">日本語</a><span aria-current="page">English</span></nav>
+
+    <header class="page-head">
+      <div>
+        <p class="eyebrow">For admins</p>
+        <h1>Setting up Cloudflare</h1>
+      </div>
+      <p class="lead">This is the detailed version of step 1 in <a href="getting-started.html">Getting started</a>: preparing a Cloudflare R2 bucket and hostname as the delivery target. It covers what to prepare, what to decide, and what to check before the first apply. Every Terraform input is documented in the product's module README, so this page points there instead of repeating it.</p>
+    </header>
+
+    <section class="doc-section" aria-labelledby="what">
+      <h2 id="what">What you get</h2>
+      <p>The product's Cloudflare Terraform module creates the delivery target that the CLI then publishes to:</p>
+      <ul>
+        <li><strong>One private R2 bucket.</strong> It holds the reader app, the site registry, the published pages, and the previews.</li>
+        <li><strong>The hostname.</strong> It connects the bucket to the custom domain readers use and routes unmatched paths, including <code>/_control/*</code>, to the reader app instead of to stored objects.</li>
+        <li><strong>Cache and response rules.</strong> The cache respects the origin's cache headers, and published HTML and previews receive the same Content Security Policy.</li>
+        <li><strong>Unchanged delivery.</strong> For this hostname only, a Configuration Rule turns off the Cloudflare features that rewrite or inject into response bodies, such as email obfuscation, Rocket Loader, and Polish, so pages reach readers exactly as published.</li>
+        <li><strong>Preview expiration.</strong> Previews are removed by an R2 lifecycle rule after the number of days you choose.</li>
+        <li><strong><code>r2.dev</code> kept disabled.</strong> The bucket's alternate public address is managed and kept off, so turning it on in the dashboard shows up as a difference in the plan.</li>
+      </ul>
+      <p>The module does not deploy the reader app, register sites, create the CLI's credentials, or set who may read. Those are separate steps: <code>app deploy</code> and <code>registry sync</code> in <a href="getting-started.html">Getting started</a>, the credentials below, and <a href="access-and-trust.html">Access and trust</a>.</p>
+      <div class="callout" role="note">
+        <span class="ico">AWS</span>
+        <div>
+          <p>Setup for AWS (S3 and CloudFront) is not covered in this guide yet. The AWS settings of the config file are described in <a href="configuration.html#provider-aws">Configuration</a>.</p>
+        </div>
+      </div>
+    </section>
+
+    <section class="doc-section" aria-labelledby="prerequisites">
+      <h2 id="prerequisites">What you need first</h2>
+      <ul>
+        <li><strong>A Cloudflare account with R2 enabled.</strong> You need its 32-character account ID.</li>
+        <li><strong>A zone for the hostname.</strong> The DNS zone that will contain the hostname readers use (<code>docs.example.com</code> in the examples) must already exist in that account. You need its 32-character zone ID.</li>
+        <li><strong>Terraform and the Cloudflare provider.</strong> The module supports Terraform <code>&gt;= 1.5.0, &lt; 2.0.0</code> and Cloudflare provider <code>&gt;= 5.24.0, &lt; 6.0.0</code>.</li>
+        <li><strong>A decision on preview retention.</strong> <code>preview_retention_days</code> is a whole number of days from 1 to 36500. It is required, and it lives only in Terraform: the CLI config has no retention value.</li>
+      </ul>
+    </section>
+
+    <section class="doc-section" aria-labelledby="credentials">
+      <h2 id="credentials">Credentials</h2>
+      <p>Two kinds of credential are involved, and they belong to different jobs. Never put a value in a <code>.tf</code> file, a variable file, a config file, or the repository; use a secret manager or CI secrets.</p>
+      <div class="table-wrap"><table>
+        <thead><tr><th>Credential</th><th>Used by</th><th>What it needs</th></tr></thead>
+        <tbody>
+          <tr><td>Cloudflare API token for Terraform</td><td>The Terraform run, read by the provider from <code>CLOUDFLARE_API_TOKEN</code></td><td>Permission to manage R2 storage, R2 custom domains and lifecycle rules, and the zone's rulesets: Transform Rules Edit, Cache Rules Edit, and Config Rules Edit. Setting <code>waf_custom_rules</code> also needs Zone WAF Write. It is separate from the CLI's credentials.</td></tr>
+          <tr><td>R2 access key and secret</td><td>The CLI, in the admin job and in team jobs</td><td>Read and write access to the bucket. Read from <code>CF_R2_ACCESS_KEY_ID</code> and <code>CF_R2_SECRET_ACCESS_KEY</code> unless the config renames them.</td></tr>
+          <tr><td>Cloudflare API token for the CLI</td><td>The CLI, in any run that changes content</td><td>Cache purge for the zone. Read from <code>CF_API_TOKEN</code> unless the config renames it. Dry runs and runs with nothing to change do not need it.</td></tr>
+        </tbody>
+      </table></div>
+      <ul>
+        <li><strong>The admin job</strong> (<code>app deploy</code>, <code>registry sync</code>) uses the R2 key and the cache-purge token.</li>
+        <li><strong>A team job</strong> (<code>site sync</code>) uses the same variable names, but the credentials it is given can be narrower, down to its own site's paths. <code>preview publish</code> needs the R2 key only. Which command needs which credential, and the optional separate read-only credential for the registry, are in <a href="configuration.html#credentials">Configuration</a>.</li>
+        <li><strong>One token instead of a key pair.</strong> If the R2 variables are both unset, the CLI can use the API token alone, provided the token has the Workers R2 Storage Bucket Item Write permission for the bucket and Cache Purge for the zone. See the specification linked below.</li>
+      </ul>
+      <p class="note">The exact object-level permissions for scoped team credentials are in the product repository's <a href="https://github.com/artifact-pages/artifact-pages/blob/main/docs/guides/cloudflare-deployment.md" target="_blank" rel="noopener">Cloudflare deployment</a> guide (English); the single-token setup is in the <a href="https://github.com/artifact-pages/artifact-pages/blob/main/docs/specification.md" target="_blank" rel="noopener">specification</a>, section "Cloudflare account-token credentials".</p>
+    </section>
+
+    <section class="doc-section" aria-labelledby="module">
+      <h2 id="module">Call the module</h2>
+      <p>Write a small Terraform root module in the admin repository, or next to it, that calls the Cloudflare module. This is the smallest form; <code>bucket_name</code> is optional and defaults to <code>artifact-pages</code>. The source below pins a release of the module's package repository. Publication to the Terraform Registry is planned, and this page will move to the Registry source then.</p>
+      <div class="term" aria-label="Minimal Terraform root module">
+        <div class="term-head"><span>main.tf / acme/platform-admin</span><button class="copy-btn" type="button">Copy</button></div>
+<!-- DOC-14: module source pending first module release -->
+<pre><span class="k">module</span> "artifact_pages" {
+  <span class="k">source</span> = "git::https://github.com/artifact-pages/terraform-cloudflare-artifact-pages.git?ref=v0.1.0"
+
+  <span class="k">account_id</span>             = var.cloudflare_account_id
+  <span class="k">zone_id</span>                = var.cloudflare_zone_id
+  <span class="k">public_hostname</span>        = var.public_hostname
+  <span class="k">preview_retention_days</span> = var.preview_retention_days
+  <span class="c"># bucket_name = "artifact-pages"   # optional</span>
+}
+
+<span class="k">provider</span> "cloudflare" {}   <span class="c"># reads CLOUDFLARE_API_TOKEN</span>
+
+<span class="k">output</span> "artifact_pages_deployment_config_yaml" {
+  <span class="k">value</span> = module.artifact_pages.artifact_pages_deployment_config_yaml
+}</pre>
+      </div>
+      <p>The variables are your account ID, zone ID, hostname without a scheme, port, or path, and retention days. Supply them in an untracked variable file. The full list of inputs, with defaults and rules, is the <strong>Inputs</strong> table in the module's README (<a href="https://github.com/artifact-pages/terraform-cloudflare-artifact-pages" target="_blank" rel="noopener">terraform-cloudflare-artifact-pages</a>).</p>
+    </section>
+
+    <section class="doc-section" aria-labelledby="review">
+      <h2 id="review">Review the plan before you apply</h2>
+      <p>Run <code>terraform plan</code> first and read it. The module takes ownership of whole sets of settings, so a zone or bucket that already has some of them needs attention before the first apply. The module README's <strong>Resource ownership and apply review</strong> section has the exact steps and import addresses.</p>
+      <ul>
+        <li><strong>Existing zone rules.</strong> The module owns the complete transform, cache, response-header, and configuration rulesets of the zone. If any of them already exists, import it, set the matching <code>*_ruleset_name</code> input to its current name, and pass all its existing rules through the matching <code>existing_*_rules</code> input in the same order. Otherwise the first apply fails or replaces them. The dashboard creates the configuration ruleset with its first Configuration Rule, so check that one too.</li>
+        <li><strong>The bucket name.</strong> The default <code>artifact-pages</code> is not reserved. If a bucket with the chosen name exists in the account, creation fails. The module always creates its bucket; to use an existing one, see "Existing-bucket use" in the README.</li>
+        <li><strong>The custom domain.</strong> The provider cannot import an existing R2 custom domain. If the hostname is already connected, set <code>connect_custom_domain = false</code> and check separately that the connection is enabled with the TLS version you want.</li>
+        <li><strong>Lifecycle rules.</strong> The module owns the bucket's complete lifecycle rule set. Pass every other rule you want to keep through <code>additional_lifecycle_rules</code>. The provider cannot import or destroy this resource, so removing it from Terraform leaves the rules in place.</li>
+        <li><strong><code>r2.dev</code> stays disabled.</strong> If you enable it in the dashboard, it bypasses the hostname's routing and could expose private <code>/_control/*</code> objects, and the next plan shows the difference. Leave it off.</li>
+        <li><strong>The bucket is not force-destroyed.</strong> Empty or move the contents deliberately before you destroy it. Removing the module is neither a backup nor a rollback of what the CLI published.</li>
+        <li><strong>Cost.</strong> R2 storage and requests, custom domains, and rules can be billable, and rules have plan limits. The module does not estimate your account's charges, so check pricing and limits for your plan.</li>
+      </ul>
+      <div class="callout warn" role="note">
+        <span class="ico">VIEWERS</span>
+        <div>
+          <p><strong>The module does not decide who can read.</strong> Restrict the hostname with Cloudflare Access or another edge policy yourself. The optional <code>waf_custom_rules</code> input can manage rules for the hostname, such as an IP allowlist, but it does not configure authentication. See <a href="access-and-trust.html">Access and trust</a>.</p>
+        </div>
+      </div>
+    </section>
+
+    <section class="doc-section" aria-labelledby="outputs">
+      <h2 id="outputs">Fill the CLI config from the outputs</h2>
+      <p>After the apply, the module's <code>artifact_pages_deployment_config_yaml</code> output is ready-to-copy YAML for the delivery target. It holds only non-secret identifiers and the effective bucket name. Credential variable names are left out when they have their default values (<code>CF_R2_ACCESS_KEY_ID</code>, <code>CF_R2_SECRET_ACCESS_KEY</code>, <code>CF_API_TOKEN</code>), and written out when you renamed them.</p>
+      <div class="term" aria-label="Read the generated configuration">
+        <div class="term-head"><span>Terminal / acme/platform-admin</span><button class="copy-btn" type="button">Copy</button></div>
+<pre><span class="p">$</span> <span data-copy>terraform output -raw artifact_pages_deployment_config_yaml</span></pre>
+      </div>
+      <div class="term" aria-label="Example of the generated target">
+        <div class="term-head"><span>output / illustrative values</span></div>
+<pre><span class="k">schemaVersion</span>: 1
+<span class="k">provider</span>: cloudflare
+<span class="k">cloudflare</span>:
+  <span class="k">accountId</span>: "&lt;32-character account ID&gt;"
+  <span class="k">bucket</span>: artifact-pages
+  <span class="k">zoneId</span>: "&lt;32-character zone ID&gt;"
+  <span class="k">publicBaseURL</span>: https://docs.example.com</pre>
+      </div>
+      <p>Copy these keys into <code>artifact-pages.yaml</code> in the admin repository, then add <code>web.version</code> and the <code>sites</code> mapping, as in step 2 of <a href="getting-started.html">Getting started</a>. The meaning of each key is in <a href="configuration.html#provider-cloudflare">Configuration</a>. Put the credential values in the environment of the admin job and the team jobs, never in the file.</p>
+      <p class="note"><code>docs.example.com</code> and the placeholders are illustrative. The generated values are public identifiers, not secrets, so the file can be committed to the admin repository.</p>
+    </section>
+
+    <section class="doc-section" aria-labelledby="next">
+      <h2 id="next">Next</h2>
+      <p>With the bucket, hostname, and rules in place and the config written, continue with <a href="getting-started.html#cloudflare">step 2 of Getting started</a>, then deploy the reader app and register the sites.</p>
+    </section>
+
+    <nav class="pager" aria-label="Pages">
+      <a class="prev" href="getting-started.html"><small>Previous</small><strong>Getting started</strong></a>
+      <a class="next" href="configuration.html"><small>Next</small><strong>Configuration</strong></a>
+    </nav>
+  </main>
+</body>
+</html>

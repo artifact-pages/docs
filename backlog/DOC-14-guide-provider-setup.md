@@ -1,6 +1,7 @@
 # DOC-14 — Guide: provider setup
 
-- Status: Open
+- Status: In progress
+- Assignee: Claude
 - Site: `guide`
 - Page: one page per provider or one page with a section each (decide when drafting), for example `ja/setup-cloudflare.html`, `en/setup-cloudflare.html`
 - Audience: Admins preparing a delivery target
@@ -35,4 +36,6 @@ Step 1 of [getting started](DOC-03-guide-getting-started.md) ("Set up the delive
 
 ## Notes
 
+- Decision 2026-10-10: one page per provider; Cloudflare first (`setup-cloudflare.html`, both languages); AWS gets its own page with milestone M2. The Cloudflare draft says AWS setup is not yet covered.
+- The Terraform module source in the draft is the git form `git::https://github.com/artifact-pages/terraform-cloudflare-artifact-pages.git?ref=v0.1.0`, marked with `<!-- DOC-14: module source pending first module release -->` in both pages. Replace it when IMP-64 publishes the first module release and again when Registry publication happens.
 - Opened 2026-10-04 when getting started switched its walkthrough from the `local` provider to Cloudflare. Until this page exists, step 1 links to the product repository's Cloudflare guide.
