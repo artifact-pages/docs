@@ -65,6 +65,7 @@ Batch of 2026-10-02: DOC-02 (reading-features revision), DOC-04–07 and DOC-08�
 | 16 | [DOC-16](DOC-16-guide-private-config-github-app.md) | guide | GitHub App pattern for private configuration repositories (`configuration.html`) | In progress |
 | 17 | [DOC-17](DOC-17-guide-versions.md) | guide | `versions.html` — pinning and upgrading versions (and revisions to pages that described one product version) | Done |
 | 18 | [DOC-18](DOC-18-guide-release-catch-up.md) | guide | Revisions after the split release — command names, install, links | In progress |
+| 19 | [DOC-19](DOC-19-architecture-command-catch-up.md) | architecture | Revisions after the split release — command names, withdrawal, control keys | In progress |
 
 ## Product observations from this work
 

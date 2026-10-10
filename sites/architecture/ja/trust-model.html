@@ -195,13 +195,13 @@
       <ul class="checklist no">
         <li>サイトの登録情報からサイトを外すこと、画面の一覧から隠すこと。オブジェクトを消すまでは、直接のURLで開けます。</li>
         <li>推測しにくいプレビューのSHA、プレビューが「マージ前」であること。</li>
-        <li>登録解除を取り消しとみなすこと。オリジンのオブジェクトを消してキャッシュの無効化を依頼しますが、すでに届いた中身は取り戻せません。</li>
+        <li>サイトの取り下げを取り消しとみなすこと。<code>registry sync</code>はオリジンのオブジェクトを消してキャッシュの無効化を依頼しますが、すでに届いた中身は取り戻せません。</li>
       </ul>
     </section>
 
     <section class="doc-section" aria-labelledby="publishers">
       <h2 id="publishers">公開者の認証情報と制御用のオブジェクト</h2>
-      <p>サイトの登録情報の確認とサイトのロックはArtifact Pagesのコマンド同士の調整で、権限の仕組みでは<strong>ありません</strong>。バケットへ直接書き込める認証情報を持つ人は迂回できます。公開者が触れる範囲を絞るのは、プロバイダーの認証情報の役目です。別のリポジトリから公開する人に許すのは、サイトの登録情報のオブジェクトの読み取り、自分のサイトのインデックスと成果物のプレフィックスの中での読み書きと削除、プレビューのプレフィックスの読み書き（AWSの参照構成では、プレビューの履歴を消す権限は与えません）、サイトのロック<code>_control/locks/sites/&lt;site&gt;.json</code>の読み書き、キャッシュ再試行の記録<code>_control/site-cache/&lt;site&gt;.json</code>の読み書きと削除、それにCDNの無効化の依頼（CloudFrontの<code>CreateInvalidation</code>、またはキャッシュ削除の権限を持つCloudflareのゾーンのトークン）です。無効化の依頼が要るのは、中身が変わる公開が、変わったURLのキャッシュを消すからです。サイトの登録情報とアプリケーションプレーンへの書き込みは許しません。Cloudflareでは、サイトの登録情報を読むための別の身元を任意で設定できます。AWSの参照構成では、管理者用と公開者用に分けたロールをGitHub ActionsのOIDCで使う想定です。</p>
+      <p>サイトの登録情報の確認とサイトのロックはArtifact Pagesのコマンド同士の調整で、権限の仕組みでは<strong>ありません</strong>。バケットへ直接書き込める認証情報を持つ人は迂回できます。公開者が触れる範囲を絞るのは、プロバイダーの認証情報の役目です。別のリポジトリから公開する人に許すのは、サイトの登録情報のオブジェクトとデプロイ済みWebの記録<code>_control/versions/app.json</code>の読み取り、自分のサイトのインデックスと成果物のプレフィックスの中での読み書きと削除、プレビューのプレフィックスの中での読み書きと削除（<code>preview remove</code>がグループの持つリビジョンを消すため）、自分のサイトの制御用プレフィックス<code>_control/sites/&lt;site&gt;/</code>（サイトのロック、キャッシュ再試行の記録、同期の状態、プレビュー片付けの記録、版の記録）の読み書き・削除・一覧、サイトのロック<code>_control/sites/&lt;site&gt;/lock.json</code>の読み書き、キャッシュ再試行の記録<code>_control/sites/&lt;site&gt;/site-cache.json</code>の読み書きと削除、それにCDNの無効化の依頼（CloudFrontの<code>CreateInvalidation</code>、またはキャッシュ削除の権限を持つCloudflareのゾーンのトークン）です。無効化の依頼が要るのは、中身が変わる公開が、変わったURLのキャッシュを消すからです。サイトの登録情報とアプリケーションプレーンへの書き込みは許しません。Cloudflareでは、サイトの登録情報を読むための別の身元を任意で設定できます。AWSの参照構成では、管理者用と公開者用に分けたロールをGitHub ActionsのOIDCで使う想定です。</p>
       <p><code>/_control/*</code>にある非公開の調整用オブジェクトは、読者に返してはいけません。ロックや再試行の記録の中身を返さない限り、配信側がこれらのパスにアプリのシェルを返すことは許されます。</p>
     </section>
 
@@ -209,7 +209,7 @@
       <h2 id="proof">どこまで実証されているか</h2>
       <ul class="proof">
         <li><span class="chip local">ローカルで実証済み</span><span>iframeでのCSSの閉じ込め、害の無いフィクスチャからの意図どおりの親のDOMと保存領域へのアクセス、Markdownからのスクリプトの除去、nullやワイルドカードのCORSを付けない同一オリジンでのモジュールの読み込み、CSPによる外部HTTPSの許可と外部HTTPの拒否（T4、T6、ISSUE-037のブラウザのテスト）。</span></li>
-        <li><span class="chip sampled">Cloudflareで抜き取り確認</span><span>2026-10-01に、稼働中のGuideのHTMLに強制の成果物CSPのヘッダーが付くこと、プレビューのHTMLにリビジョンのパスに合わせた強制のCSPが付くこと、制御用のキーのパスがアプリのシェルしか返さないことを確かめました。2026-10-02には、稼働中のGuideのページで実行時に組み立てたHTTPのURLへのfetchが、強制のCSP（<code>default-src</code>から引き継ぐ<code>connect-src</code>）で拒否されること（Chromium）、範囲を絞った一時的なR2の認証情報が自分のサイトの外への書き込みを拒否されつつ、そのサイトは公開できることを確かめました（T15）。</span></li>
+        <li><span class="chip sampled">Cloudflareで抜き取り確認</span><span>2026-10-01に、稼働中のGuideのHTMLに強制の成果物CSPのヘッダーが付くこと、プレビューのHTMLにリビジョンのパスに合わせた強制のCSPが付くこと、制御用のキーのパスがアプリのシェルしか返さないこと（以前のキー配置で確認）を確かめました。2026-10-02には、稼働中のGuideのページで実行時に組み立てたHTTPのURLへのfetchが、強制のCSP（<code>default-src</code>から引き継ぐ<code>connect-src</code>）で拒否されること（Chromium）、範囲を絞った一時的なR2の認証情報が自分のサイトの外への書き込みを拒否されつつ、そのサイトは公開できることを確かめました（T15）。</span></li>
         <li><span class="chip open">未実証</span><span>リソースの種類とブラウザをひととおり組み合わせた、外部HTTPの拒否の確認。公開者のプロセスからキャッシュ削除用のトークンを切り離すこと。GitHubのOIDCのロール、AWSでの実際の動作すべて。</span></li>
       </ul>
     </section>

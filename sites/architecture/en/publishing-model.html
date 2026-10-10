@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <meta name="description" content="How site publish converges: desired-state synchronization, digest-based change detection, write ordering, the per-site lock and registry check, failure and retry, cache invalidation, and concurrent publish and unregister.">
+  <meta name="description" content="How site sync converges: desired-state synchronization, digest-based change detection, write ordering, the per-site lock and registry check, failure and retry, cache invalidation, and concurrent sync and withdrawal.">
   <title>Publishing model</title>
   <script>
     // Copy the reader app's theme (same-origin parent) before first paint; assets/site.js keeps it in sync.
@@ -43,14 +43,14 @@
         <p class="eyebrow">Architecture · 03</p>
         <h1>Publishing model</h1>
       </div>
-      <p class="answer"><span class="answer-label">Short answer</span><code>site publish</code> makes the stored site match one source directory. It compares the whole desired projection with what is already at the origin, writes the difference in an order that keeps references intact, and can simply be run again until the site converges. There is no transaction and no rollback.</p>
+      <p class="answer"><span class="answer-label">Short answer</span><code>site sync</code> makes the stored site match one source directory. It compares the whole desired projection with what is already at the origin, writes the difference in an order that keeps references intact, and can simply be run again until the site converges. There is no transaction and no rollback.</p>
     </header>
 
     <figure class="fig" style="--fig-min: 600px; --fig-max: 820px">
-      <div class="fig-head"><strong>One run of <code>site publish</code></strong><span>top to bottom</span></div>
-      <div class="fig-frame" role="group" aria-label="Diagram: one run of site publish">
+      <div class="fig-head"><strong>One run of <code>site sync</code></strong><span>top to bottom</span></div>
+      <div class="fig-frame" role="group" aria-label="Diagram: one run of site sync">
         <svg viewBox="0 0 720 664" role="img" aria-labelledby="pm-run-t pm-run-d">
-          <title id="pm-run-t">One run of site publish</title>
+          <title id="pm-run-t">One run of site sync</title>
           <desc id="pm-run-d">Thirteen steps. With local storage, the publisher first checks that the storage root and the source do not overlap. It then takes the site lock, checks the registry at the origin, builds the projection locally with the registered name and description, and compares it with both site prefixes to make a plan. A dry run takes no lock and stops there. A real run then saves a cache retry record, uploads files, search blobs, the index, the search manifest and the metadata in that order, deletes stale objects, prunes missing preview references, requests cache invalidation, clears the retry record and releases the lock.</desc>
           <text class="ad-lab" x="470" y="30">WHERE</text>
           <text class="ad-lab" x="604" y="30" text-anchor="middle">LOCK</text>
@@ -66,7 +66,7 @@
 
           <circle class="ad-num" cx="30" cy="108" r="11"/><text class="ad-num-t" x="30" y="112" text-anchor="middle">2</text>
           <text class="ad-t" x="52" y="106">Acquire the site lock</text>
-          <text class="ad-mq" x="52" y="124">_control/locks/sites/&lt;site&gt;.json · skipped by --dry-run</text>
+          <text class="ad-mq" x="52" y="124">_control/sites/&lt;site&gt;/lock.json · skipped by --dry-run</text>
           <text class="ad-lab acc" x="470" y="110">ORIGIN</text>
 
           <circle class="ad-num" cx="30" cy="152" r="11"/><text class="ad-num-t" x="30" y="156" text-anchor="middle">3</text>
@@ -90,7 +90,7 @@
 
           <circle class="ad-num" cx="30" cy="312" r="11"/><text class="ad-num-t" x="30" y="316" text-anchor="middle">6</text>
           <text class="ad-t" x="52" y="310">Save the cache retry record</text>
-          <text class="ad-mq" x="52" y="328">_control/site-cache/&lt;site&gt;.json</text>
+          <text class="ad-mq" x="52" y="328">_control/sites/&lt;site&gt;/site-cache.json</text>
           <text class="ad-lab acc" x="470" y="314">ORIGIN</text>
 
           <circle class="ad-num" cx="30" cy="356" r="11"/><text class="ad-num-t" x="30" y="360" text-anchor="middle">7</text>
@@ -134,11 +134,11 @@
         <summary>The diagram as text</summary>
         <ol>
           <li>Only when the target is local storage: resolve the source path from the registry and check, before locking, that the storage directory and the source do not overlap. This early registry read is advisory; the authoritative check is step 3.</li>
-          <li>Acquire the per-site lock <code>_control/locks/sites/&lt;site&gt;.json</code> with a conditional write. A dry run does not.</li>
+          <li>Acquire the per-site lock <code>_control/sites/&lt;site&gt;/lock.json</code> with a conditional write. A dry run does not.</li>
           <li>Read <code>/_indexes/sites.json</code> from the origin, not through the CDN, and require that the site is registered and that the checkout's repository and source path match the registration.</li>
           <li>Collect the source files (regular files only) and build the index, metadata and page text search data in a temporary directory, using the registered name and description.</li>
           <li>List <code>_artifacts/&lt;site&gt;/</code> and <code>_indexes/&lt;site&gt;/</code> completely and compare each desired object's digest and headers. The preview catalog and any outstanding cache retry record are read too. A dry run prints this plan and stops.</li>
-          <li>Save the invalidation paths in <code>_control/site-cache/&lt;site&gt;.json</code>.</li>
+          <li>Save the invalidation paths in <code>_control/sites/&lt;site&gt;/site-cache.json</code>.</li>
           <li>Upload new and changed files.</li>
           <li>Upload search blobs, then <code>index.json</code>.</li>
           <li>Upload the search manifest, then <code>meta.json</code>.</li>
@@ -169,9 +169,9 @@
       <div class="term" aria-label="Plan, then apply">
         <div class="term-head"><span>TERMINAL</span></div>
 <pre><span class="c"># Plan: reads only</span>
-<span class="p">$ </span><span class="v">artifact-pages</span> site publish --site checkout --dry-run
+<span class="p">$ </span><span class="v">artifact-pages</span> site sync --site checkout --dry-run
 <span class="c"># Apply the same plan</span>
-<span class="p">$ </span><span class="v">artifact-pages</span> site publish --site checkout</pre>
+<span class="p">$ </span><span class="v">artifact-pages</span> site sync --site checkout</pre>
       </div>
       <p class="note"><code>checkout</code> is an illustrative site ID. Both commands build page text search data; see <a href="search.html">Search and indexes</a>.</p>
     </section>
@@ -200,66 +200,66 @@
 
     <section class="doc-section" aria-labelledby="lock">
       <h2 id="lock">The site lock and the registry check</h2>
-      <p>Each site has one small lock record, <code>_control/locks/sites/&lt;site&gt;.json</code>, shared by <code>site publish</code>, <code>preview publish</code>, and <code>registry unregister</code>. It is created only if absent and changed only with a compare-and-swap on its ETag, so a recovery that inspected an old state cannot release a newer owner's lock. Different sites use different locks and publish independently.</p>
+      <p>Each site has one small lock record, <code>_control/sites/&lt;site&gt;/lock.json</code>, shared by <code>site sync</code>, <code>preview publish</code>, <code>preview remove</code>, <code>registry sync</code>, and <code>app deploy</code> when it checks formats (bundle with <code>reads</code> or a pinned config). It is created only if absent and changed only with a compare-and-swap on its ETag, so a recovery that inspected an old state cannot release a newer owner's lock. Different sites use different locks and publish independently.</p>
       <p>The registry check runs <strong>after</strong> the lock is held and reads <code>sites.json</code> directly from the origin rather than a cached copy. That closes the gap between “is this source registered?” and “write the objects”. A publisher in another repository does not need the admin's config checkout; it only needs to read the deployed registry.</p>
       <p>This is coordination between Artifact Pages commands, <strong>not a security boundary</strong>. Someone with direct write credentials to the bucket can bypass it. Scoping credentials is a provider setup concern; see <a href="trust-model.html#publishers">Trust model</a>.</p>
     </section>
 
-    <section class="doc-section" aria-labelledby="unregister">
-      <h2 id="unregister">Concurrent publish and unregister</h2>
-      <p><code>registry unregister</code> first removes the site from the deployed registry, which closes the gate to new publishes, then takes the same site lock before deleting the site's prefixes. Either ordering ends in the same state.</p>
+    <section class="doc-section" aria-labelledby="withdrawal">
+      <h2 id="withdrawal">Concurrent sync and withdrawal</h2>
+      <p>There is no separate unregister command: a site is withdrawn by removing it from <code>sites</code> and running <code>registry sync</code>. Before it changes the registry, <code>registry sync</code> takes the lock of every omitted site. It then writes the registry without the site, which closes the gate to new syncs, and deletes the site's prefixes and its control records (except the lock) while still holding the lock. Either ordering ends in the same state.</p>
       <figure class="fig" style="--fig-min: 620px; --fig-max: 860px">
         <div class="fig-head"><strong>Both orderings converge</strong><span>time →</span></div>
-        <div class="fig-frame" role="group" aria-label="Diagram: concurrent publish and unregister">
+        <div class="fig-frame" role="group" aria-label="Diagram: concurrent sync and withdrawal">
           <svg viewBox="0 0 760 352" role="img" aria-labelledby="pm-race-t pm-race-d">
-            <title id="pm-race-t">Concurrent publish and unregister</title>
-            <desc id="pm-race-d">Case A: the publisher holds the lock and finishes writing while unregister, having already removed the registry entry, waits; unregister then takes the lock and deletes the site. Case B: unregister removes the entry and deletes the site first; the publisher then takes the lock, finds the site missing from the registry and exits without writing. Both end unregistered with no site objects.</desc>
+            <title id="pm-race-t">Concurrent sync and withdrawal</title>
+            <desc id="pm-race-d">Case A: the publisher holds the lock and finishes writing while registry sync waits for the same lock; registry sync then removes the registry entry and deletes the site. Case B: registry sync takes the lock first, removes the entry and deletes the site; the publisher then takes the lock, finds the site missing from the registry and exits without writing. Both end with the site withdrawn and no site objects.</desc>
             <defs>
               <marker id="pm-a" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0 0L10 5L0 10z" class="ad-head q"/></marker>
             </defs>
             <text class="ad-t" x="16" y="24">A · The publisher holds the lock first</text>
             <text class="ad-s" x="16" y="74">Publisher</text>
-            <text class="ad-s" x="16" y="134">Unregister</text>
+            <text class="ad-s" x="16" y="134">Registry sync</text>
             <path class="ad-line" d="M110 70 H740" marker-end="url(#pm-a)"/>
             <path class="ad-line" d="M110 130 H740" marker-end="url(#pm-a)"/>
             <rect class="ad-bar" x="140" y="64" width="250" height="12" rx="6"/>
             <circle class="ad-dot" cx="200" cy="70" r="5"/><text class="ad-q" x="200" y="56" text-anchor="middle">registry: present</text>
             <text class="ad-q" x="300" y="56" text-anchor="middle">writes</text>
-            <circle class="ad-dot warn" cx="250" cy="130" r="5"/><text class="ad-q" x="250" y="154" text-anchor="middle">removes entry</text>
-            <path class="ad-flow warn ad-dash" d="M262 130 H398"/>
-            <text class="ad-q" x="330" y="120" text-anchor="middle">waits for the lock</text>
-            <rect class="ad-bar" x="400" y="124" width="250" height="12" rx="6"/>
-            <text class="ad-q" x="470" y="154" text-anchor="middle">deletes prefixes</text>
-            <text class="ad-q" x="590" y="154" text-anchor="middle">invalidates</text>
-            <text class="ad-s ok" x="740" y="24" text-anchor="end">→ unregistered, no site objects</text>
+            <path class="ad-flow warn ad-dash" d="M150 130 H398"/>
+            <text class="ad-q" x="274" y="120" text-anchor="middle">waits for the lock</text>
+            <rect class="ad-bar" x="400" y="124" width="300" height="12" rx="6"/>
+            <circle class="ad-dot warn" cx="414" cy="130" r="5"/><text class="ad-q" x="450" y="154" text-anchor="middle">removes entry</text>
+            <text class="ad-q" x="565" y="154" text-anchor="middle">deletes prefixes</text>
+            <text class="ad-q" x="690" y="154" text-anchor="middle">invalidates</text>
+            <text class="ad-s ok" x="740" y="24" text-anchor="end">→ withdrawn, no site objects</text>
 
-            <text class="ad-t" x="16" y="204">B · Unregister removes the entry first</text>
-            <text class="ad-s" x="16" y="254">Unregister</text>
+            <text class="ad-t" x="16" y="204">B · Registry sync takes the lock first</text>
+            <text class="ad-s" x="16" y="254">Registry sync</text>
             <text class="ad-s" x="16" y="314">Publisher</text>
             <path class="ad-line" d="M110 250 H740" marker-end="url(#pm-a)"/>
             <path class="ad-line" d="M110 310 H740" marker-end="url(#pm-a)"/>
             <circle class="ad-dot warn" cx="150" cy="250" r="5"/><text class="ad-q" x="150" y="236" text-anchor="middle">removes entry</text>
-            <rect class="ad-bar" x="190" y="244" width="230" height="12" rx="6"/>
+            <rect class="ad-bar" x="130" y="244" width="290" height="12" rx="6"/>
             <text class="ad-q" x="260" y="236" text-anchor="middle">deletes prefixes</text>
             <text class="ad-q" x="370" y="236" text-anchor="middle">invalidates</text>
             <path class="ad-flow warn ad-dash" d="M230 310 H428"/>
             <text class="ad-q" x="330" y="334" text-anchor="middle">waits for the lock</text>
             <rect class="ad-bar" x="430" y="304" width="110" height="12" rx="6"/>
             <circle class="ad-dot warn" cx="480" cy="310" r="5"/><text class="ad-q" x="490" y="334" text-anchor="middle">registry: missing → exits, writes nothing</text>
-            <text class="ad-s ok" x="740" y="204" text-anchor="end">→ unregistered, no site objects</text>
+            <text class="ad-s ok" x="740" y="204" text-anchor="end">→ withdrawn, no site objects</text>
           </svg>
         </div>
         <figcaption>Blue bars are periods holding the site lock. The publisher's registry check happens inside its lock, so it cannot write after the projection has been deleted. <span class="fig-scroll">Scroll sideways to see the whole diagram.</span></figcaption>
       </figure>
-      <p>Unregister reports success only after the registry update, the origin deletion, and the cache request have all succeeded, and it is safe to retry if any of them fails. It is eventual consistency, not revocation: an edge may serve a stale response while invalidation propagates, and pages already delivered to a browser cannot be recalled. Whole-registry updates are serialized separately through <code>_control/locks/registry.json</code>.</p>
+      <p><code>registry sync</code> reports success only after the registry update, the origin deletion, and the cache request have all succeeded. It writes its cleanup intent to <code>_control/registry-cleanup.json</code> before it changes the registry or deletes anything, so if a step fails, a later <code>registry sync</code> finishes the cleanup even though the config no longer mentions the site. If a later config adds the site back, its cleanup stops, but its old URLs are still purged from the CDN. It is eventual consistency, not revocation: an edge may serve a stale response while invalidation propagates, and pages already delivered to a browser cannot be recalled. Whole-registry updates are serialized separately through <code>_control/locks/registry.json</code>.</p>
     </section>
 
     <section class="doc-section" aria-labelledby="proof">
       <h2 id="proof">What has been proven</h2>
       <ul class="proof">
-        <li><span class="chip local">Proven locally</span><span>With deterministic local and fake backends (T14, T5): both publish/unregister orderings; failures injected during artifact upload, <code>index.json</code> and <code>meta.json</code> replacement, and partial stale deletion, each followed by a converging retry; aborting when either listing fails; AWS listing pagination and 1,000-key delete batches with per-object failures; guarded stale-lock recovery; a second process waiting on a held lock; and zero-document sites.</span></li>
-        <li><span class="chip sampled">Sampled on Cloudflare</span><span>A disposable site was registered, published, previewed, retried, and unregistered against the live R2 deployment on 2026-10-01, and an R2 compare-and-swap race produced exactly one winner. On 2026-10-02, an interrupted <code>preview publish</code> left its lock held, <code>lock recover</code> with the observed ETag freed it, and the retry succeeded; a stale process that had lost the lock was rejected before replacing the catalog. Publishing with temporary scoped credentials (including the site lock and cache retry record) also worked (T15). These are samples, not the complete provider proof.</span></li>
-        <li><span class="chip open">Not yet proven</span><span>Concurrent <code>site publish</code> runs for different sites across processes against a real provider, and real S3 and R2 conditional-write and interruption-recovery runs of <code>site publish</code> with provider cache behavior (T14). No live AWS run.</span></li>
+        <li><span class="chip local">Proven locally</span><span>With deterministic local and fake backends (T14, T5): both orderings of a sync and a site withdrawal; failures injected during artifact upload, <code>index.json</code> and <code>meta.json</code> replacement, and partial stale deletion, each followed by a converging retry; aborting when either listing fails; AWS listing pagination and 1,000-key delete batches with per-object failures; guarded stale-lock recovery; a second process waiting on a held lock; and zero-document sites.</span></li>
+        <li><span class="chip sampled">Sampled on Cloudflare</span><span>A disposable site was registered, published, previewed, retried, and withdrawn (with the separate withdrawal command of the time, since folded into <code>registry sync</code>) against the live R2 deployment on 2026-10-01, and an R2 compare-and-swap race produced exactly one winner. On 2026-10-02, an interrupted <code>preview publish</code> left its lock held, <code>lock recover</code> with the observed ETag freed it, and the retry succeeded; a stale process that had lost the lock was rejected before replacing the catalog. Publishing with temporary scoped credentials (including the site lock and cache retry record) also worked (T15). These are samples, not the complete provider proof.</span></li>
+        <li><span class="chip open">Not yet proven</span><span>Concurrent <code>site sync</code> runs for different sites across processes against a real provider, and real S3 and R2 conditional-write and interruption-recovery runs of <code>site sync</code> with provider cache behavior (T14). No live AWS run.</span></li>
       </ul>
     </section>
 
