@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <meta name="description" content="Git Artifact Pagesでチームのサイトを公開する方法。公開するディレクトリ、site publish、本文検索、反映のタイミング、CI、プレビュー。">
+  <meta name="description" content="Git Artifact Pagesでチームのサイトを公開する方法。公開するディレクトリ、site sync、本文検索、反映のタイミング、CI、プレビュー。">
   <title>サイトの公開</title>
   <script>
     // Copy the reader app's theme (same-origin parent) before first paint; assets/site.js keeps it in sync.
@@ -30,7 +30,7 @@
         <p class="eyebrow">公開するチーム向け</p>
         <h1>サイトの公開</h1>
       </div>
-      <p class="lead">各チームは、自分のGitリポジトリにある1つのディレクトリから、自分のサイトを公開します。このページでは、そのディレクトリに置くもの、<code>site publish</code>コマンド、CIからの実行、プレビューを説明します。</p>
+      <p class="lead">各チームは、自分のGitリポジトリにある1つのディレクトリから、自分のサイトを公開します。このページでは、そのディレクトリに置くもの、<code>site sync</code>コマンド、CIからの実行、プレビューを説明します。</p>
     </header>
 
     <div class="callout" role="note">
@@ -71,16 +71,16 @@
     </section>
 
     <section class="doc-section" aria-labelledby="publish">
-      <h2 id="publish"><code>site publish</code>で公開する</h2>
+      <h2 id="publish"><code>site sync</code>で公開する</h2>
       <p>登録したリポジトリをチェックアウトした場所で実行します。まず<code>--dry-run</code>で変更内容を確かめてから公開します。</p>
-      <div class="term" aria-label="site publishのコマンド例">
+      <div class="term" aria-label="site syncのコマンド例">
         <div class="term-head"><span>ターミナル / acme/checkout</span><button class="copy-btn" type="button">コピー</button></div>
 <pre><span class="c"># 何が変わるかを確認（何も書き込みません）</span>
-<span class="p">$</span> <span data-copy>artifact-pages <span class="v">site publish</span> --site checkout --source docs/artifacts --dry-run</span>
+<span class="p">$</span> <span data-copy>artifact-pages <span class="v">site sync</span> --site checkout --source docs/artifacts --dry-run</span>
 <span class="c"># 公開する</span>
-<span class="p">$</span> <span data-copy>artifact-pages <span class="v">site publish</span> --site checkout --source docs/artifacts</span></pre>
+<span class="p">$</span> <span data-copy>artifact-pages <span class="v">site sync</span> --site checkout --source docs/artifacts</span></pre>
       </div>
-      <ol class="flow" style="--steps: 4" aria-label="site publishが行うこと（順番）">
+      <ol class="flow" style="--steps: 4" aria-label="site syncが行うこと（順番）">
         <li><strong>インデックスを作る</strong><p>ディレクトリを読み、タイトル、見出し、日付などのページのインデックスを作ります。</p></li>
         <li><strong>登録を確認する</strong><p>配信先からサイトの登録情報を読みます。リポジトリとディレクトリが登録と一致しなければ、何も書き込みません。</p></li>
         <li><strong>同期する</strong><p>新しいファイルと変わったファイルを送り、インデックスを差し替え、最後にディレクトリから消えたファイルを削除します。</p></li>
@@ -93,16 +93,18 @@
           <tr><td><code>--site ID</code></td><td><span class="pill on">必須</span></td><td>登録されたサイトのID。リポジトリ名から推測はしません。</td></tr>
           <tr><td><code>--source DIR</code></td><td><span class="pill">任意</span></td><td>公開するディレクトリ。リポジトリのルートからのパスが、登録した<code>sourcePath</code>と一致する必要があります。省略すると登録されたパスを使います。</td></tr>
           <tr><td><code>--config LOCATOR</code></td><td><span class="pill">任意</span></td><td>配信先を指定する設定ファイル。サテライトリポジトリは、管理リポジトリの<code>github://</code>の指定を渡します（<a href="configuration.html#remote">リモートの設定ファイル</a>）。省略したときの選ばれ方は「<a href="configuration.html#precedence">設定ファイル</a>」を参照してください。</td></tr>
+          <tr><td><code>--ref REF</code></td><td><span class="pill">任意</span></td><td>サイトのインデックスに記録する<code>source.ref</code>のメタデータだけを上書きします。チェックアウトや公開するファイルは変わりません。空にすると、チェックアウトから推定したブランチまたはコミットのままです。</td></tr>
+          <tr><td><code>--reconcile</code></td><td><span class="pill">任意</span></td><td>配信先にあるファイルの全体を、すべての本体をダウンロードせず、オブジェクトのメタデータで照合します。</td></tr>
           <tr><td><code>--dry-run</code></td><td><span class="pill">任意</span></td><td>書き込み、削除、キャッシュ更新の依頼をせずに、変更内容だけを表示します。</td></tr>
           <tr><td><code>--format text|json</code></td><td><span class="pill">任意</span></td><td><code>json</code>にすると、変更の全一覧を返します。CI向けです。</td></tr>
         </tbody>
       </table></div>
-      <p>テキストの出力は、先頭に結果（<code>DRY RUN</code>、<code>PUBLISHED</code>、<code>UP TO DATE</code>）を示し、追加・更新・削除したパスをグループごとに最大12件まで並べます。終了コードは、計画・公開・変更なしのとき<code>0</code>、オプションや設定が不正なとき<code>2</code>、公開に失敗したとき<code>1</code>です。</p>
+      <p>テキストの出力は、先頭に結果（<code>DRY RUN</code>、<code>SYNCED</code>、<code>UP TO DATE</code>）を示し、追加・更新・削除したパスをグループごとに最大12件まで並べます。終了コードは、計画・公開・変更なしのとき<code>0</code>、オプションや設定が不正なとき<code>2</code>、同期に失敗したとき<code>1</code>です。</p>
     </section>
 
     <section class="doc-section" aria-labelledby="page-text-search">
       <h2 id="page-text-search">本文検索</h2>
-      <p><code>site publish</code>は、閲覧アプリの本文検索が使うデータも毎回作って公開します。省く指定はありません。そのサイトの読者は、サイドバーの検索欄と<kbd>⌘⇧F</kbd>を使えます。それより前のバージョンで公開したサイトは、公開し直すと本文検索が使えるようになります。</p>
+      <p><code>site sync</code>は、閲覧アプリの本文検索が使うデータも毎回作って公開します。省く指定はありません。そのサイトの読者は、サイドバーの検索欄と<kbd>⌘⇧F</kbd>を使えます。それより前のバージョンで公開したサイトは、公開し直すと本文検索が使えるようになります。</p>
       <p>検索の対象は、HTMLならタイトルと静的な本文、Markdownならタイトルと表示される本文（コードブロックを含む）です。スクリプトが作る文字、画像の<code>alt</code>、パスは対象外です。CSSで隠しただけの文字は対象になります。ナビゲーションのように毎ページ繰り返す文字を除くには、その要素に<code>hidden</code>、<code>aria-hidden="true"</code>、<code>data-search-ignore</code>のいずれかを付けます。</p>
     </section>
 
@@ -123,12 +125,12 @@
         <li><div><h3>プルリクエストで：変更を確認する</h3><p>読み取り専用の認証情報で、<code>--dry-run</code>を付けて実行します。JSONの結果に、変わる内容がすべて出ます。</p>
           <div class="term" aria-label="CIでのドライランのコマンド例">
             <div class="term-head"><span>CI / プルリクエスト</span><button class="copy-btn" type="button">コピー</button></div>
-<pre><span class="p">$</span> <span data-copy>artifact-pages <span class="v">site publish</span> --site checkout --source docs/artifacts --config github://acme/platform-admin/artifact-pages.yaml --dry-run --format json</span></pre>
+<pre><span class="p">$</span> <span data-copy>artifact-pages <span class="v">site sync</span> --site checkout --source docs/artifacts --config github://acme/platform-admin/artifact-pages.yaml --dry-run --format json</span></pre>
           </div></div></li>
         <li><div><h3>マージ後に：公開する</h3><p>このサイトだけに書き込める認証情報で、<code>--dry-run</code>を外して実行します。</p>
           <div class="term" aria-label="CIでの公開のコマンド例">
             <div class="term-head"><span>CI / デフォルトブランチ</span><button class="copy-btn" type="button">コピー</button></div>
-<pre><span class="p">$</span> <span data-copy>artifact-pages <span class="v">site publish</span> --site checkout --source docs/artifacts --config github://acme/platform-admin/artifact-pages.yaml --format json</span></pre>
+<pre><span class="p">$</span> <span data-copy>artifact-pages <span class="v">site sync</span> --site checkout --source docs/artifacts --config github://acme/platform-admin/artifact-pages.yaml --format json</span></pre>
           </div></div></li>
       </ol>
       <ul>
@@ -137,7 +139,7 @@
       </ul>
 
       <h3 id="github-actions">GitHub Actionsで実行する</h3>
-      <p>公開用のAction、<code>artifact-pages/publish-action</code>は、同じ公開を実行します。最初にブートストラップのCLIをインストールし、そのうえで管理リポジトリの設定ファイルに書かれたリリースのCLIを動かします（「<a href="versions.html#actions">バージョンの固定と更新</a>」を参照）。オプションは入力として受け取ります。入力は<code>site</code>（必須）、<code>source</code>、<code>config</code>、<code>dry-run</code>です。次のワークフローは、プルリクエストでは変更計画だけを確認し、<code>main</code>へのマージ後に公開します。</p>
+      <p>公開用のAction、<code>artifact-pages/publish-action</code>は、同じ公開を実行します。最初にブートストラップのCLIをインストールし、そのうえで管理リポジトリの設定ファイルに書かれたリリースのCLIを動かします（「<a href="versions.html#actions">バージョンの固定と更新</a>」を参照）。オプションは入力として受け取ります。入力は<code>site</code>（必須）、<code>source</code>、<code>ref</code>（<code>--ref</code>のメタデータ）、<code>config</code>、<code>dry-run</code>のほか、<code>cli-version</code>、<code>github-token</code>、<code>publish-on</code>、<code>summary</code>、<code>checkout</code>、<code>fetch-depth</code>があります（後で説明します）。次のワークフローは、プルリクエストでは変更計画だけを確認し、<code>main</code>へのマージ後に公開します。</p>
       <div class="term" aria-label="サイトを公開するGitHub Actionsのワークフロー例">
         <div class="term-head"><span>.github/workflows/publish-docs.yml / acme/checkout</span><button class="copy-btn" type="button">コピー</button></div>
 <pre><span class="k">name</span>: Publish docs
@@ -179,7 +181,8 @@
         <li><strong>公開は1つずつ実行します。</strong>サイトのロックを持てる公開は1つだけなので、<code>concurrency</code>のグループで公開を1つずつ実行します（待っている実行は、新しいプッシュの実行に置き換わります）。</li>
         <li><strong>設定の固定</strong>は任意です。<code>?ref=</code>を付けないと、管理リポジトリのデフォルトブランチを実行の最初に1つのコミットに決め、その実行の最後まで使います。コミットを固定したいときは、指定の末尾に<code>?ref=&lt;完全なコミットSHA&gt;</code>を付けます。</li>
         <li><strong>管理リポジトリが非公開なら</strong>、既定ではこのワークフローのトークンで読みにいきますが、別の非公開リポジトリは読めません。管理リポジトリを読み取れるトークンを<code>github-token</code>の入力で渡します。GitHub Appでトークンを発行する方法は、<a href="configuration.html#remote-private">設定ファイル</a>のページにあります。</li>
-        <li><strong>結果</strong>は出力で受け取れます。<code>outcome</code>（<code>planned</code>、<code>published</code>、<code>no-op</code>、<code>failed</code>）、<code>changes</code>、<code>result</code>などです。</li>
+        <li><strong>結果</strong>は出力で受け取れます。<code>outcome</code>（<code>planned</code>、<code>synced</code>、<code>no-op</code>、<code>failed</code>）、<code>changes</code>、<code>preview-changes</code>、<code>result</code>のほか、<code>operation</code>、<code>site</code>、<code>exit-code</code>、<code>error</code>があります。<code>summary: true</code>（既定）のときは、失敗した実行でもJob Summaryを書き出します。</li>
+        <li><strong>イベントによってドライランにできます。</strong><code>publish-on</code>には、<code>event</code>または<code>event:ref</code>の形（たとえば<code>push:refs/heads/main</code>）を改行区切りで並べます。どれにも当てはまらない実行はドライランになり、<code>dry-run: true</code>を明示したときは常にそちらが優先されます。空なら条件なしです。<code>checkout</code>は前の項目、<code>fetch-depth</code>は下の「<a href="#shallow">浅いチェックアウトと日付</a>」、<code>github-token</code>は非公開の管理リポジトリ（上）、<code>cli-version</code>は「<a href="versions.html#override">CLIを1回だけ変えて実行する</a>」を参照してください。</li>
         <li><strong>ほかのAction</strong>は、別々のリポジトリで独自のタグを持ちます。レジストリには<code>artifact-pages/registry-action</code>、<code>app deploy</code>には<code>artifact-pages/app-deploy-action</code>、プレビューには<code>artifact-pages/preview-action</code>を使います。</li>
       </ul>
       <p class="note"><code>acme/checkout</code>と<code>acme/platform-admin</code>は説明用の例です。<code>vX.Y.Z</code>と<code>&lt;full commit SHA&gt;</code>は実際の値に置き換えてください。</p>
@@ -240,7 +243,7 @@
           <tr><td>サイトが登録されていない</td><td>エラーに登録済みのサイトIDが並びます。<code>--site</code>と設定ファイルの配信先を確かめるか、管理者にサイトの登録を依頼します。</td></tr>
           <tr><td>「registered to … selected checkout is …」</td><td>リポジトリかディレクトリが登録と違います。登録したリポジトリのチェックアウトで、登録したディレクトリを指定して実行します。</td></tr>
           <tr><td>公開元にシンボリックリンクがある</td><td>実体のファイルに置き換えるか、ディレクトリの外へ移します。</td></tr>
-          <tr><td>サイトのロックが取られている</td><td>同じサイトの公開か登録解除が実行中です。しばらくして再実行します。途中で止まった実行がロックを残した場合は、管理者が<code>lock inspect --site</code>で確認し、<code>lock recover</code>で解除します。</td></tr>
+          <tr><td>サイトのロックが取られている</td><td>同じサイトの公開か、このサイトを変える<code>registry sync</code>が実行中です。しばらくして再実行します。途中で止まった実行がロックを残した場合は、管理者が<code>lock inspect --site</code>で確認し、<code>lock recover</code>で解除します。</td></tr>
           <tr><td>一部を変更したあとで失敗した</td><td>原因を直して同じコマンドをもう一度実行します。残りの変更が反映されます。</td></tr>
         </tbody>
       </table></div>

@@ -72,7 +72,7 @@
 
     <section class="doc-section" aria-labelledby="follow">
       <h2 id="follow">サイトが追従するしくみ</h2>
-      <p>サイトのリポジトリは、CLIを選びません。サイトのワークフローは、次の<code>site sync</code>（ほかのページではまだ改訂前の<code>site publish</code>という名前で書かれています）や<code>preview publish</code>で、<a href="configuration.html#remote"><code>github://</code>の指定</a>で参照している管理リポジトリの設定ファイルを読み、そこに書かれたCLIで動きます。<code>cli.version</code>を1回上げるだけで、各Actionの対応する範囲内であれば全サイトが移り、サイトのリポジトリにプルリクエストを出す必要はありません（<a href="#actions">後の節</a>）。</p>
+      <p>サイトのリポジトリは、CLIを選びません。サイトのワークフローは、次の<code>site sync</code>や<code>preview publish</code>で、<a href="configuration.html#remote"><code>github://</code>の指定</a>で参照している管理リポジトリの設定ファイルを読み、そこに書かれたCLIで動きます。<code>cli.version</code>を1回上げるだけで、各Actionの対応する範囲内であれば全サイトが移り、サイトのリポジトリにプルリクエストを出す必要はありません（<a href="#actions">後の節</a>）。</p>
       <ul>
         <li><strong>書き込む側は、配置済みの閲覧アプリを確認します。</strong><code>registry sync</code>、<code>site sync</code>、<code>preview publish</code>は、配置済みの閲覧アプリが読めるデータ形式を調べ、そのCLIが書く形式を読めなければ、書き込む前に止まります。そのため、閲覧アプリに表示できないページを新しいCLIが公開することはありません。ただし、<code>registry sync --accept-breaking</code>で明示的に受け入れた場合は別です（<a href="#breaking">後の節</a>）。閲覧アプリがまだ置かれていないときは、<code>web.version</code>のリリースのマニフェストに書かれた形式と照合します。レガシーの設定ファイルは確認されません。</li>
         <li><strong>プレビューでCLIを変えることはできません。</strong>プレビューのActionは、信頼の事前確認のあとでCLIを決め、リポジトリが持つ設定ファイルは信頼できるベースのコミットから読みます。そのため、プルリクエストで書き換えても、動くCLIは変わりません。明示的に指定した外部の管理者用ファイルとリモートの指定は、それ自身の権限で読まれます。</li>

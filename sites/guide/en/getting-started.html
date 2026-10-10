@@ -35,26 +35,25 @@
 
     <section class="doc-section" aria-labelledby="install">
       <h2 id="install">Install the CLI</h2>
-      <p>One command, <code>artifact-pages</code>, does all the work: it deploys the reader app, registers sites, and publishes them. It is a Go program built from its released source. There is no standalone binary to download.</p>
-      <h3 id="install-mise">With mise (recommended)</h3>
-      <p><a href="https://mise.jdx.dev/dev-tools/backends/go.html" target="_blank" rel="noopener">mise's Go backend</a> builds the command with <code>go install</code> and keeps the version you choose. <code>-g</code> installs it for your user, in every directory.</p>
-      <div class="term" aria-label="Install the CLI with mise">
-        <div class="term-head"><span>TERMINAL / mise</span><button class="copy-btn" type="button">Copy</button></div>
-<pre><span class="p">$</span> <span data-copy>mise use -g go:github.com/tasuku43/git-artifact-pages/cli/cmd/artifact-pages@x.y.z</span>
+      <p>One command, <code>artifact-pages</code>, does all the work: it deploys the reader app, registers sites, and publishes them. Each CLI release on <a href="https://github.com/artifact-pages/artifact-pages/releases" target="_blank" rel="noopener">GitHub Releases</a> ships a standalone binary for Linux and macOS on amd64 and arm64, with a checksums file. Windows is not supported. The commands in this guide need CLI 0.2.0 or later; the 0.1.0 binaries have the same file names but the older command names.</p>
+      <div class="term" aria-label="Install the CLI from a release">
+        <div class="term-head"><span>TERMINAL / INSTALL</span><button class="copy-btn" type="button">Copy</button></div>
+<pre><span class="p">$</span> <span data-copy>VERSION=0.2.0</span>
+<span class="p">$</span> <span data-copy>OS=$(uname -s | tr '[:upper:]' '[:lower:]')</span>
+<span class="p">$</span> <span data-copy>ARCH=$(uname -m | sed -e 's/x86_64/amd64/' -e 's/aarch64/arm64/')</span>
+<span class="p">$</span> <span data-copy>BASE=https://github.com/artifact-pages/artifact-pages/releases/download/v$VERSION</span>
+<span class="p">$</span> <span data-copy>curl -fsSLO "$BASE/artifact-pages_v${VERSION}_${OS}_${ARCH}"</span>
+<span class="p">$</span> <span data-copy>curl -fsSLO "$BASE/artifact-pages_v${VERSION}_checksums.txt"</span>
+<span class="p">$</span> <span data-copy>grep "artifact-pages_v${VERSION}_${OS}_${ARCH}\$" "artifact-pages_v${VERSION}_checksums.txt" | shasum -a 256 -c -</span>
+<span class="p">$</span> <span data-copy>install -m 0755 "artifact-pages_v${VERSION}_${OS}_${ARCH}" ~/.local/bin/artifact-pages</span>
 <span class="p">$</span> <span data-copy>artifact-pages version</span></pre>
       </div>
       <ul>
-        <li><strong>Write the version without a leading <code>v</code></strong> (<code>x.y.z</code>), as <code>mise ls-remote go:github.com/tasuku43/git-artifact-pages/cli/cmd/artifact-pages</code> lists it. A very recent release may not be listed yet, because mise holds back new releases for a minimum age, but naming its version from GitHub Releases still installs it.</li>
-        <li><strong>It needs Go 1.26 or later.</strong> If you don't have Go yet, add <code>go@1.26</code> to the same <code>mise use</code> command and mise installs both.</li>
-        <li><strong>mise must be active in your shell</strong> (or its shims on your <code>PATH</code>) for <code>artifact-pages</code> to be found.</li>
+        <li><strong><code>0.2.0</code> is an example release version</strong>, written here without the leading <code>v</code> that the tag and the file names carry. The binary is the release asset <code>artifact-pages_vX.Y.Z_&lt;os&gt;_&lt;arch&gt;</code> with <code>&lt;os&gt;</code> <code>linux</code> or <code>darwin</code> and <code>&lt;arch&gt;</code> <code>amd64</code> or <code>arm64</code>. It is not archived, so there is nothing to unpack.</li>
+        <li><strong>The checksum step must print <code>OK</code>.</strong> The checksums file comes from the same release as the binary, so it detects a corrupted download or a partial upload, not a compromised release. On Linux without <code>shasum</code>, use <code>sha256sum -c -</code> instead. Do not run a binary that fails it.</li>
+        <li><strong>Put the binary on your <code>PATH</code>.</strong> Any directory works; <code>~/.local/bin</code> is an example and must exist.</li>
+        <li><strong>The installed CLI is a starting point.</strong> When the config names <code>cli.version</code>, the installed command downloads that release, checks its checksum, and runs it (see below). The release also carries the licenses of the bundled Go modules and a compatibility file, <code>artifact-pages_vX.Y.Z_compatibility.json</code>.</li>
       </ul>
-      <h3 id="install-go">With <code>go install</code></h3>
-      <p>The same release without mise. Here the version is the release tag, with its <code>v</code>.</p>
-      <div class="term" aria-label="Install the CLI with go install">
-        <div class="term-head"><span>TERMINAL / go install</span><button class="copy-btn" type="button">Copy</button></div>
-<pre><span class="p">$</span> <span data-copy>go install github.com/tasuku43/git-artifact-pages/cli/cmd/artifact-pages@vX.Y.Z</span></pre>
-      </div>
-      <p class="note">Go puts the command in its <code>bin</code> directory (<code>go env GOBIN</code>, or <code>bin</code> under <code>go env GOPATH</code>); make sure it is on your <code>PATH</code>. <code>x.y.z</code> stands for a release version; releases are listed on <a href="https://github.com/tasuku43/git-artifact-pages/releases" target="_blank" rel="noopener">GitHub Releases</a>. A Homebrew formula is planned but not available yet.</p>
       <div class="callout" role="note">
         <span class="ico">VERSIONS</span>
         <div>
@@ -84,7 +83,7 @@
       <p>This walkthrough uses Cloudflare as the delivery target and ends with a first site you can read. The admin repository <code>acme/platform-admin</code> and the team repository <code>acme/checkout</code> are illustrative. On AWS the flow and commands are the same; only steps 1 and 2 differ (<a href="#other-targets">Other delivery targets</a>).</p>
       <ol class="timeline">
         <li><div><h3>Set up the delivery target</h3><p>Create one private R2 bucket and connect it to the hostname readers will use (<code>docs.example.com</code> in the examples). Also configure routing to the reader app, blocking of <code>/_control/</code>, cache rules and preview retention. Artifact Pages commands do not create these; set them up with Terraform or similar. The product repository has Terraform modules for this. For the admin, also prepare an R2 access key and secret and an API token that can purge the cache.</p>
-          <p class="note">For the detailed steps, see <a href="https://github.com/tasuku43/git-artifact-pages/blob/main/docs/guides/cloudflare-deployment.md" target="_blank" rel="noopener">Cloudflare deployment</a> in the product repository.</p>
+          <p class="note">For the detailed steps, see <a href="https://github.com/artifact-pages/artifact-pages/blob/main/docs/guides/cloudflare-deployment.md" target="_blank" rel="noopener">Cloudflare deployment</a> in the product repository.</p>
           
           <figure class="concept" role="group" aria-label="State after step 1"><figcaption>State after step 1</figcaption><div class="concept-row"><div class="cbox r-admin"><div class="cbox-h">Admin repository<small>acme/platform-admin</small></div><ul><li class="r-admin todo">Config file<span class="sr-only"> (not yet)</span><em aria-hidden="true">2</em></li></ul></div><span class="to" aria-hidden="true">→</span><div class="cbox r-store"><div class="cbox-h">Delivery target<small>Cloudflare</small></div><ul><li class="r-store now">Storage and CDN<span class="sr-only"> (added in this step)</span><em aria-hidden="true">this step</em></li><li class="r-admin todo">Reader app<span class="sr-only"> (not yet)</span><em aria-hidden="true">3</em></li><li class="r-admin todo">Site registry<span class="sr-only"> (not yet)</span><em aria-hidden="true">4</em></li><li class="r-team todo">Published pages<span class="sr-only"> (not yet)</span><em aria-hidden="true">5</em></li></ul></div><span class="to" aria-hidden="true">←</span><div class="cbox r-team"><div class="cbox-h">Team repository<small>acme/checkout</small></div><ul><li class="r-team done">Pages<span class="sr-only"> (done)</span></li></ul></div></div></figure></div></li>
         <li><div><h3>Write <code>artifact-pages.yaml</code> in the admin repository</h3><p>Name <code>cloudflare</code> as the delivery target, name the reader app release in <code>web.version</code> (<code>x.y.z</code> stands for a release version), and list the sites under <code>sites</code>. <code>repository</code> is the team repository&#39;s <code>owner/repo</code>, and <code>sourcePath</code> is the directory relative to its root. If the bucket is not named <code>artifact-pages</code>, add <code>bucket</code> (see <a href="configuration.html#provider-cloudflare">cloudflare</a>).</p>
@@ -117,15 +116,15 @@
         <li><div><h3>Register the site</h3><p>Writes the site registry from the <code>sites</code> mapping to the delivery target. The site now exists, with no pages yet.</p>
           <div class="term" aria-label="Register the site">
             <div class="term-head"><span>Terminal / acme/platform-admin</span><button class="copy-btn" type="button">Copy</button></div>
-<pre><span class="p">$</span> <span data-copy>artifact-pages <span class="v">registry register</span> --config artifact-pages.yaml --dry-run</span>
-<span class="p">$</span> <span data-copy>artifact-pages <span class="v">registry register</span> --config artifact-pages.yaml</span></pre>
+<pre><span class="p">$</span> <span data-copy>artifact-pages <span class="v">registry sync</span> --config artifact-pages.yaml --dry-run</span>
+<span class="p">$</span> <span data-copy>artifact-pages <span class="v">registry sync</span> --config artifact-pages.yaml</span></pre>
           </div>
           <figure class="concept" role="group" aria-label="State after step 4"><figcaption>State after step 4</figcaption><div class="concept-row"><div class="cbox r-admin"><div class="cbox-h">Admin repository<small>acme/platform-admin</small></div><ul><li class="r-admin done">Config file<span class="sr-only"> (done)</span><em aria-hidden="true">2</em></li></ul></div><span class="to" aria-hidden="true">→</span><div class="cbox r-store"><div class="cbox-h">Delivery target<small>Cloudflare</small></div><ul><li class="r-store done">Storage and CDN<span class="sr-only"> (done)</span><em aria-hidden="true">1</em></li><li class="r-admin done">Reader app<span class="sr-only"> (done)</span><em aria-hidden="true">3</em></li><li class="r-admin now">Site registry<span class="sr-only"> (added in this step)</span><em aria-hidden="true">this step</em></li><li class="r-team todo">Published pages<span class="sr-only"> (not yet)</span><em aria-hidden="true">5</em></li></ul></div><span class="to" aria-hidden="true">←</span><div class="cbox r-team"><div class="cbox-h">Team repository<small>acme/checkout</small></div><ul><li class="r-team done">Pages<span class="sr-only"> (done)</span></li></ul></div></div></figure></div></li>
         <li><div><h3>Publish from the team repository</h3><p>Put at least one <code>.html</code> or <code>.md</code> page in <code>docs/artifacts</code> of <code>acme/checkout</code>. Publishing reads dates from Git history, so it fails in a repository with no commits. The repository has no config file; pass a <code>github://</code> locator for the admin repository&#39;s file to <code>--config</code>. You can pin it to one commit with <code>?ref=</code>. The CLI reads the registry on the delivery target, checks the repository and directory against it, then copies the pages and builds the site&#39;s index. It also builds the data for page text search every time.</p>
           <div class="term" aria-label="Publish from the team repository">
             <div class="term-head"><span>Terminal / acme/checkout</span><button class="copy-btn" type="button">Copy</button></div>
-<pre><span class="p">$</span> <span data-copy>artifact-pages <span class="v">site publish</span> --site checkout --source docs/artifacts --config github://acme/platform-admin/artifact-pages.yaml --dry-run</span>
-<span class="p">$</span> <span data-copy>artifact-pages <span class="v">site publish</span> --site checkout --source docs/artifacts --config github://acme/platform-admin/artifact-pages.yaml</span></pre>
+<pre><span class="p">$</span> <span data-copy>artifact-pages <span class="v">site sync</span> --site checkout --source docs/artifacts --config github://acme/platform-admin/artifact-pages.yaml --dry-run</span>
+<span class="p">$</span> <span data-copy>artifact-pages <span class="v">site sync</span> --site checkout --source docs/artifacts --config github://acme/platform-admin/artifact-pages.yaml</span></pre>
           </div>
           <p>It needs the R2 access key and secret, and the API token for runs that change the site. The first run can be from your machine; after that, run it from CI after merges. <a href="publishing.html#github-actions">Publishing</a> has a GitHub Actions workflow you can start from. If the admin repository is private, it is read with <code>GITHUB_TOKEN</code> or <code>GH_TOKEN</code>.</p>
           <figure class="concept" role="group" aria-label="State after step 5"><figcaption>State after step 5</figcaption><div class="concept-row"><div class="cbox r-admin"><div class="cbox-h">Admin repository<small>acme/platform-admin</small></div><ul><li class="r-admin done">Config file<span class="sr-only"> (done)</span><em aria-hidden="true">2</em></li></ul></div><span class="to" aria-hidden="true">→</span><div class="cbox r-store"><div class="cbox-h">Delivery target<small>Cloudflare</small></div><ul><li class="r-store done">Storage and CDN<span class="sr-only"> (done)</span><em aria-hidden="true">1</em></li><li class="r-admin done">Reader app<span class="sr-only"> (done)</span><em aria-hidden="true">3</em></li><li class="r-admin done">Site registry<span class="sr-only"> (done)</span><em aria-hidden="true">4</em></li><li class="r-team now">Published pages<span class="sr-only"> (added in this step)</span><em aria-hidden="true">this step</em></li></ul></div><span class="to" aria-hidden="true">←</span><div class="cbox r-team"><div class="cbox-h">Team repository<small>acme/checkout</small></div><ul><li class="r-team done">Pages<span class="sr-only"> (done)</span></li></ul></div></div></figure></div></li>
@@ -133,7 +132,7 @@
           
           <figure class="concept" role="group" aria-label="State after step 6"><figcaption>State after step 6</figcaption><div class="concept-row rv"><div class="cbox r-store"><div class="cbox-h">Delivery target<small>Cloudflare</small></div><ul><li class="r-admin done">Reader app<span class="sr-only"> (done)</span></li><li class="r-admin done">Site registry<span class="sr-only"> (done)</span></li><li class="r-team done">Published pages<span class="sr-only"> (done)</span></li></ul></div><span class="to" aria-hidden="true">→</span><div class="rv-browser"><span class="sr-only">The reader app opens in the browser and shows the Payments / Checkout page</span><div class="rv-bar" aria-hidden="true"><i></i><i></i><i></i><code>docs.example.com/checkout/payment-flow.md</code></div><div class="rv-body" aria-hidden="true"><div class="rv-side"><b>Payments / Checkout</b><span class="on">Payment flow design</span></div><div class="rv-doc"><b>Payment flow design</b><p>How a card payment moves through checkout.</p></div></div></div></div></figure></div></li>
       </ol>
-      <p>To change the site, edit or delete files in the directory and run the same <code>site publish</code>. It uploads changed files and removes the ones that are gone.</p>
+      <p>To change the site, edit or delete files in the directory and run the same <code>site sync</code>. It uploads changed files and removes the ones that are gone.</p>
     </section>
 
     <section class="doc-section" aria-labelledby="other-targets">
@@ -192,7 +191,7 @@
             <div class="term-head"><span>Terminal / acme/checkout</span><button class="copy-btn" type="button">Copy</button></div>
 <pre><span class="p">$</span> <span data-copy>docker compose up -d</span></pre>
           </div>
-          <p>Open <code>http://localhost:8080/</code>. This is a minimal configuration for trying things out; the product repository&#39;s <a href="https://github.com/tasuku43/git-artifact-pages/blob/main/docker/nginx/default.conf" target="_blank" rel="noopener"><code>docker/nginx/default.conf</code></a> adds per-site CSP and cache headers. To start over, delete <code>.local/storage</code>.</p>
+          <p>Open <code>http://localhost:8080/</code>. This is a minimal configuration for trying things out; the product repository&#39;s <a href="https://github.com/artifact-pages/artifact-pages/blob/main/docker/nginx/default.conf" target="_blank" rel="noopener"><code>docker/nginx/default.conf</code></a> adds per-site CSP and cache headers. To start over, delete <code>.local/storage</code>.</p>
         </div>
       </details>
     </section>
@@ -203,7 +202,7 @@
       </div>
       <ul class="cards four">
         <li><a class="card" href="reading.html"><span class="tag">READERS</span><h3>Reading</h3><p>What you just opened: URLs, the screen, search, and switching sites.</p><span class="go">Reading →</span></a></li>
-        <li><a class="card" href="publishing.html"><span class="tag">TEAMS</span><h3>Publishing</h3><p>What goes in the directory, <code>site publish</code>, CI, and previews.</p><span class="go">Publishing →</span></a></li>
+        <li><a class="card" href="publishing.html"><span class="tag">TEAMS</span><h3>Publishing</h3><p>What goes in the directory, <code>site sync</code>, CI, and previews.</p><span class="go">Publishing →</span></a></li>
         <li><a class="card" href="configuration.html"><span class="tag">ADMINS</span><h3>Configuration</h3><p>The full <code>artifact-pages.yaml</code>: delivery targets, credentials, and sites.</p><span class="go">Configuration →</span></a></li>
         <li><a class="card" href="access-and-trust.html"><span class="tag">BEFORE YOU PUBLISH</span><h3>Access and trust</h3><p>Published HTML runs as code, and access control belongs at the delivery edge.</p><span class="go">Access and trust →</span></a></li>
       </ul>

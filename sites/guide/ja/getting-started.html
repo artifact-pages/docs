@@ -35,26 +35,25 @@
 
     <section class="doc-section" aria-labelledby="install">
       <h2 id="install">CLIを入れる</h2>
-      <p>閲覧アプリの配置、サイトの登録、公開は、どれも<code>artifact-pages</code>というひとつのコマンドで行います。リリースされたソースからビルドするGoのプログラムで、単体のバイナリは配布していません。</p>
-      <h3 id="install-mise">miseで入れる（おすすめ）</h3>
-      <p><a href="https://mise.jdx.dev/dev-tools/backends/go.html" target="_blank" rel="noopener">miseのGoバックエンド</a>が<code>go install</code>でコマンドをビルドし、選んだバージョンを管理します。<code>-g</code>を付けると、どのディレクトリでも使えるようにユーザー単位で入ります。</p>
-      <div class="term" aria-label="miseでCLIを入れる">
-        <div class="term-head"><span>ターミナル / mise</span><button class="copy-btn" type="button">コピー</button></div>
-<pre><span class="p">$</span> <span data-copy>mise use -g go:github.com/tasuku43/git-artifact-pages/cli/cmd/artifact-pages@x.y.z</span>
+      <p>閲覧アプリの配置、サイトの登録、公開は、どれも<code>artifact-pages</code>というひとつのコマンドで行います。<a href="https://github.com/artifact-pages/artifact-pages/releases" target="_blank" rel="noopener">GitHub Releases</a>の各CLIリリースには、LinuxとmacOS（amd64とarm64）向けの単体のバイナリと、チェックサムのファイルが付いています。Windowsは対象外です。このガイドのコマンドには、CLI 0.2.0以降が必要です（0.1.0のバイナリはファイル名が同じでも、コマンド名が古いままです）。</p>
+      <div class="term" aria-label="リリースからCLIを入れる">
+        <div class="term-head"><span>ターミナル / インストール</span><button class="copy-btn" type="button">コピー</button></div>
+<pre><span class="p">$</span> <span data-copy>VERSION=0.2.0</span>
+<span class="p">$</span> <span data-copy>OS=$(uname -s | tr '[:upper:]' '[:lower:]')</span>
+<span class="p">$</span> <span data-copy>ARCH=$(uname -m | sed -e 's/x86_64/amd64/' -e 's/aarch64/arm64/')</span>
+<span class="p">$</span> <span data-copy>BASE=https://github.com/artifact-pages/artifact-pages/releases/download/v$VERSION</span>
+<span class="p">$</span> <span data-copy>curl -fsSLO "$BASE/artifact-pages_v${VERSION}_${OS}_${ARCH}"</span>
+<span class="p">$</span> <span data-copy>curl -fsSLO "$BASE/artifact-pages_v${VERSION}_checksums.txt"</span>
+<span class="p">$</span> <span data-copy>grep "artifact-pages_v${VERSION}_${OS}_${ARCH}\$" "artifact-pages_v${VERSION}_checksums.txt" | shasum -a 256 -c -</span>
+<span class="p">$</span> <span data-copy>install -m 0755 "artifact-pages_v${VERSION}_${OS}_${ARCH}" ~/.local/bin/artifact-pages</span>
 <span class="p">$</span> <span data-copy>artifact-pages version</span></pre>
       </div>
       <ul>
-        <li><strong>バージョンは先頭の<code>v</code>を付けずに書きます</strong>（<code>x.y.z</code>）。<code>mise ls-remote go:github.com/tasuku43/git-artifact-pages/cli/cmd/artifact-pages</code>で出る一覧と同じ形です。miseは新しいリリースを一定期間一覧に出さないため、出たばかりのリリースは載っていないことがあります。その場合も、GitHub Releasesで確認したバージョンを指定すれば入ります。</li>
-        <li><strong>Go 1.26以降が必要です。</strong>Goがまだなければ、同じ<code>mise use</code>に<code>go@1.26</code>を加えると両方入ります。</li>
-        <li><strong><code>artifact-pages</code>を呼び出せるのは、シェルでmiseを有効にしているとき</strong>（またはmiseのシムが<code>PATH</code>にあるとき）です。</li>
+        <li><strong><code>0.2.0</code>はリリースのバージョンの例です。</strong>タグやファイル名に付く先頭の<code>v</code>は付けずに書きます。バイナリは、リリースのアセット<code>artifact-pages_vX.Y.Z_&lt;os&gt;_&lt;arch&gt;</code>で、<code>&lt;os&gt;</code>は<code>linux</code>か<code>darwin</code>、<code>&lt;arch&gt;</code>は<code>amd64</code>か<code>arm64</code>です。アーカイブではないので、展開は要りません。</li>
+        <li><strong>チェックサムの確認は<code>OK</code>と表示される必要があります。</strong>チェックサムのファイルはバイナリと同じリリースのものなので、壊れたダウンロードや途中までのアップロードは見つけられますが、リリース自体が改ざんされた場合は見つけられません。<code>shasum</code>がないLinuxでは、代わりに<code>sha256sum -c -</code>を使います。確認に通らないバイナリは実行しないでください。</li>
+        <li><strong>バイナリを<code>PATH</code>の通った場所に置きます。</strong>どのディレクトリでも構いません。<code>~/.local/bin</code>は一例で、先に作っておきます。</li>
+        <li><strong>入れたCLIは出発点です。</strong>設定ファイルに<code>cli.version</code>があれば、入れたコマンドがそのリリースをダウンロードしてチェックサムを確かめ、そちらを実行します（下のコールアウトを参照）。リリースには、組み込んだGoモジュールのライセンスと、互換性のファイル<code>artifact-pages_vX.Y.Z_compatibility.json</code>も付いています。</li>
       </ul>
-      <h3 id="install-go"><code>go install</code>で入れる</h3>
-      <p>miseを使わずに同じリリースを入れる方法です。こちらはリリースのタグをそのまま、<code>v</code>付きで指定します。</p>
-      <div class="term" aria-label="go installでCLIを入れる">
-        <div class="term-head"><span>ターミナル / go install</span><button class="copy-btn" type="button">コピー</button></div>
-<pre><span class="p">$</span> <span data-copy>go install github.com/tasuku43/git-artifact-pages/cli/cmd/artifact-pages@vX.Y.Z</span></pre>
-      </div>
-      <p class="note">コマンドはGoの<code>bin</code>ディレクトリ（<code>go env GOBIN</code>、未設定なら<code>go env GOPATH</code>の下の<code>bin</code>）に入ります。<code>PATH</code>に含まれているか確認してください。<code>x.y.z</code>はリリースのバージョンを表します。リリースは<a href="https://github.com/tasuku43/git-artifact-pages/releases" target="_blank" rel="noopener">GitHub Releases</a>で確認できます。Homebrewでの配布は予定していますが、まだ使えません。</p>
       <div class="callout" role="note">
         <span class="ico">バージョン</span>
         <div>
@@ -84,7 +83,7 @@
       <p>配信先にCloudflareを使う例で、最初のサイトを読めるところまで進めます。管理リポジトリの<code>acme/platform-admin</code>と、チームのリポジトリの<code>acme/checkout</code>は説明用の例です。AWSでも流れとコマンドは同じで、変わるのは手順1と2です（<a href="#other-targets">ほかの配信先</a>）。</p>
       <ol class="timeline">
         <li><div><h3>配信先を用意する</h3><p>非公開のR2のバケットをひとつ作り、読者が使うホスト名（例では<code>docs.example.com</code>）につなぎます。あわせて、閲覧アプリへの経路の振り分け、<code>/_control/</code>の遮断、キャッシュのルール、プレビューの保持期間を設定します。これらはArtifact Pagesのコマンドでは作らず、Terraformなどで用意します。製品リポジトリに、そのためのTerraformのモジュールがあります。管理者の認証情報として、R2のアクセスキーとシークレット、キャッシュを消す権限を持つAPIトークンも用意します。</p>
-          <p class="note">詳しい手順は、製品リポジトリの<a href="https://github.com/tasuku43/git-artifact-pages/blob/main/docs/guides/cloudflare-deployment.md" target="_blank" rel="noopener">Cloudflare deployment</a>（英語）を参照してください。</p>
+          <p class="note">詳しい手順は、製品リポジトリの<a href="https://github.com/artifact-pages/artifact-pages/blob/main/docs/guides/cloudflare-deployment.md" target="_blank" rel="noopener">Cloudflare deployment</a>（英語）を参照してください。</p>
           
           <figure class="concept" role="group" aria-label="手順1のあとの状態"><figcaption>手順1のあとの状態</figcaption><div class="concept-row"><div class="cbox r-admin"><div class="cbox-h">管理リポジトリ<small>acme/platform-admin</small></div><ul><li class="r-admin todo">設定ファイル<span class="sr-only">（まだ）</span><em aria-hidden="true">2</em></li></ul></div><span class="to" aria-hidden="true">→</span><div class="cbox r-store"><div class="cbox-h">配信先<small>Cloudflare</small></div><ul><li class="r-store now">ストレージとCDN<span class="sr-only">（この手順でできた）</span><em aria-hidden="true">この手順</em></li><li class="r-admin todo">閲覧アプリ<span class="sr-only">（まだ）</span><em aria-hidden="true">3</em></li><li class="r-admin todo">サイトの登録情報<span class="sr-only">（まだ）</span><em aria-hidden="true">4</em></li><li class="r-team todo">公開されたページ<span class="sr-only">（まだ）</span><em aria-hidden="true">5</em></li></ul></div><span class="to" aria-hidden="true">←</span><div class="cbox r-team"><div class="cbox-h">チームのリポジトリ<small>acme/checkout</small></div><ul><li class="r-team done">ページ<span class="sr-only">（できている）</span></li></ul></div></div></figure></div></li>
         <li><div><h3>管理リポジトリに<code>artifact-pages.yaml</code>を書く</h3><p>配信先に<code>cloudflare</code>を指定し、置く閲覧アプリのリリースを<code>web.version</code>に書き（<code>x.y.z</code>はリリースのバージョンを表します）、公開するサイトを<code>sites</code>に並べます。<code>repository</code>はチームのリポジトリの<code>owner/repo</code>、<code>sourcePath</code>はそのルートからのディレクトリのパスです。バケットの名前が<code>artifact-pages</code>でなければ<code>bucket</code>も書きます（「<a href="configuration.html#provider-cloudflare">cloudflare</a>」を参照）。</p>
@@ -117,15 +116,15 @@
         <li><div><h3>サイトを登録する</h3><p><code>sites</code>の内容から、サイトの登録情報を配信先に書き込みます。これでサイトはできましたが、ページはまだありません。</p>
           <div class="term" aria-label="サイトを登録する">
             <div class="term-head"><span>ターミナル / acme/platform-admin</span><button class="copy-btn" type="button">コピー</button></div>
-<pre><span class="p">$</span> <span data-copy>artifact-pages <span class="v">registry register</span> --config artifact-pages.yaml --dry-run</span>
-<span class="p">$</span> <span data-copy>artifact-pages <span class="v">registry register</span> --config artifact-pages.yaml</span></pre>
+<pre><span class="p">$</span> <span data-copy>artifact-pages <span class="v">registry sync</span> --config artifact-pages.yaml --dry-run</span>
+<span class="p">$</span> <span data-copy>artifact-pages <span class="v">registry sync</span> --config artifact-pages.yaml</span></pre>
           </div>
           <figure class="concept" role="group" aria-label="手順4のあとの状態"><figcaption>手順4のあとの状態</figcaption><div class="concept-row"><div class="cbox r-admin"><div class="cbox-h">管理リポジトリ<small>acme/platform-admin</small></div><ul><li class="r-admin done">設定ファイル<span class="sr-only">（できている）</span><em aria-hidden="true">2</em></li></ul></div><span class="to" aria-hidden="true">→</span><div class="cbox r-store"><div class="cbox-h">配信先<small>Cloudflare</small></div><ul><li class="r-store done">ストレージとCDN<span class="sr-only">（できている）</span><em aria-hidden="true">1</em></li><li class="r-admin done">閲覧アプリ<span class="sr-only">（できている）</span><em aria-hidden="true">3</em></li><li class="r-admin now">サイトの登録情報<span class="sr-only">（この手順でできた）</span><em aria-hidden="true">この手順</em></li><li class="r-team todo">公開されたページ<span class="sr-only">（まだ）</span><em aria-hidden="true">5</em></li></ul></div><span class="to" aria-hidden="true">←</span><div class="cbox r-team"><div class="cbox-h">チームのリポジトリ<small>acme/checkout</small></div><ul><li class="r-team done">ページ<span class="sr-only">（できている）</span></li></ul></div></div></figure></div></li>
         <li><div><h3>チームのリポジトリから公開する</h3><p><code>acme/checkout</code>の<code>docs/artifacts</code>に、<code>.html</code>か<code>.md</code>のページを1つ以上置きます。公開ではGitの履歴から日付を読むので、コミットが1つもないリポジトリでは失敗します。このリポジトリに設定ファイルは置かず、<code>--config</code>に管理リポジトリのファイルを指す<code>github://</code>の指定を渡します。<code>?ref=</code>で1つのコミットに固定することもできます。CLIは配信先の登録情報を読み、リポジトリとディレクトリが登録どおりかを確かめてから、ページをコピーしてサイトのインデックスを作ります。本文検索のためのデータも毎回作ります。</p>
           <div class="term" aria-label="チームのリポジトリから公開する">
             <div class="term-head"><span>ターミナル / acme/checkout</span><button class="copy-btn" type="button">コピー</button></div>
-<pre><span class="p">$</span> <span data-copy>artifact-pages <span class="v">site publish</span> --site checkout --source docs/artifacts --config github://acme/platform-admin/artifact-pages.yaml --dry-run</span>
-<span class="p">$</span> <span data-copy>artifact-pages <span class="v">site publish</span> --site checkout --source docs/artifacts --config github://acme/platform-admin/artifact-pages.yaml</span></pre>
+<pre><span class="p">$</span> <span data-copy>artifact-pages <span class="v">site sync</span> --site checkout --source docs/artifacts --config github://acme/platform-admin/artifact-pages.yaml --dry-run</span>
+<span class="p">$</span> <span data-copy>artifact-pages <span class="v">site sync</span> --site checkout --source docs/artifacts --config github://acme/platform-admin/artifact-pages.yaml</span></pre>
           </div>
           <p>必要な認証情報は、R2のアクセスキーとシークレット、サイトを変える実行で使うAPIトークンです。最初の1回は手元から実行してもかまいません。ふだんはマージ後にCIから実行します。そのまま使えるGitHub Actionsのワークフローが「<a href="publishing.html#github-actions">サイトの公開</a>」にあります。管理リポジトリが非公開なら、<code>GITHUB_TOKEN</code>か<code>GH_TOKEN</code>で読みます。</p>
           <figure class="concept" role="group" aria-label="手順5のあとの状態"><figcaption>手順5のあとの状態</figcaption><div class="concept-row"><div class="cbox r-admin"><div class="cbox-h">管理リポジトリ<small>acme/platform-admin</small></div><ul><li class="r-admin done">設定ファイル<span class="sr-only">（できている）</span><em aria-hidden="true">2</em></li></ul></div><span class="to" aria-hidden="true">→</span><div class="cbox r-store"><div class="cbox-h">配信先<small>Cloudflare</small></div><ul><li class="r-store done">ストレージとCDN<span class="sr-only">（できている）</span><em aria-hidden="true">1</em></li><li class="r-admin done">閲覧アプリ<span class="sr-only">（できている）</span><em aria-hidden="true">3</em></li><li class="r-admin done">サイトの登録情報<span class="sr-only">（できている）</span><em aria-hidden="true">4</em></li><li class="r-team now">公開されたページ<span class="sr-only">（この手順でできた）</span><em aria-hidden="true">この手順</em></li></ul></div><span class="to" aria-hidden="true">←</span><div class="cbox r-team"><div class="cbox-h">チームのリポジトリ<small>acme/checkout</small></div><ul><li class="r-team done">ページ<span class="sr-only">（できている）</span></li></ul></div></div></figure></div></li>
@@ -133,7 +132,7 @@
           
           <figure class="concept" role="group" aria-label="手順6のあとの状態"><figcaption>手順6のあとの状態</figcaption><div class="concept-row rv"><div class="cbox r-store"><div class="cbox-h">配信先<small>Cloudflare</small></div><ul><li class="r-admin done">閲覧アプリ<span class="sr-only">（できている）</span></li><li class="r-admin done">サイトの登録情報<span class="sr-only">（できている）</span></li><li class="r-team done">公開されたページ<span class="sr-only">（できている）</span></li></ul></div><span class="to" aria-hidden="true">→</span><div class="rv-browser"><span class="sr-only">ブラウザで閲覧アプリが開き、Payments / Checkoutのページが読める</span><div class="rv-bar" aria-hidden="true"><i></i><i></i><i></i><code>docs.example.com/checkout/payment-flow.md</code></div><div class="rv-body" aria-hidden="true"><div class="rv-side"><b>Payments / Checkout</b><span class="on">Payment flow design</span></div><div class="rv-doc"><b>Payment flow design</b><p>How a card payment moves through checkout.</p></div></div></div></div></figure></div></li>
       </ol>
-      <p>サイトを変えるときは、ディレクトリのファイルを編集または削除して、同じ<code>site publish</code>を実行します。変わったファイルをアップロードし、なくなったファイルを取り除きます。</p>
+      <p>サイトを変えるときは、ディレクトリのファイルを編集または削除して、同じ<code>site sync</code>を実行します。変わったファイルをアップロードし、なくなったファイルを取り除きます。</p>
     </section>
 
     <section class="doc-section" aria-labelledby="other-targets">
@@ -192,7 +191,7 @@
             <div class="term-head"><span>ターミナル / acme/checkout</span><button class="copy-btn" type="button">コピー</button></div>
 <pre><span class="p">$</span> <span data-copy>docker compose up -d</span></pre>
           </div>
-          <p><code>http://localhost:8080/</code>を開きます。これは試すための最小の設定です。サイトごとのCSPやキャッシュのヘッダーを含む例は、製品リポジトリの<a href="https://github.com/tasuku43/git-artifact-pages/blob/main/docker/nginx/default.conf" target="_blank" rel="noopener"><code>docker/nginx/default.conf</code></a>にあります。最初からやり直すときは<code>.local/storage</code>を削除します。</p>
+          <p><code>http://localhost:8080/</code>を開きます。これは試すための最小の設定です。サイトごとのCSPやキャッシュのヘッダーを含む例は、製品リポジトリの<a href="https://github.com/artifact-pages/artifact-pages/blob/main/docker/nginx/default.conf" target="_blank" rel="noopener"><code>docker/nginx/default.conf</code></a>にあります。最初からやり直すときは<code>.local/storage</code>を削除します。</p>
         </div>
       </details>
     </section>
@@ -203,7 +202,7 @@
       </div>
       <ul class="cards four">
         <li><a class="card" href="reading.html"><span class="tag">読者</span><h3>読者の体験</h3><p>いま開いた画面のこと。URL、画面の構成、検索とサイトの切り替え。</p><span class="go">読者の体験 →</span></a></li>
-        <li><a class="card" href="publishing.html"><span class="tag">公開するチーム</span><h3>サイトの公開</h3><p>ディレクトリに置くもの、<code>site publish</code>、CIとプレビュー。</p><span class="go">サイトの公開 →</span></a></li>
+        <li><a class="card" href="publishing.html"><span class="tag">公開するチーム</span><h3>サイトの公開</h3><p>ディレクトリに置くもの、<code>site sync</code>、CIとプレビュー。</p><span class="go">サイトの公開 →</span></a></li>
         <li><a class="card" href="configuration.html"><span class="tag">管理者</span><h3>設定ファイル</h3><p><code>artifact-pages.yaml</code>のすべて。配信先、認証情報、登録するサイト。</p><span class="go">設定ファイル →</span></a></li>
         <li><a class="card" href="access-and-trust.html"><span class="tag">公開する前に</span><h3>信頼とアクセス制御</h3><p>公開したHTMLはコードとして動きます。読める人の制限は配信側で行います。</p><span class="go">信頼とアクセス制御 →</span></a></li>
       </ul>
