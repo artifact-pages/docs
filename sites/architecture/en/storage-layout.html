@@ -113,7 +113,7 @@
             <text x="450" y="404">site sync</text>
             <text x="450" y="452">preview publish</text>
             <text x="450" y="476">preview publish</text>
-            <text x="450" y="524">site/registry sync</text>
+            <text x="450" y="524">site · preview · registry</text>
             <text x="450" y="548">site sync</text>
           </g>
           <g class="ad-s">
@@ -303,7 +303,7 @@
       <div class="table-wrap"><table>
         <thead><tr><th>Key</th><th>Purpose</th></tr></thead>
         <tbody>
-          <tr><td><code>_control/sites/&lt;site&gt;/lock.json</code></td><td>The per-site lock shared by site sync, preview publish and removal, and registry sync. Kept (as <code>free</code>) even after the site is withdrawn.</td></tr>
+          <tr><td><code>_control/sites/&lt;site&gt;/lock.json</code></td><td>The per-site lock shared by site sync, preview publish and removal, registry sync, and <code>app deploy</code> when it checks formats (bundle with <code>reads</code> or a pinned config). Kept (as <code>free</code>) even after the site is withdrawn.</td></tr>
           <tr><td><code>_control/locks/registry.json</code></td><td>Serializes whole-registry updates.</td></tr>
           <tr><td><code>_control/sites/&lt;site&gt;/site-cache.json</code></td><td>Cache invalidation paths still owed after a failed sync.</td></tr>
           <tr><td><code>_control/registry-cleanup.json</code></td><td>Content cleanup still owed for sites removed from the registry.</td></tr>

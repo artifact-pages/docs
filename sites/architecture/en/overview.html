@@ -43,7 +43,7 @@
         <p class="eyebrow">Architecture · 01</p>
         <h1>How Git Artifact Pages works</h1>
       </div>
-      <p class="answer"><span class="answer-label">Short answer</span>Git holds the source. Each site synces from its own repository, separately from every other site, into one shared static projection in object storage. One static reader app in the browser reads that projection and presents every site the same way. No application server sits in the request path.</p>
+      <p class="answer"><span class="answer-label">Short answer</span>Git holds the source. Each site syncs from its own repository, separately from every other site, into one shared static projection in object storage. One static reader app in the browser reads that projection and presents every site the same way. No application server sits in the request path.</p>
     </header>
 
     <figure class="fig" style="--fig-min: 720px; --fig-max: 1080px">
@@ -254,7 +254,7 @@
       <p>The repository is in its local-product phase. The contract above is proven locally first; provider delivery is checked separately and is not complete.</p>
       <ul class="proof">
         <li><span class="chip local">Proven locally</span><span>The reader, nginx routing, committed fixtures, and registered-site syncing to a local storage directory. Emulator profiles (MinIO for the S3 API shape, fake-gcs-server for the <code>gcp-local</code> profile) prove adapter and HTTP contracts, <strong>not</strong> equivalence with real CloudFront, Cloudflare, or GCP services.</span></li>
-        <li><span class="chip sampled">Sampled on Cloudflare</span><span>On 2026-10-01 and 10-02, live checks on the Cloudflare deployment observed logical routes returning the app shell, real 404s for missing objects, the cache headers, and the production and preview CSP headers. Disposable sites were taken through publish, preview, and withdrawal, concurrent preview publishes and interruption recovery, publishing with scoped credentials, and a runtime HTTP request refused by the CSP. These are samples; the provider-delivery verification (T15) is still in progress.</span></li>
+        <li><span class="chip sampled">Sampled on Cloudflare</span><span>On 2026-10-01 and 10-02, live checks on the Cloudflare deployment observed logical routes returning the app shell, real 404s for missing objects, the cache headers, and the production and preview CSP headers. Disposable sites were taken through publish, preview, and withdrawal (then a separate command, since folded into <code>registry sync</code>), concurrent preview publishes and interruption recovery, publishing with scoped credentials, and a runtime HTTP request refused by the CSP. These are samples; the provider-delivery verification (T15) is still in progress.</span></li>
         <li><span class="chip open">Not yet proven</span><span>Live AWS delivery (CloudFront and S3), actual preview lifecycle deletion timing, provider race and recovery cases such as concurrent publishes for different sites, and GitHub OIDC. Each page states its own open items.</span></li>
       </ul>
     </section>

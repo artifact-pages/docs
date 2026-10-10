@@ -200,14 +200,14 @@
 
     <section class="doc-section" aria-labelledby="lock">
       <h2 id="lock">The site lock and the registry check</h2>
-      <p>Each site has one small lock record, <code>_control/sites/&lt;site&gt;/lock.json</code>, shared by <code>site sync</code>, <code>preview publish</code>, <code>preview remove</code>, and <code>registry sync</code>. It is created only if absent and changed only with a compare-and-swap on its ETag, so a recovery that inspected an old state cannot release a newer owner's lock. Different sites use different locks and publish independently.</p>
+      <p>Each site has one small lock record, <code>_control/sites/&lt;site&gt;/lock.json</code>, shared by <code>site sync</code>, <code>preview publish</code>, <code>preview remove</code>, <code>registry sync</code>, and <code>app deploy</code> when it checks formats (bundle with <code>reads</code> or a pinned config). It is created only if absent and changed only with a compare-and-swap on its ETag, so a recovery that inspected an old state cannot release a newer owner's lock. Different sites use different locks and publish independently.</p>
       <p>The registry check runs <strong>after</strong> the lock is held and reads <code>sites.json</code> directly from the origin rather than a cached copy. That closes the gap between “is this source registered?” and “write the objects”. A publisher in another repository does not need the admin's config checkout; it only needs to read the deployed registry.</p>
       <p>This is coordination between Artifact Pages commands, <strong>not a security boundary</strong>. Someone with direct write credentials to the bucket can bypass it. Scoping credentials is a provider setup concern; see <a href="trust-model.html#publishers">Trust model</a>.</p>
     </section>
 
     <section class="doc-section" aria-labelledby="withdrawal">
       <h2 id="withdrawal">Concurrent sync and withdrawal</h2>
-      <p>There is no separate unregister command: a site is withdrawn by removing it from <code>sites</code> and running <code>registry sync</code>. Before it changes the registry, <code>registry sync</code> takes the lock of every omitted site. It then writes the registry without the site, which closes the gate to new syncs, and deletes the site's prefixes while still holding the lock. Either ordering ends in the same state.</p>
+      <p>There is no separate unregister command: a site is withdrawn by removing it from <code>sites</code> and running <code>registry sync</code>. Before it changes the registry, <code>registry sync</code> takes the lock of every omitted site. It then writes the registry without the site, which closes the gate to new syncs, and deletes the site's prefixes and its control records (except the lock) while still holding the lock. Either ordering ends in the same state.</p>
       <figure class="fig" style="--fig-min: 620px; --fig-max: 860px">
         <div class="fig-head"><strong>Both orderings converge</strong><span>time →</span></div>
         <div class="fig-frame" role="group" aria-label="Diagram: concurrent sync and withdrawal">
@@ -239,7 +239,7 @@
             <path class="ad-line" d="M110 250 H740" marker-end="url(#pm-a)"/>
             <path class="ad-line" d="M110 310 H740" marker-end="url(#pm-a)"/>
             <circle class="ad-dot warn" cx="150" cy="250" r="5"/><text class="ad-q" x="150" y="236" text-anchor="middle">removes entry</text>
-            <rect class="ad-bar" x="190" y="244" width="230" height="12" rx="6"/>
+            <rect class="ad-bar" x="130" y="244" width="290" height="12" rx="6"/>
             <text class="ad-q" x="260" y="236" text-anchor="middle">deletes prefixes</text>
             <text class="ad-q" x="370" y="236" text-anchor="middle">invalidates</text>
             <path class="ad-flow warn ad-dash" d="M230 310 H428"/>
@@ -251,14 +251,14 @@
         </div>
         <figcaption>Blue bars are periods holding the site lock. The publisher's registry check happens inside its lock, so it cannot write after the projection has been deleted. <span class="fig-scroll">Scroll sideways to see the whole diagram.</span></figcaption>
       </figure>
-      <p><code>registry sync</code> reports success only after the registry update, the origin deletion, and the cache request have all succeeded. It writes its cleanup intent to <code>_control/registry-cleanup.json</code> before it changes anything, so if a step fails, a later <code>registry sync</code> finishes the cleanup even though the config no longer mentions the site. It is eventual consistency, not revocation: an edge may serve a stale response while invalidation propagates, and pages already delivered to a browser cannot be recalled. Whole-registry updates are serialized separately through <code>_control/locks/registry.json</code>.</p>
+      <p><code>registry sync</code> reports success only after the registry update, the origin deletion, and the cache request have all succeeded. It writes its cleanup intent to <code>_control/registry-cleanup.json</code> before it changes the registry or deletes anything, so if a step fails, a later <code>registry sync</code> finishes the cleanup even though the config no longer mentions the site. If a later config adds the site back, its cleanup stops, but its old URLs are still purged from the CDN. It is eventual consistency, not revocation: an edge may serve a stale response while invalidation propagates, and pages already delivered to a browser cannot be recalled. Whole-registry updates are serialized separately through <code>_control/locks/registry.json</code>.</p>
     </section>
 
     <section class="doc-section" aria-labelledby="proof">
       <h2 id="proof">What has been proven</h2>
       <ul class="proof">
         <li><span class="chip local">Proven locally</span><span>With deterministic local and fake backends (T14, T5): both orderings of a sync and a site withdrawal; failures injected during artifact upload, <code>index.json</code> and <code>meta.json</code> replacement, and partial stale deletion, each followed by a converging retry; aborting when either listing fails; AWS listing pagination and 1,000-key delete batches with per-object failures; guarded stale-lock recovery; a second process waiting on a held lock; and zero-document sites.</span></li>
-        <li><span class="chip sampled">Sampled on Cloudflare</span><span>A disposable site was registered, published, previewed, retried, and withdrawn against the live R2 deployment on 2026-10-01, and an R2 compare-and-swap race produced exactly one winner. On 2026-10-02, an interrupted <code>preview publish</code> left its lock held, <code>lock recover</code> with the observed ETag freed it, and the retry succeeded; a stale process that had lost the lock was rejected before replacing the catalog. Publishing with temporary scoped credentials (including the site lock and cache retry record) also worked (T15). These are samples, not the complete provider proof.</span></li>
+        <li><span class="chip sampled">Sampled on Cloudflare</span><span>A disposable site was registered, published, previewed, retried, and withdrawn (with the separate withdrawal command of the time, since folded into <code>registry sync</code>) against the live R2 deployment on 2026-10-01, and an R2 compare-and-swap race produced exactly one winner. On 2026-10-02, an interrupted <code>preview publish</code> left its lock held, <code>lock recover</code> with the observed ETag freed it, and the retry succeeded; a stale process that had lost the lock was rejected before replacing the catalog. Publishing with temporary scoped credentials (including the site lock and cache retry record) also worked (T15). These are samples, not the complete provider proof.</span></li>
         <li><span class="chip open">Not yet proven</span><span>Concurrent <code>site sync</code> runs for different sites across processes against a real provider, and real S3 and R2 conditional-write and interruption-recovery runs of <code>site sync</code> with provider cache behavior (T14). No live AWS run.</span></li>
       </ul>
     </section>

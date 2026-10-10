@@ -15,6 +15,9 @@ The `architecture` site still uses command names and control keys from before th
 - `registry unregister` does not exist. Withdrawal is "remove the site from `sites` and run `registry sync`", with the cleanup intent journaled in `_control/registry-cleanup.json` so a later `registry sync` can finish. `publishing-model.html` has a whole section and diagram ("Concurrent publish and unregister") to rewrite: `registry sync` takes the locks of omitted sites before it changes the registry, then deletes the projection. Also in `overview`, `previews`, `trust-model` and `storage-layout`.
 - Control keys: the per-site lock and cache retry record now live at `/_control/sites/<site>/lock.json` and `/_control/sites/<site>/site-cache.json` (not `/_control/locks/sites/<site>.json` and `/_control/site-cache/<site>.json`); the lock is also shared by `preview remove`.
 - `trust-model.html` satellite credential list: add the read of the deployed-web record `/_control/versions/app.json` (specification, AWS satellite policy).
+- `trust-model.html` satellite credentials: preview prefix includes delete (`preview remove`), and the whole control prefix `_control/sites/<site>/` is read, write, delete and list (specification AWS satellite policy; `terraform/modules/aws`).
+- The per-site lock is also shared by `app deploy` when it checks formats (bundle with `reads` or a pinned config).
+- Guide residuals folded in: `guide/{en,ja}/publishing.html` and `configuration.html` cited `_control/site-cache/<site>.json` and the old satellite credential list; aligned with the above.
 - `previews.html`: mention `preview remove` (CLI only), which the page did not cover.
 
 ## Acceptance criteria

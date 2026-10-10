@@ -113,7 +113,7 @@
             <text x="450" y="404">site sync</text>
             <text x="450" y="452">preview publish</text>
             <text x="450" y="476">preview publish</text>
-            <text x="450" y="524">site/registry sync</text>
+            <text x="450" y="524">site · preview · registry</text>
             <text x="450" y="548">site sync</text>
           </g>
           <g class="ad-s">
@@ -296,7 +296,7 @@
       <div class="table-wrap"><table>
         <thead><tr><th>キー</th><th>用途</th></tr></thead>
         <tbody>
-          <tr><td><code>_control/sites/&lt;site&gt;/lock.json</code></td><td>サイトの同期、プレビューの公開と削除、<code>registry sync</code>が共有するサイトごとのロック。サイトを取り下げたあとも（<code>free</code>の状態で）残します。</td></tr>
+          <tr><td><code>_control/sites/&lt;site&gt;/lock.json</code></td><td>サイトの同期、プレビューの公開と削除、<code>registry sync</code>、形式を確かめる<code>app deploy</code>（<code>reads</code>のあるバンドルか、版を固定した設定のとき）が共有するサイトごとのロック。サイトを取り下げたあとも（<code>free</code>の状態で）残します。</td></tr>
           <tr><td><code>_control/locks/registry.json</code></td><td>サイトの登録情報の更新を1つずつ順に行うためのロック。</td></tr>
           <tr><td><code>_control/sites/&lt;site&gt;/site-cache.json</code></td><td>失敗した公開のあと、まだ済んでいないキャッシュ無効化のパス。</td></tr>
           <tr><td><code>_control/registry-cleanup.json</code></td><td>サイトの登録情報から外したサイトについて、まだ済んでいない片付け。</td></tr>

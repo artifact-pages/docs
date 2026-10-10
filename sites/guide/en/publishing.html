@@ -134,7 +134,7 @@
           </div></div></li>
       </ol>
       <ul>
-        <li><strong>Credentials</strong> stay in the CI secret store, never in the config file. A publishing job needs to read the site registry, to read and write only this site's files, its previews, its lock, and its cache-retry record (<code>_control/site-cache/&lt;site&gt;.json</code>), and to request a CDN cache refresh. See <a href="configuration.html#credentials">Configuration</a>.</li>
+        <li><strong>Credentials</strong> stay in the CI secret store, never in the config file. A publishing job needs to read the site registry, to read the deployed-web record (<code>_control/versions/app.json</code>), to read, write, and delete only this site's files and previews and its own control prefix (<code>_control/sites/&lt;site&gt;/</code>: the lock, cache-retry journal, and sync state), and to request a CDN cache refresh. See <a href="configuration.html#credentials">Configuration</a>.</li>
         <li><strong>No config file in the repository.</strong> The job points <code>--config</code> at the admin repository's file with a <code>github://</code> locator, optionally pinned with <code>?ref=&lt;full commit SHA&gt;</code>; see <a href="configuration.html#remote">remote config</a>. Eligibility is still checked against the registry on the delivery target, not against the config.</li>
       </ul>
 
