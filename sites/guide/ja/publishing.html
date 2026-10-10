@@ -36,8 +36,8 @@
     <div class="callout" role="note">
       <span class="ico">前提</span>
       <div>
-        <p><strong>始める前に、次の2つが必要です。</strong><code>artifact-pages</code>コマンドと、管理者があなたのリポジトリとディレクトリに対して登録したサイトです。サイトのIDと、管理リポジトリの設定ファイルのアドレスは、管理者に確認してください。</p>
-        <p><strong>サテライトリポジトリは、文書とワークフロー1つだけです。</strong>置くのは公開するディレクトリとCIのワークフローで、設定ファイルも、ビルドも、同期の手順もありません。管理リポジトリの<code>artifact-pages.yaml</code>を<a href="configuration.html#remote"><code>github://</code>の指定</a>で参照します。以下のコマンドは短くするため<code>--config</code>を省いています。実際には<code>--config</code>で渡すか、環境変数<code>ARTIFACT_PAGES_CONFIG</code>に<code>github://acme/platform-admin/artifact-pages.yaml</code>のような指定を入れます。</p>
+        <p><strong>始める前に、次の2つが必要です。</strong><code>artifact-pages</code>コマンドと、管理者があなたのリポジトリとディレクトリに対して登録したサイトです。サイトのIDを管理者に確認してください。ローカルCLIを使う場合は、管理リポジトリの設定ファイルの指定も確認します。</p>
+        <p><strong>サテライトリポジトリは、文書とワークフロー1つだけです。</strong>公開するディレクトリとCIのワークフローを置きます。設定ファイル、ビルド、同期のセットアップは不要です。ローカルCLIでは、管理リポジトリの<code>artifact-pages.yaml</code>を<a href="configuration.html#remote"><code>github://</code>の指定</a>で参照します。以下のコマンドは短くするため<code>--config</code>を省いています。実際には<code>--config</code>で渡すか、環境変数<code>ARTIFACT_PAGES_CONFIG</code>に<code>github://acme/platform-admin/artifact-pages.yaml</code>のような指定を入れます。GitHub Actionsでは、下記の管理リポジトリが提供する再利用可能ワークフローを使います。管理リポジトリの設定ファイルを直接読み込みます。</p>
         <p>CLIの入れ方は「<a href="getting-started.html#install">はじめる</a>」を参照してください。以下の例では、<code>acme/checkout</code>の<code>docs/artifacts</code>から公開する、説明用の<code>checkout</code>サイトを使います。</p>
       </div>
     </div>
@@ -135,13 +135,34 @@
       </ol>
       <ul>
         <li><strong>認証情報</strong>はCIのシークレットに置き、設定ファイルには書きません。公開のジョブに必要なのは、サイトの登録情報とデプロイ済みWebの記録（<code>_control/versions/app.json</code>）の読み取りと、このサイトのファイルとプレビュー、自分のサイトの制御用プレフィックス（<code>_control/sites/&lt;site&gt;/</code>。ロック、キャッシュ再試行の記録、同期の状態）の読み書きと削除、それにCDNのキャッシュ更新の依頼だけです。「<a href="configuration.html#credentials">設定ファイル</a>」を参照してください。</li>
-        <li><strong>リポジトリに設定ファイルは置きません。</strong>ジョブは<code>--config</code>に、管理リポジトリのファイルを指す<code>github://</code>の指定を渡します。必要なら<code>?ref=&lt;完全なコミットSHA&gt;</code>で固定できます（<a href="configuration.html#remote">リモートの設定ファイル</a>）。公開してよいかどうかは、設定ファイルではなく配信先にある登録情報で確認します。</li>
+        <li><strong>リポジトリに設定ファイルは置きません。</strong>ローカルCLIでは、管理リポジトリのファイルを<code>github://</code>で指定します（<a href="configuration.html#remote">リモートの設定ファイル</a>）。管理リポジトリが提供するActionsワークフローは、管理リポジトリ内の設定ファイルを読みます。Actionを直接呼ぶ場合は<code>config</code>に指定を渡します。公開してよいかどうかは、設定ファイルではなく配信先にある登録情報で確認します。</li>
       </ul>
 
       <h3 id="github-actions">GitHub Actionsで実行する</h3>
-      <p>公開用のAction、<code>artifact-pages/publish-action</code>は、同じ公開を実行します。最初にブートストラップのCLIをインストールし、そのうえで管理リポジトリの設定ファイルに書かれたリリースのCLIを動かします（「<a href="versions.html#actions">バージョンの固定と更新</a>」を参照）。オプションは入力として受け取ります。入力は<code>site</code>（必須）、<code>source</code>、<code>ref</code>（<code>--ref</code>のメタデータ）、<code>config</code>、<code>dry-run</code>のほか、<code>cli-version</code>、<code>github-token</code>、<code>publish-on</code>、<code>summary</code>、<code>checkout</code>、<code>fetch-depth</code>があります（後で説明します）。次のワークフローは、プルリクエストでは変更計画だけを確認し、<code>main</code>へのマージ後に公開します。</p>
-      <div class="term" aria-label="サイトを公開するGitHub Actionsのワークフロー例">
-        <div class="term-head"><span>.github/workflows/publish-docs.yml / acme/checkout</span><button class="copy-btn" type="button">コピー</button></div>
+      <p>公式のサイト公開手順では、管理リポジトリが提供する再利用可能ワークフローを使います。IMP-73で<code>artifact-pages registry setup</code>を実装中です。管理リポジトリが生成ファイルをコミットした後にだけ、次のように呼び出します。</p>
+      <div class="term" aria-label="管理リポジトリの公開ワークフローを呼び出すジョブ">
+        <div class="term-head"><span>.github/workflows/publish-docs.yml / acme/checkout（抜粋）</span><button class="copy-btn" type="button">コピー</button></div>
+<pre><span class="k">jobs</span>:
+  <span class="k">publish</span>:
+    <span class="k">permissions</span>:
+      <span class="k">contents</span>: read
+      <span class="c"># AWSを使うサイトではid-token: writeを加える</span>
+    <span class="k">uses</span>: acme/platform-admin/.github/workflows/publish-site.yml@main
+    <span class="k">with</span>:
+      <span class="k">site</span>: checkout
+    <span class="k">secrets</span>: inherit</pre>
+      </div>
+      <ul>
+        <li><strong>必須入力。</strong>サイトIDは必須です。リポジトリ名から自動で決めることはありません。公式手順では<code>@main</code>を推奨します。</li>
+        <li><strong>ランナー。</strong>生成ワークフローはGitHubの同一リポジトリAction構文を使います。ランナー2.336.0以降が必要で、GitHub Enterprise Serverでは利用できません。</li>
+        <li><strong>設定と認証情報。</strong>呼び出されたワークフローは、自分のコミットにある管理設定を読み、そのファイルを公式Actionに渡します。管理リポジトリのチェックアウト、設定ファイルのコピー、GitHub Appは不要です。<code>secrets: inherit</code>で呼び出し元のシークレットを渡せるのは、両方のリポジトリが同じOrganizationまたはEnterpriseにある場合です。管理リポジトリだけに置いたシークレットは渡りません。</li>
+        <li><strong>Environment。</strong>呼び出し元から再利用可能ワークフローのジョブに<code>environment:</code>を指定することはできません。生成ワークフローには省略可能な<code>environment</code>入力を用意し、サイトリポジトリのEnvironmentを選びます。Environmentのシークレットは呼び出し元のサイトに紐づいたままです。</li>
+        <li><strong>プレビュー。</strong>プレビューには<code>preview-site.yml</code>を呼び出し、呼び出し元に同じリポジトリのプルリクエストだけを許可する条件を残します。権限は<code>contents: read</code>に加え、コメントを有効にする場合は<code>pull-requests: write</code>、AWSでは<code>id-token: write</code>が必要です。</li>
+        <li><strong>非公開の管理リポジトリ。</strong>Actionsのアクセスを<strong>Organization内のリポジトリからアクセス可能</strong>にします。管理ワークフローは呼び出し元のトークン、シークレット、OIDC IDを使って実行されます。呼び出し元の外部コラボレーターは、設定値を含むワークフローのログを見られます。詳しくは「<a href="configuration.html#remote-private">設定ファイル</a>」を参照してください。</li>
+      </ul>
+      <p>管理リポジトリの設定が公開されている場合、公開用のAction、<code>artifact-pages/publish-action</code>を直接呼び出せます。ActionはブートストラップのCLIをインストールし、そのうえで管理リポジトリの設定に書かれたリリースのCLIを動かします（「<a href="versions.html#actions">バージョンの固定と更新</a>」を参照）。入力は<code>site</code>（必須）、<code>source</code>、<code>ref</code>（<code>--ref</code>のメタデータ）、<code>config</code>、<code>dry-run</code>、<code>cli-version</code>、<code>publish-on</code>、<code>summary</code>、<code>checkout</code>、<code>fetch-depth</code>です。非公開の管理設定には、上の再利用可能ワークフローを使ってください。次の例では、プルリクエストで変更計画だけを確認し、<code>main</code>へのマージ後に公開します。</p>
+      <div class="term" aria-label="公開設定を読める管理リポジトリを使う直接Action呼び出しの例">
+        <div class="term-head"><span>.github/workflows/publish-docs.yml / acme/checkout（公開管理設定）</span><button class="copy-btn" type="button">コピー</button></div>
 <pre><span class="k">name</span>: Publish docs
 
 <span class="k">on</span>:
@@ -167,7 +188,7 @@
         <span class="k">with</span>:
           <span class="k">site</span>: checkout
           <span class="k">source</span>: docs/artifacts
-          <span class="k">config</span>: github://acme/platform-admin/artifact-pages.yaml   <span class="c"># 管理リポジトリの設定。このリポジトリにファイルは置かない</span>
+          <span class="k">config</span>: github://acme/platform-admin/artifact-pages.yaml   <span class="c"># 公開管理設定。このリポジトリにファイルは置かない</span>
           <span class="k">dry-run</span>: ${{ github.event_name == 'pull_request' }}
         <span class="k">env</span>:
           <span class="k">CF_R2_ACCESS_KEY_ID</span>: ${{ secrets.CF_R2_ACCESS_KEY_ID }}
@@ -177,12 +198,12 @@
       <ul>
         <li><strong>チェックアウトはActionが行います。</strong>既定（<code>checkout: auto</code>）では、ワークスペースがまだチェックアウトでなければ、<code>fetch-depth: 1</code>、認証情報を残さない設定で<code>actions/checkout</code>を実行します。前のステップでファイルが必要なときだけ、自分でチェックアウトのステップを置いてください。その場合、Actionは何もしません。<code>permissions: contents: read</code>で足ります。浅いチェックアウトが日付にどう影響するかは、<a href="#shallow">浅いチェックアウトと日付</a>にあります。</li>
         <li><strong>リリースのタグをそのまま指定します。</strong><code>@vX.Y.Z</code>のように書きます。各Actionは専用のリポジトリ（たとえば<code>artifact-pages/publish-action</code>）で、独自のタグを付けてリリースされます。バージョンが<code>0.x</code>のあいだは、<code>@v0</code>のような動くタグはありません。いちばん厳密に固定するなら、リリースのコミットSHAを40文字で書き、タグをコメントに残します（<code>artifact-pages/publish-action@&lt;full commit SHA&gt; # vX.Y.Z</code>）。Actionのバージョンは、動くCLIを決めません。それを決めるのは管理リポジトリの設定ファイルで、Actionが固定するのはブートストラップのCLIと、対応するCLIの範囲だけです。1回の実行だけ別のCLIで動かすときは、<code>cli-version</code>入力を使います。詳しくは「<a href="versions.html">バージョンの固定と更新</a>」を参照してください。</li>
-        <li><strong>2つのEnvironmentで、別々のシークレットを持たせます。</strong><code>plan</code>と<code>production</code>は説明用の名前です。<code>plan</code>には読み取り専用の認証情報を、<code>production</code>にはこのサイトにだけ書き込める認証情報を置き、<code>production</code>は設定で<code>main</code>からだけ使えるようにします。GitHub Freeの非公開リポジトリではEnvironmentのシークレットを使えません。<a href="configuration.html#remote-private">設定ファイル</a>のページを参照してください。変数名はCloudflareの既定値です。AWSでは鍵を置かず、OIDCでロールを引き受けます（<code>permissions</code>に<code>id-token: write</code>を加えます）。フォークからのプルリクエストにはシークレットが渡らないため、そこでは変更計画の確認が失敗します。これは意図した動作です。</li>
+        <li><strong>Environmentとシークレット。</strong><code>plan</code>と<code>production</code>は説明用の名前です。呼び出し元が管理するワークフローでは、<code>plan</code>に読み取り専用の認証情報を、<code>production</code>にこのサイトだけに書き込める認証情報を置きます。再利用可能ワークフローでは、省略可能な<code>environment</code>入力でサイトリポジトリのEnvironmentを選びます。Environmentのシークレットはサイトリポジトリから読み込み、管理リポジトリから継承しません。変数名はCloudflareの既定値です。AWSでは<code>permissions</code>に<code>id-token: write</code>を加えてOIDCを使います。</li>
         <li><strong>公開は1つずつ実行します。</strong>サイトのロックを持てる公開は1つだけなので、<code>concurrency</code>のグループで公開を1つずつ実行します（待っている実行は、新しいプッシュの実行に置き換わります）。</li>
-        <li><strong>設定の固定</strong>は任意です。<code>?ref=</code>を付けないと、管理リポジトリのデフォルトブランチを実行の最初に1つのコミットに決め、その実行の最後まで使います。コミットを固定したいときは、指定の末尾に<code>?ref=&lt;完全なコミットSHA&gt;</code>を付けます。</li>
-        <li><strong>管理リポジトリが非公開なら</strong>、既定ではこのワークフローのトークンで読みにいきますが、別の非公開リポジトリは読めません。管理リポジトリを読み取れるトークンを<code>github-token</code>の入力で渡します。GitHub Appでトークンを発行する方法は、<a href="configuration.html#remote-private">設定ファイル</a>のページにあります。</li>
+        <li><strong>直接Actionで読む設定の固定</strong>は任意です。<code>?ref=</code>がなければ、管理リポジトリのデフォルトブランチを実行の最初に1つのコミットに決め、その実行の最後まで使います。固定する場合は指定の末尾に<code>?ref=&lt;完全なコミットSHA&gt;</code>を付けます。再利用可能ワークフローは呼び出したコミットの設定を読み、<code>@main</code>を推奨します。</li>
+
         <li><strong>結果</strong>は出力で受け取れます。<code>outcome</code>（<code>planned</code>、<code>synced</code>、<code>no-op</code>、<code>failed</code>）、<code>changes</code>、<code>preview-changes</code>、<code>result</code>のほか、<code>operation</code>、<code>site</code>、<code>exit-code</code>、<code>error</code>があります。<code>summary: true</code>（既定）のときは、失敗した実行でもJob Summaryを書き出します。</li>
-        <li><strong>イベントによってドライランにできます。</strong><code>publish-on</code>には、<code>event</code>または<code>event:ref</code>の形（たとえば<code>push:refs/heads/main</code>）を改行区切りで並べます。どれにも当てはまらない実行はドライランになり、<code>dry-run: true</code>を明示したときは常にそちらが優先されます。空なら条件なしです。<code>checkout</code>は前の項目、<code>fetch-depth</code>は下の「<a href="#shallow">浅いチェックアウトと日付</a>」、<code>github-token</code>は非公開の管理リポジトリ（上）、<code>cli-version</code>は「<a href="versions.html#override">CLIを1回だけ変えて実行する</a>」を参照してください。</li>
+        <li><strong>直接Actionの実行をイベントでドライランにできます。</strong><code>publish-on</code>には、<code>event</code>または<code>event:ref</code>の形（たとえば<code>push:refs/heads/main</code>）を改行区切りで並べます。どれにも当てはまらない実行はドライランになり、<code>dry-run: true</code>を明示したときは常にそちらが優先されます。空なら条件なしです。<code>checkout</code>は前の項目、<code>fetch-depth</code>は下の「<a href="#shallow">浅いチェックアウトと日付</a>」、<code>cli-version</code>は「<a href="versions.html#override">CLIを1回だけ変えて実行する</a>」を参照してください。</li>
         <li><strong>ほかのAction</strong>は、別々のリポジトリで独自のタグを持ちます。レジストリには<code>artifact-pages/registry-action</code>、<code>app deploy</code>には<code>artifact-pages/app-deploy-action</code>、プレビューには<code>artifact-pages/preview-action</code>を使います。</li>
       </ul>
       <p class="note"><code>acme/checkout</code>と<code>acme/platform-admin</code>は説明用の例です。<code>vX.Y.Z</code>と<code>&lt;full commit SHA&gt;</code>は実際の値に置き換えてください。</p>
