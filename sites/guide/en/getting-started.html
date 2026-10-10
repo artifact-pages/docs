@@ -35,11 +35,11 @@
 
     <section class="doc-section" aria-labelledby="install">
       <h2 id="install">Install the CLI</h2>
-      <p>One command, <code>artifact-pages</code>, does all the work: it deploys the reader app, registers sites, and publishes them. Each CLI release on <a href="https://github.com/artifact-pages/artifact-pages/releases" target="_blank" rel="noopener">GitHub Releases</a> ships a standalone binary for Linux and macOS on amd64 and arm64, with a checksums file. Windows is not supported.</p>
+      <p>One command, <code>artifact-pages</code>, does all the work: it deploys the reader app, registers sites, and publishes them. Each CLI release on <a href="https://github.com/artifact-pages/artifact-pages/releases" target="_blank" rel="noopener">GitHub Releases</a> ships a standalone binary for Linux and macOS on amd64 and arm64, with a checksums file. Windows is not supported. The commands in this guide need CLI 0.2.0 or later; the 0.1.0 binaries have the same file names but the older command names.</p>
       <div class="term" aria-label="Install the CLI from a release">
         <div class="term-head"><span>TERMINAL / INSTALL</span><button class="copy-btn" type="button">Copy</button></div>
-<pre><span class="p">$</span> <span data-copy>VERSION=x.y.z</span>
-<span class="p">$</span> <span data-copy>OS=$(uname -s | tr A-Z a-z)</span>
+<pre><span class="p">$</span> <span data-copy>VERSION=0.2.0</span>
+<span class="p">$</span> <span data-copy>OS=$(uname -s | tr '[:upper:]' '[:lower:]')</span>
 <span class="p">$</span> <span data-copy>ARCH=$(uname -m | sed -e 's/x86_64/amd64/' -e 's/aarch64/arm64/')</span>
 <span class="p">$</span> <span data-copy>BASE=https://github.com/artifact-pages/artifact-pages/releases/download/v$VERSION</span>
 <span class="p">$</span> <span data-copy>curl -fsSLO "$BASE/artifact-pages_v${VERSION}_${OS}_${ARCH}"</span>
@@ -49,8 +49,8 @@
 <span class="p">$</span> <span data-copy>artifact-pages version</span></pre>
       </div>
       <ul>
-        <li><strong><code>x.y.z</code> is a release version</strong>, written here without the leading <code>v</code> that the tag and the file names carry. The binary is the release asset <code>artifact-pages_vX.Y.Z_&lt;os&gt;_&lt;arch&gt;</code> with <code>&lt;os&gt;</code> <code>linux</code> or <code>darwin</code> and <code>&lt;arch&gt;</code> <code>amd64</code> or <code>arm64</code>. It is not archived, so there is nothing to unpack.</li>
-        <li><strong>The checksum step must print <code>OK</code>.</strong> The checksums file comes from the same release as the binary, so it detects a corrupted or partial download, not a compromised release. Do not run a binary that fails it.</li>
+        <li><strong><code>0.2.0</code> is an example release version</strong>, written here without the leading <code>v</code> that the tag and the file names carry. The binary is the release asset <code>artifact-pages_vX.Y.Z_&lt;os&gt;_&lt;arch&gt;</code> with <code>&lt;os&gt;</code> <code>linux</code> or <code>darwin</code> and <code>&lt;arch&gt;</code> <code>amd64</code> or <code>arm64</code>. It is not archived, so there is nothing to unpack.</li>
+        <li><strong>The checksum step must print <code>OK</code>.</strong> The checksums file comes from the same release as the binary, so it detects a corrupted download or a partial upload, not a compromised release. On Linux without <code>shasum</code>, use <code>sha256sum -c -</code> instead. Do not run a binary that fails it.</li>
         <li><strong>Put the binary on your <code>PATH</code>.</strong> Any directory works; <code>~/.local/bin</code> is an example and must exist.</li>
         <li><strong>The installed CLI is a starting point.</strong> When the config names <code>cli.version</code>, the installed command downloads that release, checks its checksum, and runs it (see below). The release also carries the licenses of the bundled Go modules and a compatibility file, <code>artifact-pages_vX.Y.Z_compatibility.json</code>.</li>
       </ul>

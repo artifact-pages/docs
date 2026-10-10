@@ -35,11 +35,11 @@
 
     <section class="doc-section" aria-labelledby="install">
       <h2 id="install">CLIを入れる</h2>
-      <p>閲覧アプリの配置、サイトの登録、公開は、どれも<code>artifact-pages</code>というひとつのコマンドで行います。<a href="https://github.com/artifact-pages/artifact-pages/releases" target="_blank" rel="noopener">GitHub Releases</a>の各CLIリリースには、LinuxとmacOS（amd64とarm64）向けの単体のバイナリと、チェックサムのファイルが付いています。Windowsは対象外です。</p>
+      <p>閲覧アプリの配置、サイトの登録、公開は、どれも<code>artifact-pages</code>というひとつのコマンドで行います。<a href="https://github.com/artifact-pages/artifact-pages/releases" target="_blank" rel="noopener">GitHub Releases</a>の各CLIリリースには、LinuxとmacOS（amd64とarm64）向けの単体のバイナリと、チェックサムのファイルが付いています。Windowsは対象外です。このガイドのコマンドには、CLI 0.2.0以降が必要です（0.1.0のバイナリはファイル名が同じでも、コマンド名が古いままです）。</p>
       <div class="term" aria-label="リリースからCLIを入れる">
         <div class="term-head"><span>ターミナル / インストール</span><button class="copy-btn" type="button">コピー</button></div>
-<pre><span class="p">$</span> <span data-copy>VERSION=x.y.z</span>
-<span class="p">$</span> <span data-copy>OS=$(uname -s | tr A-Z a-z)</span>
+<pre><span class="p">$</span> <span data-copy>VERSION=0.2.0</span>
+<span class="p">$</span> <span data-copy>OS=$(uname -s | tr '[:upper:]' '[:lower:]')</span>
 <span class="p">$</span> <span data-copy>ARCH=$(uname -m | sed -e 's/x86_64/amd64/' -e 's/aarch64/arm64/')</span>
 <span class="p">$</span> <span data-copy>BASE=https://github.com/artifact-pages/artifact-pages/releases/download/v$VERSION</span>
 <span class="p">$</span> <span data-copy>curl -fsSLO "$BASE/artifact-pages_v${VERSION}_${OS}_${ARCH}"</span>
@@ -49,8 +49,8 @@
 <span class="p">$</span> <span data-copy>artifact-pages version</span></pre>
       </div>
       <ul>
-        <li><strong><code>x.y.z</code>はリリースのバージョンです。</strong>タグやファイル名に付く先頭の<code>v</code>は付けずに書きます。バイナリは、リリースのアセット<code>artifact-pages_vX.Y.Z_&lt;os&gt;_&lt;arch&gt;</code>で、<code>&lt;os&gt;</code>は<code>linux</code>か<code>darwin</code>、<code>&lt;arch&gt;</code>は<code>amd64</code>か<code>arm64</code>です。アーカイブではないので、展開は要りません。</li>
-        <li><strong>チェックサムの確認は<code>OK</code>と表示される必要があります。</strong>チェックサムのファイルはバイナリと同じリリースのものなので、壊れたダウンロードや途中までのアップロードは見つけられますが、リリース自体が改ざんされた場合は見つけられません。確認に通らないバイナリは実行しないでください。</li>
+        <li><strong><code>0.2.0</code>はリリースのバージョンの例です。</strong>タグやファイル名に付く先頭の<code>v</code>は付けずに書きます。バイナリは、リリースのアセット<code>artifact-pages_vX.Y.Z_&lt;os&gt;_&lt;arch&gt;</code>で、<code>&lt;os&gt;</code>は<code>linux</code>か<code>darwin</code>、<code>&lt;arch&gt;</code>は<code>amd64</code>か<code>arm64</code>です。アーカイブではないので、展開は要りません。</li>
+        <li><strong>チェックサムの確認は<code>OK</code>と表示される必要があります。</strong>チェックサムのファイルはバイナリと同じリリースのものなので、壊れたダウンロードや途中までのアップロードは見つけられますが、リリース自体が改ざんされた場合は見つけられません。<code>shasum</code>がないLinuxでは、代わりに<code>sha256sum -c -</code>を使います。確認に通らないバイナリは実行しないでください。</li>
         <li><strong>バイナリを<code>PATH</code>の通った場所に置きます。</strong>どのディレクトリでも構いません。<code>~/.local/bin</code>は一例で、先に作っておきます。</li>
         <li><strong>入れたCLIは出発点です。</strong>設定ファイルに<code>cli.version</code>があれば、入れたコマンドがそのリリースをダウンロードしてチェックサムを確かめ、そちらを実行します（下のコールアウトを参照）。リリースには、組み込んだGoモジュールのライセンスと、互換性のファイル<code>artifact-pages_vX.Y.Z_compatibility.json</code>も付いています。</li>
       </ul>
