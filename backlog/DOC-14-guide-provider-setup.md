@@ -23,7 +23,7 @@ Step 1 of [getting started](DOC-03-guide-getting-started.md) ("Set up the delive
 
 ## Primary sources
 
-- [Cloudflare deployment](https://github.com/tasuku43/git-artifact-pages/blob/main/docs/guides/cloudflare-deployment.md) and the Terraform modules under `terraform/modules/` in the product repository.
+- [Cloudflare deployment](https://github.com/artifact-pages/artifact-pages/blob/main/docs/guides/cloudflare-deployment.md) and the Terraform modules under `terraform/modules/` in the product repository.
 - The per-provider Terraform documentation, once the product publishes it.
 
 ## Acceptance criteria
