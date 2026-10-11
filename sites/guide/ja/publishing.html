@@ -139,7 +139,7 @@
       </ul>
 
       <h3 id="github-actions">GitHub Actionsで実行する</h3>
-      <p>公式のサイト公開手順では、管理リポジトリが提供する再利用可能ワークフローを使います。IMP-73で<code>artifact-pages registry setup</code>を実装中です。管理リポジトリが生成ファイルをコミットした後にだけ、次のように呼び出します。</p>
+      <p>管理リポジトリにCLI v0.3.0を導入し、<code>artifact-pages registry setup</code>でワークフローを生成してコミットします。サイトからの呼び出しは、その後に行います。</p>
       <div class="term" aria-label="管理リポジトリの公開ワークフローを呼び出すジョブ">
         <div class="term-head"><span>.github/workflows/publish-docs.yml / acme/checkout（抜粋）</span><button class="copy-btn" type="button">コピー</button></div>
 <pre><span class="k">jobs</span>:
@@ -156,8 +156,9 @@
         <li><strong>必須入力。</strong>サイトIDは必須です。リポジトリ名から自動で決めることはありません。公式手順では<code>@main</code>を推奨します。</li>
         <li><strong>ランナー。</strong>生成ワークフローはGitHubの同一リポジトリAction構文を使います。ランナー2.336.0以降が必要で、GitHub Enterprise Serverでは利用できません。</li>
         <li><strong>設定と認証情報。</strong>呼び出されたワークフローは、自分のコミットにある管理設定を読み、そのファイルを公式Actionに渡します。管理リポジトリのチェックアウト、設定ファイルのコピー、GitHub Appは不要です。<code>secrets: inherit</code>で呼び出し元のシークレットを渡せるのは、両方のリポジトリが同じOrganizationまたはEnterpriseにある場合です。管理リポジトリだけに置いたシークレットは渡りません。</li>
+        <li><strong>公開のゲート。</strong>生成されたサイトワークフローは、同梱Actionに<code>publish-on</code>で<code>push:refs/heads/main</code>と<code>workflow_dispatch:refs/heads/main</code>を指定します。それ以外のイベントまたはrefからの呼び出しはドライランになります。Actionを直接呼ぶ場合は独自の<code>publish-on</code>入力を設定します。</li>
         <li><strong>Environment。</strong>呼び出し元から再利用可能ワークフローのジョブに<code>environment:</code>を指定することはできません。生成ワークフローには省略可能な<code>environment</code>入力を用意し、サイトリポジトリのEnvironmentを選びます。Environmentのシークレットは呼び出し元のサイトに紐づいたままです。</li>
-        <li><strong>プレビュー。</strong>プレビューには<code>preview-site.yml</code>を呼び出し、呼び出し元に同じリポジトリのプルリクエストだけを許可する条件を残します。権限は<code>contents: read</code>に加え、コメントを有効にする場合は<code>pull-requests: write</code>、AWSでは<code>id-token: write</code>が必要です。</li>
+        <li><strong>プレビュー。</strong>プレビューには<code>preview-site.yml</code>を呼び出し、呼び出し元にも同じリポジトリのプルリクエストだけを許可する条件を置きます。生成ワークフローも<code>pull_request</code>以外とforkを拒否します。生成されるプレビューActionは<code>comment: true</code>でコメントを有効にするため、呼び出し元のjobには<code>contents: read</code>に加えて<code>pull-requests: write</code>が必要です。AWSでは<code>id-token: write</code>も必要です。</li>
         <li><strong>非公開の管理リポジトリ。</strong>Actionsのアクセスを<strong>Organization内のリポジトリからアクセス可能</strong>にします。管理ワークフローは呼び出し元のトークン、シークレット、OIDC IDを使って実行されます。呼び出し元の外部コラボレーターは、設定値を含むワークフローのログを見られます。詳しくは「<a href="configuration.html#remote-private">設定ファイル</a>」を参照してください。</li>
       </ul>
       <p>管理リポジトリの設定が公開されている場合、公開用のAction、<code>artifact-pages/publish-action</code>を直接呼び出せます。ActionはブートストラップのCLIをインストールし、そのうえで管理リポジトリの設定に書かれたリリースのCLIを動かします（「<a href="versions.html#actions">バージョンの固定と更新</a>」を参照）。入力は<code>site</code>（必須）、<code>source</code>、<code>ref</code>（<code>--ref</code>のメタデータ）、<code>config</code>、<code>dry-run</code>、<code>cli-version</code>、<code>publish-on</code>、<code>summary</code>、<code>checkout</code>、<code>fetch-depth</code>です。非公開の管理設定には、上の再利用可能ワークフローを使ってください。次の例では、プルリクエストで変更計画だけを確認し、<code>main</code>へのマージ後に公開します。</p>
