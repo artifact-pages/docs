@@ -99,3 +99,27 @@ jobs:
             printf 'Satellite boundary checks failed: %d\n' "$failures" >&2
             exit 1
           fi
+
+  unconfigured-subject:
+    runs-on: ubuntu-24.04
+    permissions:
+      contents: read
+      id-token: write
+    steps:
+      - name: Try to assume the satellite role without an environment
+        id: assume
+        continue-on-error: true
+        uses: aws-actions/configure-aws-credentials@e1253824e5c10ff9df46874f81ed3ec929e19cfd # v6.3.0
+        with:
+          role-to-assume: ${{ env.SATELLITE_ROLE }}
+          aws-region: us-east-1
+          role-session-name: artifact-pages-aws-verify-negative
+      - name: Verify the unconfigured subject was rejected
+        shell: bash
+        run: |
+          set -euo pipefail
+          if [[ "${{ steps.assume.outcome }}" == "success" ]]; then
+            echo "satellite role accepted a subject without the aws-verify environment" >&2
+            exit 1
+          fi
+          echo "satellite role rejected the unconfigured subject as expected"
