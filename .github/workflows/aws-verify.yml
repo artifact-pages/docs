@@ -92,7 +92,7 @@ jobs:
           expect_denied "registry lock" s3api put-object --bucket "$BUCKET" --key _control/locks/registry.json --body "$probe"
           expect_denied "app plane index" s3api put-object --bucket "$BUCKET" --key index.html --body "$probe"
           expect_denied "app plane asset" s3api put-object --bucket "$BUCKET" --key assets/t15-probe.js --body "$probe"
-          expect_denied "retained preview history delete" s3api delete-object --bucket "$BUCKET" --key _previews/aws-verify/revisions/t15-probe/files/index.html
+          expect_denied "neighboring site preview delete" s3api delete-object --bucket "$BUCKET" --key _previews/neighbor/revisions/t15-probe/files/index.html
           expect_denied "neighbor control read" s3api get-object --bucket "$BUCKET" --key _control/sites/neighbor/lock.json /dev/null
 
           if (( failures > 0 )); then
