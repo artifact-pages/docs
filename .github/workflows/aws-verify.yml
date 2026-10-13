@@ -1,0 +1,101 @@
+# Disposable AWS verification workflow (T15 OIDC proof).
+# Manual only and separate from production publishing.
+name: AWS verification
+
+on:
+  workflow_dispatch:
+    inputs:
+      dry-run:
+        description: Plan only, without writes.
+        type: boolean
+        default: true
+
+permissions:
+  contents: read
+
+concurrency:
+  group: aws-verify-docs
+  cancel-in-progress: false
+
+env:
+  CONFIG: github://artifact-pages/admin/aws-verify/artifact-pages.yaml?ref=main
+  BUCKET: artifact-pages-231136241959-us-east-1
+  SATELLITE_ROLE: arn:aws:iam::231136241959:role/artifact-pages-aws-verify-aws-verify-publisher
+  ADMIN_ROLE: arn:aws:iam::231136241959:role/artifact-pages-aws-verify-admin-publisher
+
+jobs:
+  publish:
+    runs-on: ubuntu-24.04
+    environment: aws-verify
+    permissions:
+      contents: read
+      id-token: write
+    steps:
+      - name: Try to assume the admin role
+        id: admin-attempt
+        continue-on-error: true
+        uses: aws-actions/configure-aws-credentials@e1253824e5c10ff9df46874f81ed3ec929e19cfd # v6.3.0
+        with:
+          role-to-assume: ${{ env.ADMIN_ROLE }}
+          aws-region: us-east-1
+          role-session-name: artifact-pages-aws-verify-cross
+      - name: Verify the admin role rejected the satellite subject
+        shell: bash
+        run: |
+          set -euo pipefail
+          if [[ "${{ steps.admin-attempt.outcome }}" == "success" ]]; then
+            echo "admin role accepted the satellite subject" >&2
+            exit 1
+          fi
+          echo "admin role rejected the satellite subject as expected"
+      - name: Configure satellite AWS credentials
+        uses: aws-actions/configure-aws-credentials@e1253824e5c10ff9df46874f81ed3ec929e19cfd # v6.3.0
+        with:
+          role-to-assume: ${{ env.SATELLITE_ROLE }}
+          aws-region: us-east-1
+          role-session-name: artifact-pages-aws-verify-site
+      - name: Publish the AWS verification site
+        uses: artifact-pages/publish-action@8d66d7a606fc047715d25e8acdb8f09309ad4991 # v0.2.0
+        with:
+          site: aws-verify
+          config: ${{ env.CONFIG }}
+          dry-run: ${{ inputs.dry-run }}
+          publish-on: workflow_dispatch:refs/heads/main
+      - name: Check satellite boundaries
+        if: ${{ inputs.dry-run == false }}
+        shell: bash
+        run: |
+          set -uo pipefail
+          failures=0
+          probe="$(mktemp)"
+          trap 'rm -f "$probe"' EXIT
+          printf 't15 boundary probe\n' > "$probe"
+
+          expect_denied() {
+            local description="$1"
+            shift
+            local output
+            if output="$(aws "$@" 2>&1)"; then
+              printf 'FAIL: %s: command unexpectedly succeeded\n' "$description"
+              failures=$((failures + 1))
+            elif [[ "$output" == *AccessDenied* ]]; then
+              printf 'PASS: %s: AccessDenied\n' "$description"
+            else
+              printf 'FAIL: %s: expected AccessDenied, got: %s\n' "$description" "$output"
+              failures=$((failures + 1))
+            fi
+          }
+
+          expect_denied "neighboring site artifacts" s3api put-object --bucket "$BUCKET" --key _artifacts/neighbor/t15-probe.txt --body "$probe"
+          expect_denied "neighboring site index" s3api put-object --bucket "$BUCKET" --key _indexes/neighbor/index.json --body "$probe"
+          expect_denied "registry" s3api put-object --bucket "$BUCKET" --key _indexes/sites.json --body "$probe"
+          expect_denied "registry lock" s3api put-object --bucket "$BUCKET" --key _control/locks/registry.json --body "$probe"
+          expect_denied "app plane index" s3api put-object --bucket "$BUCKET" --key index.html --body "$probe"
+          expect_denied "app plane asset" s3api put-object --bucket "$BUCKET" --key assets/t15-probe.js --body "$probe"
+          expect_denied "retained preview history delete" s3api delete-object --bucket "$BUCKET" --key _previews/aws-verify/revisions/t15-probe/files/index.html
+          expect_denied "neighbor control read" s3api get-object --bucket "$BUCKET" --key _control/sites/neighbor/lock.json /dev/null
+
+          if (( failures > 0 )); then
+            printf 'Satellite boundary checks failed: %d\n' "$failures" >&2
+            exit 1
+          fi
