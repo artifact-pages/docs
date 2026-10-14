@@ -66,6 +66,9 @@ Batch of 2026-10-02: DOC-02 (reading-features revision), DOC-04–07 and DOC-08�
 | 17 | [DOC-17](DOC-17-guide-versions.md) | guide | `versions.html` — pinning and upgrading versions (and revisions to pages that described one product version) | Done |
 | 18 | [DOC-18](DOC-18-guide-release-catch-up.md) | guide | Revisions after the split release — command names, install, links | In progress |
 | 19 | [DOC-19](DOC-19-architecture-command-catch-up.md) | architecture | Revisions after the split release — command names, withdrawal, control keys | In progress |
+| 20 | [DOC-20](DOC-20-guide-getting-started-links-versions.md) | guide | `getting-started.html` revision — link the Cloudflare guide and module, current CLI version | Open |
+| 21 | [DOC-21](DOC-21-guide-publishing-single-repo-example.md) | guide | `publishing.html` revision — single-repository workflow example, preview comment settings | Open |
+| 22 | [DOC-22](DOC-22-guide-machine-readable-docs.md) | guide, architecture | Machine-readable access to the sites (`llms.txt` or raw page links); idea, low priority | Open |
 
 ## Product observations from this work
 
