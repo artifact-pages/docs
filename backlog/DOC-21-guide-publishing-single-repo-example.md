@@ -12,12 +12,12 @@ Finding D4 of cold-start trial A (2026-10-14), where a fresh agent with no prior
 ## Scope
 
 - Add a workflow example for a single repository that is both admin and site, with a local `config: artifact-pages.yaml`.
-- State that direct Action use needs `comment: true` and `pull-requests: write` for the preview comment. The page implies the comment is on.
+- Name the preview Action (`artifact-pages/preview-action`) explicitly. Its `comment` input defaults to `false`; with `comment: true` it creates or updates one PR comment per site, and it needs `pull-requests: write` (verified against its `action.yml`). Scope `comment: true` and `pull-requests: write` to the preview job only. The page implies the comment is on.
 
 ## Acceptance criteria
 
 - [ ] Both languages include the single-repository workflow example with a local `config: artifact-pages.yaml`, matching the Action's inputs.
-- [ ] Both languages state that direct Action use needs `comment: true` and `pull-requests: write` for the preview comment.
+- [ ] Both languages name `artifact-pages/preview-action` and state that its preview comment needs `comment: true` and `pull-requests: write`, scoped to the preview job only.
 - [ ] Renders in light and dark themes and at ~400px width without page-level horizontal scrolling.
 - [ ] The owner reviewed and approved the revision.
 
