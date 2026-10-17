@@ -1,6 +1,7 @@
 # DOC-06 — Guide: configuration
 
-- Status: In progress
+- Status: Superseded
+- Superseded by: DOC-27, DOC-30 (2026-10-17, structure v3)
 - Site: `guide`
 - Page: `ja/configuration.html`, `en/configuration.html`
 - Audience: Admins maintaining a deployment

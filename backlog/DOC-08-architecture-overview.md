@@ -1,6 +1,7 @@
 # DOC-08 — Architecture: overview and site registration
 
-- Status: In progress
+- Status: Superseded
+- Superseded by: DOC-29 (2026-10-17, structure v3)
 - Site: `architecture`
 - Page: `ja/overview.html`, `en/overview.html`
 - Audience: Readers who want to understand how the system works

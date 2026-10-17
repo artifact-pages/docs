@@ -1,6 +1,7 @@
 # DOC-15 — Guide: shallow checkouts and document dates
 
-- Status: In progress
+- Status: Superseded
+- Superseded by: DOC-27 (2026-10-17, structure v3)
 - Site: `guide`
 - Page: revision of `ja/publishing.html` and `en/publishing.html` ("Dates and committers" bullet, the example workflow, and a new "Shallow checkouts and dates" subsection under CI)
 - Audience: Adopters writing their publish workflow and deciding between a shallow checkout and a full clone

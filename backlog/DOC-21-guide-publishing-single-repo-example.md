@@ -1,6 +1,7 @@
 # DOC-21 — Guide: publishing from a single repository and direct Action use
 
-- Status: Open
+- Status: Superseded
+- Superseded by: DOC-27 (2026-10-17, structure v3)
 - Site: `guide`
 - Page: revisions to `publishing.html` in `ja/` and `en/`
 - Audience: Teams publishing from a repository, including adopters who are both admin and site

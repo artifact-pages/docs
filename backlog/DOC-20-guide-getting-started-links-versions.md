@@ -1,6 +1,7 @@
 # DOC-20 — Guide: getting started links and current versions
 
-- Status: Open
+- Status: Superseded
+- Superseded by: DOC-27 (2026-10-17, structure v3)
 - Site: `guide`
 - Page: revisions to `getting-started.html` in `ja/` and `en/`
 - Audience: Admins adopting the product for the first time

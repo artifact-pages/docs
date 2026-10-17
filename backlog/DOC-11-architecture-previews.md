@@ -1,6 +1,7 @@
 # DOC-11 — Architecture: previews
 
-- Status: In progress
+- Status: Superseded
+- Superseded by: DOC-29 (2026-10-17, structure v3)
 - Site: `architecture`
 - Page: `ja/previews.html`, `en/previews.html`
 - Audience: Readers who want to understand how the system works

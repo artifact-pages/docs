@@ -1,6 +1,7 @@
 # DOC-07 — Guide: access and trust
 
-- Status: In progress
+- Status: Superseded
+- Superseded by: DOC-29 (2026-10-17, structure v3)
 - Site: `guide`
 - Page: `ja/access-and-trust.html`, `en/access-and-trust.html`
 - Audience: Admins and teams deciding whether and what to publish

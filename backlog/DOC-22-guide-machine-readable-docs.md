@@ -6,6 +6,7 @@
 - Audience: Tools and agents reading the documentation
 - Depends on: owner decision
 - Priority: low (papercut)
+- Note (2026-10-17, structure v3): applies to whatever sites [DOC-23](DOC-23-structure-and-site-migration.md) settles; revisit the options once the site IDs and URLs are decided.
 
 Finding D7 of cold-start trial A (2026-10-14), where a fresh agent with no prior context adopted the product on Cloudflare using only public material.
 

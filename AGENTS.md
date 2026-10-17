@@ -12,7 +12,7 @@ sites/
     ja/  en/  assets/
   architecture/   registered source directory (sourcePath: sites/architecture)
     ja/  en/  assets/
-backlog/          one ticket per page (DOC-xx) and the queue README
+backlog/          one ticket per chapter (DOC-xx), the agreed structure and the queue README
 ~~~
 
 Keep agent instruction files and anything that is not a published page outside `sites/<site-id>/`; everything inside a registered source directory is published and readable.
@@ -44,18 +44,19 @@ Pages are not previewed locally from this repository. Author them so that they h
 
 ## Backlog and issue tracking
 
-`backlog/` holds one ticket per page. `backlog/README.md` is the queue: site lineup, page conventions, workflow and index. Product problems found while writing go to the product repository's issue tracker, not here.
+`backlog/` holds one ticket per chapter of the agreed [structure](backlog/structure.md); page granularity is decided in DOC-23. `backlog/README.md` is the queue: site lineup, page conventions, workflow and index. Product problems found while writing go to the product repository's issue tracker, not here.
 
 | Status | Meaning | Completion rule |
 | --- | --- | --- |
 | `Open` | Not yet started. | — |
 | `In progress` | Being drafted or revised. | — |
 | `Blocked` | Waiting on a decision or external change. | Record the blocker in the ticket. |
+| `Superseded` | Replaced by another ticket; kept for history. | The ticket names its replacement(s). Pages it produced stay published until the replacement ships. |
 | `Done` | Page published and approved. | The owner approved the page and its acceptance criteria are checked. |
 
 Workflow: draft both languages, have the draft reviewed independently, then open a pull request in this repository. After the PR is merged and the workflow publishes it, the owner reviews the pages on the real site. Fixes after that also go through pull requests on a branch, never directly on main. Mark `Done` only after owner approval. Keep the README index in sync with each ticket's status.
 
 ~~~sh
 # Unfinished tickets
-grep -H -m1 '^- Status:' backlog/DOC-*.md | grep -v 'Status: Done$' | sed 's|^backlog/||; s|:- Status: | — |'
+grep -H -m1 '^- Status:' backlog/DOC-*.md | grep -v -e 'Status: Done$' -e 'Status: Superseded$' | sed 's|^backlog/||; s|:- Status: | — |'
 ~~~

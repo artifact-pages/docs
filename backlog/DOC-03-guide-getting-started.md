@@ -1,6 +1,7 @@
 # DOC-03 — Guide: getting started
 
-- Status: In progress
+- Status: Superseded
+- Superseded by: DOC-27 (2026-10-17, structure v3)
 - Site: `guide`
 - Page: `ja/getting-started.html`, `en/getting-started.html`
 - Audience: Admins setting up a deployment for the first time

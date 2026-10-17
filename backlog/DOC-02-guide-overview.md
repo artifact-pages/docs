@@ -1,6 +1,7 @@
 # DOC-02 — Guide: overview page
 
-- Status: In progress
+- Status: Superseded
+- Superseded by: DOC-24, DOC-25 (2026-10-17, structure v3)
 - Site: `guide`
 - Page: `ja/what-is-git-artifact-pages.html`, `en/what-is-git-artifact-pages.html`
 - Audience: Everyone; first page a new visitor reads
