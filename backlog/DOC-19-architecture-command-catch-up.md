@@ -1,6 +1,7 @@
 # DOC-19 — Architecture: catch up with the current command names
 
-- Status: In progress
+- Status: Superseded
+- Superseded by: DOC-29 (2026-10-17, structure v3)
 - Assignee: Claude
 - Site: `architecture`
 - Page: revisions to `overview.html`, `storage-layout.html`, `publishing-model.html`, `previews.html`, `trust-model.html` and `search.html` in `ja/` and `en/`, and `assets/site.js`

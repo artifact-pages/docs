@@ -1,6 +1,7 @@
 # DOC-18 — Guide: catch up with the split release (command names, install, links)
 
-- Status: In progress
+- Status: Superseded
+- Superseded by: DOC-27, DOC-28, DOC-30 (2026-10-17, structure v3)
 - Assignee: Claude
 - Site: `guide`
 - Page: revisions to `getting-started.html`, `publishing.html`, `configuration.html` and `what-is-git-artifact-pages.html` in `ja/` and `en/`

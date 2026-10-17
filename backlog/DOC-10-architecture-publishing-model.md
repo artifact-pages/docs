@@ -1,6 +1,7 @@
 # DOC-10 — Architecture: publishing model
 
-- Status: In progress
+- Status: Superseded
+- Superseded by: DOC-29 (2026-10-17, structure v3)
 - Site: `architecture`
 - Page: `ja/publishing-model.html`, `en/publishing-model.html`
 - Audience: Readers who want to understand how the system works

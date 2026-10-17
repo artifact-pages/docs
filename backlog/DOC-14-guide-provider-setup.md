@@ -1,6 +1,7 @@
 # DOC-14 — Guide: provider setup
 
-- Status: Open
+- Status: Superseded
+- Superseded by: DOC-26 (2026-10-17, structure v3)
 - Site: `guide`
 - Page: one page per provider or one page with a section each (decide when drafting), for example `ja/setup-cloudflare.html`, `en/setup-cloudflare.html`
 - Audience: Admins preparing a delivery target

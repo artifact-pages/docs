@@ -1,6 +1,7 @@
 # DOC-05 — Guide: reading
 
-- Status: In progress
+- Status: Superseded
+- Superseded by: DOC-25 (2026-10-17, structure v3)
 - Site: `guide`
 - Page: `ja/reading.html`, `en/reading.html`
 - Audience: Readers of published sites

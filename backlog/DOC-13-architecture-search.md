@@ -1,6 +1,7 @@
 # DOC-13 — Architecture: search and indexes
 
-- Status: In progress
+- Status: Superseded
+- Superseded by: DOC-25, DOC-29 (2026-10-17, structure v3)
 - Site: `architecture`
 - Page: `ja/search.html`, `en/search.html`
 - Audience: Readers who want to understand how the system works

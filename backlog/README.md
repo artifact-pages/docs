@@ -4,9 +4,11 @@ Moved on 2026-10-03 from `docs/backlog/documentation/` in [artifact-pages/artifa
 
 Statuses follow the [shared backlog legend](../AGENTS.md#backlog-and-issue-tracking). This track covers the public, reader-facing documentation sites published from `sites/`. Internal design notes, UI concepts, and backlog records stay in their existing tracks and are not published as these sites.
 
-Each ticket is one page (or one structural change). Until 2026-10-01 pages were written and reviewed one at a time. Since 2026-10-02 the owner drafts every page that can be written in one batch, has it reviewed independently by agents first, and then reviews the set together.
+There is one ticket per chapter of the agreed [structure](structure.md) (owner-agreed 2026-10-17); page granularity within a chapter is decided in [DOC-23](DOC-23-structure-and-site-migration.md). Tickets DOC-02 to DOC-16 and DOC-18 to DOC-21 were written per page and are superseded by the chapter tickets DOC-23 to DOC-30; they are kept for history.
 
-## Site lineup
+## Site lineup (current published state)
+
+[structure.md](structure.md) supersedes this lineup. The table below is the current published state until [DOC-23](DOC-23-structure-and-site-migration.md) settles the final site IDs and URLs (two per-language sites is the leading option, not decided).
 
 Sites are divided by the reader's purpose, not by language. Translations live inside one site (see [`AGENTS.md`](../AGENTS.md)).
 
@@ -42,33 +44,40 @@ Names are English and descriptions carry both languages because registry `name` 
 
 ## Index
 
-Batch of 2026-10-02: DOC-02 (reading-features revision), DOC-04–07 and DOC-08–13 are drafted and awaiting review. DOC-04 and DOC-06 cover only what does not depend on the release-shape decision in [DOC-03](DOC-03-guide-getting-started.md#blocker-2026-10-01); each records its release-dependent parts. Second review round of 2026-10-03 applied to DOC-02 and DOC-04–13 (each ticket records it). Per the owner, pages assume releases are published, use `x.y.z`, and link to GitHub Releases once; release details are expected to change. DOC-03 was unblocked on 2026-10-03 (CLI via mise, Actions by exact release tag) and drafted with the DOC-04 workflow example; both await review.
+See [structure.md](structure.md) for the agreed chapters. Order: chapter tickets, then DOC-22, then Done and Superseded tickets.
 
-
-| Order | Ticket | Site | Page | Status |
-| ---: | --- | --- | --- | --- |
-| 1 | [DOC-01](DOC-01-guide-site-structure.md) | guide | Move to the `guide` site structure | Done |
-| 2 | [DOC-02](DOC-02-guide-overview.md) | guide | `what-is-git-artifact-pages.html` — overview | In progress |
-| 3 | [DOC-03](DOC-03-guide-getting-started.md) | guide | `getting-started.html` | In progress |
-| 4 | [DOC-04](DOC-04-guide-publishing.md) | guide | `publishing.html` | In progress |
-| 5 | [DOC-05](DOC-05-guide-reading.md) | guide | `reading.html` | In progress |
-| 6 | [DOC-06](DOC-06-guide-configuration.md) | guide | `configuration.html` | In progress |
-| 7 | [DOC-07](DOC-07-guide-access-and-trust.md) | guide | `access-and-trust.html` | In progress |
-| 8 | [DOC-08](DOC-08-architecture-overview.md) | architecture | `overview.html` and site registration | In progress |
-| 9 | [DOC-09](DOC-09-architecture-storage-layout.md) | architecture | `storage-layout.html` | In progress |
-| 10 | [DOC-10](DOC-10-architecture-publishing-model.md) | architecture | `publishing-model.html` | In progress |
-| 11 | [DOC-11](DOC-11-architecture-previews.md) | architecture | `previews.html` | In progress |
-| 12 | [DOC-12](DOC-12-architecture-trust-model.md) | architecture | `trust-model.html` | In progress |
-| 13 | [DOC-13](DOC-13-architecture-search.md) | architecture | `search.html` — name search and page text search | In progress |
-| 14 | [DOC-14](DOC-14-guide-provider-setup.md) | guide | Provider setup (AWS, Cloudflare) | Open |
-| 15 | [DOC-15](DOC-15-guide-shallow-checkout-dates.md) | guide | `publishing.html` revision — shallow checkouts and document dates | In progress |
-| 16 | [DOC-16](DOC-16-guide-private-config-github-app.md) | guide | GitHub App pattern for private configuration repositories (`configuration.html`) | In progress |
-| 17 | [DOC-17](DOC-17-guide-versions.md) | guide | `versions.html` — pinning and upgrading versions (and revisions to pages that described one product version) | Done |
-| 18 | [DOC-18](DOC-18-guide-release-catch-up.md) | guide | Revisions after the split release — command names, install, links | In progress |
-| 19 | [DOC-19](DOC-19-architecture-command-catch-up.md) | architecture | Revisions after the split release — command names, withdrawal, control keys | In progress |
-| 20 | [DOC-20](DOC-20-guide-getting-started-links-versions.md) | guide | `getting-started.html` revision — link the Cloudflare guide and module, current CLI version | Open |
-| 21 | [DOC-21](DOC-21-guide-publishing-single-repo-example.md) | guide | `publishing.html` revision — single-repository workflow example, preview comment settings | Open |
-| 22 | [DOC-22](DOC-22-guide-machine-readable-docs.md) | guide, architecture | Machine-readable access to the sites (`llms.txt` or raw page links); idea, low priority | Open |
+| Order | Ticket | Title | Status |
+| ---: | --- | --- | --- |
+| 1 | [DOC-23](DOC-23-structure-and-site-migration.md) | Structure and site migration | Blocked |
+| 2 | [DOC-24](DOC-24-entry-readme.md) | Entry README: outcomes and overall picture | Open |
+| 3 | [DOC-25](DOC-25-experience-and-features.md) | 体験と機能 (Experience and features) | Open |
+| 4 | [DOC-26](DOC-26-setup-infrastructure.md) | 導入: インフラを構築する (Setup: build the infrastructure, Cloudflare and AWS) | Open |
+| 5 | [DOC-27](DOC-27-setup-admin-to-first-publish.md) | 導入: 管理リポジトリ準備 → 閲覧アプリのデプロイ → サイト登録 → 最初のサイト公開 → PRプレビュー (Setup: admin repository to first publish and PR preview) | Open |
+| 6 | [DOC-28](DOC-28-rollout-and-operations.md) | 社内展開と運用 (Rollout and operations) | Open |
+| 7 | [DOC-29](DOC-29-architecture.md) | アーキテクチャ (Architecture, including cost and performance) | Open |
+| 8 | [DOC-30](DOC-30-reference.md) | リファレンス (Reference) | Open |
+| 9 | [DOC-22](DOC-22-guide-machine-readable-docs.md) | Docs: machine-readable access to the sites | Open |
+| 10 | [DOC-01](DOC-01-guide-site-structure.md) | Move to the `guide` site structure | Done |
+| 11 | [DOC-17](DOC-17-guide-versions.md) | Guide: pinning and upgrading versions | Done |
+| 12 | [DOC-02](DOC-02-guide-overview.md) | Guide: overview page | Superseded |
+| 13 | [DOC-03](DOC-03-guide-getting-started.md) | Guide: getting started | Superseded |
+| 14 | [DOC-04](DOC-04-guide-publishing.md) | Guide: publishing | Superseded |
+| 15 | [DOC-05](DOC-05-guide-reading.md) | Guide: reading | Superseded |
+| 16 | [DOC-06](DOC-06-guide-configuration.md) | Guide: configuration | Superseded |
+| 17 | [DOC-07](DOC-07-guide-access-and-trust.md) | Guide: access and trust | Superseded |
+| 18 | [DOC-08](DOC-08-architecture-overview.md) | Architecture: overview and site registration | Superseded |
+| 19 | [DOC-09](DOC-09-architecture-storage-layout.md) | Architecture: storage layout | Superseded |
+| 20 | [DOC-10](DOC-10-architecture-publishing-model.md) | Architecture: publishing model | Superseded |
+| 21 | [DOC-11](DOC-11-architecture-previews.md) | Architecture: previews | Superseded |
+| 22 | [DOC-12](DOC-12-architecture-trust-model.md) | Architecture: trust model | Superseded |
+| 23 | [DOC-13](DOC-13-architecture-search.md) | Architecture: search and indexes | Superseded |
+| 24 | [DOC-14](DOC-14-guide-provider-setup.md) | Guide: provider setup | Superseded |
+| 25 | [DOC-15](DOC-15-guide-shallow-checkout-dates.md) | Guide: shallow checkouts and document dates | Superseded |
+| 26 | [DOC-16](DOC-16-guide-private-config-github-app.md) | Guide: GitHub App for private configuration repositories | Superseded |
+| 27 | [DOC-18](DOC-18-guide-release-catch-up.md) | Guide: catch up with the split release (command names, install, links) | Superseded |
+| 28 | [DOC-19](DOC-19-architecture-command-catch-up.md) | Architecture: catch up with the current command names | Superseded |
+| 29 | [DOC-20](DOC-20-guide-getting-started-links-versions.md) | Guide: getting started links and current versions | Superseded |
+| 30 | [DOC-21](DOC-21-guide-publishing-single-repo-example.md) | Guide: publishing from a single repository and direct Action use | Superseded |
 
 ## Product observations from this work
 

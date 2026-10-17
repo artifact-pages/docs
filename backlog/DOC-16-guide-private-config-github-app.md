@@ -1,6 +1,7 @@
 # DOC-16 — Guide: GitHub App for private configuration repositories
 
-- Status: In progress
+- Status: Superseded
+- Superseded by: DOC-27 (2026-10-17, structure v3)
 - Site: `guide`
 - Page: new section "A private admin repository" in `ja/configuration.html` and `en/configuration.html` (`#remote-private`); pointer from `publishing.html`
 - Audience: Adopters whose admin (config) repository is private and whose site repositories publish through `github://` config locators

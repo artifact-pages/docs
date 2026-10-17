@@ -1,6 +1,7 @@
 # DOC-04 — Guide: publishing
 
-- Status: In progress
+- Status: Superseded
+- Superseded by: DOC-27 (2026-10-17, structure v3)
 - Site: `guide`
 - Page: `ja/publishing.html`, `en/publishing.html`
 - Audience: Teams publishing from their own repositories

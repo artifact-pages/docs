@@ -1,6 +1,7 @@
 # DOC-12 — Architecture: trust model
 
-- Status: In progress
+- Status: Superseded
+- Superseded by: DOC-29 (2026-10-17, structure v3)
 - Site: `architecture`
 - Page: `ja/trust-model.html`, `en/trust-model.html`
 - Audience: Readers who want to understand how the system works

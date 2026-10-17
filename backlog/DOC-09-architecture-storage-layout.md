@@ -1,6 +1,7 @@
 # DOC-09 — Architecture: storage layout
 
-- Status: In progress
+- Status: Superseded
+- Superseded by: DOC-29 (2026-10-17, structure v3)
 - Site: `architecture`
 - Page: `ja/storage-layout.html`, `en/storage-layout.html`
 - Audience: Readers who want to understand how the system works
