@@ -1,7 +1,7 @@
 # DOC-28 — 社内展開と運用 (Rollout and operations)
 
 - Status: Open
-- Site: see [DOC-23](DOC-23-structure-and-site-migration.md) (site IDs and URLs undecided)
+- Site: `ja`, `en` ([DOC-23](DOC-23-structure-and-site-migration.md)); owns `03-operations/` in each, at identical relative paths
 - Depends on: [DOC-23](DOC-23-structure-and-site-migration.md) for publication only; builds on DOC-27
 
 ## Purpose

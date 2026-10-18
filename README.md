@@ -7,6 +7,8 @@ Public documentation for [Git Artifact Pages](https://github.com/artifact-pages/
 | `guide` | [`sites/guide/`](sites/guide/) | Adopting, publishing and reading |
 | `architecture` | [`sites/architecture/`](sites/architecture/) | How it works and why |
 
+The sites are moving to per-language sites `ja` and `en` (sources `sites/ja/` and `sites/en/`) as decided in [DOC-23](backlog/DOC-23-structure-and-site-migration.md); the table above stays current until launch.
+
 Each site has Japanese (`ja/`) and English (`en/`) pages. This repository is a satellite: it publishes its own sites with `artifact-pages site sync` (the CLI always builds the full-text search data; the former `--fulltext` flag was removed and is now an unknown-flag error). The registry, the reader app and the publish workflow are operated from `artifact-pages/admin`.
 
 ## Working on the pages

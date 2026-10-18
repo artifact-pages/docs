@@ -1,7 +1,7 @@
 # DOC-25 — 体験と機能 (Experience and features)
 
 - Status: Open
-- Site: see [DOC-23](DOC-23-structure-and-site-migration.md) (site IDs and URLs undecided)
+- Site: `ja`, `en` ([DOC-23](DOC-23-structure-and-site-migration.md)); owns `01-features/` (`index.html` and the four feature pages) in each, at identical relative paths
 - Depends on: [DOC-23](DOC-23-structure-and-site-migration.md) for publication only; final reader UI descriptions follow the shipped UI of ISSUE-107, ISSUE-108 and ISSUE-109 (product repository, merged as #163, #162 and #166)
 
 ## Purpose

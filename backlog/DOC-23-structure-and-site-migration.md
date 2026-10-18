@@ -1,38 +1,61 @@
 # DOC-23 — Structure and site migration
 
-- Status: Blocked
-- Site: see [DOC-23](DOC-23-structure-and-site-migration.md) (site IDs and URLs undecided)
-- Depends on: owner decisions (below)
+- Status: Open
+- Site: `ja`, `en` (new, planned); `guide` and `architecture` stay current until launch
+- Depends on: the reader UI improvements (ISSUE-107, ISSUE-108, ISSUE-109) for final operating instructions and screenshots only; migration work has not started
 
-## Blocker (2026-10-17)
+## Decisions (owner, 2026-10-18)
 
-Waiting on the owner for the decisions that [structure.md](structure.md) leaves open:
+1. Sites: one site per language. Site IDs `ja` and `en`, sources `sites/ja/` and `sites/en/` in this repository. Display names: `Artifact Pages ドキュメント` (`ja`) and `Artifact Pages Documentation` (`en`). Each site holds the whole [structure.md](structure.md) tree for its language.
+2. Granularity: one page per leaf of the structure.md tree; each chapter and sub-folder has an entry page.
+3. File names: English names; both sites use identical relative paths, so a page's translation is the same path in the other site. Numeric `01-` prefixes only where order is information: the chapter folders (`01-features/` to `05-reference/`), the four feature pages and the setup steps. No prefixes inside operations, architecture or reference. Reason: the reader lists folders first, then files by filename, not by title (product TD19).
+4. Format: the site root is `README.md` (Markdown), because the reader's site-home Overview renders only a root `README.md` or `index.md`. Every folder below the root uses `index.html` as its entry page, and every other page is HTML. Pages must be as rich as the current HTML manuscript pages in `sites/guide` and `sites/architecture`; their content may be partly reused. Each site stays self-contained with its own `assets/`.
+5. Old URLs: before the new sites launch, fix the known links to the old `/guide/…` and `/architecture/…` URLs (product repository, `artifact-pages/admin`, release notes); at launch, unregister `guide` and `architecture` (no stub pages). The product has no redirects; unknown paths are soft 404s.
 
-- Final site IDs and URLs. Two per-language sites is the leading option, consistently favored, but not decided. Public settings do not change until it is.
-- Migration of the old URLs (`/guide/<lang>/…`, `/architecture/<lang>/…`, referenced by cross-site links and by the registered `guide` and `architecture` sites).
-- Page granularity: structure.md is a logical tree, not one file per entry; chapter READMEs included.
-- File names and numeric prefixes (today: no prefixes, reading order via pager navigation; do not assume current file-name order is the reading order).
-- Manuscript format.
+Also from the owner (handoff guidance):
+
+- Final operating instructions and screenshots are made after the reader UI improvements (ISSUE-107, ISSUE-108, ISSUE-109 in the product repository) land.
+- Translation of the public material is settled last; drafts need not be translated in bulk now.
+- Public migration, releases and deploys are handled separately with owner approval.
+
+## Agreed layout
+
+~~~text
+sites/<ja|en>/
+├── README.md
+├── 01-features/ index.html, 01-publish-and-review.html, 02-find.html, 03-read.html, 04-provide-and-operate.html
+├── 02-setup/ index.html, 01-infrastructure/{index.html, aws.html, cloudflare.html}, 02-admin-repository.html, 03-reader-app.html, 04-register-site.html, 05-first-site.html, 06-pr-previews.html
+├── 03-operations/ index.html, onboard-team.html, update-shared-workflows.html, upgrade.html, change-or-retire-site.html, troubleshooting.html
+├── 04-architecture/ index.html, repositories-and-updates.html, publishing-and-previews.html, reading-and-search.html, security-and-access.html, cost-and-performance/{index.html, aws.html, cloudflare.html}
+└── 05-reference/ index.html, reader/{index.html, keyboard-shortcuts.html, search.html, urls.html, local-storage.html}, configuration.html, cli.html, github-actions.html, terraform.html, versions.html
+~~~
+
+DOC-27 still decides where the local-try path (`provider: local`) goes inside `02-setup/`.
+
+## Open check
+
+- Whether a link from a page in one site to a page in the other site navigates inside the reader app. If it does not, language-switch and cross-site links use absolute `https://artifact-pages.dev/<id>/…` URLs instead of relative ones.
 
 ## Purpose
 
-Settle the physical shape of the documentation (sites, URLs, files, format) and migrate the published sites to it, so that DOC-24 to DOC-30 have a place to land.
+Record the physical shape of the documentation (sites, URLs, files, format; decided 2026-10-18) and migrate the published sites to it, so that DOC-24 to DOC-30 have a place to land.
 
 ## Scope
 
-- Decide and record the items above, then update `AGENTS.md` and the [README](README.md) site lineup to match.
-- Register or rename sites, move the sources, and set up redirects or pointers for old URLs, once the owner approves.
-- Update the registry configuration in `artifact-pages/admin` if site IDs change (a separate pull request there).
-- Reconcile the in-product and cross-repository links to the old URLs (product repository, `admin`, release notes).
+- Keep `AGENTS.md`, the [README](README.md) site lineup and the repository `README.md` in line with the decisions above.
+- Create `sites/ja/` and `sites/en/` with the agreed layout and their own `assets/`, then register the sites `ja` and `en` in the registry configuration in `artifact-pages/admin` (a separate pull request there), once the owner approves.
+- Before launch, fix the known links to the old `/guide/…` and `/architecture/…` URLs (product repository, `admin`, release notes).
+- At launch, unregister `guide` and `architecture`; no stub pages are left.
+- Resolve the open check above.
 
 ## Gate
 
-This ticket gates the publication of DOC-24 to DOC-30, not their drafting. Drafts proceed against [structure.md](structure.md) and are moved into place after this ticket settles.
+This ticket gates the publication of DOC-24 to DOC-30, not their drafting. Drafts proceed against [structure.md](structure.md) and the agreed layout, and are moved into place at migration.
 
 ## Out of scope
 
 - Page content (DOC-24 to DOC-30).
-- Changing public settings before the owner decides.
+- Changing public settings (registry, deploys, releases) without the owner's approval.
 
 ## Inputs carried over
 
@@ -41,9 +64,9 @@ This ticket gates the publication of DOC-24 to DOC-30, not their drafting. Draft
 
 ## Acceptance criteria
 
-- [ ] Both languages exist with matching structure, localized H1 and `<title>`, and a working language switch.
+- [ ] Both sites exist with identical relative paths, localized H1 and `<title>`, and an in-page language switch linking to the same path in the other site.
 - [ ] Every command, flag, path, number and behavior matches the cited primary sources and the current CLI help; nothing is stated that the specification does not state.
 - [ ] Renders in light and dark themes and at ~400 px width without page-level horizontal scrolling (checked in the markup and styles).
 - [ ] The owner reviewed and approved the pages on the real site.
-- [ ] The owner decisions are recorded in this ticket and in `AGENTS.md` and the README.
-- [ ] Old URLs resolve or point to their replacements, and cross-site links work (checked against the real site).
+- [x] The owner decisions are recorded in this ticket and in `AGENTS.md` and the README.
+- [ ] Known links point to the new URLs, the old sites `guide` and `architecture` are unregistered, and cross-site links work (checked against the real site).

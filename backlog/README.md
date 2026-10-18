@@ -4,34 +4,38 @@ Moved on 2026-10-03 from `docs/backlog/documentation/` in [artifact-pages/artifa
 
 Statuses follow the [shared backlog legend](../AGENTS.md#backlog-and-issue-tracking). This track covers the public, reader-facing documentation sites published from `sites/`. Internal design notes, UI concepts, and backlog records stay in their existing tracks and are not published as these sites.
 
-There is one ticket per chapter of the agreed [structure](structure.md) (owner-agreed 2026-10-17); page granularity within a chapter is decided in [DOC-23](DOC-23-structure-and-site-migration.md). Tickets DOC-02 to DOC-16 and DOC-18 to DOC-21 were written per page and are superseded by the chapter tickets DOC-23 to DOC-30; they are kept for history.
+There is one ticket per chapter of the agreed [structure](structure.md) (owner-agreed 2026-10-17); sites, page granularity, file names and format were decided by the owner on 2026-10-18 and are recorded in [DOC-23](DOC-23-structure-and-site-migration.md). Tickets DOC-02 to DOC-16 and DOC-18 to DOC-21 were written per page and are superseded by the chapter tickets DOC-23 to DOC-30; they are kept for history.
 
-## Site lineup (current published state)
+## Site lineup
 
-[structure.md](structure.md) supersedes this lineup. The table below is the current published state until [DOC-23](DOC-23-structure-and-site-migration.md) settles the final site IDs and URLs (two per-language sites is the leading option, not decided).
+Decided 2026-10-18 ([DOC-23](DOC-23-structure-and-site-migration.md)): one site per language, each holding the whole [structure.md](structure.md) tree. The new sites are planned; `guide` and `architecture` stay registered and current until the new sites launch, then they are unregistered with no stub pages.
 
-Sites are divided by the reader's purpose, not by language. Translations live inside one site (see [`AGENTS.md`](../AGENTS.md)).
-
-| Site ID | Display name | Reader's purpose | Status |
-| --- | --- | --- | --- |
-| `guide` | Guide | Adopt, publish, and read with Git Artifact Pages. | Registered; source `sites/guide/` (DOC-01). |
-| `architecture` | Architecture | Understand how it works and why. | Registered; source `sites/architecture/` (DOC-08). |
-| `reference` | Reference | Look up commands, config keys, and index formats. | Not planned yet. Start inside `guide`; split out when lookup becomes the main use. |
+| Site ID | Display name | Language | Source | Status |
+| --- | --- | --- | --- | --- |
+| `ja` | Artifact Pages ドキュメント | Japanese | `sites/ja/` | Planned (DOC-23); not yet created or registered. |
+| `en` | Artifact Pages Documentation | English | `sites/en/` | Planned (DOC-23); not yet created or registered. |
+| `guide` | Guide | Japanese and English | `sites/guide/` | Current; unregistered at launch. |
+| `architecture` | Architecture | Japanese and English | `sites/architecture/` | Current; unregistered at launch. |
 
 Contributor-facing material stays in the GitHub repository and is not a site.
 
 Registry metadata:
 
+- `ja` (planned) — name `Artifact Pages ドキュメント`.
+- `en` (planned) — name `Artifact Pages Documentation`.
 - `guide` (registered) — name `Guide`; description `Adopt, publish, and read with Git Artifact Pages. 導入・公開・閲覧のガイド。`
 - `architecture` (registered) — name `Architecture`; description `How Git Artifact Pages works and why. 仕組みと設計の考え方。`
 
-Names are English and descriptions carry both languages because registry `name` and `description` are single strings today.
+Each new site is one language, so its name and description are single-language strings. The descriptions of `ja` and `en` are written at registration.
 
 ## Page conventions
 
-- Every page exists as `ja/<file>.html` and `en/<file>.html` with the same filename; each links to its translation through the in-page language switch.
-- No numeric filename prefixes. Reading order is expressed by in-page previous/next navigation.
-- Each site is self-contained: it owns its CSS and JavaScript in `sites/<site>/assets/`, edited directly, with no shared source or sync step (a site never loads another site's assets; per-site CSP blocks cross-site asset paths only over plain HTTP, such as local nginx, because over HTTPS its `https:` source matches every same-origin path). Sites may look different.
+- Layout: `sites/<ja|en>/` with `README.md` at the root and the folders `01-features/`, `02-setup/`, `03-operations/`, `04-architecture/`, `05-reference/` (the full tree is in DOC-23). Both sites use identical relative paths; a page's translation is the same path in the other site.
+- Format: the root is `README.md` (Markdown); every folder below the root has an `index.html` entry page and every other page is HTML. One page per leaf of the structure tree.
+- File names are English. Numeric `01-` prefixes only where order is information (chapter folders, the four feature pages, the setup steps); none inside operations, architecture or reference, because the reader orders by filename, not title.
+- The language switch in each page links to the same path in the other site (see the open check in DOC-23 on relative versus absolute links). The old `ja/<file>.html` layout applies only to `guide` and `architecture` until launch.
+- Each site is self-contained: it owns its CSS and JavaScript in `sites/<site>/assets/`, edited directly, with no shared source or sync step (a site never loads another site's assets; per-site CSP blocks cross-site asset paths only over plain HTTP, such as local nginx, because over HTTPS its `https:` source matches every same-origin path).
+- Pages are as rich as the current HTML manuscript pages; their content may be partly reused.
 - Facts come from the linked primary sources (specification, technical design, CLI help). A page must not introduce behavior that the specification does not state.
 - Illustrative teams and repositories use the `acme/…` examples (`sre`, `checkout`, `billing`) and say they are illustrative.
 
@@ -48,7 +52,7 @@ See [structure.md](structure.md) for the agreed chapters. Order: chapter tickets
 
 | Order | Ticket | Title | Status |
 | ---: | --- | --- | --- |
-| 1 | [DOC-23](DOC-23-structure-and-site-migration.md) | Structure and site migration | Blocked |
+| 1 | [DOC-23](DOC-23-structure-and-site-migration.md) | Structure and site migration | Open |
 | 2 | [DOC-24](DOC-24-entry-readme.md) | Entry README: outcomes and overall picture | Open |
 | 3 | [DOC-25](DOC-25-experience-and-features.md) | 体験と機能 (Experience and features) | Open |
 | 4 | [DOC-26](DOC-26-setup-infrastructure.md) | 導入: インフラを構築する (Setup: build the infrastructure, Cloudflare and AWS) | Open |
@@ -84,6 +88,6 @@ See [structure.md](structure.md) for the agreed chapters. Order: chapter tickets
 These surfaced while planning the sites. They are not yet product issues; file them in [issues](https://github.com/artifact-pages/artifact-pages/blob/main/docs/backlog/issues/README.md) if the owner confirms them.
 
 - Registry site `name` and `description` cannot be localized, so a bilingual site shows one language in the picker and palette.
-- One site with `ja/` and `en/` mixes both languages in Browse, Recently updated, and page search. Language filtering is explicitly undecided in `AGENTS.md`.
+- Resolved by the per-language `ja`/`en` sites: the current `guide` and `architecture` sites mix both languages in Browse, Recently updated, and page search until they are unregistered.
 - Each site owns its CSS and JavaScript. Per-site CSP blocks cross-site asset paths only over plain HTTP; over HTTPS self-containment is a convention, not something CSP enforces.
 - From the 2026-10-01 beginner review of the reader (documentation-side, not product issues): the guide pages use smooth scrolling, so a Contents jump to a distant heading takes about one to two seconds and looks unresponsive at first; and the overview page's autoplay palette sample looks identical to the real palette, so a first-time reader may not tell them apart despite the "sample" note.
