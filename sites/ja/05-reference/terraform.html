@@ -85,7 +85,7 @@
           <tr><td><code>github_oidc_issuer_url</code></td><td>string</td><td><code>"https://token.actions.githubusercontent.com"</code></td></tr>
           <tr><td><code>aliases</code></td><td>list(string)</td><td><code>[]</code>。DNSは呼び出し側で作る。</td></tr>
           <tr><td><code>acm_certificate_arn</code></td><td>string</td><td><code>null</code>。<code>aliases</code>を使うなら<code>us-east-1</code>の証明書。</td></tr>
-          <tr><td><code>viewer_protocol_policy</code></td><td>string</td><td><code>"redirect-to-https"</code>か<code>"https-only"</code>。</td></tr>
+          <tr><td><code>viewer_protocol_policy</code></td><td>string</td><td>既定は<code>"redirect-to-https"</code>。ほかに<code>"https-only"</code>を選べる。nullは不可。</td></tr>
           <tr><td><code>price_class</code></td><td>string</td><td><code>"PriceClass_100"</code>。<code>PriceClass_200</code>、<code>PriceClass_All</code>も可。</td></tr>
           <tr><td><code>web_acl_arn</code></td><td>string</td><td><code>null</code>。自分で管理するWAFのACL。<code>waf_custom_rules</code>とは同時に使えない。</td></tr>
           <tr><td><code>waf_custom_rules</code></td><td>object</td><td><code>null</code>。<code>default_action</code>（既定は許可）、<code>presets</code>（<code>ip_allowlist</code>）、<code>rules</code>、<code>custom_response_bodies</code>、可視化の設定。</td></tr>

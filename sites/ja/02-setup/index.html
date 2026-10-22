@@ -85,7 +85,7 @@
       </div>
       <ul>
         <li>チェックサムの確認で<code>OK</code>と出ないバイナリは使わないでください。<code>shasum</code>がないLinuxでは<code>sha256sum -c -</code>を使います。</li>
-        <li><code>~/.local/bin</code>は一例です。<code>PATH</code>の通ったディレクトリに置きます。</li>
+        <li><code>~/.local/bin</code>は一例です。ない場合は先に<code>mkdir -p ~/.local/bin</code>で作り、<code>PATH</code>に含まれていることを確かめます。</li>
         <li>入れたCLIは入口です。設定ファイルに<code>cli.version</code>があれば、ほとんどのコマンドはその版をダウンロードして確かめ、そちらで実行します。</li>
       </ul>
       <p>コマンドの多くは<code>--dry-run</code>で試し実行ができます。試し実行は配信先を読みますが、書き込み、削除、ロック、キャッシュの変更はしません。結果は通常は文章で、<code>--format json</code>で機械向けに出せます。</p>
@@ -114,7 +114,7 @@
     <span class="k">sourcePath</span>: docs</span></pre>
       </div>
       <ol start="2">
-        <li>閲覧アプリを置き、サイトを登録し、サイトを公開します。それぞれ試し実行で確かめてから実行します。</li>
+        <li>閲覧アプリを置き、サイトを登録し、サイトを公開します。ここでは試し実行を省いています。書き込む前に内容を確かめたい場合は、各コマンドに<code>--dry-run</code>を付けて先に実行します。</li>
       </ol>
       <div class="term" aria-label="ローカルで公開する">
         <div class="term-head"><span>ターミナル / 試すリポジトリ</span><button class="copy-btn" type="button">コピー</button></div>

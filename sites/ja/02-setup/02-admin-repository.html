@@ -114,7 +114,7 @@
 
     <section class="doc-section" aria-labelledby="access">
       <h2 id="access">Organizationから呼び出せるようにする</h2>
-      <p>管理リポジトリが非公開の場合は、同じOrganizationのリポジトリから共通のワークフローを呼び出せるように設定します。<code>registry setup</code>が表示するコマンドと同じです。</p>
+      <p>管理リポジトリが非公開の場合は、ActionsのアクセスをOrganizationのリポジトリに開く設定にします。<code>registry setup</code>が表示するコマンドと同じです。それでも、公開リポジトリからは非公開リポジトリの共通のワークフローを呼び出せません。公開リポジトリのチームも使う場合は、管理リポジトリを公開にします。</p>
       <div class="term" aria-label="Organizationからの呼び出しを許す">
         <div class="term-head"><span>ターミナル / GitHub CLI</span><button class="copy-btn" type="button">コピー</button></div>
 <pre><span class="p">$</span> <span data-copy>gh api --method PUT repos/acme/platform-admin/actions/permissions/access --field access_level=organization</span></pre>
@@ -133,7 +133,7 @@
       <h3 id="aws">AWS</h3>
       <p>AWSではシークレットを置かず、各ジョブがIAMロールを引き受けます。管理リポジトリのリポジトリ変数<code>ARTIFACT_PAGES_REGISTRY_ADMIN_ROLE_ARN</code>に、Terraformの出力<code>admin_role_arn</code>を設定します（<code>registry setup</code>がコマンドを表示します）。各チームのジョブのロールは、共通のワークフローがサイトIDと設定の<code>aws.accountId</code>から求めるので、チームに設定は要りません。Terraformの<code>admin_github_subjects</code>と<code>satellite_github_subjects</code>に、実際に動くジョブの<code>sub</code>が入っていることを確かめてください。</p>
       <h3 id="environments">Environment</h3>
-      <p>本番の書き込みに承認やブランチの制限をかけたい場合は、GitHubのEnvironmentを使います。管理リポジトリには<code>production</code>を作ります。チームが<code>environment</code>入力で名前を渡すと、共通のワークフローは呼び出したリポジトリのそのEnvironmentを使います。存在しない名前を渡すとGitHubが制限なしで作ってしまうので、先に作っておきます。</p>
+      <p>本番の書き込みに承認やブランチの制限をかけたい場合は、GitHubのEnvironmentを使います。非公開のリポジトリでEnvironmentを使えるかどうか、承認のルールまで使えるかどうかは、GitHubのプランによって違うので確かめてください。管理リポジトリには<code>production</code>を作ります。チームが<code>environment</code>入力で名前を渡すと、共通のワークフローは呼び出したリポジトリのそのEnvironmentを使います。存在しない名前を渡すとGitHubが制限なしで作ってしまうので、先に作っておきます。</p>
     </section>
 
     <section class="doc-section" aria-labelledby="direct">
@@ -148,6 +148,15 @@
         <li>非公開のリポジトリなら、そのリポジトリの<code>contents:read</code>を持つトークンを<code>GITHUB_TOKEN</code>か<code>GH_TOKEN</code>に設定します。GitHub Appのインストールトークンや、fine-grained personal access tokenを使えます。製品のActionsには、別のトークンを渡す入力はありません。</li>
         <li>読めないときのメッセージと原因は「<a href="../03-operations/troubleshooting.html#remote">問題を調べ、復旧する</a>」にあります。</li>
       </ul>
+      <h3 id="github-app">GitHub Appで非公開の設定を読む</h3>
+      <p>共通のワークフローを使うチームには、この準備は要りません。独自のジョブから非公開の管理リポジトリの設定を直接読む場合に使います。</p>
+      <ol>
+        <li>Organizationで、Contentsの読み取り（<code>contents:read</code>）だけを持つGitHub Appを作り、管理リポジトリにだけインストールします。</li>
+        <li>ジョブを動かすリポジトリに、AppのIDと秘密鍵をシークレットとして置きます。</li>
+        <li>ジョブの中で、管理リポジトリを対象にしたインストールトークンを発行し（たとえば<code>actions/create-github-app-token</code>を使います）、CLIを動かすステップの環境変数<code>GITHUB_TOKEN</code>に渡します。</li>
+        <li>CLIの<code>--config</code>に、上の<code>github://</code>の指定を渡します。</li>
+      </ol>
+      <p>製品のActionsにはトークンを渡す入力がないので、この方法はCLIを直接動かすジョブに限ります。</p>
     </section>
 
     <nav class="pager" aria-label="ページ送り">

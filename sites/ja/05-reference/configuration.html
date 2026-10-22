@@ -39,7 +39,7 @@
         <li>いまのディレクトリの<code>artifact-pages.yaml</code></li>
         <li><code>artifact-pages config set-default</code>で保存した指定</li>
       </ol>
-      <p>最初に見つかったものだけを使い、ほかと暗黙に合成しません。<code>config set-default</code>は、手元のパスなら絶対パスにして、ユーザーの設定ディレクトリの<code>artifact-pages/default-config</code>に保存します。設定の中の相対パス（<code>local.root</code>など）は、設定ファイルの場所ではなく、コマンドを実行したディレクトリが基準です。</p>
+      <p>最初に見つかったものだけを使い、ほかと暗黙に合成しません。ただし<code>registry setup</code>と<code>registry role-arn</code>はこの順番を使わず、手元の設定ファイルだけを読みます（<code>registry setup</code>は<code>--directory</code>の下の<code>--config</code>で、既定は<code>artifact-pages.yaml</code>。<code>registry role-arn</code>は<code>--config</code>で明示したファイル）。環境変数、保存した指定、<code>github://</code>は使いません。<code>config set-default</code>は、手元のパスなら絶対パスにして、ユーザーの設定ディレクトリの<code>artifact-pages/default-config</code>に保存します。設定の中の相対パス（<code>local.root</code>など）は、設定ファイルの場所ではなく、コマンドを実行したディレクトリが基準です。</p>
       <h3 id="layers">重ね合わせ</h3>
       <div class="table-wrap"><table>
         <thead><tr><th>キー</th><th>重ねたときの扱い</th></tr></thead>

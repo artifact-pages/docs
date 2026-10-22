@@ -94,7 +94,7 @@
           <tr><td>404</td><td>ファイルのパスか参照がない、リポジトリがない、またはトークンで見えない非公開のリポジトリ。</td></tr>
         </tbody>
       </table></div>
-      <p>手元のCLIは<code>GITHUB_TOKEN</code>か<code>GH_TOKEN</code>のトークンを使います。製品のActionでは入力<code>github-token</code>で渡します。</p>
+      <p>手元のCLIは<code>GITHUB_TOKEN</code>か<code>GH_TOKEN</code>のトークンを使います。製品のActionsには別のトークンを渡す入力がなく、ワークフローのトークンで読める設定だけを使えます。非公開の管理リポジトリの設定は、共通のワークフロー経由で渡します。</p>
       <h3 id="cloudflare">Cloudflareの認証</h3>
       <div class="table-wrap"><table>
         <thead><tr><th>メッセージ</th><th>対処</th></tr></thead>

@@ -47,7 +47,7 @@
         <tbody>
           <tr><td><strong>Overview</strong></td><td>サイトの直下の<code>README.md</code>、なければ<code>index.md</code>（大文字と小文字は区別しない）。どちらもなければOverviewは出ず、Filesが開きます。直下の<code>index.html</code>や<code>index.htm</code>はOverviewにならず、Filesの資料として並びます。</td></tr>
           <tr><td><strong>Files</strong></td><td>直下のフォルダと資料。資料が7つ以上のサイトでは、<strong>Recently updated</strong>に新しい順に6件。</td></tr>
-          <tr><td><strong>Previews</strong></td><td>そのサイトのPRプレビューの一覧。</td></tr>
+          <tr><td><strong>Previews</strong></td><td>そのサイトのプレビューの一覧。PRプレビューと、手動で作ったプレビュー（<strong>Manual preview</strong>）が並ぶ。</td></tr>
           <tr><td>検索</td><td>どの画面にもサイトを検索する入口。狭い画面では<strong>Search this site</strong>のアイコンボタン。</td></tr>
         </tbody>
       </table></div>
@@ -77,7 +77,7 @@
         <thead><tr><th>部分</th><th>仕様</th></tr></thead>
         <tbody>
           <tr><td>HTML</td><td>閲覧アプリと同じオリジンのiframeで表示。</td></tr>
-          <tr><td>Markdown</td><td>CommonMarkとGFM（表、チェックリスト、取り消し線、自動リンク、脚注）、Mermaid（strictモード）。埋め込まれたHTMLは取り除かれます。</td></tr>
+          <tr><td>Markdown</td><td>CommonMarkとGFM（表、チェックリスト、取り消し線、自動リンク、脚注）、Mermaid（strictモード）。埋め込まれたHTMLは、許可していない要素と属性が取り除かれます。</td></tr>
           <tr><td>右の列</td><td>幅1200px以上では常にあり、上に<strong>Details</strong>、下に<strong>Contents</strong>。Markdownでは本文と一緒にDetailsが流れ、Contentsが残ります。HTMLでは右の列だけが別にスクロールします。</td></tr>
           <tr><td>狭い画面</td><td>ContentsとDetailsはボタンで開くパネル。620px以下では、ヘッダーが簡単になり、操作は<strong>More actions</strong>のメニューにまとまります。</td></tr>
           <tr><td>資料のメニュー</td><td><strong>Pin</strong> / <strong>Unpin</strong>、<strong>Copy link</strong>、<strong>Open source</strong>、<strong>View history</strong>。どれも公開した資料やGitは変えません。</td></tr>
