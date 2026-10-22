@@ -1,0 +1,150 @@
+<!doctype html>
+<html lang="ja">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="description" content="チームのリポジトリで公開するディレクトリを整え、管理リポジトリの共通のワークフローを呼び出すワークフローを置き、プルリクエストで試し実行してマージで公開する。浅いチェックアウトと日付、管理とサイトが同じリポジトリの場合。">
+  <title>最初のサイトを公開する — Artifact Pages ドキュメント</title>
+  <script>
+    // Copy the reader app's theme (same-origin parent) before first paint; assets/site.js keeps it in sync.
+    (() => {
+      const root = document.documentElement;
+      root.classList.add('js');
+      try {
+        const theme = window.parent !== window && window.parent.document.documentElement.dataset.theme;
+        if (theme === 'light' || theme === 'dark') root.dataset.theme = theme;
+      } catch { /* cross-origin: fall back to prefers-color-scheme */ }
+    })();
+  </script>
+  <link rel="icon" href="data:,">
+  <link rel="stylesheet" href="../assets/site.css">
+  <script src="../assets/site.js" defer></script>
+</head>
+<body>
+  <a class="skip" href="#main">本文へ移動</a>
+  <main id="main" class="wrap">
+    <header class="page-head">
+      <div>
+        <p class="eyebrow">導入する · ステップ5</p>
+        <h1>最初のサイトを公開する</h1>
+      </div>
+      <p class="lead">ここからはチームの作業です。<code>acme/sre</code>に公開する資料のディレクトリと、共通のワークフローを呼び出すワークフローを置きます。プルリクエストでは試し実行、<code>main</code>へのマージで公開されます。</p>
+    </header>
+
+    <section class="doc-section" aria-labelledby="directory">
+      <h2 id="directory">公開するディレクトリを整える</h2>
+      <p>登録した<code>sourcePath</code>（例では<code>docs</code>）の中身が、そのままサイトになります。</p>
+      <div class="term" aria-label="公開するディレクトリの例">
+        <div class="term-head"><span>acme/sre（説明用の例）</span></div>
+<pre>docs/
+├── README.md              <span class="c"># サイトのトップの Overview になる</span>
+├── runbooks/
+│   ├── README.md          <span class="c"># フォルダの画面に表示される</span>
+│   └── on-call.html
+└── postmortems/
+    └── 2026-09-db-failover.md</pre>
+      </div>
+      <ul>
+        <li><strong>そのまま配信できる形にしておきます。</strong>Artifact Pagesは生成やビルドをしません。ほかのツールで生成するなら、公開の前のステップで生成します。</li>
+        <li><strong>公開したくないものは入れません。</strong>このディレクトリの中のファイルは、リンクされていなくても、Gitで追跡していなくても公開されます。<code>.html</code>のテンプレートや部分的なファイルも資料として載ります。シンボリックリンクがあると公開は失敗します。<code>.git</code>は公開されません。</li>
+        <li><strong>サイトのトップ。</strong>直下の<code>README.md</code>（なければ<code>index.md</code>）が、サイトのトップのOverviewになります。直下の<code>index.html</code>はその代わりにはならず、<code>/sre/index.html</code>という資料として開きます。</li>
+        <li><strong>URL。</strong>資料のURLは<code>/sre/</code>に続けて、このディレクトリからのパスを拡張子まで付けたものです。</li>
+      </ul>
+    </section>
+
+    <section class="doc-section" aria-labelledby="workflow">
+      <h2 id="workflow">ワークフローを置く</h2>
+      <div class="term" aria-label="チームの公開ワークフロー">
+        <div class="term-head"><span>.github/workflows/publish.yml / acme/sre</span><button class="copy-btn" type="button">コピー</button></div>
+<pre><span data-copy><span class="k">name</span>: Publish docs
+<span class="k">on</span>:
+  <span class="k">pull_request</span>:
+    <span class="k">paths</span>: ['docs/**']
+  <span class="k">push</span>:
+    <span class="k">branches</span>: [main]
+  <span class="k">workflow_dispatch</span>:
+<span class="k">permissions</span>:
+  <span class="k">contents</span>: read
+<span class="k">concurrency</span>:
+  <span class="k">group</span>: publish-${{ github.ref }}
+  <span class="k">cancel-in-progress</span>: ${{ github.event_name == 'pull_request' }}
+<span class="k">jobs</span>:
+  <span class="k">publish</span>:
+    <span class="k">permissions</span>:
+      <span class="k">contents</span>: read
+      <span class="c"># AWSでは id-token: write も足す</span>
+    <span class="k">uses</span>: acme/platform-admin/.github/workflows/publish-site.yml@main
+    <span class="k">with</span>:
+      <span class="k">site</span>: sre
+      <span class="k">environment</span>: ${{ github.event_name != 'pull_request' &amp;&amp; 'production' || '' }}
+    <span class="k">secrets</span>: inherit</span></pre>
+      </div>
+      <ul>
+        <li><code>site</code>は登録したサイトIDです。<code>environment</code>は、使うならこのリポジトリのEnvironmentの名前で、この例ではプルリクエストのときだけ空にしています。Environmentを使わないなら、この行ごと省きます。</li>
+        <li>共通のワークフローは<code>site</code>と<code>environment</code>しか受け取りません。<code>dry-run</code>や<code>fetch-depth</code>などを<code>with</code>で渡すことはできません。</li>
+        <li>Cloudflareでは、このリポジトリ（またはOrganization）のシークレットに公開用の認証情報を入れておきます。AWSでは、このジョブの<code>sub</code>がTerraformの<code>satellite_github_subjects</code>に入っている必要があります。</li>
+      </ul>
+    </section>
+
+    <section class="doc-section" aria-labelledby="publish">
+      <h2 id="publish">試し実行してから公開する</h2>
+      <ol>
+        <li>資料とワークフローを追加するプルリクエストを出します。ジョブは試し実行で、何が書き込まれるかがジョブの概要に出ます。</li>
+        <li>マージすると、<code>main</code>へのプッシュで公開されます。結果は<code>synced</code>、何も変わっていなければ<code>no-op</code>です。</li>
+        <li>閲覧アプリでSREチームのサイトを開き、資料が読めることを確かめます。</li>
+      </ol>
+      <p>公開は、新しいファイルと変わったファイルを書き込み、一覧と検索のデータを更新し、なくなったファイルを削除します。手元から試すときは、管理リポジトリの設定を<code>github://</code>で読みます（AWSでは手元にもAWSの認証が要ります）。</p>
+      <div class="term" aria-label="手元から試す">
+        <div class="term-head"><span>ターミナル / acme/sre</span><button class="copy-btn" type="button">コピー</button></div>
+<pre><span class="p">$</span> <span data-copy>artifact-pages site sync --site sre --config github://acme/platform-admin/artifact-pages.yaml --dry-run</span></pre>
+      </div>
+      <p><code>--source</code>を省くと、登録した<code>sourcePath</code>を公開します。<code>--ref</code>は資料に記録する参照の表示を変えるだけで、公開するファイルは変えません。</p>
+    </section>
+
+    <section class="doc-section" aria-labelledby="dates">
+      <h2 id="dates">浅いチェックアウトと日付</h2>
+      <p>資料の更新日と名前は、Gitの履歴から求めます。GitHub Actionsのチェックアウトは既定で直近の1コミットだけですが、CLIは必要なだけ履歴を取り寄せるので、通常は全履歴があるときと同じ結果になります。</p>
+      <p>ただし、前回の公開から内容が同じ状態に戻ったファイル（変更を取り消したコミットなど）は、前回の更新日のまま残ることがあります。どんな場合も履歴どおりの日付にしたいときは、全履歴でチェックアウトします。共通のワークフローは<code>fetch-depth</code>を受け取らないので、その場合は製品の<code>publish-action</code>を直接使う構成にします。</p>
+    </section>
+
+    <section class="doc-section" aria-labelledby="single">
+      <h2 id="single">管理リポジトリとサイトが同じリポジトリの場合</h2>
+      <p>小さな組織や試験的な導入では、管理リポジトリの中のディレクトリを1つのサイトとして公開することもできます。この場合は、共通のワークフローを通さずに、製品の<code>publish-action</code>を同じリポジトリの設定ファイルで直接呼び出せます。</p>
+      <div class="term" aria-label="同じリポジトリで公開する">
+        <div class="term-head"><span>.github/workflows/publish.yml / 管理とサイトが同じリポジトリ（Cloudflare）</span><button class="copy-btn" type="button">コピー</button></div>
+<pre><span data-copy><span class="k">on</span>:
+  <span class="k">pull_request</span>:
+  <span class="k">push</span>:
+    <span class="k">branches</span>: [main]
+
+<span class="k">jobs</span>:
+  <span class="k">publish</span>:
+    <span class="k">runs-on</span>: ubuntu-24.04
+    <span class="k">permissions</span>:
+      <span class="k">contents</span>: read
+    <span class="k">steps</span>:
+      - <span class="k">uses</span>: artifact-pages/publish-action@vX.Y.Z
+        <span class="k">with</span>:
+          <span class="k">site</span>: sre
+          <span class="k">config</span>: artifact-pages.yaml
+          <span class="k">publish-on</span>: |
+            push:refs/heads/main
+        <span class="k">env</span>:
+          <span class="k">CF_R2_ACCESS_KEY_ID</span>: ${{ secrets.CF_R2_ACCESS_KEY_ID }}
+          <span class="k">CF_R2_SECRET_ACCESS_KEY</span>: ${{ secrets.CF_R2_SECRET_ACCESS_KEY }}
+          <span class="k">CF_API_TOKEN</span>: ${{ secrets.CF_API_TOKEN }}</span></pre>
+      </div>
+      <ul>
+        <li><code>publish-on</code>に合わないきっかけ（プルリクエストなど）では試し実行になります。</li>
+        <li><code>sourcePath</code>は<code>docs</code>のように資料だけのディレクトリにします。リポジトリ全体にすると、設定ファイルやワークフローも公開されます。</li>
+        <li>この場合も、登録の反映と閲覧アプリの配置は別のジョブで行います。</li>
+      </ul>
+    </section>
+
+    <nav class="pager" aria-label="ページ送り">
+      <a class="prev" href="04-register-site.html"><small>前へ</small><strong>サイトを登録する</strong></a>
+      <a class="next" href="06-pr-previews.html"><small>次へ</small><strong>PRプレビューを使えるようにする</strong></a>
+    </nav>
+  </main>
+</body>
+</html>

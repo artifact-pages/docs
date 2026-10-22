@@ -1,0 +1,89 @@
+<!doctype html>
+<html lang="ja">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="description" content="HTMLとMarkdownの信頼の扱い、CSPと内部の記録の扱い、閲覧の制限を配信の端で行う理由、管理者とサイトの公開の認証情報の分け方。">
+  <title>セキュリティとアクセス — Artifact Pages ドキュメント</title>
+  <script>
+    // Copy the reader app's theme (same-origin parent) before first paint; assets/site.js keeps it in sync.
+    (() => {
+      const root = document.documentElement;
+      root.classList.add('js');
+      try {
+        const theme = window.parent !== window && window.parent.document.documentElement.dataset.theme;
+        if (theme === 'light' || theme === 'dark') root.dataset.theme = theme;
+      } catch { /* cross-origin: fall back to prefers-color-scheme */ }
+    })();
+  </script>
+  <link rel="icon" href="data:,">
+  <link rel="stylesheet" href="../assets/site.css">
+  <script src="../assets/site.js" defer></script>
+</head>
+<body>
+  <a class="skip" href="#main">本文へ移動</a>
+  <main id="main" class="wrap">
+    <header class="page-head">
+      <div>
+        <p class="eyebrow">アーキテクチャ</p>
+        <h1>セキュリティとアクセス</h1>
+      </div>
+      <p class="lead">Artifact Pagesは、公開する人を信頼し、読む人の制限は配信先に任せる設計です。何が守られ、何が守られないかを知ったうえで、公開の権限と閲覧の制限を設計してください。</p>
+    </header>
+
+    <section class="doc-section" aria-labelledby="html">
+      <h2 id="html">HTMLとMarkdownの信頼</h2>
+      <div class="table-wrap"><table>
+        <thead><tr><th></th><th>HTML</th><th>Markdown</th></tr></thead>
+        <tbody>
+          <tr><td>表示</td><td>閲覧アプリと同じオリジンのiframe。<code>sandbox</code>は付けない</td><td>閲覧アプリが描画する</td></tr>
+          <tr><td>スクリプト</td><td>動く。親の画面、同じオリジンのほかの資料、ブラウザの保存領域にアクセスできる</td><td>動かない。埋め込まれたHTMLは、許可していない要素と属性が取り除かれる。Mermaidは制限したモードで描く</td></tr>
+          <tr><td>扱い</td><td>公開する人が信頼したコード</td><td>安全に整えて表示する文書</td></tr>
+        </tbody>
+      </table></div>
+      <p>iframeはCSSとレイアウトを分けるためのもので、悪意のあるスクリプトを閉じ込めるものではありません。HTMLの資料は、ピン留めや最近読んだ資料が入っているブラウザの保存領域も読めます。プレビューのHTMLも同じ扱いで、マージ前のコードを安全に動かす仕組みではありません。だれに公開を任せるかが、そのまま信頼の範囲になります。</p>
+    </section>
+
+    <section class="doc-section" aria-labelledby="csp">
+      <h2 id="csp">CSPと内部の記録</h2>
+      <ul>
+        <li>資料の応答に付くCSPは、HTTPSの外部リソース、インラインのスクリプト、<code>eval</code>などを許します。信頼したHTMLをそのまま動かすための方針で、スクリプトを厳しく止める方針ではありません。HTTPの外部リソースは読み込めません。</li>
+        <li>CSPの<code>https:</code>は同じオリジンのほかのサイトのパスにも当てはまります。サイトの間で機密を分ける仕組みにはなりません。</li>
+        <li><code>/_control/</code>以下の内部の記録は、読者に中身を返しません（閲覧アプリの画面が返ることはあります）。資料、一覧、プレビューのファイルがない場合は404を返します。</li>
+      </ul>
+    </section>
+
+    <section class="doc-section" aria-labelledby="viewers">
+      <h2 id="viewers">閲覧の制限</h2>
+      <p>製品には、利用者のアカウント、ログイン、役割、サイトごとの閲覧の設定がありません。サイトを登録しないこと、一覧に出さないこと、推測しにくいURLを使うことは、どれも閲覧の制限になりません。</p>
+      <p>読者を限るのは、配信先のホスト名に対する制限です。読者が開く論理的なURLだけでなく、一覧、資料、プレビューのファイルのパスにも効き、キャッシュから返す前に判定される必要があります。</p>
+      <div class="table-wrap"><table>
+        <thead><tr><th>配信先</th><th>モジュールで設定できるもの</th><th>別に用意するもの</th></tr></thead>
+        <tbody>
+          <tr><td>Cloudflare</td><td>IPアドレスでの制限、HTTPSだけの許可（WAFのルール）</td><td>人単位の認証（Cloudflare Access）</td></tr>
+          <tr><td>AWS</td><td>IPアドレスでの制限（AWS WAF）、自分で管理するWAFのACLの付与、HTTPSの扱い（<code>viewer_protocol_policy</code>）</td><td>人単位の認証</td></tr>
+        </tbody>
+      </table></div>
+    </section>
+
+    <section class="doc-section" aria-labelledby="credentials">
+      <h2 id="credentials">公開の認証情報の分け方</h2>
+      <p>CLIは、公開の前に登録を確かめ、ロックで順番を守ります。これはCLI同士の約束で、権限の境界ではありません。配信先に直接書ける権限を持つ人は、CLIを通さずに書き込めます。どこまで書けるかは、配信先の権限で決まります。</p>
+      <div class="table-wrap"><table>
+        <thead><tr><th></th><th>AWS</th><th>Cloudflare</th></tr></thead>
+        <tbody>
+          <tr><td>管理者</td><td>管理用のIAMロール。登録、閲覧アプリ、全サイトの片づけ、キャッシュの無効化</td><td>管理者が発行したR2のキーとAPIトークン</td></tr>
+          <tr><td>各チーム</td><td>サイトごとのIAMロール。自分のサイトの領域の読み書きと、登録情報と閲覧アプリの記録の読み取りだけ。ほかのサイト、登録、閲覧アプリには書けない</td><td>通常はバケット全体に書けるキーで、サイトごとには分かれない。分けるには、サイトのプレフィックスに絞った一時的な認証情報を組織の仕組みで発行する（CLIは発行しない）</td></tr>
+          <tr><td>キャッシュの削除</td><td>ディストリビューションへの<code>cloudfront:CreateInvalidation</code></td><td>ゾーンの<code>Cache Purge</code>を持つAPIトークン。R2の権限とは別</td></tr>
+        </tbody>
+      </table></div>
+      <p>サイトごとのロールは、本公開とプレビューの両方に使います。プレビュー専用のロールはありません。プレビューのActionは、フォークからのプルリクエストと<code>pull_request_target</code>を拒否し、プルリクエストのリポジトリとコミットを確かめます。呼び出す側のワークフローでも、同じリポジトリからのプルリクエストに限っておきます。</p>
+    </section>
+
+    <nav class="pager" aria-label="ページ送り">
+      <a class="prev" href="reading-and-search.html"><small>前へ</small><strong>閲覧と検索の仕組み</strong></a>
+      <a class="next" href="cost-and-performance/index.html"><small>次へ</small><strong>コストとパフォーマンス</strong></a>
+    </nav>
+  </main>
+</body>
+</html>

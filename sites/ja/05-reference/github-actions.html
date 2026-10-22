@@ -1,0 +1,119 @@
+<!doctype html>
+<html lang="ja">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="description" content="製品の4つのGitHub Actions（publish、preview、registry、app-deploy）のv0.3.0での入力、既定値、出力と結果の値、権限、対応するランナー。">
+  <title>GitHub Actions — Artifact Pages ドキュメント</title>
+  <script>
+    // Copy the reader app's theme (same-origin parent) before first paint; assets/site.js keeps it in sync.
+    (() => {
+      const root = document.documentElement;
+      root.classList.add('js');
+      try {
+        const theme = window.parent !== window && window.parent.document.documentElement.dataset.theme;
+        if (theme === 'light' || theme === 'dark') root.dataset.theme = theme;
+      } catch { /* cross-origin: fall back to prefers-color-scheme */ }
+    })();
+  </script>
+  <link rel="icon" href="data:,">
+  <link rel="stylesheet" href="../assets/site.css">
+  <script src="../assets/site.js" defer></script>
+</head>
+<body>
+  <a class="skip" href="#main">本文へ移動</a>
+  <main id="main" class="wrap">
+    <header class="page-head">
+      <div>
+        <p class="eyebrow">リファレンス</p>
+        <h1>GitHub Actions</h1>
+      </div>
+      <p class="lead">製品は4つのActionsを配っています。どれもCLIを入れて対応するコマンドを実行する薄いラッパーです。ここに書くのはv0.3.0の契約です。管理リポジトリの共通のワークフローの使い方は「<a href="../02-setup/02-admin-repository.html">管理リポジトリを準備する</a>」にあります。</p>
+    </header>
+
+    <section class="doc-section" aria-labelledby="actions">
+      <h2 id="actions">4つのActions</h2>
+      <div class="table-wrap"><table>
+        <thead><tr><th>Action</th><th>実行するコマンド</th></tr></thead>
+        <tbody>
+          <tr><td><code>artifact-pages/publish-action</code></td><td><code>site sync</code></td></tr>
+          <tr><td><code>artifact-pages/preview-action</code></td><td><code>preview publish</code></td></tr>
+          <tr><td><code>artifact-pages/registry-action</code></td><td><code>registry sync</code></td></tr>
+          <tr><td><code>artifact-pages/app-deploy-action</code></td><td><code>app deploy</code></td></tr>
+        </tbody>
+      </table></div>
+      <p>対応するランナーはLinuxとmacOS（x64、arm64）です。Windowsには対応しません。配信先の認証情報（Cloudflareの環境変数、AWSのロールの引き受け）は、Actionの前のステップかジョブの<code>env</code>で用意します。削除、<code>--accept-breaking</code>、<code>--reconcile</code>を行う入力はないので、必要な場合はCLIを直接使います。</p>
+    </section>
+
+    <section class="doc-section" aria-labelledby="common">
+      <h2 id="common">共通の入力</h2>
+      <div class="table-wrap"><table>
+        <thead><tr><th>入力</th><th>既定</th><th>意味</th></tr></thead>
+        <tbody>
+          <tr><td><code>config</code></td><td><code>""</code></td><td>設定ファイルのパスか、<code>github://</code>の指定1つ。</td></tr>
+          <tr><td><code>cli-version</code></td><td><code>""</code></td><td>1回だけ使うCLIの正確な版。互換性の確認は行う。</td></tr>
+          <tr><td><code>dry-run</code></td><td><code>"false"</code></td><td>試し実行にする。</td></tr>
+          <tr><td><code>summary</code></td><td><code>"true"</code></td><td>ジョブの概要に結果を書く（失敗のときも）。</td></tr>
+          <tr><td><code>checkout</code></td><td><code>auto</code></td><td>Gitのチェックアウトがなければチェックアウトする。<code>true</code>で常に、<code>false</code>でしない。</td></tr>
+          <tr><td><code>fetch-depth</code></td><td><code>"1"</code></td><td>Actionがチェックアウトするときの深さ。<code>0</code>で全履歴。</td></tr>
+          <tr><td><code>publish-on</code></td><td><code>""</code></td><td>publish、registry、app-deployだけ。書き込みを許すきっかけを、改行区切りの<code>event</code>か<code>event:ref</code>で書く（例：<code>push:refs/heads/main</code>）。合わないきっかけでは試し実行になる。空なら制限なし。</td></tr>
+        </tbody>
+      </table></div>
+      <p>チェックアウトは認証情報を残さない設定で行います。<code>github-token</code>の入力はありません。</p>
+    </section>
+
+    <section class="doc-section" aria-labelledby="specific">
+      <h2 id="specific">Actionごとの入力</h2>
+      <div class="table-wrap"><table>
+        <thead><tr><th>Action</th><th>入力</th><th>既定と意味</th></tr></thead>
+        <tbody>
+          <tr><td rowspan="3">publish</td><td><code>site</code></td><td>必須。サイトID。</td></tr>
+          <tr><td><code>source</code></td><td><code>""</code>。省くと登録の<code>sourcePath</code>。</td></tr>
+          <tr><td><code>ref</code></td><td><code>""</code>。記録する参照の表示だけ。チェックアウトは変えない。</td></tr>
+          <tr><td rowspan="8">preview</td><td><code>site</code></td><td>必須。</td></tr>
+          <tr><td><code>source</code></td><td><code>""</code>。書くなら登録の<code>sourcePath</code>と同じにする。</td></tr>
+          <tr><td><code>head</code></td><td><code>""</code>。プルリクエストのイベントではその先頭のSHA、それ以外は<code>HEAD</code>。</td></tr>
+          <tr><td><code>default-ref</code></td><td><code>""</code>。プルリクエストのイベントでは<code>origin/&lt;base&gt;</code>、それ以外は<code>origin/HEAD</code>。</td></tr>
+          <tr><td><code>pull-request</code></td><td><code>""</code>。プルリクエストのイベントではその番号。<code>none</code>でプルリクエストに結び付けない。</td></tr>
+          <tr><td><code>include</code></td><td><code>""</code>。資料ではない追加のリソースを、公開元のディレクトリからの相対パスか、Goの<code>path.Match</code>のパターンで改行区切りに指定する。HTMLやMarkdownの資料に一致するとエラーになる。</td></tr>
+          <tr><td><code>base-url</code></td><td><code>""</code>。省くと設定の<code>publicBaseURL</code>。どちらもなければ失敗。</td></tr>
+          <tr><td><code>comment</code></td><td><code>"false"</code>。<code>"true"</code>でサイトごとに1つのコメントを作り、更新する。コメントの失敗は警告で、プレビューは失敗にしない。</td></tr>
+          <tr><td>registry</td><td colspan="2">共通の入力だけ。</td></tr>
+          <tr><td rowspan="2">app-deploy</td><td><code>archive</code></td><td><code>""</code>。手元のバンドル。省くと設定の<code>web.version</code>。</td></tr>
+          <tr><td><code>repository</code></td><td><code>artifact-pages/artifact-pages</code>。</td></tr>
+        </tbody>
+      </table></div>
+      <p>previewのActionは、チェックアウトをプルリクエストのbaseで行い、CLIの版をbaseの設定から選びます。プルリクエストで設定を書き換えて、書き込むCLIを変えることはできません。<code>pull_request_target</code>とフォークからのプルリクエストは拒否します。</p>
+    </section>
+
+    <section class="doc-section" aria-labelledby="outputs">
+      <h2 id="outputs">出力</h2>
+      <div class="table-wrap"><table>
+        <thead><tr><th>Action</th><th>出力</th><th><code>outcome</code></th></tr></thead>
+        <tbody>
+          <tr><td>共通</td><td><code>operation</code>、<code>outcome</code>、<code>result</code>、<code>exit-code</code>、<code>error</code></td><td></td></tr>
+          <tr><td>publish</td><td>＋<code>site</code>、<code>changes</code>、<code>preview-changes</code></td><td><code>planned</code>、<code>synced</code>、<code>no-op</code>、<code>failed</code></td></tr>
+          <tr><td>preview</td><td>＋<code>site</code>、<code>group-list-url</code>、<code>documents</code>、<code>comment-url</code></td><td><code>planned</code>、<code>published</code>、<code>no-op</code>、<code>no-preview</code>、<code>failed</code></td></tr>
+          <tr><td>registry</td><td>＋<code>registry-updated</code>、<code>changes</code></td><td><code>planned</code>、<code>synced</code>、<code>no-op</code>、<code>failed</code></td></tr>
+          <tr><td>app-deploy</td><td>＋<code>changes</code></td><td><code>planned</code>、<code>deployed</code>、<code>no-op</code>、<code>failed</code></td></tr>
+        </tbody>
+      </table></div>
+      <p>出力はすべて文字列です。<code>changes</code>、<code>preview-changes</code>、<code>documents</code>、<code>result</code>はJSONの文字列、<code>registry-updated</code>は<code>"true"</code>か<code>"false"</code>、<code>exit-code</code>は整数の文字列です。CLIを入れる前に失敗した場合は、すべての出力があるとは限りません。</p>
+    </section>
+
+    <section class="doc-section" aria-labelledby="permissions">
+      <h2 id="permissions">権限</h2>
+      <ul>
+        <li>通常は<code>contents: read</code>。</li>
+        <li>previewで<code>comment: "true"</code>なら<code>pull-requests: write</code>（プレビューのジョブだけに）。</li>
+        <li>AWSのロールをOIDCで引き受けるジョブには<code>id-token: write</code>。</li>
+      </ul>
+    </section>
+
+    <nav class="pager" aria-label="ページ送り">
+      <a class="prev" href="cli.html"><small>前へ</small><strong>CLI</strong></a>
+      <a class="next" href="terraform.html"><small>次へ</small><strong>Terraform</strong></a>
+    </nav>
+  </main>
+</body>
+</html>

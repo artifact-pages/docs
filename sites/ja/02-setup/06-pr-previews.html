@@ -1,0 +1,108 @@
+<!doctype html>
+<html lang="ja">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="description" content="チームのリポジトリに共通のプレビューのワークフローを呼び出すワークフローを置き、プルリクエストの変更をレビューの前に閲覧アプリで読めるようにする。見えるもの、閉じたあとの扱い、保持期間。">
+  <title>PRプレビューを使えるようにする — Artifact Pages ドキュメント</title>
+  <script>
+    // Copy the reader app's theme (same-origin parent) before first paint; assets/site.js keeps it in sync.
+    (() => {
+      const root = document.documentElement;
+      root.classList.add('js');
+      try {
+        const theme = window.parent !== window && window.parent.document.documentElement.dataset.theme;
+        if (theme === 'light' || theme === 'dark') root.dataset.theme = theme;
+      } catch { /* cross-origin: fall back to prefers-color-scheme */ }
+    })();
+  </script>
+  <link rel="icon" href="data:,">
+  <link rel="stylesheet" href="../assets/site.css">
+  <script src="../assets/site.js" defer></script>
+</head>
+<body>
+  <a class="skip" href="#main">本文へ移動</a>
+  <main id="main" class="wrap">
+    <header class="page-head">
+      <div>
+        <p class="eyebrow">導入する · ステップ6</p>
+        <h1>PRプレビューを使えるようにする</h1>
+      </div>
+      <p class="lead">最後に、プルリクエストで変えた資料を、マージの前に閲覧アプリで読めるようにします。チームのリポジトリに、共通のプレビューのワークフローを呼び出すワークフローを1つ足します。</p>
+    </header>
+
+    <section class="doc-section" aria-labelledby="workflow">
+      <h2 id="workflow">ワークフローを置く</h2>
+      <div class="term" aria-label="チームのプレビューワークフロー">
+        <div class="term-head"><span>.github/workflows/preview.yml / acme/sre</span><button class="copy-btn" type="button">コピー</button></div>
+<pre><span data-copy><span class="k">name</span>: Preview docs
+<span class="k">on</span>:
+  <span class="k">pull_request</span>:
+    <span class="k">paths</span>: ['docs/**']
+<span class="k">permissions</span>:
+  <span class="k">contents</span>: read
+<span class="k">concurrency</span>:
+  <span class="k">group</span>: preview-${{ github.event.pull_request.number }}
+  <span class="k">cancel-in-progress</span>: true
+<span class="k">jobs</span>:
+  <span class="k">preview</span>:
+    <span class="k">if</span>: github.event.pull_request.head.repo.full_name == github.repository
+    <span class="k">permissions</span>:
+      <span class="k">contents</span>: read
+      <span class="k">pull-requests</span>: write
+      <span class="c"># AWSでは id-token: write も足す</span>
+    <span class="k">uses</span>: acme/platform-admin/.github/workflows/preview-site.yml@main
+    <span class="k">with</span>:
+      <span class="k">site</span>: sre
+    <span class="k">secrets</span>: inherit</span></pre>
+      </div>
+      <ul>
+        <li><strong><code>if</code>で、同じリポジトリのブランチからのプルリクエストに限ります。</strong>フォークからのプルリクエストに認証情報を渡さないためです。共通のワークフローも同じ確認をしますが、呼び出す側でも止めておきます。</li>
+        <li><strong><code>pull-requests: write</code>は、このプレビューのジョブだけに付けます。</strong>共通のワークフローは、プルリクエストにプレビューのコメントを付けます。本公開のジョブには要りません。</li>
+        <li>製品の<code>artifact-pages/preview-action</code>を直接使う場合、コメントの入力<code>comment</code>の既定は<code>false</code>で、コメントは付きません。共通のワークフローは内部で<code>comment: true</code>を指定しています。</li>
+        <li>AWSでは、このジョブの<code>sub</code>（Environmentを使わなければ<code>repo:acme/sre:pull_request</code>の形）を<code>satellite_github_subjects</code>に入れておきます。</li>
+      </ul>
+      <p>プレビューを作るたびに配信先に書き込むので、すべてのプルリクエストではなく、ラベルを付けたものだけにする運用もあります。その場合は<code>on</code>と<code>if</code>にラベルの条件を足します。</p>
+    </section>
+
+    <section class="doc-section" aria-labelledby="see">
+      <h2 id="see">レビューする人に見えるもの</h2>
+      <ol>
+        <li>プルリクエストに、サイトごとに1つのコメントが付きます。変わった資料の一覧とプレビューへのリンクがあり、プレビューを作り直すたびに書き換わります。</li>
+        <li>リンクを開くと、閲覧アプリの中でプレビューが開きます。左には、変更した資料と、変更したファイルの影響を受けた資料だけが並びます。</li>
+        <li>サイトのトップの<strong>Previews</strong>からも、そのサイトのプレビューの一覧を開けます。</li>
+      </ol>
+      <p>プレビューに含まれるのは、プルリクエストで追加・変更した資料と、変更したCSSや画像を参照している資料です。プレビューの内容は、プルリクエストの先頭のコミットそのものです。削除した資料だけの変更など、プレビューする資料がない場合は、結果が<code>no-preview</code>になり、正常に終わります。</p>
+      <div class="table-wrap"><table>
+        <thead><tr><th>URL</th><th>開くもの</th></tr></thead>
+        <tbody>
+          <tr><td><code>/sre/_previews?group=pr%3A42</code></td><td>プルリクエスト#42の最新のプレビューの一覧。新しいプレビューができると、その内容に変わります。</td></tr>
+          <tr><td><code>/sre/_previews/&lt;コミットのSHA&gt;/&lt;資料のパス&gt;</code></td><td>そのコミットのプレビューの資料。あとから変わりません。</td></tr>
+        </tbody>
+      </table></div>
+    </section>
+
+    <section class="doc-section" aria-labelledby="after">
+      <h2 id="after">プルリクエストを閉じたあと</h2>
+      <p>プルリクエストをマージしたり閉じたりしても、プレビューは自動では消えません。配信先の保持期間（Terraformの<code>preview_retention_days</code>）が過ぎると、配信先が削除します。削除は配信先が非同期に行うので、ちょうどその日数で消えるとは限りません。</p>
+      <p>期間を待たずに消したい場合は、CLIで削除します。</p>
+      <div class="term" aria-label="プレビューを削除する">
+        <div class="term-head"><span>ターミナル</span><button class="copy-btn" type="button">コピー</button></div>
+<pre><span class="p">$</span> <span data-copy>artifact-pages preview remove --site sre --group pr:42 --config github://acme/platform-admin/artifact-pages.yaml --dry-run</span>
+<span class="p">$</span> <span data-copy>artifact-pages preview remove --site sre --group pr:42 --config github://acme/platform-admin/artifact-pages.yaml</span></pre>
+      </div>
+      <p>本公開の資料からファイルを消しても、そのファイルのプレビューは消えません。サイトを取り下げると、そのサイトのプレビューもまとめて削除されます。</p>
+    </section>
+
+    <section class="doc-section" aria-labelledby="done">
+      <h2 id="done">導入の完了</h2>
+      <p>これで、最初のチームが自分のリポジトリから資料を公開し、プルリクエストをプレビューで確かめられるようになりました。次のチームを受け入れるときは「<a href="../03-operations/onboard-team.html">新しいチーム・サイトを受け入れる</a>」に進みます。</p>
+    </section>
+
+    <nav class="pager" aria-label="ページ送り">
+      <a class="prev" href="05-first-site.html"><small>前へ</small><strong>最初のサイトを公開する</strong></a>
+      <a class="next" href="../03-operations/index.html"><small>次へ</small><strong>社内展開と運用</strong></a>
+    </nav>
+  </main>
+</body>
+</html>

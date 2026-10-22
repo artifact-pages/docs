@@ -1,0 +1,109 @@
+<!doctype html>
+<html lang="ja">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="description" content="cli.versionとweb.versionで固定した閲覧アプリとCLIを更新する。通常の手順、形式が変わる更新の順序、1回だけ別のCLIを使う方法、固定のない古い環境の追いつき。">
+  <title>閲覧アプリ・CLI・Actionsを更新する — Artifact Pages ドキュメント</title>
+  <script>
+    // Copy the reader app's theme (same-origin parent) before first paint; assets/site.js keeps it in sync.
+    (() => {
+      const root = document.documentElement;
+      root.classList.add('js');
+      try {
+        const theme = window.parent !== window && window.parent.document.documentElement.dataset.theme;
+        if (theme === 'light' || theme === 'dark') root.dataset.theme = theme;
+      } catch { /* cross-origin: fall back to prefers-color-scheme */ }
+    })();
+  </script>
+  <link rel="icon" href="data:,">
+  <link rel="stylesheet" href="../assets/site.css">
+  <script src="../assets/site.js" defer></script>
+</head>
+<body>
+  <a class="skip" href="#main">本文へ移動</a>
+  <main id="main" class="wrap">
+    <header class="page-head">
+      <div>
+        <p class="eyebrow">社内展開と運用</p>
+        <h1>閲覧アプリ・CLI・Actionsを更新する</h1>
+      </div>
+      <p class="lead">閲覧アプリ、CLI、GitHub Actionsは、それぞれ別のバージョンでリリースされます。管理リポジトリの<code>artifact-pages.yaml</code>で閲覧アプリとCLIの版を固定し、それを書き換えて更新します。</p>
+    </header>
+
+    <section class="doc-section" aria-labelledby="pins">
+      <h2 id="pins">版を固定する</h2>
+      <div class="term" aria-label="版の固定">
+        <div class="term-head"><span>artifact-pages.yaml / 管理リポジトリ</span></div>
+<pre><span class="k">cli</span>:
+  <span class="k">version</span>: 0.5.2   <span class="c"># 公開や登録を行うCLI</span>
+<span class="k">web</span>:
+  <span class="k">version</span>: 0.4.1   <span class="c"># app deploy が置く閲覧アプリ</span></pre>
+      </div>
+      <ul>
+        <li>値は<code>0.5.2</code>のような正確な版です。先頭の<code>v</code>、範囲、<code>latest</code>は書けません。</li>
+        <li>入れてあるCLIは、<code>cli.version</code>が自分と違う版を指していれば、その版をダウンロードし、チェックサムを確かめてから実行を任せます。</li>
+        <li>製品のActionsの版（いまは<code>v0.3.0</code>）は、CLIの版とは別の番号です。各Actionsは、使えるCLIの範囲（<code>v0.3.0</code>では<code>&gt;=0.5.0 &lt;0.6.0</code>）を持っています。</li>
+      </ul>
+      <p>いまの版はすべて0.xのプレリリースで、版をまたぐ互換性は約束されていません。ただし、CLIは書き込む前に、配置された閲覧アプリがその形式を読めるかを毎回確かめます。</p>
+    </section>
+
+    <section class="doc-section" aria-labelledby="normal">
+      <h2 id="normal">通常の更新</h2>
+      <ol>
+        <li><code>cli.version</code>と<code>web.version</code>のうち、上げるほうを書き換えます。</li>
+        <li><code>config check</code>で、そのCLIが書く形式と、配信先にいま入っている形式を、その閲覧アプリが読めるかを確かめます。書き込みはしません。</li>
+        <li>登録を反映し、閲覧アプリを変えた場合は配置します。それぞれ試し実行で確かめてから実行します。</li>
+      </ol>
+      <div class="term" aria-label="通常の更新">
+        <div class="term-head"><span>ターミナル / 管理リポジトリ</span><button class="copy-btn" type="button">コピー</button></div>
+<pre><span class="p">$</span> <span data-copy>artifact-pages config check --config artifact-pages.yaml</span>
+Config and stored formats are compatible with web.version.
+<span class="p">$</span> <span data-copy>artifact-pages registry sync --config artifact-pages.yaml</span>
+<span class="p">$</span> <span data-copy>artifact-pages app deploy --config artifact-pages.yaml</span></pre>
+      </div>
+      <p>CLIの新しい版が、共通のワークフローで使っている製品Actionsの範囲を外れる場合は、先に新しいCLIで共通のワークフローを作り直します（「<a href="update-shared-workflows.html">共通の公開・プレビューの仕組みを更新する</a>」）。範囲の外の版を指定すると、ジョブはダウンロードの前に終了コード2で止まります。</p>
+    </section>
+
+    <section class="doc-section" aria-labelledby="breaking">
+      <h2 id="breaking">形式が変わる更新</h2>
+      <p>新しい版で保存の形式が変わり、古い閲覧アプリでは読めなくなる場合は、<code>config check</code>が失敗します。そのときは、次の順で計画的に移ります。</p>
+      <ol>
+        <li><code>registry sync --accept-breaking</code>で登録を新しい形式にします。</li>
+        <li><code>app deploy --accept-breaking</code>で新しい閲覧アプリを置きます。</li>
+        <li>新しいCLIで、すべてのサイトを公開し直します。</li>
+      </ol>
+      <p><code>--accept-breaking</code>があるのは<code>registry sync</code>と<code>app deploy</code>だけです。公開し直すまでの間、まだ古い形式のサイトを開くと、閲覧アプリは<strong>This site needs to be republished</strong>と表示します。</p>
+    </section>
+
+    <section class="doc-section" aria-labelledby="override">
+      <h2 id="override">1回だけ別のCLIを使う</h2>
+      <p>設定を変えずに、1回の実行だけ別のCLIを使えます。優先順は、コマンドの<code>--cli-version</code>、環境変数<code>ARTIFACT_PAGES_CLI_VERSION</code>、製品Actionの入力<code>cli-version</code>、設定の<code>cli.version</code>の順です。</p>
+      <div class="term" aria-label="1回だけ別のCLIを使う">
+        <div class="term-head"><span>ターミナル</span><button class="copy-btn" type="button">コピー</button></div>
+<pre><span class="p">$</span> <span data-copy>artifact-pages --cli-version 0.5.2 site sync --site sre --config artifact-pages.yaml --dry-run</span></pre>
+      </div>
+      <p>互換性の確認とActionsの範囲の確認は、この場合も行われます。管理リポジトリの共通のワークフローには、この指定を渡す入力がありません。チームのジョブで試すには、直接CLIを動かします。</p>
+    </section>
+
+    <section class="doc-section" aria-labelledby="catch-up">
+      <h2 id="catch-up">固定のない古い環境を追いつかせる</h2>
+      <ul>
+        <li>設定に<code>cli</code>も<code>web</code>もない環境では、入れてあるCLIがそのまま動きます。古いCLIはこれらのキーを知らずに拒否するので、まず使うCLIとActionsを、これらのキーに対応する版に上げます。そのあとで<code>web.version</code>（必要なら<code>cli.version</code>）を書き足します。閲覧アプリとCLIのリリースが分かれたあとのCLIでは、<code>cli.version</code>だけを書いて<code>web.version</code>がないと、<code>app deploy</code>は<code>--archive</code>を指定しない限り閲覧アプリを選べず、終了コード2で止まります。</li>
+        <li>版の記録がない古いサイトは、互換かどうか判断できないものとして扱われます。登録を反映し、全サイトを公開し直して記録を作ってから閲覧アプリを置くか、上の「形式が変わる更新」の順で移ります。</li>
+        <li>AWSでは、CLI 0.5.0以降が、サイトの一覧と検索のデータを圧縮して保存します。一度0.5.0以降で公開したサイトには、そのあと0.5.0より古いCLIで書き込まないでください。移る前に、そのサイトに書き込むすべての実行（手元、定期実行、Actions）を0.5.0以降にそろえます。</li>
+      </ul>
+    </section>
+
+    <section class="doc-section" aria-labelledby="rollback">
+      <h2 id="rollback">前の版に戻す</h2>
+      <p>閲覧アプリは、保存の形式が変わっていなければ、<code>web.version</code>を前の版にして<code>config check</code>と<code>app deploy</code>を行えば戻せます。CLIは、上のAWSの制約のように、新しい版で書いたデータを古い版が扱えない場合があります。設定を元に戻せば必ず安全に戻せる、というわけではないので、戻す前に<code>config check</code>で確かめてください。</p>
+    </section>
+
+    <nav class="pager" aria-label="ページ送り">
+      <a class="prev" href="update-shared-workflows.html"><small>前へ</small><strong>共通の公開・プレビューの仕組みを更新する</strong></a>
+      <a class="next" href="change-or-retire-site.html"><small>次へ</small><strong>サイトを変更・廃止する</strong></a>
+    </nav>
+  </main>
+</body>
+</html>

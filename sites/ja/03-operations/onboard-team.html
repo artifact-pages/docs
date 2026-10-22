@@ -1,0 +1,136 @@
+<!doctype html>
+<html lang="ja">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="description" content="次のチームのサイトを管理リポジトリに登録し、配信先の権限を足し、共通のワークフローを呼び出すワークフローを渡して、最初の公開まで進める。">
+  <title>新しいチーム・サイトを受け入れる — Artifact Pages ドキュメント</title>
+  <script>
+    // Copy the reader app's theme (same-origin parent) before first paint; assets/site.js keeps it in sync.
+    (() => {
+      const root = document.documentElement;
+      root.classList.add('js');
+      try {
+        const theme = window.parent !== window && window.parent.document.documentElement.dataset.theme;
+        if (theme === 'light' || theme === 'dark') root.dataset.theme = theme;
+      } catch { /* cross-origin: fall back to prefers-color-scheme */ }
+    })();
+  </script>
+  <link rel="icon" href="data:,">
+  <link rel="stylesheet" href="../assets/site.css">
+  <script src="../assets/site.js" defer></script>
+</head>
+<body>
+  <a class="skip" href="#main">本文へ移動</a>
+  <main id="main" class="wrap">
+    <header class="page-head">
+      <div>
+        <p class="eyebrow">社内展開と運用</p>
+        <h1>新しいチーム・サイトを受け入れる</h1>
+      </div>
+      <p class="lead">2つ目以降のチームを受け入れるときに必要なのは、サイトの登録、配信先の権限、チームのワークフローの3つだけです。環境はすでにあるので作り直しません。ここでは、説明用の例として<code>acme/billing</code>のサイト<code>billing</code>を受け入れます。</p>
+    </header>
+
+    <section class="doc-section" aria-labelledby="request">
+      <h2 id="request">1. サイトを登録する</h2>
+      <p>多くの組織では、チームが管理リポジトリにプルリクエストを出し、管理者がレビューしてマージします。この流れは製品の機能ではなく運用の取り決めなので、組織に合わせて決めてください。追加するのは<code>sites</code>の1項目です。</p>
+      <div class="term" aria-label="サイトを追加する">
+        <div class="term-head"><span>artifact-pages.yaml / 管理リポジトリ（説明用の例）</span><button class="copy-btn" type="button">コピー</button></div>
+<pre><span data-copy><span class="k">sites</span>:
+  <span class="k">sre</span>:                 <span class="c"># 既存のサイトは消さずに残す</span>
+    <span class="k">name</span>: SREチーム
+    <span class="k">repository</span>: acme/sre
+    <span class="k">sourcePath</span>: docs
+  <span class="k">billing</span>:
+    <span class="k">name</span>: 決済チーム / Billing
+    <span class="k">description</span>: 請求まわりの設計と運用
+    <span class="k">repository</span>: acme/billing
+    <span class="k">sourcePath</span>: docs</span></pre>
+      </div>
+      <ul>
+        <li><strong>サイトID</strong>（ここでは<code>billing</code>）は、英小文字と数字をハイフンでつないだ形です。<code>assets</code>は使えません。IDはURLの一部になり、あとから名前を付け替える操作はありません。</li>
+        <li><strong><code>repository</code></strong>は<code>owner/repository</code>の形で書きます。URLや<code>.git</code>は付けません。</li>
+        <li><strong><code>sourcePath</code></strong>はリポジトリの中の相対パスです。リポジトリ全体なら<code>.</code>です。同じリポジトリとディレクトリの組を、2つのサイトに登録することはできません。</li>
+      </ul>
+      <p>マージしたら、登録を配信先に反映します。<code>sites</code>は追加分ではなく登録するサイトのすべてなので、既存のサイトを消していないことを試し実行で確かめます。</p>
+      <div class="term" aria-label="登録を反映する">
+        <div class="term-head"><span>ターミナル / 管理リポジトリ</span><button class="copy-btn" type="button">コピー</button></div>
+<pre><span class="p">$</span> <span data-copy>artifact-pages registry sync --config artifact-pages.yaml --dry-run</span>
+<span class="p">$</span> <span data-copy>artifact-pages registry sync --config artifact-pages.yaml</span></pre>
+      </div>
+      <p>管理リポジトリのワークフローで反映している場合は、そのワークフローがマージ後に同じことを行います。</p>
+    </section>
+
+    <section class="doc-section" aria-labelledby="access">
+      <h2 id="access">2. 配信先の権限を足す</h2>
+      <h3 id="aws">AWS</h3>
+      <p>サイトを登録しても、そのサイトのIAMロールはできません。Terraformの<code>satellite_github_subjects</code>に新しいサイトIDと、ロールを引き受けてよいジョブの<code>sub</code>を足して適用します。</p>
+      <div class="term" aria-label="サイトのロールを足す">
+        <div class="term-head"><span>HCL / module "artifact_pages"（説明用の例）</span><button class="copy-btn" type="button">コピー</button></div>
+<pre><span data-copy><span class="k">satellite_github_subjects</span> = {
+  <span class="k">sre</span>     = ["repo:acme/sre:environment:artifact-pages-production"]
+  <span class="k">billing</span> = [
+    "repo:acme/billing:environment:artifact-pages-production",
+    "repo:acme/billing:pull_request",   <span class="c"># プレビューのジョブ</span>
+  ]
+}</span></pre>
+      </div>
+      <p>ロールは<code>sub</code>が完全に一致するジョブにしか引き受けられません。本公開のジョブ、プレビューのジョブなど、実際に動くジョブの<code>sub</code>をすべて書きます。Environmentを付けないプルリクエストのジョブの<code>sub</code>は、Environmentの例とは形が違います（「<a href="../02-setup/01-infrastructure/aws.html#subjects">許可するジョブを書く</a>」）。ロールのARNは次のコマンドで確かめられます。</p>
+      <div class="term" aria-label="ロールのARNを確かめる">
+        <div class="term-head"><span>ターミナル / 管理リポジトリ</span><button class="copy-btn" type="button">コピー</button></div>
+<pre><span class="p">$</span> <span data-copy>artifact-pages registry role-arn --config artifact-pages.yaml --site billing</span></pre>
+      </div>
+      <h3 id="cloudflare">Cloudflare</h3>
+      <p>チームのリポジトリ（またはOrganization）のシークレットに、公開用の認証情報を入れます。名前は<code>CF_R2_ACCESS_KEY_ID</code>、<code>CF_R2_SECRET_ACCESS_KEY</code>、<code>CF_API_TOKEN</code>で、APIトークン1つの方式なら<code>CF_API_TOKEN</code>だけです。バケット全体に書ける認証情報は、チームのジョブをそのサイトの領域だけに限りません。限る場合は、サイトのプレフィックスに絞った一時的な認証情報を、組織の仕組みで発行して渡します（「<a href="../02-setup/01-infrastructure/cloudflare.html#credentials">認証情報</a>」）。</p>
+    </section>
+
+    <section class="doc-section" aria-labelledby="workflow">
+      <h2 id="workflow">3. チームにワークフローを渡す</h2>
+      <p>チームのリポジトリには、管理リポジトリの共通のワークフローを呼び出すファイルを置きます。最初のチームと同じ形で、サイトIDだけが違います。</p>
+      <div class="term" aria-label="チームの公開ワークフロー">
+        <div class="term-head"><span>.github/workflows/publish.yml / acme/billing（説明用の例）</span><button class="copy-btn" type="button">コピー</button></div>
+<pre><span data-copy><span class="k">name</span>: Publish docs
+<span class="k">on</span>:
+  <span class="k">push</span>:
+    <span class="k">branches</span>: [main]
+  <span class="k">workflow_dispatch</span>:
+<span class="k">jobs</span>:
+  <span class="k">publish</span>:
+    <span class="k">permissions</span>:
+      <span class="k">contents</span>: read
+      <span class="k">id-token</span>: write   <span class="c"># AWSのときだけ</span>
+    <span class="k">uses</span>: acme/platform-admin/.github/workflows/publish-site.yml@main
+    <span class="k">with</span>:
+      <span class="k">site</span>: billing
+      <span class="k">environment</span>: artifact-pages-production   <span class="c"># Environmentを使わないなら省く</span>
+    <span class="k">secrets</span>: inherit</span></pre>
+      </div>
+      <ul>
+        <li>呼び出す側の<code>permissions</code>が、共通のワークフローで使える権限の上限になります。AWSではOIDCのために<code>id-token: write</code>が要ります。</li>
+        <li>共通のワークフローは、チームのリポジトリの権限とシークレットで動きます。<code>secrets: inherit</code>で、チームのシークレットを共通のワークフローへ渡します。管理リポジトリのシークレットは使われません。</li>
+        <li>書き込むのは、<code>main</code>へのプッシュと、<code>main</code>での手動実行のときだけです。それ以外のきっかけでは試し実行になります。</li>
+        <li>Environmentを使う場合は、最初に動かす前にチームのリポジトリでEnvironmentを作り、ブランチの制限をかけておきます。</li>
+      </ul>
+      <p>プレビューも同じように<code>preview-site.yml</code>を呼び出します。書き方は「<a href="../02-setup/06-pr-previews.html">PRプレビューを使えるようにする</a>」と同じです。</p>
+    </section>
+
+    <section class="doc-section" aria-labelledby="first">
+      <h2 id="first">4. 最初の公開を確かめる</h2>
+      <p>チームのワークフローを手動で動かすか、<code>main</code>にマージして、公開が成功することを確かめます。失敗した場合は、まず次の2つを疑います。</p>
+      <div class="table-wrap"><table>
+        <thead><tr><th>メッセージ</th><th>原因</th></tr></thead>
+        <tbody>
+          <tr><td><code>site "billing" is not registered in the deployed registry</code></td><td>登録を配信先に反映していません（<code>registry sync</code>）。</td></tr>
+          <tr><td><code>site "billing" is registered to …; selected checkout is …</code></td><td>公開しようとしたリポジトリかディレクトリが、登録と違います。</td></tr>
+        </tbody>
+      </table></div>
+      <p>閲覧アプリのサイトの一覧に新しいサイトが出て、資料が読めれば受け入れは完了です。</p>
+    </section>
+
+    <nav class="pager" aria-label="ページ送り">
+      <a class="prev" href="index.html"><small>前へ</small><strong>社内展開と運用</strong></a>
+      <a class="next" href="update-shared-workflows.html"><small>次へ</small><strong>共通の公開・プレビューの仕組みを更新する</strong></a>
+    </nav>
+  </main>
+</body>
+</html>

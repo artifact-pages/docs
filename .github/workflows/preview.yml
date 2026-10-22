@@ -1,5 +1,5 @@
-# Publish pre-merge previews of pages a pull request adds or changes, for both
-# sites. A preview runs only for pull requests that carry the "preview-artifact"
+# Publish pre-merge previews of pages a pull request adds or changes, for every
+# site. A preview runs only for pull requests that carry the "preview-artifact"
 # label and change a file under sites/, and only for pull requests from this
 # repository: a fork never reaches the credentials. The existing dry-run in
 # publish.yml stays; it validates the real publish, while this workflow lets the
@@ -38,7 +38,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        site: [guide, architecture]
+        site: [guide, architecture, ja]
     uses: artifact-pages/admin/.github/workflows/preview-site.yml@main
     with:
       site: ${{ matrix.site }}

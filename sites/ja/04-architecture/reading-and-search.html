@@ -1,0 +1,82 @@
+<!doctype html>
+<html lang="ja">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="description" content="閲覧アプリが読み込むもの、タイトルとパスの検索、静的なファイルだけで動く本文検索の形と制約、サイトの規模による限界。">
+  <title>閲覧と検索の仕組み — Artifact Pages ドキュメント</title>
+  <script>
+    // Copy the reader app's theme (same-origin parent) before first paint; assets/site.js keeps it in sync.
+    (() => {
+      const root = document.documentElement;
+      root.classList.add('js');
+      try {
+        const theme = window.parent !== window && window.parent.document.documentElement.dataset.theme;
+        if (theme === 'light' || theme === 'dark') root.dataset.theme = theme;
+      } catch { /* cross-origin: fall back to prefers-color-scheme */ }
+    })();
+  </script>
+  <link rel="icon" href="data:,">
+  <link rel="stylesheet" href="../assets/site.css">
+  <script src="../assets/site.js" defer></script>
+</head>
+<body>
+  <a class="skip" href="#main">本文へ移動</a>
+  <main id="main" class="wrap">
+    <header class="page-head">
+      <div>
+        <p class="eyebrow">アーキテクチャ</p>
+        <h1>閲覧と検索の仕組み</h1>
+      </div>
+      <p class="lead">検索のためのサーバーはありません。閲覧アプリは、公開のときに作られた一覧と検索のデータを、必要な分だけ配信先から読み込み、ブラウザの中で検索します。</p>
+    </header>
+
+    <section class="doc-section" aria-labelledby="loading">
+      <h2 id="loading">閲覧アプリが読み込むもの</h2>
+      <ol>
+        <li>起動すると、サイトの登録情報<code>/_indexes/sites.json</code>と、各サイトの小さな概要<code>meta.json</code>を読みます。サイトの一覧に出る資料の数や更新日は、この概要から出します。</li>
+        <li>サイトを開くと、そのサイトの全資料の情報<code>index.json</code>を読みます。ほかのサイトの一覧は先読みしません。</li>
+        <li>資料を開くと、その資料のファイルを読みます。HTMLは閲覧アプリと同じオリジンのiframeに、Markdownは閲覧アプリが描画します。</li>
+      </ol>
+      <p>サイトの一覧<code>index.json</code>は、サイトごとに1つのファイルです。資料の数に比例して大きくなります。読み込みは、ヘッダーと本体を合わせて20秒で打ち切ります。</p>
+    </section>
+
+    <section class="doc-section" aria-labelledby="name">
+      <h2 id="name">タイトルとパスの検索</h2>
+      <p>パレットとサイドバーの絞り込みは、すでに読み込んだ<code>index.json</code>の中を探します。入力のたびに配信先へ問い合わせないので、一覧が読み込めていれば入力に合わせて候補が絞られます。サイトをまたいで検索することはありません。</p>
+    </section>
+
+    <section class="doc-section" aria-labelledby="fulltext">
+      <h2 id="fulltext">静的な本文検索</h2>
+      <p>本文検索のデータは、公開のたびに<code>site sync</code>が作ります。データは、変わりうる目次（<code>manifest.json</code>）と、中身から名前を決めた変わらないファイル（<code>root-…gz</code>、最大128個の<code>leaf-…gz</code>、抜粋用の<code>sections-…gz</code>と<code>text-…gz</code>）でできています。</p>
+      <ul>
+        <li>検索のときは、目次と、必要な区画のファイルだけを読みます。資料のファイルを1件ずつ取り寄せることはしません。抜粋は、表示する分の抜粋用のファイルから作ります。</li>
+        <li>中身から名前を決めたファイルは変わらないので、長くキャッシュできます。目次は60秒たつと次の検索で確かめ直します。</li>
+        <li>一致は、正規化（NFKC、小文字化、空白の整理）したうえで、スペースで区切った言葉をすべて含むかどうかで判断します。関連度の計算はなく、閲覧アプリが結果をタイトル、見出し、本文の一致の順に並べます（500件以下の場合）。500件を超えると、並べ替えずにパスの順で20件ずつ表示します。フォルダごとの件数は出さず、フォルダでの絞り込みは読み込んだ分にだけ効きます。</li>
+        <li>対象はタイトルと静的な本文です。スクリプトが作る文字、画像の代替テキスト、パス、<code>hidden</code>や<code>data-search-ignore</code>の付いた部分は対象外です。</li>
+      </ul>
+    </section>
+
+    <section class="doc-section" aria-labelledby="limits">
+      <h2 id="limits">制約とトレードオフ</h2>
+      <div class="table-wrap"><table>
+        <thead><tr><th>項目</th><th>値と挙動</th></tr></thead>
+        <tbody>
+          <tr><td>検索語の長さ</td><td>最大4096（UTF-16のコード単位）</td></tr>
+          <tr><td>同時に読む区画</td><td>同時に読むのは最大6ファイル</td></tr>
+          <tr><td>抜粋のデータ</td><td>1資料256 KiB、1サイト32 MiBまで。256 KiBを超える資料は、抜粋用の本文を途中で切る。サイトの上限には資料をパスの順に入れていき、入らない資料はまるごと抜粋なしになる（あとの小さな資料は入ることがある）。どちらの場合も検索の一致は残る</td></tr>
+          <tr><td>抜粋の区切り</td><td>目次のh1からh3の見出しごと</td></tr>
+          <tr><td>サイトの一覧の読み込み</td><td>20秒で打ち切り</td></tr>
+          <tr><td>データの破損</td><td>検索のデータは検証し、壊れた区画を0件として扱わない。抜粋のデータが壊れていても、結果は表示する</td></tr>
+        </tbody>
+      </table></div>
+      <p>この方式は、サーバーなしで動き、配信のキャッシュがよく効く代わりに、サイトの資料が増えると<code>index.json</code>が大きくなり、サイトを開く時間が延びます。圧縮は転送量を減らしますが、ブラウザが展開して読み込む量は減りません。どのくらいの規模で何が起きたかの計測は「<a href="cost-and-performance/index.html">コストとパフォーマンス</a>」にあります。</p>
+    </section>
+
+    <nav class="pager" aria-label="ページ送り">
+      <a class="prev" href="publishing-and-previews.html"><small>前へ</small><strong>公開とプレビューの仕組み</strong></a>
+      <a class="next" href="security-and-access.html"><small>次へ</small><strong>セキュリティとアクセス</strong></a>
+    </nav>
+  </main>
+</body>
+</html>

@@ -1,6 +1,7 @@
 # DOC-30 — リファレンス (Reference)
 
-- Status: Open
+- Status: In progress
+- Assignee: Claude
 - Site: `ja`, `en` ([DOC-23](DOC-23-structure-and-site-migration.md)); owns `05-reference/` in each, at identical relative paths
 - Depends on: [DOC-23](DOC-23-structure-and-site-migration.md) for publication only; the reader app part follows the shipped UI of ISSUE-107, ISSUE-108 and ISSUE-109
 

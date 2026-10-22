@@ -1,0 +1,95 @@
+<!doctype html>
+<html lang="ja">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="description" content="管理リポジトリのsitesに最初のサイトを書き、registry.ymlのワークフローで試し実行してから配信先に反映する。sitesが完全な一覧であることと、登録が認めること。">
+  <title>サイトを登録する — Artifact Pages ドキュメント</title>
+  <script>
+    // Copy the reader app's theme (same-origin parent) before first paint; assets/site.js keeps it in sync.
+    (() => {
+      const root = document.documentElement;
+      root.classList.add('js');
+      try {
+        const theme = window.parent !== window && window.parent.document.documentElement.dataset.theme;
+        if (theme === 'light' || theme === 'dark') root.dataset.theme = theme;
+      } catch { /* cross-origin: fall back to prefers-color-scheme */ }
+    })();
+  </script>
+  <link rel="icon" href="data:,">
+  <link rel="stylesheet" href="../assets/site.css">
+  <script src="../assets/site.js" defer></script>
+</head>
+<body>
+  <a class="skip" href="#main">本文へ移動</a>
+  <main id="main" class="wrap">
+    <header class="page-head">
+      <div>
+        <p class="eyebrow">導入する · ステップ4</p>
+        <h1>サイトを登録する</h1>
+      </div>
+      <p class="lead">最初のチームのサイト<code>sre</code>を登録します。登録すると、<code>acme/sre</code>の指定したディレクトリから、このサイトに公開できるようになります。</p>
+    </header>
+
+    <section class="doc-section" aria-labelledby="write">
+      <h2 id="write">sitesに書く</h2>
+      <div class="term" aria-label="最初のサイトを登録する">
+        <div class="term-head"><span>artifact-pages.yaml / 管理リポジトリ（説明用の例）</span><button class="copy-btn" type="button">コピー</button></div>
+<pre><span data-copy><span class="k">sites</span>:
+  <span class="k">sre</span>:
+    <span class="k">name</span>: SREチーム
+    <span class="k">description</span>: 運用手順と障害の振り返り
+    <span class="k">repository</span>: acme/sre
+    <span class="k">sourcePath</span>: docs</span></pre>
+      </div>
+      <div class="table-wrap"><table>
+        <thead><tr><th>項目</th><th></th><th>内容</th></tr></thead>
+        <tbody>
+          <tr><td>サイトID（<code>sre</code>）</td><td><span class="pill on">必須</span></td><td>URLの最初の部分になります。英小文字と数字をハイフンでつないだ形で、<code>assets</code>は使えません。リポジトリ名から自動では決まりません。</td></tr>
+          <tr><td><code>name</code></td><td><span class="pill on">必須</span></td><td>サイトの一覧に出る名前。</td></tr>
+          <tr><td><code>description</code></td><td><span class="pill">任意</span></td><td>サイトの一覧に出る説明。</td></tr>
+          <tr><td><code>repository</code></td><td><span class="pill on">必須</span></td><td>公開元のGitHubのリポジトリ。<code>owner/repository</code>の形。</td></tr>
+          <tr><td><code>sourcePath</code></td><td><span class="pill on">必須</span></td><td>公開するディレクトリ。リポジトリの中の相対パスで、全体なら<code>.</code>。</td></tr>
+        </tbody>
+      </table></div>
+      <p>同じリポジトリの別のディレクトリを、別のサイトとして登録できます。同じリポジトリとディレクトリの組を2つのサイトに登録することはできません。</p>
+      <div class="callout warn" role="note">
+        <span class="ico">完全な一覧</span>
+        <div>
+          <p><strong><code>sites</code>は、登録するサイトのすべてです。</strong>ここにないサイトは、反映したときに取り下げられ、公開済みの資料とプレビューも削除されます。すでにサイトがある環境でこの例を貼るときは、既存のサイトを消さないでください。<code>sites</code>そのものを書かないと反映は失敗し、<code>sites: {}</code>はすべてのサイトの取り下げを意味します。</p>
+        </div>
+      </div>
+    </section>
+
+    <section class="doc-section" aria-labelledby="apply">
+      <h2 id="apply">試し実行してから反映する</h2>
+      <p>生成した<code>registry.yml</code>が反映を受け持ちます。</p>
+      <ol>
+        <li>設定の変更をプルリクエストにします。<code>registry.yml</code>が試し実行し、何が変わるかをジョブの概要に出します。結果は<code>planned</code>です。</li>
+        <li>内容がよければマージします。<code>main</code>へのプッシュで、配信先の登録が更新されます。結果は<code>synced</code>、変わるものがなければ<code>no-op</code>です。</li>
+      </ol>
+      <p>手元からは次のコマンドで同じことができます。</p>
+      <div class="term" aria-label="手元から登録を反映する">
+        <div class="term-head"><span>ターミナル / 管理リポジトリ</span><button class="copy-btn" type="button">コピー</button></div>
+<pre><span class="p">$</span> <span data-copy>artifact-pages registry sync --config artifact-pages.yaml --dry-run</span>
+<span class="p">$</span> <span data-copy>artifact-pages registry sync --config artifact-pages.yaml</span></pre>
+      </div>
+      <p>反映すると、閲覧アプリのサイトの一覧に<strong>SREチーム</strong>が出ます。資料はまだないので、開いても空です。</p>
+    </section>
+
+    <section class="doc-section" aria-labelledby="grants">
+      <h2 id="grants">登録が認めること</h2>
+      <ul>
+        <li>公開のとき、CLIは配信先の登録を読み、公開しようとしているリポジトリとディレクトリが登録どおりかを確かめます。チームが自分で読んだ設定に自分を書き足しても、登録にはなりません。</li>
+        <li>この確認は、配信先の権限の代わりにはなりません。バケットに広く書ける認証情報を持つ人は、CLIを通さずに書き込めます。AWSでは、サイトのIAMロールがTerraformで作られていることも必要です（<a href="01-infrastructure/aws.html#roles">IAMロールとOIDC</a>）。</li>
+        <li>登録は、読者を限定しません。</li>
+      </ul>
+    </section>
+
+    <nav class="pager" aria-label="ページ送り">
+      <a class="prev" href="03-reader-app.html"><small>前へ</small><strong>閲覧アプリをデプロイする</strong></a>
+      <a class="next" href="05-first-site.html"><small>次へ</small><strong>最初のサイトを公開する</strong></a>
+    </nav>
+  </main>
+</body>
+</html>

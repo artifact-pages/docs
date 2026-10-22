@@ -1,0 +1,153 @@
+<!doctype html>
+<html lang="ja">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="description" content="artifact-pages.yamlの選ばれ方と重ね合わせ、全キーの必須性と既定値と制約、github://の指定、認証情報の環境変数と操作ごとの要否。">
+  <title>設定ファイル — Artifact Pages ドキュメント</title>
+  <script>
+    // Copy the reader app's theme (same-origin parent) before first paint; assets/site.js keeps it in sync.
+    (() => {
+      const root = document.documentElement;
+      root.classList.add('js');
+      try {
+        const theme = window.parent !== window && window.parent.document.documentElement.dataset.theme;
+        if (theme === 'light' || theme === 'dark') root.dataset.theme = theme;
+      } catch { /* cross-origin: fall back to prefers-color-scheme */ }
+    })();
+  </script>
+  <link rel="icon" href="data:,">
+  <link rel="stylesheet" href="../assets/site.css">
+  <script src="../assets/site.js" defer></script>
+</head>
+<body>
+  <a class="skip" href="#main">本文へ移動</a>
+  <main id="main" class="wrap">
+    <header class="page-head">
+      <div>
+        <p class="eyebrow">リファレンス</p>
+        <h1>設定ファイル</h1>
+      </div>
+      <p class="lead">設定ファイル<code>artifact-pages.yaml</code>は、配信先、CLIと閲覧アプリの版、登録するサイトを書くYAMLです。認証情報の値は書かず、値を読む環境変数の名前だけを書きます。</p>
+    </header>
+
+    <section class="doc-section" aria-labelledby="selection">
+      <h2 id="selection">どの設定が使われるか</h2>
+      <ol>
+        <li><code>--config</code>（何度でも指定でき、指定した順に重ねる）</li>
+        <li>環境変数<code>ARTIFACT_PAGES_CONFIG</code></li>
+        <li>いまのディレクトリの<code>artifact-pages.yaml</code></li>
+        <li><code>artifact-pages config set-default</code>で保存した指定</li>
+      </ol>
+      <p>最初に見つかったものだけを使い、ほかと暗黙に合成しません。ただし<code>registry setup</code>と<code>registry role-arn</code>はこの順番を使わず、手元の設定ファイルだけを読みます（<code>registry setup</code>は<code>--directory</code>の下の<code>--config</code>で、既定は<code>artifact-pages.yaml</code>。<code>registry role-arn</code>は<code>--config</code>で明示したファイル）。環境変数、保存した指定、<code>github://</code>は使いません。<code>config set-default</code>は、手元のパスなら絶対パスにして、ユーザーの設定ディレクトリの<code>artifact-pages/default-config</code>に保存します。設定の中の相対パス（<code>local.root</code>など）は、設定ファイルの場所ではなく、コマンドを実行したディレクトリが基準です。</p>
+      <h3 id="layers">重ね合わせ</h3>
+      <div class="table-wrap"><table>
+        <thead><tr><th>キー</th><th>重ねたときの扱い</th></tr></thead>
+        <tbody>
+          <tr><td><code>schemaVersion</code></td><td>どの層にも必要（整数の<code>1</code>）。</td></tr>
+          <tr><td><code>provider</code>と対応するブロック</td><td>組で1つ。後の層が配信先の設定を丸ごと置き換える。</td></tr>
+          <tr><td><code>sites</code></td><td>書かなければ前の層を引き継ぐ。書けば丸ごと置き換える（<code>sites: {}</code>も空として置き換える）。</td></tr>
+          <tr><td><code>cli</code>、<code>web</code></td><td>2つを合わせて、書ける層は1つだけ。別々の層に書くこともできない。</td></tr>
+        </tbody>
+      </table></div>
+      <p>知らないキー、重複したキー、型の違い、複数のYAMLドキュメントは拒否します。手元の層の合計とリモートの設定は、それぞれ512 KiBまでです。</p>
+    </section>
+
+    <section class="doc-section" aria-labelledby="keys">
+      <h2 id="keys">キー</h2>
+      <h3 id="common">共通</h3>
+      <div class="table-wrap"><table>
+        <thead><tr><th>キー</th><th></th><th>内容</th></tr></thead>
+        <tbody>
+          <tr><td><code>schemaVersion</code></td><td><span class="pill on">必須</span></td><td>整数の<code>1</code>。</td></tr>
+          <tr><td><code>provider</code></td><td><span class="pill on">必須</span></td><td><code>local</code>、<code>aws</code>、<code>cloudflare</code>のどれか（ほかに検証用の<code>gcp-local</code>）。</td></tr>
+          <tr><td><code>publicBaseURL</code></td><td><span class="pill">任意</span></td><td>読者が開くURLのオリジン。HTTPS（手元ならHTTPのループバックも可）。パス、クエリ、フラグメントは付けない。プレビューのURLを作るのに使う。</td></tr>
+          <tr><td><code>cli.version</code></td><td><span class="pill">任意</span></td><td>公開を行うCLIの正確な版（<code>MAJOR.MINOR.PATCH</code>）。<code>v</code>、範囲、<code>latest</code>、プレリリースの印は不可。</td></tr>
+          <tr><td><code>web.version</code></td><td><span class="pill">任意</span></td><td><code>app deploy</code>が置く閲覧アプリの正確な版。互換性の確認にも使う。</td></tr>
+          <tr><td><code>sites</code></td><td><span class="pill">任意</span></td><td>登録するサイトのすべて。<code>registry sync</code>と<code>registry setup</code>では必須。</td></tr>
+        </tbody>
+      </table></div>
+      <h3 id="local">local</h3>
+      <div class="table-wrap"><table>
+        <thead><tr><th>キー</th><th></th><th>内容</th></tr></thead>
+        <tbody>
+          <tr><td><code>local.root</code></td><td><span class="pill on">必須</span></td><td>配信先にするディレクトリ。公開元と重ならない場所。</td></tr>
+        </tbody>
+      </table></div>
+      <h3 id="aws">aws</h3>
+      <div class="table-wrap"><table>
+        <thead><tr><th>キー</th><th></th><th>内容</th></tr></thead>
+        <tbody>
+          <tr><td><code>aws.region</code></td><td><span class="pill on">必須</span></td><td>バケットのリージョン。</td></tr>
+          <tr><td><code>aws.accountId</code></td><td><span class="pill">任意</span></td><td>12桁の文字列。<code>bucket</code>を省くとき、<code>registry setup</code>と<code>registry role-arn</code>では必須。</td></tr>
+          <tr><td><code>aws.bucket</code></td><td><span class="pill">任意</span></td><td>既定は<code>artifact-pages-&lt;accountId&gt;-&lt;region&gt;</code>。</td></tr>
+          <tr><td><code>aws.distributionId</code></td><td><span class="pill">任意</span></td><td>CloudFrontのディストリビューション。ないとキャッシュの無効化をしない。</td></tr>
+          <tr><td><code>aws.namePrefix</code></td><td><span class="pill">任意</span></td><td>IAMロールの名前の先頭。既定は<code>artifact-pages</code>。Terraformの<code>name_prefix</code>と同じにする。</td></tr>
+        </tbody>
+      </table></div>
+      <p>AWSの認証情報は、AWS SDKの標準の探し方（環境変数、プロファイル、OIDCで得た一時的な認証情報など）で読みます。</p>
+      <h3 id="cloudflare">cloudflare</h3>
+      <div class="table-wrap"><table>
+        <thead><tr><th>キー</th><th></th><th>内容</th></tr></thead>
+        <tbody>
+          <tr><td><code>cloudflare.accountId</code>、<code>cloudflare.zoneId</code></td><td><span class="pill on">必須</span></td><td>それぞれ32桁の16進数。</td></tr>
+          <tr><td><code>cloudflare.publicBaseURL</code></td><td><span class="pill on">必須</span></td><td>HTTPSのオリジン。最上位の<code>publicBaseURL</code>も書くなら同じ値。</td></tr>
+          <tr><td><code>cloudflare.bucket</code></td><td><span class="pill">任意</span></td><td>既定は<code>artifact-pages</code>。</td></tr>
+          <tr><td><code>cloudflare.accessKeyIdEnv</code></td><td><span class="pill">任意</span></td><td>R2のアクセスキーIDの環境変数名。既定は<code>CF_R2_ACCESS_KEY_ID</code>。</td></tr>
+          <tr><td><code>cloudflare.secretAccessKeyEnv</code></td><td><span class="pill">任意</span></td><td>R2のシークレットの環境変数名。既定は<code>CF_R2_SECRET_ACCESS_KEY</code>。</td></tr>
+          <tr><td><code>cloudflare.apiTokenEnv</code></td><td><span class="pill">任意</span></td><td>APIトークンの環境変数名。既定は<code>CF_API_TOKEN</code>。</td></tr>
+          <tr><td><code>cloudflare.sessionTokenEnv</code></td><td><span class="pill">任意</span></td><td>一時的なR2の認証情報のセッショントークンの環境変数名。R2のキーを明示する方式でだけ使える。</td></tr>
+          <tr><td><code>cloudflare.registryReaderAccessKeyIdEnv</code>、<code>registryReaderSecretAccessKeyEnv</code>、<code>registryReaderSessionTokenEnv</code></td><td><span class="pill">任意</span></td><td>サイトの公開とプレビューで、登録情報と閲覧アプリの記録を読むためだけの別の認証情報の環境変数名。キーとシークレットは組で書く。名前を書いて値がなければ、ほかの認証情報で代わりに読むことはしない。</td></tr>
+        </tbody>
+      </table></div>
+      <h3 id="sites">sites</h3>
+      <div class="table-wrap"><table>
+        <thead><tr><th>キー</th><th></th><th>内容</th></tr></thead>
+        <tbody>
+          <tr><td><code>sites.&lt;id&gt;</code></td><td><span class="pill on">必須</span></td><td>サイトID。英小文字と数字をハイフンでつないだ形。<code>assets</code>は使えない。</td></tr>
+          <tr><td><code>sites.&lt;id&gt;.name</code></td><td><span class="pill on">必須</span></td><td>表示名。空白だけは不可。</td></tr>
+          <tr><td><code>sites.&lt;id&gt;.description</code></td><td><span class="pill">任意</span></td><td>説明。</td></tr>
+          <tr><td><code>sites.&lt;id&gt;.repository</code></td><td><span class="pill on">必須</span></td><td><code>owner/repository</code>。URLや<code>.git</code>は不可。大文字と小文字は区別しない。</td></tr>
+          <tr><td><code>sites.&lt;id&gt;.sourcePath</code></td><td><span class="pill on">必須</span></td><td>リポジトリの中の相対パス。全体なら<code>.</code>。<code>..</code>、<code>\</code>、絶対パスは不可。</td></tr>
+        </tbody>
+      </table></div>
+      <p>同じ<code>repository</code>と<code>sourcePath</code>の組を、2つのサイトに登録することはできません。</p>
+    </section>
+
+    <section class="doc-section" aria-labelledby="github">
+      <h2 id="github">github://の指定</h2>
+      <div class="table-wrap"><table>
+        <thead><tr><th>項目</th><th>仕様</th></tr></thead>
+        <tbody>
+          <tr><td>形</td><td><code>github://OWNER/REPO[/FILE]?ref=REF</code>。<code>FILE</code>を省くと<code>artifact-pages.yaml</code>。</td></tr>
+          <tr><td><code>ref</code></td><td>ブランチ、タグ、SHA。省くと既定のブランチ。その実行で使うコミットに固定し、結果の<code>configCommitSha</code>に記録する。</td></tr>
+          <tr><td>合成</td><td>リモートの設定は単独で完結させる。手元の層やほかのリモートとは重ねられない。</td></tr>
+          <tr><td>認証</td><td><code>GITHUB_TOKEN</code>、なければ<code>GH_TOKEN</code>。非公開のリポジトリにはその<code>contents:read</code>。</td></tr>
+        </tbody>
+      </table></div>
+    </section>
+
+    <section class="doc-section" aria-labelledby="credentials">
+      <h2 id="credentials">Cloudflareの認証情報の要否</h2>
+      <p>R2のキー（アクセスキーIDとシークレット）を明示する方式と、APIトークン1つから導く方式があります。キーが2つとも設定されていれば明示する方式、2つとも空ならトークン1つの方式です。片方だけは失敗します。</p>
+      <div class="table-wrap"><table>
+        <thead><tr><th>操作</th><th>R2のキー</th><th><code>CF_API_TOKEN</code>（明示する方式）</th></tr></thead>
+        <tbody>
+          <tr><td><code>site sync</code></td><td>要る</td><td>内容が変わる実行と、残ったキャッシュの削除を続けるとき</td></tr>
+          <tr><td><code>preview publish</code></td><td>要る</td><td>通常は要らない。中断したプレビューの片づけを続けるとき</td></tr>
+          <tr><td><code>preview remove</code>、<code>app remove</code></td><td>要る</td><td>実際に削除するとき</td></tr>
+          <tr><td><code>app deploy</code>、<code>registry sync</code></td><td>要る</td><td>実際にキャッシュを削除するとき</td></tr>
+          <tr><td><code>lock inspect</code>、<code>lock recover</code>、<code>config check</code></td><td>要る</td><td>要らない</td></tr>
+          <tr><td><code>index build</code>、<code>config set-default</code>、<code>registry setup</code>、<code>registry role-arn</code></td><td>要らない</td><td>要らない</td></tr>
+        </tbody>
+      </table></div>
+      <p>トークン1つの方式では、配信先に触れるすべての操作で、試し実行や変更のない実行も含めて<code>CF_API_TOKEN</code>が要ります。トークンには、バケットの<code>Workers R2 Storage Bucket Item Write</code>とゾーンの<code>Cache Purge</code>が必要です（「<a href="../02-setup/01-infrastructure/cloudflare.html#credentials">Cloudflareに構築する</a>」）。</p>
+    </section>
+
+    <nav class="pager" aria-label="ページ送り">
+      <a class="prev" href="reader/local-storage.html"><small>前へ</small><strong>ピン留め・閲覧履歴などの保存と扱い</strong></a>
+      <a class="next" href="cli.html"><small>次へ</small><strong>CLI</strong></a>
+    </nav>
+  </main>
+</body>
+</html>

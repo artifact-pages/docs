@@ -1,0 +1,60 @@
+<!doctype html>
+<html lang="ja">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="description" content="閲覧アプリの操作、設定ファイル、CLI、GitHub Actions、Terraform、バージョンと互換性を、目的から引くための入口。">
+  <title>リファレンス — Artifact Pages ドキュメント</title>
+  <script>
+    // Copy the reader app's theme (same-origin parent) before first paint; assets/site.js keeps it in sync.
+    (() => {
+      const root = document.documentElement;
+      root.classList.add('js');
+      try {
+        const theme = window.parent !== window && window.parent.document.documentElement.dataset.theme;
+        if (theme === 'light' || theme === 'dark') root.dataset.theme = theme;
+      } catch { /* cross-origin: fall back to prefers-color-scheme */ }
+    })();
+  </script>
+  <link rel="icon" href="data:,">
+  <link rel="stylesheet" href="../assets/site.css">
+  <script src="../assets/site.js" defer></script>
+</head>
+<body>
+  <a class="skip" href="#main">本文へ移動</a>
+  <main id="main" class="wrap">
+    <header class="page-head">
+      <div>
+        <p class="eyebrow">リファレンス</p>
+        <h1>リファレンス</h1>
+      </div>
+      <p class="lead">設定値、コマンド、入力と出力、URL、保存のしかたを正確に引くための章です。手順は導入と運用の章に、理由はアーキテクチャの章にあります。</p>
+    </header>
+
+    <section class="doc-section" aria-labelledby="by-purpose">
+      <h2 id="by-purpose">目的から引く</h2>
+      <div class="table-wrap"><table>
+        <thead><tr><th>知りたいこと</th><th>ページ</th></tr></thead>
+        <tbody>
+          <tr><td>閲覧アプリの画面とその役割</td><td><a href="reader/index.html">閲覧アプリ：画面と操作</a></td></tr>
+          <tr><td>キーボードでの操作</td><td><a href="reader/keyboard-shortcuts.html">キーボードショートカット</a></td></tr>
+          <tr><td>何が検索に掛かり、何が掛からないか</td><td><a href="reader/search.html">検索の対象と範囲</a></td></tr>
+          <tr><td>共有するURLの形</td><td><a href="reader/urls.html">ページ・見出し・プレビューのURL</a></td></tr>
+          <tr><td>ブラウザに残るもの</td><td><a href="reader/local-storage.html">ピン留め・閲覧履歴などの保存と扱い</a></td></tr>
+          <tr><td><code>artifact-pages.yaml</code>のキー</td><td><a href="configuration.html">設定ファイル</a></td></tr>
+          <tr><td>コマンドとフラグ、結果、終了コード</td><td><a href="cli.html">CLI</a></td></tr>
+          <tr><td>製品の4つのActionsの入力と出力</td><td><a href="github-actions.html">GitHub Actions</a></td></tr>
+          <tr><td>Terraformのモジュールの入力と出力</td><td><a href="terraform.html">Terraform</a></td></tr>
+          <tr><td>何に版があり、どう組み合わさるか</td><td><a href="versions.html">バージョンと互換性</a></td></tr>
+        </tbody>
+      </table></div>
+      <p>このリファレンスは、CLI 0.5.2、閲覧アプリ0.4.1、Actions v0.3.0、Terraformモジュール0.1.1の時点の内容です。</p>
+    </section>
+
+    <nav class="pager" aria-label="ページ送り">
+      <a class="prev" href="../04-architecture/cost-and-performance/aws.html"><small>前へ</small><strong>コストとパフォーマンス：AWS</strong></a>
+      <a class="next" href="reader/index.html"><small>次へ</small><strong>閲覧アプリ：画面と操作</strong></a>
+    </nav>
+  </main>
+</body>
+</html>

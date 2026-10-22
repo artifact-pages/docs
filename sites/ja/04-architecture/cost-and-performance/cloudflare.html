@@ -1,0 +1,74 @@
+<!doctype html>
+<html lang="ja">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="description" content="CloudflareのR2とCloudflare Cacheでの構成、キャッシュの削除のまとめ方、圧縮の扱い、費用のモデルによる月額の見積もりとその前提。">
+  <title>コストとパフォーマンス：Cloudflare — Artifact Pages ドキュメント</title>
+  <script>
+    // Copy the reader app's theme (same-origin parent) before first paint; assets/site.js keeps it in sync.
+    (() => {
+      const root = document.documentElement;
+      root.classList.add('js');
+      try {
+        const theme = window.parent !== window && window.parent.document.documentElement.dataset.theme;
+        if (theme === 'light' || theme === 'dark') root.dataset.theme = theme;
+      } catch { /* cross-origin: fall back to prefers-color-scheme */ }
+    })();
+  </script>
+  <link rel="icon" href="data:,">
+  <link rel="stylesheet" href="../../assets/site.css">
+  <script src="../../assets/site.js" defer></script>
+</head>
+<body>
+  <a class="skip" href="#main">本文へ移動</a>
+  <main id="main" class="wrap">
+    <header class="page-head">
+      <div>
+        <p class="eyebrow">アーキテクチャ · コストとパフォーマンス</p>
+        <h1>Cloudflare：構成と最適化</h1>
+      </div>
+      <p class="lead">CloudflareではR2の非公開バケットを、カスタムドメインとCloudflare Cacheで配信します。R2は配信の転送量に課金しないので、費用の中心はストレージとリクエストの回数です。</p>
+    </header>
+
+    <section class="doc-section" aria-labelledby="shape">
+      <h2 id="shape">構成</h2>
+      <ul>
+        <li>R2のバケットをカスタムドメインにつなぎ、ゾーンのルールでURLの振り分け、キャッシュ、応答ヘッダーを設定します。PagesやWorkers、検索のサーバーは使いません。バケットの<code>r2.dev</code>のURLは無効にします。</li>
+        <li>メールアドレスの難読化やRocket Loaderなど、HTMLを書き換えるCloudflareの機能は、このホスト名では止めます。資料が公開したバイトのまま届くようにするためです。</li>
+        <li>圧縮はCloudflareの配信に任せます。AWSで行う一覧の事前の圧縮は、Cloudflareでは行いません。検索のデータの<code>.gz</code>ファイルは、それ自体がgzipの形式のファイルで、閲覧アプリが展開します。</li>
+      </ul>
+    </section>
+
+    <section class="doc-section" aria-labelledby="purge">
+      <h2 id="purge">キャッシュの削除</h2>
+      <p>公開のたびに、変わったURLのキャッシュを削除します。同じサイトの資料か一覧で削除するURLが100件を超えるときは、そのサイトのプレフィックスでの削除にまとめます。ほかのサイト、閲覧アプリ、登録情報には広げません。</p>
+    </section>
+
+    <section class="doc-section" aria-labelledby="model">
+      <h2 id="model">費用のモデル</h2>
+      <p>R2 Standardの公開価格（ストレージ<code>$0.015/GB-月</code>、Class A操作<code>$4.50/100万</code>、Class B操作<code>$0.36/100万</code>、転送は無料）を、操作を数えた結果に当てはめた30日の見積もりです。</p>
+      <div class="table-wrap"><table>
+        <thead><tr><th>想定</th><th>キャッシュに当たらない割合10%</th><th>50%</th><th>100%</th></tr></thead>
+        <tbody>
+          <tr><td>S：5サイト × 各200ページ、1日1,000回閲覧</td><td>$0.09（無料枠の後 $0）</td><td>$0.23（$0）</td><td>$0.42（$0）</td></tr>
+          <tr><td>M：30サイト × 各2,000ページ、1日20,000回閲覧</td><td>$1.86（$0）</td><td>$4.83（$0.35）</td><td>$8.54（$4.07）</td></tr>
+          <tr><td>L：Mに5万ページのサイトを1つ追加、1日100,000回閲覧</td><td>$5.93（$1.22）</td><td>$20.78（$16.07）</td><td>$39.34（$34.63）</td></tr>
+        </tbody>
+      </table></div>
+      <ul>
+        <li>ページ数は、計測した合成サイトで代用しています。Sの200ページは1千件、Mの2,000ページは5千件の計測を使うので、少なめのページ数に対しては多めの見積もりです。公開はSが1サイト1日2回、MとLが5回、検索はSが1日100回、Mが2,000回、Lが10,000回です。</li>
+        <li>無料枠（ストレージ10 GB-月、Class A 100万回、Class B 1,000万回）はアカウントで共有なので、ほかの用途があれば括弧の額より増えます。</li>
+        <li>この見積もりは、端数を課金の単位に切り上げずに計算しています。実際の請求は単位ごとに切り上げられるので、小さな額は特に請求額としては使えません。</li>
+        <li>プレビュー、登録の反映、閲覧アプリの配置、WAFやAccessなどアカウントの費用は含みません。</li>
+      </ul>
+      <p>前提と内訳は製品の<a href="https://github.com/artifact-pages/artifact-pages/blob/main/docs/research/hosting-cost-model.md" target="_blank" rel="noopener">費用のモデル（英語）</a>にあります。最新の価格は<a href="https://developers.cloudflare.com/r2/pricing/" target="_blank" rel="noopener">R2の料金</a>で確かめてください。</p>
+    </section>
+
+    <nav class="pager" aria-label="ページ送り">
+      <a class="prev" href="index.html"><small>前へ</small><strong>コストとパフォーマンス</strong></a>
+      <a class="next" href="aws.html"><small>次へ</small><strong>コストとパフォーマンス：AWS</strong></a>
+    </nav>
+  </main>
+</body>
+</html>

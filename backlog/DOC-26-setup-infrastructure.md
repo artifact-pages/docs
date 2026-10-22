@@ -1,6 +1,7 @@
 # DOC-26 — 導入: インフラを構築する (Setup: build the infrastructure, Cloudflare and AWS)
 
-- Status: Open
+- Status: In progress
+- Assignee: Claude
 - Site: `ja`, `en` ([DOC-23](DOC-23-structure-and-site-migration.md)); owns `02-setup/01-infrastructure/` (`index.html`, `aws.html`, `cloudflare.html`) in each, at identical relative paths
 - Depends on: [DOC-23](DOC-23-structure-and-site-migration.md) for publication only
 

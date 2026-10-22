@@ -1,0 +1,220 @@
+<!doctype html>
+<html lang="ja">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="description" content="Artifact Pagesの配信環境をAWSのS3とCloudFrontに構築する。GitHubのOIDCとIAMロール、Terraformモジュールの呼び出し、ホスト名と独自ドメイン、閲覧の制限、出力の受け渡し。">
+  <title>AWSに構築する — Artifact Pages ドキュメント</title>
+  <script>
+    // Copy the reader app's theme (same-origin parent) before first paint; assets/site.js keeps it in sync.
+    (() => {
+      const root = document.documentElement;
+      root.classList.add('js');
+      try {
+        const theme = window.parent !== window && window.parent.document.documentElement.dataset.theme;
+        if (theme === 'light' || theme === 'dark') root.dataset.theme = theme;
+      } catch { /* cross-origin: fall back to prefers-color-scheme */ }
+    })();
+  </script>
+  <link rel="icon" href="data:,">
+  <link rel="stylesheet" href="../../assets/site.css">
+  <script src="../../assets/site.js" defer></script>
+</head>
+<body>
+  <a class="skip" href="#main">本文へ移動</a>
+  <main id="main" class="wrap">
+    <header class="page-head">
+      <div>
+        <p class="eyebrow">導入する · インフラを構築する</p>
+        <h1>AWSに構築する</h1>
+      </div>
+      <p class="lead">S3のバケットとCloudFrontで、Artifact Pagesの配信環境を作ります。公開ジョブが使うIAMロールもモジュールが作り、各ジョブはGitHubのOIDCでそのロールを引き受けます。GitHubにAWSのアクセスキーは置きません。</p>
+    </header>
+
+    <section class="doc-section" aria-labelledby="result">
+      <h2 id="result">できあがるもの</h2>
+      <ul>
+        <li><strong>非公開のS3バケット。</strong>パブリックアクセスはブロックし、CloudFrontだけが読めるようにします。閲覧アプリと公開された資料はすべてここに入ります。</li>
+        <li><strong>CloudFrontのディストリビューション。</strong>ページのURLを閲覧アプリへ振り分け、資料の種類ごとのキャッシュと応答ヘッダーを設定します。資料のファイルを直接指すURLで、そのファイルがない場合は404を返します。</li>
+        <li><strong>PRプレビューの保持期間。</strong>バケットのライフサイクルの規則として、<code>_previews/</code>以下を指定日数で削除します。</li>
+        <li><strong>IAMロール。</strong>管理リポジトリ用のロール1つと、サイトごとのロールです（<a href="#roles">IAMロールとOIDC</a>）。</li>
+      </ul>
+      <p>DNSのレコード、ACMの証明書、GitHub ActionsのOIDCプロバイダー、GitHubのEnvironmentとシークレットは、モジュールが作りません。</p>
+    </section>
+
+    <section class="doc-section" aria-labelledby="before">
+      <h2 id="before">先に必要なもの</h2>
+      <ul>
+        <li><strong>GitHub ActionsのOIDCプロバイダー。</strong>同じAWSアカウントに登録しておき、そのARNをモジュールに渡します。ARNのアカウントが適用先のアカウントと違うと、計画の段階で止まります。</li>
+        <li><strong>Terraformを適用できる権限。</strong>S3、CloudFront、IAM（ロールとインラインポリシーの作成、OIDCプロバイダーの読み取り）を操作し、WAFを使う場合はWAFv2も操作します。適用に必要な最小限のIAMポリシーは、まだ示せていません。検証は広い管理者権限で行いました。</li>
+        <li><strong>CLI 0.4.0以降。</strong>サイトのロールは、各サイト用の制御の領域だけに書き込めます。これを使うのはCLI 0.4.0以降です。</li>
+      </ul>
+      <p>適用に使う権限と、公開ジョブが引き受けるロールは別のものです。混同しないでください。</p>
+    </section>
+
+    <section class="doc-section" aria-labelledby="roles">
+      <h2 id="roles">IAMロールとOIDC</h2>
+      <p>モジュールが作るロールは2種類だけです。</p>
+      <div class="table-wrap"><table>
+        <thead><tr><th>ロール</th><th>名前</th><th>使うジョブとできること</th></tr></thead>
+        <tbody>
+          <tr><td>管理用</td><td><code>&lt;name_prefix&gt;-admin-publisher</code></td><td>管理リポジトリのジョブ。閲覧アプリの配置、サイトの登録と登録の取り消し、内部の記録の更新、CloudFrontのキャッシュの無効化。閲覧アプリの配置専用のロールはありません。</td></tr>
+          <tr><td>サイトごと</td><td><code>&lt;name_prefix&gt;-&lt;サイトID&gt;-publisher</code></td><td>そのサイトを公開するチームのジョブ。自分のサイトの公開と、PRプレビューの公開と削除。書けるのは自分のサイトの領域だけで、ほかのサイト、サイトの登録情報、閲覧アプリには書けません。プレビュー専用のロールはありません。</td></tr>
+        </tbody>
+      </table></div>
+      <p>サイトごとのロールの名前が64文字を超える場合は、ハッシュを使った名前になります。<code>name_prefix</code>の既定は<code>artifact-pages</code>です。</p>
+      <p>各ロールは、GitHubのOIDCトークンの<code>aud</code>（<code>sts.amazonaws.com</code>）と<code>sub</code>が完全に一致するときだけ引き受けられます。モジュールはワイルドカードを足さず、ブランチやEnvironmentを推測もしないので、許可するジョブの<code>sub</code>をすべて正確に書きます。</p>
+      <h3 id="subjects">許可するジョブを書く</h3>
+      <p>Environmentを使うジョブの<code>sub</code>は、既定では<code>repo:OWNER/REPO:environment:ENV</code>の形です。Environmentを使わないジョブでは、末尾がジョブのきっかけで変わります。ブランチへのプッシュなら<code>:ref:refs/heads/main</code>、プルリクエストなら<code>:pull_request</code>、タグなら<code>:ref:refs/tags/…</code>のようになります。リポジトリによっては、オーナーとリポジトリのIDを含む別の形を使います。実際の形は次のコマンドで確かめられます。</p>
+      <div class="term" aria-label="OIDCのsubの形を確かめる">
+        <div class="term-head"><span>ターミナル / GitHub CLI</span><button class="copy-btn" type="button">コピー</button></div>
+<pre><span class="p">$</span> <span data-copy>gh api repos/OWNER/REPO/actions/oidc/customization/sub --jq '.sub_claim_prefix'</span></pre>
+      </div>
+      <p>表示されたプレフィックスにジョブの部分（<code>:environment:ENV</code>など）を足したものを書きます。リポジトリが独自のテンプレートを使っている場合は、プレフィックスから推測せず、試しのジョブで実際の<code>sub</code>を確かめてください。</p>
+      <div class="callout warn" role="note">
+        <span class="ico">Environment</span>
+        <div>
+          <p><strong>Environmentは、ジョブを初めて動かす前に作り、ブランチの制限をかけておきます。</strong>ワークフローに存在しないEnvironmentの名前を書くと、GitHubはそれを制限なしで自動的に作ります。</p>
+        </div>
+      </div>
+      <p>サイトを登録しただけでは、そのサイトのロールは増えません。新しいサイトを加えるときは、Terraformの<code>satellite_github_subjects</code>にも加えて適用します。</p>
+    </section>
+
+    <section class="doc-section" aria-labelledby="module">
+      <h2 id="module">モジュールを呼び出す</h2>
+      <p>呼び出し側のTerraformの設定に、モジュールとプロバイダー、あとで使う出力を書きます。最初のチームのサイトもここで加えておくと、次のステップでそのまま公開まで進めます。リポジトリとサイトは説明用の例です。</p>
+      <div class="term" aria-label="AWSのモジュールを呼び出す">
+        <div class="term-head"><span>HCL / main.tf</span><button class="copy-btn" type="button">コピー</button></div>
+<pre><span data-copy><span class="k">provider</span> "aws" {
+  <span class="k">region</span> = "us-east-1"    <span class="c"># aws_region と同じリージョン</span>
+}
+
+<span class="k">module</span> "artifact_pages" {
+  <span class="k">source</span>  = "artifact-pages/artifact-pages/aws"
+  <span class="k">version</span> = "0.1.1"
+
+  <span class="k">aws_region</span>             = "us-east-1"
+  <span class="k">preview_retention_days</span> = 14
+
+  <span class="k">github_oidc_provider_arn</span> = "arn:aws:iam::123456789012:oidc-provider/token.actions.githubusercontent.com"
+
+  <span class="k">admin_github_subjects</span> = [
+    "repo:acme/platform-admin:environment:artifact-pages-production",
+  ]
+
+  <span class="k">satellite_github_subjects</span> = {
+    <span class="k">sre</span> = ["repo:acme/sre:environment:artifact-pages-production"]
+  }
+}
+
+<span class="k">output</span> "aws_deployment_config_yaml" {
+  <span class="k">value</span> = module.artifact_pages.aws_deployment_config_yaml
+}
+<span class="k">output</span> "admin_role_arn" {
+  <span class="k">value</span> = module.artifact_pages.admin_role_arn
+}
+<span class="k">output</span> "satellite_role_arns" {
+  <span class="k">value</span> = module.artifact_pages.satellite_role_arns
+}
+<span class="k">output</span> "distribution_domain_name" {
+  <span class="k">value</span> = module.artifact_pages.distribution_domain_name
+}</span></pre>
+      </div>
+      <p>プロバイダーのバージョンは<code>hashicorp/aws</code>の<code>~&gt; 6.0</code>を指定します。</p>
+      <div class="table-wrap"><table>
+        <thead><tr><th>入力</th><th></th><th>内容</th></tr></thead>
+        <tbody>
+          <tr><td><code>aws_region</code></td><td><span class="pill on">必須</span></td><td>S3のバケットを置くリージョン。プロバイダーの<code>region</code>と同じにします。</td></tr>
+          <tr><td><code>preview_retention_days</code></td><td><span class="pill on">必須</span></td><td>PRプレビューを残す日数。1から36500までの整数で、既定値はありません。<code>14</code>は例です。</td></tr>
+          <tr><td><code>github_oidc_provider_arn</code></td><td><span class="pill on">必須</span></td><td>登録済みのOIDCプロバイダーのARN。</td></tr>
+          <tr><td><code>admin_github_subjects</code></td><td><span class="pill on">必須</span></td><td>管理用ロールを引き受けてよいジョブの<code>sub</code>。1つ以上。</td></tr>
+          <tr><td><code>satellite_github_subjects</code></td><td><span class="pill">任意</span></td><td>サイトIDごとに、そのサイトのロールを引き受けてよいジョブの<code>sub</code>。既定は空で、サイトのロールは作られません。</td></tr>
+          <tr><td><code>name_prefix</code></td><td><span class="pill">任意</span></td><td>ロールの名前の先頭。既定は<code>artifact-pages</code>。変えた場合は、CLIの設定の<code>aws.namePrefix</code>も同じにします。</td></tr>
+          <tr><td><code>bucket_name</code></td><td><span class="pill">任意</span></td><td>既定は<code>artifact-pages-&lt;アカウントID&gt;-&lt;リージョン&gt;</code>。S3の名前は全体で一意なので、使えるとは限りません。</td></tr>
+          <tr><td><code>viewer_protocol_policy</code></td><td><span class="pill">任意</span></td><td>既定の<code>redirect-to-https</code>はHTTPをHTTPSへリダイレクトし、<code>https-only</code>はHTTPを拒否します。</td></tr>
+        </tbody>
+      </table></div>
+      <p>すべての入力は、モジュールの<a href="https://github.com/artifact-pages/artifact-pages/blob/main/terraform/modules/aws/README.md#inputs" target="_blank" rel="noopener">README</a>にあります。</p>
+    </section>
+
+    <section class="doc-section" aria-labelledby="hostname">
+      <h2 id="hostname">ホスト名と独自ドメイン</h2>
+      <p>独自ドメインを指定しなければ、CloudFrontが割り当てるホスト名（例：<code>https://d111111abcdef8.cloudfront.net</code>）で読めます。証明書もDNSも要らないので、まずはこれで始められます。ホスト名は出力<code>distribution_domain_name</code>で確かめます。</p>
+      <p>独自ドメインを使う場合は、次の順に進めます。</p>
+      <ol>
+        <li><code>us-east-1</code>にACMの証明書を作り、発行済みになるまで待ちます。</li>
+        <li>モジュールの<code>aliases</code>にホスト名を、<code>acm_certificate_arn</code>に証明書のARNを指定して適用します。</li>
+        <li>DNSをディストリビューションに向けます。Route 53では、<code>distribution_domain_name</code>と<code>distribution_hosted_zone_id</code>を使ったエイリアスのA・AAAAレコードを作ります。ほかのDNSではCNAMEを<code>distribution_domain_name</code>に向けます。CloudflareのDNSでは、プロキシを通さないDNSのみのレコードにします。</li>
+      </ol>
+      <p>Route 53で証明書からレコードまでまとめて作る例は、モジュールの<a href="https://github.com/artifact-pages/artifact-pages/tree/main/terraform/modules/aws/examples/route53-consumer" target="_blank" rel="noopener">route53-consumer</a>にあります。</p>
+    </section>
+
+    <section class="doc-section" aria-labelledby="restrict">
+      <h2 id="restrict">閲覧を制限する</h2>
+      <p>社内からだけ読めるようにしたい場合は、<code>waf_custom_rules</code>のプリセット<code>ip_allowlist</code>で、一覧にないIPアドレスからの通信を拒否できます。モジュールがAWS WAFのACLを作り、ディストリビューション全体に付けます。独自ドメインだけでなく、CloudFrontのホスト名、プレビュー、キャッシュから返る応答にも効きます。</p>
+      <div class="term" aria-label="IPアドレスで制限する">
+        <div class="term-head"><span>HCL / module "artifact_pages" に追加</span><button class="copy-btn" type="button">コピー</button></div>
+<pre><span data-copy><span class="k">viewer_protocol_policy</span> = "https-only"
+<span class="k">waf_custom_rules</span> = {
+  <span class="k">presets</span> = {
+    <span class="k">ip_allowlist</span> = ["192.0.2.10/32", "2001:db8::/128"]   <span class="c"># 説明用のアドレス。実際の社内の公開CIDRに置き換える</span>
+  }
+}</span></pre>
+      </div>
+      <ul>
+        <li>HTTPSだけを許すのはWAFではなく<code>viewer_protocol_policy</code>の役目です。</li>
+        <li>自分で管理しているWAFのACLを付けたい場合は、代わりに<code>web_acl_arn</code>を指定します。2つは同時に指定できません。</li>
+        <li>自分の接続元のアドレスが一覧に入っていることを、適用の前に確かめてください。</li>
+        <li>WAFを使うと、その分の費用がかかります。</li>
+      </ul>
+      <p>この制限は、IPアドレスで絞るフィルターです。誰が読んでいるかは確かめません。人単位の認証が必要な場合は、別の仕組みを用意してください。WAFの細かな設定は、モジュールの<a href="https://github.com/artifact-pages/artifact-pages/blob/main/terraform/modules/aws/docs/waf.md" target="_blank" rel="noopener">WAFの説明</a>にあります。</p>
+    </section>
+
+    <section class="doc-section" aria-labelledby="apply">
+      <h2 id="apply">計画を確かめて適用する</h2>
+      <div class="term" aria-label="計画と適用">
+        <div class="term-head"><span>ターミナル / 呼び出し側のディレクトリ</span><button class="copy-btn" type="button">コピー</button></div>
+<pre><span class="p">$</span> <span data-copy>terraform init</span>
+<span class="p">$</span> <span data-copy>terraform plan</span>
+<span class="p">$</span> <span data-copy>terraform apply</span></pre>
+      </div>
+      <p>計画で、作られるバケット、ディストリビューション、ロールとそのポリシーを確かめます。WAFを使わずサイトが1つの場合、作られるリソースは22個です。CloudFrontの変更は、適用が終わってから全体に行き渡るまでに時間がかかります。</p>
+      <p>S3とCloudFrontは使った分だけ課金されます。適用の前に、想定する量で<a href="https://aws.amazon.com/s3/pricing/" target="_blank" rel="noopener">S3</a>と<a href="https://aws.amazon.com/cloudfront/pricing/" target="_blank" rel="noopener">CloudFront</a>の料金を確かめてください。費用の生まれ方は「<a href="../../04-architecture/cost-and-performance/aws.html">コストとパフォーマンス：AWS</a>」で説明します。</p>
+      <p>プレビューの削除はS3が非同期に行うので、指定した日数ちょうどで消えるとは限りません。プレビューを今すぐ見えなくする手段としては使えません。</p>
+    </section>
+
+    <section class="doc-section" aria-labelledby="outputs">
+      <h2 id="outputs">出力を次のステップに渡す</h2>
+      <p>次のステップでは、配信先の設定と、ジョブが引き受けるロールのARNを使います。秘密の値は出力に含まれません。</p>
+      <div class="term" aria-label="配信先の設定とロールを出力する">
+        <div class="term-head"><span>ターミナル / 出力の例</span><button class="copy-btn" type="button">コピー</button></div>
+<pre><span class="p">$</span> <span data-copy>terraform output -raw aws_deployment_config_yaml</span>
+<span class="k">"aws"</span>:
+  <span class="k">"accountId"</span>: "123456789012"
+  <span class="k">"bucket"</span>: "artifact-pages-123456789012-us-east-1"
+  <span class="k">"distributionId"</span>: "E1ABCDEFGHIJKL"
+  <span class="k">"region"</span>: "us-east-1"
+<span class="k">"provider"</span>: "aws"
+<span class="k">"schemaVersion"</span>: 1
+<span class="p">$</span> <span data-copy>terraform output -raw admin_role_arn</span>
+<span class="p">$</span> <span data-copy>terraform output -json satellite_role_arns</span></pre>
+      </div>
+      <div class="table-wrap"><table>
+        <thead><tr><th>出力</th><th>使う場所</th></tr></thead>
+        <tbody>
+          <tr><td><code>aws_deployment_config_yaml</code></td><td>管理リポジトリの<code>artifact-pages.yaml</code>の配信先の設定。<code>name_prefix</code>を変えた場合だけ<code>namePrefix</code>が加わります。</td></tr>
+          <tr><td><code>admin_role_arn</code></td><td>管理リポジトリのジョブが引き受けるロール。</td></tr>
+          <tr><td><code>satellite_role_arns</code></td><td>サイトIDごとの、各チームのジョブが引き受けるロール。</td></tr>
+          <tr><td><code>distribution_domain_name</code></td><td>読者が開くホスト名。独自ドメインではCNAMEの向け先。</td></tr>
+        </tbody>
+      </table></div>
+      <p>ロールのARNは設定ファイルには書かず、ジョブの設定で使います。次のステップで、設定ファイルにCLIと閲覧アプリのバージョン、登録するサイトを書き足し、ジョブを用意します。閲覧アプリやサイトを置いたあとの動作の確認も、次のステップ以降で行います。</p>
+    </section>
+
+    <nav class="pager" aria-label="ページ送り">
+      <a class="prev" href="cloudflare.html"><small>前へ</small><strong>Cloudflareに構築する</strong></a>
+      <a class="next" href="../02-admin-repository.html"><small>次へ</small><strong>管理リポジトリを準備する</strong></a>
+    </nav>
+  </main>
+</body>
+</html>

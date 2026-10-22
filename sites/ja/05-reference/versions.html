@@ -1,0 +1,91 @@
+<!doctype html>
+<html lang="ja">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="description" content="Artifact PagesのCLI、閲覧アプリ、Actions、Terraformモジュールの版の系列と選ばれ方、読み書きする形式の互換性の確かめ方、Actionsとサイトが版に追従する条件。">
+  <title>バージョンと互換性 — Artifact Pages ドキュメント</title>
+  <script>
+    // Copy the reader app's theme (same-origin parent) before first paint; assets/site.js keeps it in sync.
+    (() => {
+      const root = document.documentElement;
+      root.classList.add('js');
+      try {
+        const theme = window.parent !== window && window.parent.document.documentElement.dataset.theme;
+        if (theme === 'light' || theme === 'dark') root.dataset.theme = theme;
+      } catch { /* cross-origin: fall back to prefers-color-scheme */ }
+    })();
+  </script>
+  <link rel="icon" href="data:,">
+  <link rel="stylesheet" href="../assets/site.css">
+  <script src="../assets/site.js" defer></script>
+</head>
+<body>
+  <a class="skip" href="#main">本文へ移動</a>
+  <main id="main" class="wrap">
+    <header class="page-head">
+      <div>
+        <p class="eyebrow">リファレンス</p>
+        <h1>バージョンと互換性</h1>
+      </div>
+      <p class="lead">版を持つ部品は、CLI、閲覧アプリ、4つのActions、2つのTerraformモジュールで、それぞれ別にリリースされます。いまの版はすべて0.xのプレリリースで、版をまたぐ互換性は約束されていません。互いに合っているかは、版の番号ではなく、読み書きする形式で確かめます。</p>
+    </header>
+
+    <section class="doc-section" aria-labelledby="series">
+      <h2 id="series">版の系列</h2>
+      <div class="table-wrap"><table>
+        <thead><tr><th>部品</th><th>タグ</th><th>選び方</th></tr></thead>
+        <tbody>
+          <tr><td>CLI</td><td><code>vX.Y.Z</code></td><td>設定の<code>cli.version</code>、または1回だけの指定</td></tr>
+          <tr><td>閲覧アプリ</td><td><code>web/vX.Y.Z</code></td><td>設定の<code>web.version</code>、または手元のバンドル</td></tr>
+          <tr><td>Actions</td><td>各Actionのリポジトリの<code>vX.Y.Z</code></td><td>ワークフローの<code>uses: …@&lt;タグかSHA&gt;</code></td></tr>
+          <tr><td>Terraformモジュール</td><td>各モジュールのリポジトリの<code>vX.Y.Z</code></td><td>モジュールの<code>version</code></td></tr>
+        </tbody>
+      </table></div>
+      <p>CLIのリリースには、LinuxとmacOS（amd64、arm64）のバイナリ、チェックサム、互換性のJSON、ライセンスが付きます。閲覧アプリのリリースは<code>artifact-pages-web-vX.Y.Z.tar.gz</code>と、その説明のJSONとチェックサムです。</p>
+    </section>
+
+    <section class="doc-section" aria-labelledby="actions">
+      <h2 id="actions">Actionsが使うCLI</h2>
+      <p>各Actionは、まず自分に組み込まれた入口のCLIを入れ、そのCLIが設定の<code>cli.version</code>の版に切り替えて実行します。Actionの版が、そのまま公開を行うCLIの版になるわけではありません。</p>
+      <div class="table-wrap"><table>
+        <thead><tr><th>Actions</th><th>入口のCLI</th><th>使えるCLIの範囲</th></tr></thead>
+        <tbody>
+          <tr><td>v0.3.0（4つとも）</td><td><code>0.5.0</code></td><td><code>&gt;=0.5.0 &lt;0.6.0</code></td></tr>
+        </tbody>
+      </table></div>
+      <p>範囲の外の版を指定すると、ダウンロードの前に終了コード2で止まります。入口のCLIを入れられなかった場合、ジョブの概要には<code>CLI executed: none (installation failed)</code>と出ます。</p>
+    </section>
+
+    <section class="doc-section" aria-labelledby="formats">
+      <h2 id="formats">読み書きする形式</h2>
+      <p>CLIが書き、閲覧アプリが読む形式は6つです（登録情報、サイトの概要、資料の一覧、本文検索の目次、プレビューの一覧、プレビューのリビジョン）。CLI 0.5.2はすべて形式1で書き、閲覧アプリ0.4.1はすべて形式1を読みます。</p>
+      <div class="table-wrap"><table>
+        <thead><tr><th>確かめる場面</th><th>内容</th></tr></thead>
+        <tbody>
+          <tr><td>公開と登録の前</td><td>CLIが書くすべての形式を、配置された閲覧アプリが読めるか。閲覧アプリの記録がなければ<code>web.version</code>のリリースの情報で判断する。</td></tr>
+          <tr><td>閲覧アプリの配置の前</td><td>置く閲覧アプリが、配信先に記録された登録とサイトの形式を読めるか。</td></tr>
+          <tr><td><code>config check</code></td><td>上の両方を、書き込まずに確かめる。<code>web.version</code>がないと終了コード2、互換でなければ1。</td></tr>
+        </tbody>
+      </table></div>
+      <p>配信先には、書いた形式の記録が残ります（<code>_control/versions/app.json</code>、<code>_control/versions/registry.json</code>、<code>_control/sites/&lt;site&gt;/versions.json</code>）。記録がないサイトは、互換ではなく不明として扱い、公開し直して記録を作ります。知らない形式の記録や壊れた記録は、<code>--accept-breaking</code>を付けても受け入れません。CLIの形式は<code>artifact-pages compatibility --format json</code>で見られます。</p>
+    </section>
+
+    <section class="doc-section" aria-labelledby="follow">
+      <h2 id="follow">追従する条件</h2>
+      <ul>
+        <li>設定の<code>cli.version</code>を変えると、その設定を使う次の実行から新しいCLIになります。チームのワークフローが管理リポジトリの古いコミットを参照していれば、古い設定のままです。</li>
+        <li>版を変えても、公開済みの内容は作り直されません。サイトは次の公開で、閲覧アプリは<code>app deploy</code>で新しくなります。</li>
+        <li>プレビューは、プルリクエストのbaseの設定から版を選びます。</li>
+        <li>AWSで一度CLI 0.5.0以降で公開したサイトには、0.5.0より古いCLIで書き込めません。</li>
+      </ul>
+      <p>更新の手順は「<a href="../03-operations/upgrade.html">閲覧アプリ・CLI・Actionsを更新する</a>」にあります。</p>
+    </section>
+
+    <nav class="pager" aria-label="ページ送り">
+      <a class="prev" href="terraform.html"><small>前へ</small><strong>Terraform</strong></a>
+      <a class="next" href="../README.md"><small>次へ</small><strong>Artifact Pages ドキュメント</strong></a>
+    </nav>
+  </main>
+</body>
+</html>

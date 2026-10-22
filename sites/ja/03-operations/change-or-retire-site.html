@@ -1,0 +1,94 @@
+<!doctype html>
+<html lang="ja">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="description" content="サイトの表示名や公開元を変える、サイトIDを変えたいときの扱い、サイトを取り下げて内容を削除する、プレビューだけを削除する。">
+  <title>サイトを変更・廃止する — Artifact Pages ドキュメント</title>
+  <script>
+    // Copy the reader app's theme (same-origin parent) before first paint; assets/site.js keeps it in sync.
+    (() => {
+      const root = document.documentElement;
+      root.classList.add('js');
+      try {
+        const theme = window.parent !== window && window.parent.document.documentElement.dataset.theme;
+        if (theme === 'light' || theme === 'dark') root.dataset.theme = theme;
+      } catch { /* cross-origin: fall back to prefers-color-scheme */ }
+    })();
+  </script>
+  <link rel="icon" href="data:,">
+  <link rel="stylesheet" href="../assets/site.css">
+  <script src="../assets/site.js" defer></script>
+</head>
+<body>
+  <a class="skip" href="#main">本文へ移動</a>
+  <main id="main" class="wrap">
+    <header class="page-head">
+      <div>
+        <p class="eyebrow">社内展開と運用</p>
+        <h1>サイトを変更・廃止する</h1>
+      </div>
+      <p class="lead">サイトの変更と廃止は、どれも管理リポジトリの<code>sites</code>を書き換えて<code>registry sync</code>で反映します。変える項目によって、配信先で起きることが違います。</p>
+    </header>
+
+    <section class="doc-section" aria-labelledby="change">
+      <h2 id="change">名前や公開元を変える</h2>
+      <div class="table-wrap"><table>
+        <thead><tr><th>変えるもの</th><th>反映すると</th><th>そのあと</th></tr></thead>
+        <tbody>
+          <tr><td><code>name</code>、<code>description</code></td><td>サイトの一覧の表示が変わります。</td><td>サイトの中の表示まで新しい名前にするには、次にそのサイトを公開します。</td></tr>
+          <tr><td><code>repository</code>、<code>sourcePath</code></td><td>新しいリポジトリとディレクトリだけが、このサイトに公開できるようになります。公開済みの内容は消えません。</td><td>新しい公開元から公開すると、内容が入れ替わります。リポジトリの名前を変えたり移したりした場合も、ここを書き換えます。</td></tr>
+        </tbody>
+      </table></div>
+    </section>
+
+    <section class="doc-section" aria-labelledby="id">
+      <h2 id="id">サイトIDを変えたいとき</h2>
+      <p>サイトIDの名前を付け替える操作はありません。<code>sites</code>のキーを変えると、古いIDのサイトの取り下げと、新しいIDのサイトの追加として扱われます。</p>
+      <ul>
+        <li>URLが変わります。古いURLから新しいURLへの転送はありません。</li>
+        <li>古いIDの公開済みの内容とプレビューは削除されます。新しいIDで公開し直します。</li>
+        <li>読者のピン留めや最近読んだ資料は、新しいIDには引き継がれません。</li>
+        <li>同じリポジトリとディレクトリを、古いIDと新しいIDに同時に登録することはできません。1回の反映で付け替えます。</li>
+      </ul>
+    </section>
+
+    <section class="doc-section" aria-labelledby="retire">
+      <h2 id="retire">サイトを取り下げる</h2>
+      <p>サイトを廃止するには、<code>sites</code>からそのIDを消して反映します。取り下げ専用のコマンドや、一時停止の状態はありません。</p>
+      <div class="term" aria-label="サイトを取り下げる">
+        <div class="term-head"><span>ターミナル / 管理リポジトリ</span><button class="copy-btn" type="button">コピー</button></div>
+<pre><span class="p">$</span> <span data-copy>artifact-pages registry sync --config artifact-pages.yaml --dry-run</span>
+<span class="p">$</span> <span data-copy>artifact-pages registry sync --config artifact-pages.yaml</span></pre>
+      </div>
+      <ul>
+        <li>そのサイトの公開済みの内容、一覧、プレビューと、公開の状態などの内部の記録が削除されます（ロックの記録は残ります）。ほかのサイトと閲覧アプリには触れません。</li>
+        <li>途中で失敗しても、同じ設定でもう一度<code>registry sync</code>を実行すれば続きから削除します。</li>
+        <li>キャッシュに残った写しや、開いたままの画面がすぐに消えるとは限りません。</li>
+      </ul>
+      <div class="callout" role="note">
+        <span class="ico">別に片づけるもの</span>
+        <div>
+          <p><strong>取り下げても、権限とワークフローは残ります。</strong>チームのワークフロー、AWSの<code>satellite_github_subjects</code>のエントリ（とそのロール）、Cloudflareでそのチームに渡した認証情報は、別に片づけます。</p>
+        </div>
+      </div>
+    </section>
+
+    <section class="doc-section" aria-labelledby="previews">
+      <h2 id="previews">プレビューだけを削除する</h2>
+      <p>プレビューは、配信先の保持期間が過ぎると自動で削除されます。プルリクエストを閉じただけでは消えません。期間を待たずに消したい場合は、CLIでプレビューのグループを指定して削除します。製品のActionには削除の操作はありません。</p>
+      <div class="term" aria-label="プレビューを削除する">
+        <div class="term-head"><span>ターミナル</span><button class="copy-btn" type="button">コピー</button></div>
+<pre><span class="p">$</span> <span data-copy>artifact-pages preview remove --site sre --group pr:42 --config artifact-pages.yaml --dry-run</span>
+<span class="p">$</span> <span data-copy>artifact-pages preview remove --site sre --group pr:42 --config artifact-pages.yaml</span></pre>
+      </div>
+      <p>ほかのグループからも参照されているプレビューは残ります。指定したグループがなければ、何もせずに終わります。保持期間を変えるには、Terraformの<code>preview_retention_days</code>を変えて適用します。</p>
+    </section>
+
+    <nav class="pager" aria-label="ページ送り">
+      <a class="prev" href="upgrade.html"><small>前へ</small><strong>閲覧アプリ・CLI・Actionsを更新する</strong></a>
+      <a class="next" href="troubleshooting.html"><small>次へ</small><strong>問題を調べ、復旧する</strong></a>
+    </nav>
+  </main>
+</body>
+</html>

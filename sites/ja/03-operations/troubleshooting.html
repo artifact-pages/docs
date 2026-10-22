@@ -1,0 +1,131 @@
+<!doctype html>
+<html lang="ja">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="description" content="公開や配置の失敗を切り分け、残ったロックを解き、中断した公開をやり直し、配信先とのずれを直し、設定の読み込みや認証の失敗に対処する。">
+  <title>問題を調べ、復旧する — Artifact Pages ドキュメント</title>
+  <script>
+    // Copy the reader app's theme (same-origin parent) before first paint; assets/site.js keeps it in sync.
+    (() => {
+      const root = document.documentElement;
+      root.classList.add('js');
+      try {
+        const theme = window.parent !== window && window.parent.document.documentElement.dataset.theme;
+        if (theme === 'light' || theme === 'dark') root.dataset.theme = theme;
+      } catch { /* cross-origin: fall back to prefers-color-scheme */ }
+    })();
+  </script>
+  <link rel="icon" href="data:,">
+  <link rel="stylesheet" href="../assets/site.css">
+  <script src="../assets/site.js" defer></script>
+</head>
+<body>
+  <a class="skip" href="#main">本文へ移動</a>
+  <main id="main" class="wrap">
+    <header class="page-head">
+      <div>
+        <p class="eyebrow">社内展開と運用</p>
+        <h1>問題を調べ、復旧する</h1>
+      </div>
+      <p class="lead">ほとんどの失敗は、同じ操作をもう一度実行すれば収まるように作られています。まず何が失敗したかを確かめ、必要ならロックを解いてから、元の操作をやり直します。</p>
+    </header>
+
+    <section class="doc-section" aria-labelledby="triage">
+      <h2 id="triage">まず切り分ける</h2>
+      <ol>
+        <li>失敗したジョブの概要（Job Summary）で、実行されたCLIの版（<strong>CLI executed</strong>）、操作、結果、エラーを確かめます。</li>
+        <li>終了コードを見ます。<code>2</code>は引数や設定の誤り、<code>1</code>は配信先、ダウンロード、互換性の確認などの失敗です。</li>
+        <li>同じ操作を<code>--dry-run</code>で動かします。試し実行は読み取りだけを行い、ロックも取らず、何も書き込みません。</li>
+      </ol>
+    </section>
+
+    <section class="doc-section" aria-labelledby="locks">
+      <h2 id="locks">ロックが残っている</h2>
+      <p>同じサイトへの操作は、ロックで1つずつ順に行われます。ロックは自動では期限切れになりません。操作が途中で強制終了されるとロックが残り、次の操作は10秒待ってから<code>timed out waiting for site "…" lock</code>で失敗します。</p>
+      <div class="term" aria-label="ロックを調べて解く">
+        <div class="term-head"><span>ターミナル</span><button class="copy-btn" type="button">コピー</button></div>
+<pre><span class="c"># ロックの状態を見る（共有のロックは --scope registry か --scope application）</span>
+<span class="p">$</span> <span data-copy>artifact-pages lock inspect --site sre --config artifact-pages.yaml --format json</span>
+<span class="c"># 表示された etag を指定して解く</span>
+<span class="p">$</span> <span data-copy>artifact-pages lock recover --site sre --observed-etag ETAG --config artifact-pages.yaml</span></pre>
+      </div>
+      <ul>
+        <li><strong>解く前に、本当に誰も動いていないかを確かめます。</strong>サイトのロックは、そのサイトの公開とプレビュー、サイトを変える<code>registry sync</code>、<code>app deploy</code>が取ります。管理リポジトリだけでなく、各チームのジョブや手元の実行も確かめます。取った時刻だけで古いと判断しないでください。</li>
+        <li><code>lock recover</code>に試し実行はありません。確かめた<code>etag</code>と今の状態が違えば、何もせずに失敗します。</li>
+        <li>解くのはロックだけです。そのあとで、止まっていた元の操作をもう一度実行します。</li>
+      </ul>
+    </section>
+
+    <section class="doc-section" aria-labelledby="interrupted">
+      <h2 id="interrupted">公開や配置が途中で止まった</h2>
+      <p>公開は多数のファイルの書き込みで、途中で失敗しても自動では元に戻りません。同じ公開元と設定で、同じ操作をもう一度実行すれば、残りを書き込んで収まります。</p>
+      <div class="table-wrap"><table>
+        <thead><tr><th>止まった操作</th><th>やり直すこと</th></tr></thead>
+        <tbody>
+          <tr><td>サイトの公開</td><td>同じ<code>site sync</code>。キャッシュの削除だけが残っていた場合は、変更がなくても結果が<code>synced</code>になります。</td></tr>
+          <tr><td>登録の反映、サイトの取り下げ</td><td>同じ設定で<code>registry sync</code>。</td></tr>
+          <tr><td>閲覧アプリの配置</td><td>同じ<code>app deploy</code>。</td></tr>
+        </tbody>
+      </table></div>
+      <p>キャッシュの削除に失敗したときのメッセージは<code>site origin synchronized but cache revalidation failed; retry site publish: …</code>です。ここにある<code>site publish</code>は古いコマンド名で、実行するのは<code>site sync</code>です。</p>
+    </section>
+
+    <section class="doc-section" aria-labelledby="drift">
+      <h2 id="drift">配信先の中身がずれている</h2>
+      <p>誰かが配信先のファイルを直接消したり置き換えたりすると、公開の内容とずれます。通常の公開は、公開元が前回と同じなら配信先の個々のファイルを確かめずに<code>no-op</code>で終わるので、このずれには気付きません。</p>
+      <div class="term" aria-label="配信先と突き合わせて直す">
+        <div class="term-head"><span>ターミナル / チームのリポジトリ</span><button class="copy-btn" type="button">コピー</button></div>
+<pre><span class="p">$</span> <span data-copy>artifact-pages site sync --site sre --config 'github://acme/platform-admin/artifact-pages.yaml?ref=main' --reconcile --dry-run</span>
+<span class="p">$</span> <span data-copy>artifact-pages site sync --site sre --config 'github://acme/platform-admin/artifact-pages.yaml?ref=main' --reconcile</span></pre>
+      </div>
+      <p><code>--reconcile</code>は、配信先のファイルの一覧とメタデータを公開元と突き合わせ、足りないファイル、余分なファイル、メタデータの違いを直します。ファイルの中身までは読まないので、メタデータを保ったまま中身だけが壊れた場合は見つけられません。公開した内容そのものが間違っている場合は、正しいコミットを取り出して公開し直します。<code>--ref</code>は表示用の情報を変えるだけで、公開する内容は変えません。</p>
+    </section>
+
+    <section class="doc-section" aria-labelledby="config">
+      <h2 id="config">設定を読めない、認証に失敗する</h2>
+      <h3 id="remote">別のリポジトリの設定を読めない</h3>
+      <p><code>github://</code>で管理リポジトリの設定を直接読む場合、失敗すると<code>cannot read deployment config github://…</code>で始まるメッセージが出ます。</p>
+      <div class="table-wrap"><table>
+        <thead><tr><th>HTTP</th><th>考えられる原因</th></tr></thead>
+        <tbody>
+          <tr><td>401</td><td>トークンが無効か期限切れ。</td></tr>
+          <tr><td>403</td><td>トークンにそのリポジトリの<code>contents:read</code>がない、またはAPIのレート制限。</td></tr>
+          <tr><td>404</td><td>ファイルのパスか参照がない、リポジトリがない、またはトークンで見えない非公開のリポジトリ。</td></tr>
+        </tbody>
+      </table></div>
+      <p>手元のCLIは<code>GITHUB_TOKEN</code>か<code>GH_TOKEN</code>のトークンを使います。製品のActionsには別のトークンを渡す入力がなく、ワークフローのトークンで読める設定だけを使えます。非公開の管理リポジトリの設定は、共通のワークフロー経由で渡します。</p>
+      <h3 id="cloudflare">Cloudflareの認証</h3>
+      <div class="table-wrap"><table>
+        <thead><tr><th>メッセージ</th><th>対処</th></tr></thead>
+        <tbody>
+          <tr><td><code>Cloudflare R2 access key ID and secret must be set together</code></td><td>R2のキーが片方だけ設定されています。両方設定するか、両方外してAPIトークン1つの方式にします。</td></tr>
+          <tr><td><code>Cloudflare API token is required to derive R2 credentials</code></td><td>APIトークン1つの方式で、<code>CF_API_TOKEN</code>がありません。</td></tr>
+          <tr><td><code>Cloudflare API token is required for cache invalidation</code></td><td>キャッシュの削除が必要な実行で、<code>CF_API_TOKEN</code>がありません。</td></tr>
+        </tbody>
+      </table></div>
+      <p>試し実行で確かめられるのは読み取りの権限までです。キャッシュを削除する権限は、実際の実行まで確かめられません。</p>
+      <h3 id="aws">AWSのロールを引き受けられない</h3>
+      <p>次を順に確かめます。Terraformでそのサイトのロールを作ったか、ジョブの<code>sub</code>が<code>satellite_github_subjects</code>の値と完全に一致するか、設定の<code>aws.accountId</code>と<code>aws.namePrefix</code>がTerraformと合っているか。期待するロールのARNは<code>artifact-pages registry role-arn</code>で確かめられます。</p>
+      <h3 id="registry">登録と合わない</h3>
+      <div class="table-wrap"><table>
+        <thead><tr><th>メッセージ</th><th>対処</th></tr></thead>
+        <tbody>
+          <tr><td><code>site "…" is not registered in the deployed registry</code></td><td>管理リポジトリの変更を<code>registry sync</code>で反映します。</td></tr>
+          <tr><td><code>site "…" is registered to …; selected checkout is …</code></td><td>公開しようとしたリポジトリかディレクトリが登録と違います。</td></tr>
+        </tbody>
+      </table></div>
+    </section>
+
+    <section class="doc-section" aria-labelledby="more">
+      <h2 id="more">さらに詳しい手順</h2>
+      <p>内部の記録が壊れた場合の扱いなど、まれな状況の手順は、製品の<a href="https://github.com/artifact-pages/artifact-pages/blob/main/docs/guides/operator-recovery.md" target="_blank" rel="noopener">復旧ガイド（英語）</a>にあります。そこにある手順の多くは、実際の環境ではまだ試されていません。内部の記録を手で消す操作は、そのガイドの条件を満たす場合だけにしてください。</p>
+    </section>
+
+    <nav class="pager" aria-label="ページ送り">
+      <a class="prev" href="change-or-retire-site.html"><small>前へ</small><strong>サイトを変更・廃止する</strong></a>
+      <a class="next" href="../04-architecture/index.html"><small>次へ</small><strong>アーキテクチャ</strong></a>
+    </nav>
+  </main>
+</body>
+</html>

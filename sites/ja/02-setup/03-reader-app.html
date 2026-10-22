@@ -1,0 +1,97 @@
+<!doctype html>
+<html lang="ja">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="description" content="設定ファイルのweb.versionで選んだ閲覧アプリを、管理リポジトリのワークフローとapp-deploy-actionで配信先に置き、ホスト名を開いて確かめる。">
+  <title>閲覧アプリをデプロイする — Artifact Pages ドキュメント</title>
+  <script>
+    // Copy the reader app's theme (same-origin parent) before first paint; assets/site.js keeps it in sync.
+    (() => {
+      const root = document.documentElement;
+      root.classList.add('js');
+      try {
+        const theme = window.parent !== window && window.parent.document.documentElement.dataset.theme;
+        if (theme === 'light' || theme === 'dark') root.dataset.theme = theme;
+      } catch { /* cross-origin: fall back to prefers-color-scheme */ }
+    })();
+  </script>
+  <link rel="icon" href="data:,">
+  <link rel="stylesheet" href="../assets/site.css">
+  <script src="../assets/site.js" defer></script>
+</head>
+<body>
+  <a class="skip" href="#main">本文へ移動</a>
+  <main id="main" class="wrap">
+    <header class="page-head">
+      <div>
+        <p class="eyebrow">導入する · ステップ3</p>
+        <h1>閲覧アプリをデプロイする</h1>
+      </div>
+      <p class="lead">読者が開く閲覧アプリを、配信先に置きます。置くのは設定ファイルの<code>web.version</code>で選んだリリースです。共通のワークフローは閲覧アプリの配置を含まないので、管理リポジトリに配置用のワークフローを1つ書きます。</p>
+    </header>
+
+    <section class="doc-section" aria-labelledby="workflow">
+      <h2 id="workflow">配置のワークフローを書く</h2>
+      <p>閲覧アプリの配置は、必要なときに手動で動かす形にします。設定を変えたりActionsを更新したりしただけでは配置されないので、意図しない更新が起きません。</p>
+      <div class="term" aria-label="閲覧アプリの配置ワークフロー（Cloudflare）">
+        <div class="term-head"><span>.github/workflows/app-deploy.yml / 管理リポジトリ（Cloudflare）</span><button class="copy-btn" type="button">コピー</button></div>
+<pre><span data-copy><span class="k">name</span>: App deploy
+<span class="k">on</span>:
+  <span class="k">workflow_dispatch</span>:
+    <span class="k">inputs</span>:
+      <span class="k">dry-run</span>:
+        <span class="k">description</span>: Plan only, without writes.
+        <span class="k">type</span>: boolean
+        <span class="k">default</span>: true
+<span class="k">permissions</span>:
+  <span class="k">contents</span>: read
+<span class="k">concurrency</span>:
+  <span class="k">group</span>: app-deploy
+  <span class="k">cancel-in-progress</span>: false
+<span class="k">jobs</span>:
+  <span class="k">deploy</span>:
+    <span class="k">runs-on</span>: ubuntu-24.04
+    <span class="k">environment</span>: production
+    <span class="k">steps</span>:
+      - <span class="k">uses</span>: artifact-pages/app-deploy-action@vX.Y.Z
+        <span class="k">with</span>:
+          <span class="k">dry-run</span>: ${{ inputs.dry-run }}
+        <span class="k">env</span>:
+          <span class="k">CF_R2_ACCESS_KEY_ID</span>: ${{ secrets.CF_R2_ACCESS_KEY_ID }}
+          <span class="k">CF_R2_SECRET_ACCESS_KEY</span>: ${{ secrets.CF_R2_SECRET_ACCESS_KEY }}
+          <span class="k">CF_API_TOKEN</span>: ${{ secrets.CF_API_TOKEN }}</span></pre>
+      </div>
+      <ul>
+        <li><code>vX.Y.Z</code>は<a href="https://github.com/artifact-pages/app-deploy-action/releases" target="_blank" rel="noopener">app-deploy-actionのリリース</a>の版です。生成された共通のワークフローと同じように、タグの代わりにコミットのSHAで固定するとより確実です。Actionの版は、置く閲覧アプリの版とは関係ありません。閲覧アプリは<code>web.version</code>で決まります。</li>
+        <li>AWSでは<code>env</code>の代わりに、このステップの前に<code>aws-actions/configure-aws-credentials</code>で<code>admin_role_arn</code>のロールを引き受け、ジョブの<code>permissions</code>に<code>id-token: write</code>を足します。</li>
+      </ul>
+    </section>
+
+    <section class="doc-section" aria-labelledby="run">
+      <h2 id="run">試し実行してから置く</h2>
+      <ol>
+        <li>GitHubのActionsの画面から<strong>App deploy</strong>を、<code>dry-run</code>にチェックを入れたまま動かします。何を書き込むかが表示され、結果は<code>planned</code>になります。</li>
+        <li>内容がよければ、<code>dry-run</code>のチェックを外してもう一度動かします。結果は<code>deployed</code>になります。置くものが前回と同じなら<code>no-op</code>です。</li>
+      </ol>
+      <p>手元からは、同じことを次のコマンドで行えます。</p>
+      <div class="term" aria-label="手元から閲覧アプリを置く">
+        <div class="term-head"><span>ターミナル / 管理リポジトリ</span><button class="copy-btn" type="button">コピー</button></div>
+<pre><span class="p">$</span> <span data-copy>artifact-pages app deploy --config artifact-pages.yaml --dry-run</span>
+<span class="p">$</span> <span data-copy>artifact-pages app deploy --config artifact-pages.yaml</span></pre>
+      </div>
+      <p>配置では、<code>web/vx.y.z</code>のリリースのアーカイブとチェックサムを確かめてから、閲覧アプリのファイル（<code>index.html</code>、<code>assets/</code>など）を書き込みます。サイトの資料、一覧、プレビューには触れません。<code>index.html</code>は最後に書き込みますが、すべてのファイルが一瞬で切り替わるわけではありません。</p>
+    </section>
+
+    <section class="doc-section" aria-labelledby="open">
+      <h2 id="open">開いて確かめる</h2>
+      <p>配信先のホスト名を開きます。Cloudflareでは<code>publicBaseURL</code>、AWSではCloudFrontのホスト名（独自ドメインならそのホスト名）です。閲覧アプリが表示されれば配置は完了です。まだサイトを登録していないので、サイトの一覧は空です。</p>
+    </section>
+
+    <nav class="pager" aria-label="ページ送り">
+      <a class="prev" href="02-admin-repository.html"><small>前へ</small><strong>管理リポジトリを準備する</strong></a>
+      <a class="next" href="04-register-site.html"><small>次へ</small><strong>サイトを登録する</strong></a>
+    </nav>
+  </main>
+</body>
+</html>
