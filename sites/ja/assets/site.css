@@ -400,6 +400,7 @@ td:first-child { white-space: nowrap; font-weight: 600; }
 .st > li.is-later:not(:last-child)::after { background: repeating-linear-gradient(180deg, var(--line-strong) 0 4px, transparent 4px 8px); }
 
 /* ── 段階マップ（nav.sm）：導入の6ステップ ── */
+.sm { container: sm / inline-size; }
 .sm ol { display: grid; grid-template-columns: repeat(6, minmax(0, 1fr)); gap: 0; margin: 0; padding: 0; list-style: none; }
 .sm li { position: relative; min-width: 0; }
 .sm a { position: relative; display: flex; flex-direction: column; align-items: center; gap: 8px; height: 100%; padding: 4px 6px 8px; border-radius: 10px; color: var(--muted); font-size: 12.5px; line-height: 1.5; text-align: center; text-decoration: none; }
@@ -413,7 +414,7 @@ td:first-child { white-space: nowrap; font-weight: 600; }
 .sm a[aria-current] { background: var(--paper); box-shadow: 0 0 0 1.5px var(--ink); color: var(--ink); }
 .sm a[aria-current] b { font-weight: 700; }
 .sm a[aria-current] .sm-n { border-style: solid; border-color: var(--ink); background: var(--ink); color: var(--bg); }
-@container fg (max-width: 640px) {
+@container sm (max-width: 640px) {
   .sm ol { grid-template-columns: minmax(0, 1fr); gap: 2px; }
   .sm a { flex-direction: row; align-items: center; gap: 12px; padding: 5px 10px 5px 6px; text-align: left; }
   .sm li:not(:last-child)::after { top: 40px; bottom: -10px; left: 21.25px; right: auto; width: 1.5px; height: auto; background: repeating-linear-gradient(180deg, var(--line-strong) 0 4px, transparent 4px 8px); }
