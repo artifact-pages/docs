@@ -126,7 +126,7 @@
         <li><code>.local/storage</code>をWebサーバーで配信して開きます。ファイルをそのまま返すだけのサーバーでは足りません。<code>/_indexes/</code>、<code>/_artifacts/</code>、<code>/_previews/</code>、<code>/assets/</code>はファイルを返してなければ404、<code>/_control</code>以下は返さず、それ以外のURLはすべて<code>/index.html</code>を返す設定にします。</li>
       </ol>
       <div class="term" aria-label="ローカルのnginxの設定">
-        <div class="term-head"><span>nginx / server ブロックの例</span><button class="copy-btn" type="button">コピー</button></div>
+        <div class="term-head"><span>nginx / serverブロックの例</span><button class="copy-btn" type="button">コピー</button></div>
 <pre><span data-copy>root /srv/artifact-pages;   <span class="c"># .local/storage を読み取り専用で置いた場所</span>
 location = /_control { return 404; }
 location ^~ /_control/ { return 404; }
