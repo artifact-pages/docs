@@ -193,13 +193,13 @@
       <div class="term" aria-label="配信先の設定を出力する">
         <div class="term-head"><span>ターミナル / 出力の例</span><button class="copy-btn" type="button">コピー</button></div>
 <pre><span class="p">$</span> <span data-copy>terraform output -raw artifact_pages_deployment_config_yaml</span>
-<span class="k">cloudflare</span>:
-  <span class="k">accountId</span>: 0123456789abcdef0123456789abcdef
-  <span class="k">bucket</span>: artifact-pages
-  <span class="k">publicBaseURL</span>: https://docs.example.com
-  <span class="k">zoneId</span>: fedcba9876543210fedcba9876543210
-<span class="k">provider</span>: cloudflare
-<span class="k">schemaVersion</span>: 1</pre>
+<span class="k">"cloudflare"</span>:
+  <span class="k">"accountId"</span>: "0123456789abcdef0123456789abcdef"
+  <span class="k">"bucket"</span>: "artifact-pages"
+  <span class="k">"publicBaseURL"</span>: "https://docs.example.com"
+  <span class="k">"zoneId"</span>: "fedcba9876543210fedcba9876543210"
+<span class="k">"provider"</span>: "cloudflare"
+<span class="k">"schemaVersion"</span>: 1</pre>
       </div>
       <p>この内容を、次のステップで管理リポジトリの<code>artifact-pages.yaml</code>に入れ、CLIと閲覧アプリのバージョン、登録するサイトを書き足します。公開ジョブの環境変数名を既定から変えた場合は、その名前もここに出力されます。</p>
       <p>閲覧アプリやサイトを置いたあとの動作の確認は、次のステップ以降で行います。</p>

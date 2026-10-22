@@ -65,7 +65,7 @@
       <p>サイトごとのロールの名前が64文字を超える場合は、ハッシュを使った名前になります。<code>name_prefix</code>の既定は<code>artifact-pages</code>です。</p>
       <p>各ロールは、GitHubのOIDCトークンの<code>aud</code>（<code>sts.amazonaws.com</code>）と<code>sub</code>が完全に一致するときだけ引き受けられます。モジュールはワイルドカードを足さず、ブランチやEnvironmentを推測もしないので、許可するジョブの<code>sub</code>をすべて正確に書きます。</p>
       <h3 id="subjects">許可するジョブを書く</h3>
-      <p>Environmentを使うジョブの<code>sub</code>は、既定では<code>repo:OWNER/REPO:environment:ENV</code>の形です。Environmentを使わないジョブでは、末尾が<code>:ref:refs/heads/main</code>のようなブランチになります。リポジトリによっては、オーナーとリポジトリのIDを含む別の形を使います。実際の形は次のコマンドで確かめられます。</p>
+      <p>Environmentを使うジョブの<code>sub</code>は、既定では<code>repo:OWNER/REPO:environment:ENV</code>の形です。Environmentを使わないジョブでは、末尾がジョブのきっかけで変わります。ブランチへのプッシュなら<code>:ref:refs/heads/main</code>、プルリクエストなら<code>:pull_request</code>、タグなら<code>:ref:refs/tags/…</code>のようになります。リポジトリによっては、オーナーとリポジトリのIDを含む別の形を使います。実際の形は次のコマンドで確かめられます。</p>
       <div class="term" aria-label="OIDCのsubの形を確かめる">
         <div class="term-head"><span>ターミナル / GitHub CLI</span><button class="copy-btn" type="button">コピー</button></div>
 <pre><span class="p">$</span> <span data-copy>gh api repos/OWNER/REPO/actions/oidc/customization/sub --jq '.sub_claim_prefix'</span></pre>
@@ -189,13 +189,13 @@
       <div class="term" aria-label="配信先の設定とロールを出力する">
         <div class="term-head"><span>ターミナル / 出力の例</span><button class="copy-btn" type="button">コピー</button></div>
 <pre><span class="p">$</span> <span data-copy>terraform output -raw aws_deployment_config_yaml</span>
-<span class="k">aws</span>:
-  <span class="k">accountId</span>: "123456789012"
-  <span class="k">bucket</span>: artifact-pages-123456789012-us-east-1
-  <span class="k">distributionId</span>: E1ABCDEFGHIJKL
-  <span class="k">region</span>: us-east-1
-<span class="k">provider</span>: aws
-<span class="k">schemaVersion</span>: 1
+<span class="k">"aws"</span>:
+  <span class="k">"accountId"</span>: "123456789012"
+  <span class="k">"bucket"</span>: "artifact-pages-123456789012-us-east-1"
+  <span class="k">"distributionId"</span>: "E1ABCDEFGHIJKL"
+  <span class="k">"region"</span>: "us-east-1"
+<span class="k">"provider"</span>: "aws"
+<span class="k">"schemaVersion"</span>: 1
 <span class="p">$</span> <span data-copy>terraform output -raw admin_role_arn</span>
 <span class="p">$</span> <span data-copy>terraform output -json satellite_role_arns</span></pre>
       </div>
