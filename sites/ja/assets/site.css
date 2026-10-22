@@ -221,8 +221,8 @@ td:first-child { white-space: nowrap; font-weight: 600; }
   min-width: 0; padding: 9px 12px; border: 1.5px solid var(--kl); border-radius: 10px;
   background: linear-gradient(var(--kw), var(--kw)), var(--paper); color: var(--ink);
 }
-.nd > b { grid-column: 2; word-break: auto-phrase; font-size: 13px; font-weight: 650; line-height: 1.5; overflow-wrap: anywhere; }
-.nd > small { grid-column: 2; color: var(--muted); font-size: 11px; line-height: 1.55; overflow-wrap: anywhere; }
+.nd > b { grid-column: 2; word-break: auto-phrase; font-size: 13px; font-weight: 650; line-height: 1.5; overflow-wrap: break-word; }
+.nd > small { grid-column: 2; color: var(--muted); font-size: 11px; line-height: 1.55; overflow-wrap: break-word; }
 .nd small code { padding: 0; border: 0; background: none; color: inherit; font-size: 1em; }
 .nd::before, .st-who::before { content: ""; flex: none; width: var(--gs, 14px); height: var(--gs, 14px); color: var(--k); }
 .nd::before { grid-column: 1; grid-row: 1 / span 2; align-self: center; }
@@ -272,13 +272,17 @@ td:first-child { white-space: nowrap; font-weight: 600; }
 
 /* ── フロー（.fl） ── */
 .fl { display: flex; align-items: center; gap: 4px; }
-.fl > .nd, .fl > .fl-stack { flex: 1 1 0; min-width: 0; }
+.fl > .nd, .fl > .fl-stack { flex: 1 1 0; min-width: 100px; }
+.fl .nd { grid-template-columns: minmax(0, 1fr); row-gap: 5px; padding: 9px 10px; }
+.fl .nd::before { grid-column: 1; grid-row: auto; }
+.fl .nd > b, .fl .nd > small { grid-column: 1; }
+.fl .nd small code { overflow-wrap: break-word; }
 .fl-stack { display: flex; flex-direction: column; justify-content: center; gap: 8px; }
 @container fg (max-width: 600px) {
   .fl { flex-direction: column; align-items: stretch; gap: 0; }
   .fl > .nd, .fl > .fl-stack { flex: none; }
 }
-@container fg (max-width: 820px) {
+@container fg (max-width: 720px) {
   .fl:has(> :nth-child(9)) { flex-direction: column; align-items: stretch; gap: 0; }
   .fl:has(> :nth-child(9)) > .nd, .fl:has(> :nth-child(9)) > .fl-stack { flex: none; }
 }
@@ -292,7 +296,7 @@ td:first-child { white-space: nowrap; font-weight: 600; }
   .fl > .fl-a::after { bottom: 0; clip-path: polygon(0 0, 100% 0, 50% 100%); }
   .fl > .fl-a::before { top: 0; clip-path: polygon(50% 0, 100% 100%, 0 100%); }
 }
-@container fg (max-width: 820px) {
+@container fg (max-width: 720px) {
   .fl:has(> :nth-child(9)) > .fl-a { grid-template-rows: none; grid-template-columns: 1fr 10px 1fr; justify-items: start; align-items: center; width: 100%; min-width: 0; min-height: 40px;
     background: linear-gradient(currentColor, currentColor) 50% 0 / 1.5px 100% no-repeat; }
   .fl:has(> :nth-child(9)) > .fl-a.is-dashed { background: repeating-linear-gradient(180deg, currentColor 0 5px, transparent 5px 9px) 50% 0 / 1.5px 100% no-repeat; }
@@ -300,6 +304,29 @@ td:first-child { white-space: nowrap; font-weight: 600; }
   .fl:has(> :nth-child(9)) > .fl-a::before, .fl:has(> :nth-child(9)) > .fl-a::after { top: auto; left: calc(50% - 5px); right: auto; width: 10px; height: 8px; }
   .fl:has(> :nth-child(9)) > .fl-a::after { bottom: 0; clip-path: polygon(0 0, 100% 0, 50% 100%); }
   .fl:has(> :nth-child(9)) > .fl-a::before { top: 0; clip-path: polygon(50% 0, 100% 100%, 0 100%); }
+}
+@container fg (max-width: 960px) {
+  .fl:has(> :nth-child(11)) { flex-direction: column; align-items: stretch; gap: 0; }
+  .fl:has(> :nth-child(11)) > .nd, .fl:has(> :nth-child(11)) > .fl-stack { flex: none; }
+}
+/* 縦向きの矢印（フローが縦になったとき、列の中のフロー、.bd が縦になったとき） */
+@container fg (max-width: 600px) {
+  .fl > .fl-a { grid-template-rows: none; grid-template-columns: 1fr 10px 1fr; justify-items: start; align-items: center; width: 100%; min-width: 0; min-height: 40px;
+    background: linear-gradient(currentColor, currentColor) 50% 0 / 1.5px 100% no-repeat; }
+  .fl > .fl-a.is-dashed { background: repeating-linear-gradient(180deg, currentColor 0 5px, transparent 5px 9px) 50% 0 / 1.5px 100% no-repeat; }
+  .fl > .fl-a > span { grid-column: 3; grid-row: 1; align-self: center; padding: 0 0 0 10px; background: none; text-align: left; }
+  .fl > .fl-a::before, .fl > .fl-a::after { top: auto; left: calc(50% - 5px); right: auto; width: 10px; height: 8px; }
+  .fl > .fl-a::after { bottom: 0; clip-path: polygon(0 0, 100% 0, 50% 100%); }
+  .fl > .fl-a::before { top: 0; clip-path: polygon(50% 0, 100% 100%, 0 100%); }
+}
+@container fg (max-width: 960px) {
+  .fl:has(> :nth-child(11)) > .fl-a { grid-template-rows: none; grid-template-columns: 1fr 10px 1fr; justify-items: start; align-items: center; width: 100%; min-width: 0; min-height: 40px;
+    background: linear-gradient(currentColor, currentColor) 50% 0 / 1.5px 100% no-repeat; }
+  .fl:has(> :nth-child(11)) > .fl-a.is-dashed { background: repeating-linear-gradient(180deg, currentColor 0 5px, transparent 5px 9px) 50% 0 / 1.5px 100% no-repeat; }
+  .fl:has(> :nth-child(11)) > .fl-a > span { grid-column: 3; grid-row: 1; align-self: center; padding: 0 0 0 10px; background: none; text-align: left; }
+  .fl:has(> :nth-child(11)) > .fl-a::before, .fl:has(> :nth-child(11)) > .fl-a::after { top: auto; left: calc(50% - 5px); right: auto; width: 10px; height: 8px; }
+  .fl:has(> :nth-child(11)) > .fl-a::after { bottom: 0; clip-path: polygon(0 0, 100% 0, 50% 100%); }
+  .fl:has(> :nth-child(11)) > .fl-a::before { top: 0; clip-path: polygon(50% 0, 100% 100%, 0 100%); }
 }
 /* 列やゾーンの中、または .is-v を付けたフローは、常に縦 */
 .fl.is-v, .bd-col .fl { flex-direction: column; align-items: stretch; gap: 0; }
