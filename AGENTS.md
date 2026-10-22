@@ -57,7 +57,9 @@ Pages are not previewed locally from this repository. Author them so that they h
 | `Superseded` | Replaced by another ticket; kept for history. | The ticket names its replacement(s). Pages it produced stay published until the replacement ships. |
 | `Done` | Page published and approved. | The owner approved the page and its acceptance criteria are checked. |
 
-Workflow: draft both languages, have the draft reviewed independently, then open a pull request in this repository. After the PR is merged and the workflow publishes it, the owner reviews the pages on the real site. Fixes after that also go through pull requests on a branch, never directly on main. Mark `Done` only after owner approval. Keep the README index in sync with each ticket's status.
+Authoring roles (owner, 2026-10-22): the Claude main session writes all reader-visible text; Sol (Codex, `gpt-6.1-sol`) gathers the facts before drafting and reviews the draft for accuracy against the implementation and consistency with other pages, the specification and the backlog. The owner reviews one chapter (one DOC ticket) at a time. Japanese is drafted first; English follows after the owner approves the Japanese chapter. The step-by-step procedure is the workspace skill `docs-chapter` (outside this repository).
+
+Workflow: draft the chapter, have it reviewed by Sol, show the owner a review copy, then open a pull request in this repository. After the PR is merged and the workflow publishes it, the owner reviews the pages on the real site (for a site that is not registered yet, the review copy stands in until launch). Fixes after that also go through pull requests on a branch, never directly on main. Mark `Done` only after owner approval. Keep the README index in sync with each ticket's status.
 
 ~~~sh
 # Unfinished tickets

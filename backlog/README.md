@@ -42,8 +42,8 @@ Each new site is one language, so its name and description are single-language s
 ## Workflow and definition of Done
 
 1. Mark the ticket `In progress` and update this index.
-2. Draft both languages and make sure they hold up in light, dark, and ~400px width with no page-level horizontal scroll.
-3. Have the draft reviewed independently, then open a pull request. After it is merged and published by the workflow, the owner reviews the pages on the real site. Fixes go through pull requests on a branch, not main. Revise until approved.
+2. Draft the Japanese pages (English after the owner approves the Japanese chapter) and make sure they hold up in light, dark, and ~400px width with no page-level horizontal scroll.
+3. Have the draft reviewed by Sol for accuracy and consistency (see `AGENTS.md`, Authoring roles), show the owner a review copy, then open a pull request. After it is merged and published by the workflow, the owner reviews the pages on the real site. Fixes go through pull requests on a branch, not main. Revise until approved.
 4. Mark `Done` only after the owner approves the page and the acceptance criteria are checked.
 
 ## Index
