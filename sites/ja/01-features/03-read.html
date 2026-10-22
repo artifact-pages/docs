@@ -1,0 +1,113 @@
+<!doctype html>
+<html lang="ja">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="description" content="HTMLとMarkdownを共通の画面で読み、目次で見出しへ移動し、ページや見出しのURLを共有し、更新日や公開元を確かめ、GitHubの元ファイルを開く。">
+  <title>資料を読む — Artifact Pages ドキュメント</title>
+  <script>
+    // Copy the reader app's theme (same-origin parent) before first paint; assets/site.js keeps it in sync.
+    (() => {
+      const root = document.documentElement;
+      root.classList.add('js');
+      try {
+        const theme = window.parent !== window && window.parent.document.documentElement.dataset.theme;
+        if (theme === 'light' || theme === 'dark') root.dataset.theme = theme;
+      } catch { /* cross-origin: fall back to prefers-color-scheme */ }
+    })();
+  </script>
+  <link rel="icon" href="data:,">
+  <link rel="stylesheet" href="../assets/site.css">
+  <script src="../assets/site.js" defer></script>
+</head>
+<body>
+  <a class="skip" href="#main">本文へ移動</a>
+  <main id="main" class="wrap">
+    <header class="page-head">
+      <div>
+        <p class="eyebrow">体験と機能 · 3</p>
+        <h1>資料を読む</h1>
+      </div>
+      <p class="lead">どのサイトの資料も、同じ閲覧アプリの画面で読みます。左にサイトの構造、中央に資料、広い画面では右に資料の情報と目次が並びます。</p>
+    </header>
+
+    <section class="doc-section" aria-labelledby="formats">
+      <h2 id="formats">HTMLとMarkdownを同じ画面で</h2>
+      <div class="table-wrap"><table>
+        <thead><tr><th></th><th>HTML</th><th>Markdown</th></tr></thead>
+        <tbody>
+          <tr><td>表示</td><td>公開したファイルをそのまま表示します。資料自身のCSSとJavaScriptも動くので、レポートやダッシュボード、図が作ったときの見た目で読めます。</td><td>閲覧アプリが読みやすく整えて表示します。表、チェックリスト、脚注などのGitHub形式の書き方と、Mermaidの図に対応します。</td></tr>
+          <tr><td>スクリプト</td><td>動きます。</td><td>動きません。埋め込まれたHTMLは安全のために一部が取り除かれます。</td></tr>
+          <tr><td>テーマ</td><td>資料自身のデザインのままです。</td><td>閲覧アプリのライト・ダークに合わせます。</td></tr>
+        </tbody>
+      </table></div>
+      <p>どちらの形式でも、同じサイトのほかの資料への相対リンクを押すと、閲覧アプリの中で移動します。</p>
+      <div class="callout warn" role="note">
+        <span class="ico">HTMLの扱い</span>
+        <div>
+          <p><strong>HTMLは公開したとおりに動くので、信頼できるHTMLだけを公開します。</strong>HTMLの資料は閲覧アプリと同じオリジンで動き、スクリプトは隔離されません。どこまでを信頼し、閲覧をどこで制限するかは「<a href="../04-architecture/security-and-access.html">セキュリティとアクセス</a>」で説明します。</p>
+        </div>
+      </div>
+    </section>
+
+    <section class="doc-section" aria-labelledby="contents">
+      <h2 id="contents">目次で全体をつかみ、見出しへ移る</h2>
+      <p><strong>Contents</strong>は資料の見出しの一覧で、押すとその見出しへ移ります。幅が十分ある画面（目安は1200px以上）では、右の列に<strong>Details</strong>と<strong>Contents</strong>が常に表示されます。それより狭い画面では、資料の上部のボタンで重ねて開きます。スマートフォンほどの幅では、サイドバーは引き出して使います。</p>
+    </section>
+
+    <section class="doc-section" aria-labelledby="urls">
+      <h2 id="urls">ページと見出しのURLを共有する</h2>
+      <p>資料のURLは、サイトのIDと、公開元でのファイルのパスでできていて、拡張子も残ります。</p>
+      <div class="term" aria-label="資料のURLの例">
+        <div class="term-head"><span>URLの例（説明用）</span></div>
+<pre>https://docs.example.com/<span class="k">checkout</span>/<span class="v">design/payment-flow.html</span>
+<span class="c"># 見出しを指すURLは、末尾に # と見出しのIDが付く</span></pre>
+      </div>
+      <p>共有しても、ブックマークしても、再読み込みしても同じ資料が開きます。見出しを指すURLも共有できます。コマンドのリンクのコピーは、見出しの指定を残し、自分の検索の条件は外して写します。</p>
+    </section>
+
+    <section class="doc-section" aria-labelledby="details">
+      <h2 id="details">資料の情報を確かめる</h2>
+      <p><strong>Details</strong>には、資料の公開元の情報が出ます。</p>
+      <div class="table-wrap"><table>
+        <thead><tr><th>項目</th><th>意味</th></tr></thead>
+        <tbody>
+          <tr><td>更新日</td><td>この資料（と、それが使うCSSや画像など）を最後に変えたコミットの日時です。</td></tr>
+          <tr><td>名前</td><td>そのコミットの作成者です。公開時にGitHubのアカウントが確かめられた場合は、そのアイコンも表示されます。</td></tr>
+          <tr><td>公開元</td><td>リポジトリ、ファイルのパス、ブランチなどのGitの参照です。</td></tr>
+        </tbody>
+      </table></div>
+      <p>名前は最後の変更を記録したもので、資料を最初に書いた人や、管理する責任者を表すものではありません。</p>
+    </section>
+
+    <section class="doc-section" aria-labelledby="github">
+      <h2 id="github">GitHubの元ファイルを開く</h2>
+      <p>Detailsのリンクから、資料の元になったGitHubのファイルへ移動できます。リンク先は、公開したときの参照（ブランチなど）にあるそのファイルです。</p>
+    </section>
+
+    <section class="doc-section" aria-labelledby="screen">
+      <h2 id="screen">画面と言語</h2>
+      <ul>
+        <li><strong>テーマ。</strong>System、Light、Darkから選べます。既定はSystemで、端末の設定に合わせます。選んだテーマはブラウザに保存されます。</li>
+        <li><strong>画面の言語。</strong>閲覧アプリのメニューやボタンは英語です。資料の言語は、その資料に書かれたとおりに表示されます。</li>
+        <li><strong>狭い画面。</strong>Markdownの横に長い表やコードは、その部分だけ横にスクロールします。HTMLの資料がスマートフォンで読みやすいかどうかは、そのHTMLの作りによります。</li>
+      </ul>
+    </section>
+
+    <section class="doc-section" aria-labelledby="previews">
+      <h2 id="previews">プレビューを読む</h2>
+      <p>プレビューも同じ画面で開きます。左には、そのプレビューに含まれる資料だけが並び、変更した資料と、変更したファイルの影響を受けた資料が分けて示されます。画面の上部には、どのプルリクエストのプレビューかが表示されます。</p>
+      <ul>
+        <li>Detailsには、プレビューを作った日時やコミットが表示されます。本公開の更新日や名前は表示されません。</li>
+        <li>プルリクエストに新しいコミットが積まれたあとで古いプレビューを開くと、新しいプレビューへの案内が出ます。</li>
+        <li>いまのところ、プレビューではContentsに見出しが表示されません。</li>
+      </ul>
+    </section>
+
+    <nav class="pager" aria-label="ページ送り">
+      <a class="prev" href="02-find.html"><small>前へ</small><strong>資料を探す</strong></a>
+      <a class="next" href="04-provide-and-operate.html"><small>次へ</small><strong>基盤を提供・運用する</strong></a>
+    </nav>
+  </main>
+</body>
+</html>

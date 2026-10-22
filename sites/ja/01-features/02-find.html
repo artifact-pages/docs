@@ -1,0 +1,103 @@
+<!doctype html>
+<html lang="ja">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="description" content="サイトとフォルダをたどる、パレットでタイトルやパスから探す、本文を検索する、ピン留めと最近読んだ資料から戻る。閲覧アプリでの資料の探し方。">
+  <title>資料を探す — Artifact Pages ドキュメント</title>
+  <script>
+    // Copy the reader app's theme (same-origin parent) before first paint; assets/site.js keeps it in sync.
+    (() => {
+      const root = document.documentElement;
+      root.classList.add('js');
+      try {
+        const theme = window.parent !== window && window.parent.document.documentElement.dataset.theme;
+        if (theme === 'light' || theme === 'dark') root.dataset.theme = theme;
+      } catch { /* cross-origin: fall back to prefers-color-scheme */ }
+    })();
+  </script>
+  <link rel="icon" href="data:,">
+  <link rel="stylesheet" href="../assets/site.css">
+  <script src="../assets/site.js" defer></script>
+</head>
+<body>
+  <a class="skip" href="#main">本文へ移動</a>
+  <main id="main" class="wrap">
+    <header class="page-head">
+      <div>
+        <p class="eyebrow">体験と機能 · 2</p>
+        <h1>資料を探す</h1>
+      </div>
+      <p class="lead">読者は、構造をたどる、検索する、身近な手がかりから戻る、の3つの方法で資料を探します。どの方法も、いま開いているサイトの中で働きます。</p>
+    </header>
+
+    <section class="doc-section" aria-labelledby="structure">
+      <h2 id="structure">構造から探す</h2>
+      <h3 id="sites">サイトの一覧と切り替え</h3>
+      <p>閲覧アプリを開くと、登録されたサイトが並びます。各サイトには、名前、説明、資料の数、最後に内容が更新された日が表示されます。<strong>Start reading</strong>でそのサイトに入ります。読んでいる途中でも、パレットで<code>@</code>を打てばサイトの名前やIDで探して移れます。</p>
+      <h3 id="home">サイトのトップ</h3>
+      <p>サイトのトップには、サイトの情報と、<strong>Overview</strong>、<strong>Files</strong>、<strong>Previews</strong>の3つの切り替えがあります。どの画面にも、そのサイトを検索する入口があります。</p>
+      <div class="table-wrap"><table>
+        <thead><tr><th>画面</th><th>表示するもの</th></tr></thead>
+        <tbody>
+          <tr><td><strong>Overview</strong></td><td>サイトの直下に<code>README.md</code>（なければ<code>index.md</code>）があるとき、その内容。サイトの紹介を書いておくと、最初にこれが開きます。</td></tr>
+          <tr><td><strong>Files</strong></td><td>直下のフォルダと資料。資料の多いサイトでは、最近更新された資料も並びます。</td></tr>
+          <tr><td><strong>Previews</strong></td><td>そのサイトのPRプレビューの一覧。</td></tr>
+        </tbody>
+      </table></div>
+      <h3 id="folders">フォルダをたどる</h3>
+      <p>左のサイドバーには、公開元のディレクトリと同じ構造で資料が並びます。フォルダの名前を押すとそのフォルダの画面が開き、横の矢印で開閉します。フォルダの中に<code>README.md</code>や<code>index.html</code>があれば、フォルダの画面にその内容が表示されます。</p>
+      <p>並び順は、フォルダが先、そのあとにファイルで、どちらもファイル名の順です。資料のタイトルの順ではないので、読む順番を伝えたい場合は、ファイル名の先頭に<code>01-</code>のような番号を付けます。</p>
+    </section>
+
+    <section class="doc-section" aria-labelledby="search">
+      <h2 id="search">検索する</h2>
+      <h3 id="palette">パレットでタイトルとパスから探す</h3>
+      <p><kbd>⌘K</kbd>（Windows・Linuxでは<kbd>Ctrl</kbd> <kbd>K</kbd>）でパレットを開き、言葉を入れると、資料のタイトル、パス、ファイル名から候補が絞り込まれていきます。名前の一部を覚えていれば、数文字で目的の資料に届きます。先頭に記号を付けると、探す対象が変わります。</p>
+      <div class="table-wrap"><table>
+        <thead><tr><th>入力</th><th>探すもの</th></tr></thead>
+        <tbody>
+          <tr><td>（記号なし）</td><td>いまのサイトの資料。フォルダや、ほかの資料の見出しも候補に出ます。</td></tr>
+          <tr><td><code>@</code></td><td>サイト。選ぶとそのサイトへ移ります。</td></tr>
+          <tr><td><code>#</code></td><td>見出し。<code>#</code>だけなら開いている資料の見出し、続けて言葉を入れるとサイトの全資料の見出し。</td></tr>
+          <tr><td><code>&gt;</code></td><td>コマンド（テーマの切り替え、リンクのコピーなど）。</td></tr>
+        </tbody>
+      </table></div>
+      <p>何も入力していないパレットには、ピン留めした資料と最近読んだ資料が並びます。</p>
+      <h3 id="fulltext">本文を検索する</h3>
+      <p>名前では見つからないときは、本文の言葉で探します。パレットの<strong>Search full text for …</strong>を選ぶか<kbd>⌘</kbd> <kbd>↵</kbd>を押すと、同じ言葉で本文検索の画面が開きます。サイドバーの検索欄でEnterを押しても開きます。</p>
+      <ul>
+        <li><strong>対象。</strong>いまのサイトの資料のタイトルと本文です。HTMLは静的な本文、Markdownは表示されるテキストが対象で、コードブロックも含みます。スクリプトが後から作る文字や画像の代替テキストは対象外です。プレビューは含みません。</li>
+        <li><strong>一致のしかた。</strong>スペースで区切った言葉をすべて含む資料が見つかります。言葉の途中の文字列でも一致し、全角と半角、大文字と小文字の違いは区別しません。あいまいな検索や意味での検索ではありません。</li>
+        <li><strong>結果。</strong>タイトルに一致した資料、見出しに一致した資料、本文だけに一致した資料の順に並び、本文の抜粋が付きます。入力をやめると少しして結果が更新されます。</li>
+        <li><strong>開いたあと。</strong>結果から資料を開くと、一致した言葉がハイライトされます。検索した状態のURLは共有できます。</li>
+      </ul>
+      <p>本文検索のためのデータは、公開のたびに自動で作られます。公開する側で設定は要りません。</p>
+      <div class="callout" role="note">
+        <span class="ico">大きなサイト</span>
+        <div>
+          <p><strong>資料がとても多いサイトでは、検索の結果の一部に抜粋が付かないことがあります。</strong>抜粋のデータには上限があり、それを超えた資料は抜粋なしで結果に出ます。資料が見つからなくなるわけではありません。また、サイトの資料の一覧が読み込めないほど大きい場合、閲覧アプリは読み込みを打ち切って再試行を促します。規模と速さの関係は「<a href="../04-architecture/reading-and-search.html">閲覧と検索の仕組み</a>」で説明します。</p>
+        </div>
+      </div>
+    </section>
+
+    <section class="doc-section" aria-labelledby="clues">
+      <h2 id="clues">身近な手がかりから探す</h2>
+      <div class="table-wrap"><table>
+        <thead><tr><th>手がかり</th><th>どこに出るか</th><th>中身</th></tr></thead>
+        <tbody>
+          <tr><td><strong>Pinned</strong></td><td>サイドバーと、空のパレット</td><td>自分でピン留めした資料。</td></tr>
+          <tr><td><strong>Recently read</strong></td><td>空のパレット</td><td>そのサイトで最近開いた資料（パレットには最大8件）。</td></tr>
+          <tr><td><strong>Recently updated</strong></td><td>サイトのトップのFiles</td><td>最近更新された資料。資料が7つ以上あるサイトで、新しい順に6件。</td></tr>
+        </tbody>
+      </table></div>
+      <p>ピン留めと最近読んだ資料は、読者のブラウザにだけ保存されます。アカウントはないので、別の端末やブラウザには引き継がれず、ほかの人にも見えません。更新を知らせる通知や購読の機能はありません。</p>
+    </section>
+
+    <nav class="pager" aria-label="ページ送り">
+      <a class="prev" href="01-publish-and-review.html"><small>前へ</small><strong>資料を公開・レビューする</strong></a>
+      <a class="next" href="03-read.html"><small>次へ</small><strong>資料を読む</strong></a>
+    </nav>
+  </main>
+</body>
+</html>

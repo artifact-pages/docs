@@ -1,0 +1,99 @@
+<!doctype html>
+<html lang="ja">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="description" content="チームのリポジトリからHTMLとMarkdownをGitHub Actionsで公開し、プルリクエストの変更を本公開とは別のプレビューで確かめる。">
+  <title>資料を公開・レビューする — Artifact Pages ドキュメント</title>
+  <script>
+    // Copy the reader app's theme (same-origin parent) before first paint; assets/site.js keeps it in sync.
+    (() => {
+      const root = document.documentElement;
+      root.classList.add('js');
+      try {
+        const theme = window.parent !== window && window.parent.document.documentElement.dataset.theme;
+        if (theme === 'light' || theme === 'dark') root.dataset.theme = theme;
+      } catch { /* cross-origin: fall back to prefers-color-scheme */ }
+    })();
+  </script>
+  <link rel="icon" href="data:,">
+  <link rel="stylesheet" href="../assets/site.css">
+  <script src="../assets/site.js" defer></script>
+</head>
+<body>
+  <a class="skip" href="#main">本文へ移動</a>
+  <main id="main" class="wrap">
+    <header class="page-head">
+      <div>
+        <p class="eyebrow">体験と機能 · 1</p>
+        <h1>資料を公開・レビューする</h1>
+      </div>
+      <p class="lead">各チームは、資料を置いた自分のリポジトリから、GitHub Actionsのジョブで自分のサイトを公開します。プルリクエストで変えた資料は、マージする前にプレビューで読めます。</p>
+    </header>
+
+    <section class="doc-section" aria-labelledby="what">
+      <h2 id="what">公開できるもの</h2>
+      <p>サイトの公開元は、登録したリポジトリの中の1つのディレクトリです。その中のファイルを、ディレクトリの構造のまま公開します。</p>
+      <ul>
+        <li><strong>資料になるファイル。</strong><code>.html</code>、<code>.htm</code>、<code>.md</code>のファイルが、資料として一覧と検索に載ります。</li>
+        <li><strong>資料が使うファイル。</strong>CSS、JavaScript、画像、SVG、フォント、JSONなども一緒に公開され、資料から相対パスで読み込めます。これらは資料としては一覧に載りません。</li>
+      </ul>
+      <p>Artifact Pagesは、テンプレートの展開やサイトの生成、CSSやJavaScriptのまとめ直しをしません。手で書いたHTMLでも、別のツールが出力したHTMLでも、公開元のディレクトリにあるファイルがそのまま届きます。ほかのツールで生成するチームは、公開の前のステップで生成しておきます。</p>
+      <div class="callout warn" role="note">
+        <span class="ico">注意</span>
+        <div>
+          <p><strong>公開したくないファイルは、公開元のディレクトリに置かないでください。</strong>テンプレートや部分的なHTMLも、拡張子が<code>.html</code>なら資料として載ります。シンボリックリンクがあると公開は失敗します。<code>/assets/…</code>のようにルートから始まるパスは、サイトの中を指さないので、資料からは相対パスで参照します。</p>
+        </div>
+      </div>
+    </section>
+
+    <section class="doc-section" aria-labelledby="publish">
+      <h2 id="publish">チームのリポジトリから公開する</h2>
+      <p>公開は、チームのリポジトリのGitHub Actionsのジョブで行います。チームが書くワークフローは短く、管理リポジトリが用意した共通の公開ワークフローを、サイトIDを指定して呼び出すだけです。共通のワークフローの中で、製品の<code>publish-action</code>が<code>artifact-pages site sync</code>を実行します。</p>
+      <ol>
+        <li>資料をプルリクエストで変更し、チームの中でレビューします。</li>
+        <li>マージすると、ワークフローが自分のサイトを公開します。変わったファイルだけが書き込まれ、消えたファイルは削除されます。</li>
+        <li>読者は、閲覧アプリでそのサイトを開けば新しい内容を読めます。</li>
+      </ol>
+      <p>公開は試し実行（dry-run）もでき、何が変わるかを書き込まずに確かめられます。ワークフローの書き方は「<a href="../02-setup/05-first-site.html">最初のサイトを公開する</a>」で説明します。</p>
+    </section>
+
+    <section class="doc-section" aria-labelledby="independent">
+      <h2 id="independent">サイトごとに独立した公開</h2>
+      <p>公開が書き込むのは、そのサイトの資料と一覧だけです。ほかのサイトの資料や閲覧アプリには触れないので、各チームは自分の都合で公開できます。</p>
+      <ul>
+        <li>同じサイトへの公開とプレビューは、ロックで1つずつ順に行われます。別のサイトの公開とは並んで進みます。</li>
+        <li>公開は多数のファイルの書き込みなので、すべてが一瞬で切り替わるわけではありません。公開の直後は、キャッシュによって少しの間、古い内容が見えることがあります。</li>
+      </ul>
+    </section>
+
+    <section class="doc-section" aria-labelledby="preview">
+      <h2 id="preview">プルリクエストをプレビューで確かめる</h2>
+      <p>プレビューは、プルリクエストの変更を、本公開とは別の場所に公開したものです。レビューする人は、マージの前に、変更後の資料を閲覧アプリの中で読めます。</p>
+      <div class="table-wrap"><table>
+        <thead><tr><th>項目</th><th>内容</th></tr></thead>
+        <tbody>
+          <tr><td>対象</td><td>プルリクエストで追加・変更した資料と、変更したCSSや画像などを使っている資料。削除した資料にプレビューはありません。</td></tr>
+          <tr><td>内容</td><td>プルリクエストの先頭のコミットの内容です。マージしたあとの姿を合成したものではありません。</td></tr>
+          <tr><td>開き方</td><td>サイトのトップの<strong>Previews</strong>、パレットの<strong>Open previews</strong>、共有されたプレビューのURL、またはプルリクエストのコメント。</td></tr>
+          <tr><td>コメント</td><td>任意です。有効にすると、サイトごとに1つのコメントを作り、プレビューを更新するたびにそのコメントを書き換えます。</td></tr>
+          <tr><td>残る期間</td><td>配信先の設定で決めた日数が過ぎると、自動で削除されます。プルリクエストを閉じただけでは消えません。</td></tr>
+        </tbody>
+      </table></div>
+      <p>プレビューは、本公開の一覧、最近更新された資料、検索には混ざりません。プレビューの中のリンクは、同じプレビューに含まれる資料ならそのプレビューへ、それ以外なら本公開の資料へ移ります。</p>
+      <div class="callout" role="note">
+        <span class="ico">対象のPR</span>
+        <div>
+          <p><strong>プレビューは、同じリポジトリのブランチからのプルリクエストだけが対象です。</strong>フォークからのプルリクエストにはプレビューを作りません。プレビューのHTMLも本公開と同じく、そのまま動く資料として扱われます。</p>
+        </div>
+      </div>
+      <p>プレビューを使えるようにする手順は「<a href="../02-setup/06-pr-previews.html">PRプレビューを使えるようにする</a>」で説明します。</p>
+    </section>
+
+    <nav class="pager" aria-label="ページ送り">
+      <a class="prev" href="index.html"><small>前へ</small><strong>体験と機能</strong></a>
+      <a class="next" href="02-find.html"><small>次へ</small><strong>資料を探す</strong></a>
+    </nav>
+  </main>
+</body>
+</html>

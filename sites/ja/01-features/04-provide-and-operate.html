@@ -1,0 +1,81 @@
+<!doctype html>
+<html lang="ja">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="description" content="配信環境をTerraformでCloudflareかAWSに作り、サイトと公開元を登録し、閲覧アプリを資料とは別に更新する。管理者と各チームの担当の分け方。">
+  <title>基盤を提供・運用する — Artifact Pages ドキュメント</title>
+  <script>
+    // Copy the reader app's theme (same-origin parent) before first paint; assets/site.js keeps it in sync.
+    (() => {
+      const root = document.documentElement;
+      root.classList.add('js');
+      try {
+        const theme = window.parent !== window && window.parent.document.documentElement.dataset.theme;
+        if (theme === 'light' || theme === 'dark') root.dataset.theme = theme;
+      } catch { /* cross-origin: fall back to prefers-color-scheme */ }
+    })();
+  </script>
+  <link rel="icon" href="data:,">
+  <link rel="stylesheet" href="../assets/site.css">
+  <script src="../assets/site.js" defer></script>
+</head>
+<body>
+  <a class="skip" href="#main">本文へ移動</a>
+  <main id="main" class="wrap">
+    <header class="page-head">
+      <div>
+        <p class="eyebrow">体験と機能 · 4</p>
+        <h1>基盤を提供・運用する</h1>
+      </div>
+      <p class="lead">ここまでの体験は、管理者が用意する基盤の上で動きます。管理者は、配信環境を作り、サイトを登録し、閲覧アプリと共通の公開の仕組みを保ちます。各チームは、その範囲の中で自由に公開します。</p>
+    </header>
+
+    <section class="doc-section" aria-labelledby="infra">
+      <h2 id="infra">配信環境をTerraformで作る</h2>
+      <p>配信環境は、CloudflareのR2とゾーンのルール、またはAWSのS3とCloudFrontに作ります。どちらも製品が公開しているTerraformのモジュールで、ストレージ、ホスト名、URLの振り分けとキャッシュ、プレビューの保持期間、公開ジョブの認証情報（AWSではIAMロール）を用意します。</p>
+      <p>閲覧を社内に限るには、配信先のホスト名に対してIPアドレスの制限や、CloudflareではCloudflare Accessを設定します。Artifact Pages自体には、利用者のアカウントやサイトごとの閲覧権限はありません。手順は「<a href="../02-setup/01-infrastructure/index.html">インフラを構築する</a>」で説明します。</p>
+    </section>
+
+    <section class="doc-section" aria-labelledby="register">
+      <h2 id="register">サイトと公開元を登録する</h2>
+      <p>どのサイトがあり、どのリポジトリのどのディレクトリから公開されるかは、管理リポジトリの設定ファイル<code>artifact-pages.yaml</code>で決めます。</p>
+      <div class="term" aria-label="サイトの登録の例">
+        <div class="term-head"><span>artifact-pages.yaml / 管理リポジトリ（説明用の例）</span></div>
+<pre><span class="k">sites</span>:
+  <span class="k">sre</span>:
+    <span class="k">name</span>: SREチーム
+    <span class="k">description</span>: 運用手順と障害の振り返り
+    <span class="k">repository</span>: acme/sre
+    <span class="k">sourcePath</span>: docs</pre>
+      </div>
+      <p><code>sites</code>に書いたものが、登録するサイトのすべてです。管理者がこれを配信先に反映すると、登録されたリポジトリだけが、そのサイトに公開できるようになります。<code>sites</code>から外したサイトは、次に反映したときに登録が取り下げられ、公開済みの内容も削除されます。1つのサイトの公開元は1つのリポジトリの1つのディレクトリで、同じリポジトリの別のディレクトリを別のサイトとして登録することもできます。</p>
+    </section>
+
+    <section class="doc-section" aria-labelledby="app">
+      <h2 id="app">閲覧アプリを資料とは別に更新する</h2>
+      <p>閲覧アプリは、設定ファイルの<code>web.version</code>で選んだリリースを、管理者が配信先に置きます。閲覧アプリを新しくしても、各サイトを公開し直す必要はありません。公開に使うCLIのバージョンも<code>cli.version</code>で固定でき、閲覧アプリ、CLI、GitHub Actionsは、それぞれ別のバージョンで更新されます。</p>
+      <p>互いに読み書きする形式が合っているかは、公開と配置のときに確かめられます。いまの版はすべて0.xのプレリリースで、版をまたぐ互換性は約束されていません。更新の手順は「<a href="../03-operations/upgrade.html">閲覧アプリ・CLI・Actionsを更新する</a>」で説明します。</p>
+    </section>
+
+    <section class="doc-section" aria-labelledby="roles">
+      <h2 id="roles">管理者と各チームの担当</h2>
+      <div class="table-wrap"><table>
+        <thead><tr><th>管理者</th><th>各チーム</th></tr></thead>
+        <tbody>
+          <tr><td>配信環境と閲覧の制限</td><td>資料の中身と構成</td></tr>
+          <tr><td>サイトの登録と取り下げ</td><td>いつ公開するか（マージのたび、など）</td></tr>
+          <tr><td>閲覧アプリとCLIのバージョン</td><td>プレビューを使うかどうか</td></tr>
+          <tr><td>共通の公開・プレビューのワークフロー</td><td>それを呼び出す短いワークフロー</td></tr>
+        </tbody>
+      </table></div>
+      <p>共通のワークフローは管理リポジトリに置きますが、各チームのジョブは、そのチームのリポジトリの権限とシークレットで動きます。管理リポジトリのシークレットが自動で配られるわけではありません。どの認証情報をだれが持つかは、導入の章で配信先ごとに説明します。</p>
+    </section>
+
+    <nav class="pager" aria-label="ページ送り">
+      <a class="prev" href="03-read.html"><small>前へ</small><strong>資料を読む</strong></a>
+      <a class="next" href="../02-setup/index.html"><small>次へ</small><strong>導入する</strong></a>
+    </nav>
+  </main>
+</body>
+</html>
