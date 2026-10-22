@@ -12,7 +12,7 @@ Decided 2026-10-18 ([DOC-23](DOC-23-structure-and-site-migration.md)): one site 
 
 | Site ID | Display name | Language | Source | Status |
 | --- | --- | --- | --- | --- |
-| `ja` | Artifact Pages ドキュメント | Japanese | `sites/ja/` | Planned (DOC-23); not yet created or registered. |
+| `ja` | Artifact Pages ドキュメント | Japanese | `sites/ja/` | Registered and published as a draft for the owner's whole-set review (2026-10-23); not yet linked from the current sites. |
 | `en` | Artifact Pages Documentation | English | `sites/en/` | Planned (DOC-23); not yet created or registered. |
 | `guide` | Guide | Japanese and English | `sites/guide/` | Current; unregistered at launch. |
 | `architecture` | Architecture | Japanese and English | `sites/architecture/` | Current; unregistered at launch. |
@@ -53,13 +53,13 @@ See [structure.md](structure.md) for the agreed chapters. Order: chapter tickets
 | Order | Ticket | Title | Status |
 | ---: | --- | --- | --- |
 | 1 | [DOC-23](DOC-23-structure-and-site-migration.md) | Structure and site migration | Open |
-| 2 | [DOC-24](DOC-24-entry-readme.md) | Entry README: outcomes and overall picture | Open |
-| 3 | [DOC-25](DOC-25-experience-and-features.md) | 体験と機能 (Experience and features) | Open |
-| 4 | [DOC-26](DOC-26-setup-infrastructure.md) | 導入: インフラを構築する (Setup: build the infrastructure, Cloudflare and AWS) | Open |
-| 5 | [DOC-27](DOC-27-setup-admin-to-first-publish.md) | 導入: 管理リポジトリ準備 → 閲覧アプリのデプロイ → サイト登録 → 最初のサイト公開 → PRプレビュー (Setup: admin repository to first publish and PR preview) | Open |
-| 6 | [DOC-28](DOC-28-rollout-and-operations.md) | 社内展開と運用 (Rollout and operations) | Open |
-| 7 | [DOC-29](DOC-29-architecture.md) | アーキテクチャ (Architecture, including cost and performance) | Open |
-| 8 | [DOC-30](DOC-30-reference.md) | リファレンス (Reference) | Open |
+| 2 | [DOC-24](DOC-24-entry-readme.md) | Entry README: outcomes and overall picture | In progress |
+| 3 | [DOC-25](DOC-25-experience-and-features.md) | 体験と機能 (Experience and features) | In progress |
+| 4 | [DOC-26](DOC-26-setup-infrastructure.md) | 導入: インフラを構築する (Setup: build the infrastructure, Cloudflare and AWS) | In progress |
+| 5 | [DOC-27](DOC-27-setup-admin-to-first-publish.md) | 導入: 管理リポジトリ準備 → 閲覧アプリのデプロイ → サイト登録 → 最初のサイト公開 → PRプレビュー (Setup: admin repository to first publish and PR preview) | In progress |
+| 6 | [DOC-28](DOC-28-rollout-and-operations.md) | 社内展開と運用 (Rollout and operations) | In progress |
+| 7 | [DOC-29](DOC-29-architecture.md) | アーキテクチャ (Architecture, including cost and performance) | In progress |
+| 8 | [DOC-30](DOC-30-reference.md) | リファレンス (Reference) | In progress |
 | 9 | [DOC-22](DOC-22-guide-machine-readable-docs.md) | Docs: machine-readable access to the sites | Open |
 | 10 | [DOC-01](DOC-01-guide-site-structure.md) | Move to the `guide` site structure | Done |
 | 11 | [DOC-17](DOC-17-guide-versions.md) | Guide: pinning and upgrading versions | Done |

@@ -1,6 +1,7 @@
 # DOC-27 — 導入: 管理リポジトリ準備 → 閲覧アプリのデプロイ → サイト登録 → 最初のサイト公開 → PRプレビュー (Setup: admin repository to first publish and PR preview)
 
-- Status: Open
+- Status: In progress
+- Assignee: Claude
 - Site: `ja`, `en` ([DOC-23](DOC-23-structure-and-site-migration.md)); owns the rest of `02-setup/`: `index.html`, `02-admin-repository.html` to `06-pr-previews.html`; also decides where the local-try path (`provider: local`) goes inside `02-setup/` in each, at identical relative paths
 - Depends on: [DOC-23](DOC-23-structure-and-site-migration.md) for publication only; follows DOC-26 in reading order
 

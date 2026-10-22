@@ -1,6 +1,7 @@
 # DOC-29 — アーキテクチャ (Architecture, including cost and performance)
 
-- Status: Open
+- Status: In progress
+- Assignee: Claude
 - Site: `ja`, `en` ([DOC-23](DOC-23-structure-and-site-migration.md)); owns `04-architecture/` (including `cost-and-performance/`) in each, at identical relative paths
 - Depends on: [DOC-23](DOC-23-structure-and-site-migration.md) for publication only
 

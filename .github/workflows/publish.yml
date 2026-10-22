@@ -1,6 +1,6 @@
-# Publish the guide and architecture sites to https://artifact-pages.dev.
+# Publish the guide, architecture and ja sites to https://artifact-pages.dev.
 # Pull requests that change a site or this workflow run a dry-run publish;
-# main pushes and manual runs on main publish both sites. A publish that
+# main pushes and manual runs on main publish every site. A publish that
 # changes nothing is a no-op.
 # Every publish also builds the page text search data.
 name: Publish
@@ -29,7 +29,7 @@ jobs:
       fail-fast: false
       max-parallel: 1
       matrix:
-        site: [guide, architecture]
+        site: [guide, architecture, ja]
     uses: artifact-pages/admin/.github/workflows/publish-site.yml@main
     with:
       site: ${{ matrix.site }}

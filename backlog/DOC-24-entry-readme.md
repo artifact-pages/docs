@@ -1,6 +1,7 @@
 # DOC-24 — Entry README: outcomes and overall picture
 
-- Status: Open
+- Status: In progress
+- Assignee: Claude
 - Site: `ja`, `en` ([DOC-23](DOC-23-structure-and-site-migration.md)); owns `README.md` at each site root (`sites/<ja|en>/README.md`) in each, at identical relative paths
 - Depends on: [DOC-23](DOC-23-structure-and-site-migration.md) for publication only
 
