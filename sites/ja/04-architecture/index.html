@@ -29,7 +29,7 @@
         <h1>アーキテクチャの全体像</h1>
       </div>
       <p class="lead">Artifact Pagesは、各サイトの静的なファイルをオブジェクトストレージに置き、ブラウザで動く閲覧アプリがそれを読む構成です。この章では、なぜこの形なのか、どこに境界とトレードオフがあるのかを説明します。</p>
-      <p class="answer"><span class="answer-label">要点</span>Gitが正本です。各サイトはCLIで配信先へ別々に同期され、ブラウザの共通の閲覧アプリがそれを読みます。読者のリクエストを処理するサーバーはありません。</p>
+      <p class="answer"><span class="answer-label">要点</span>Gitが正本です。各サイトはCLIで配信先へ別々に同期され、ブラウザの共通の閲覧アプリがそれを読みます。閲覧に必要なアプリケーションサーバーはありません（AWSでは、CloudFront FunctionsがURLを振り分けます）。</p>
     </header>
 
     <section class="doc-section" aria-labelledby="shape">
