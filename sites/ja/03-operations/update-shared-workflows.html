@@ -28,7 +28,7 @@
         <p class="eyebrow">社内展開と運用</p>
         <h1>共通の公開・プレビューの仕組みを更新する</h1>
       </div>
-      <p class="lead">管理リポジトリの共通のワークフローは、CLIのコマンドで生成したファイルです。新しいCLIで作り直すと、使う製品のActionsも新しくなります。その変更が各チームに届くかどうかは、チームのワークフローが共通のワークフローをどう参照しているかで決まります。</p>
+      <p class="lead">管理リポジトリの共通のワークフローは、CLIのコマンドで生成したファイルです。そのCLIに新しい製品Actionsの参照が組み込まれていれば、作り直すと共通のワークフローが使うActionsも新しくなります。その変更が各チームに届くかどうかは、チームのワークフローが共通のワークフローをどう参照しているかで決まります。</p>
     </header>
 
     <section class="doc-section" aria-labelledby="layers">
@@ -38,7 +38,7 @@
         <thead><tr><th>固定する場所</th><th>決まるもの</th><th>変わるとき</th></tr></thead>
         <tbody>
           <tr><td>チームのワークフローの<code>uses: …/publish-site.yml@&lt;参照&gt;</code></td><td>どの時点の共通のワークフローと、同じコミットにある<code>artifact-pages.yaml</code>を使うか</td><td><code>@main</code>なら、管理リポジトリの<code>main</code>が変わったあとの次の実行から。コミットのSHAなら、チームが参照を書き換えるまで変わりません。</td></tr>
-          <tr><td>共通のワークフローの中の製品Actionの参照</td><td>製品の<code>publish-action</code>と<code>preview-action</code>の版（コミットのSHAで固定）</td><td>新しいCLIで共通のワークフローを作り直したとき。製品の新しいリリースが出ただけでは変わりません。</td></tr>
+          <tr><td>共通のワークフローの中の製品Actionの参照</td><td>製品の<code>publish-action</code>と<code>preview-action</code>の版（コミットのSHAで固定）</td><td>新しいActionsの参照を組み込んだCLIで、共通のワークフローを作り直したとき。製品の新しいリリースが出ただけでは変わりません。</td></tr>
           <tr><td><code>artifact-pages.yaml</code>の<code>cli.version</code></td><td>実際に公開を行うCLIの版</td><td>管理者がこの値を変えたとき。ただし、チームが古いコミットを参照していれば、古い設定の値のままです。</td></tr>
         </tbody>
       </table></div>

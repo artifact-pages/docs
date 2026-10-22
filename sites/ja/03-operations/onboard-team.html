@@ -37,8 +37,10 @@
       <div class="term" aria-label="サイトを追加する">
         <div class="term-head"><span>artifact-pages.yaml / 管理リポジトリ（説明用の例）</span><button class="copy-btn" type="button">コピー</button></div>
 <pre><span data-copy><span class="k">sites</span>:
-  <span class="k">sre</span>:
-    <span class="c"># 既存のサイトはそのまま残す</span>
+  <span class="k">sre</span>:                 <span class="c"># 既存のサイトは消さずに残す</span>
+    <span class="k">name</span>: SREチーム
+    <span class="k">repository</span>: acme/sre
+    <span class="k">sourcePath</span>: docs
   <span class="k">billing</span>:
     <span class="k">name</span>: 決済チーム / Billing
     <span class="k">description</span>: 請求まわりの設計と運用

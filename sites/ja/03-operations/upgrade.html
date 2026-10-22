@@ -42,7 +42,7 @@
       </div>
       <ul>
         <li>値は<code>0.5.2</code>のような正確な版です。先頭の<code>v</code>、範囲、<code>latest</code>は書けません。</li>
-        <li>入れてあるCLIは、<code>cli.version</code>があればその版をダウンロードし、チェックサムを確かめてから実行を任せます。</li>
+        <li>入れてあるCLIは、<code>cli.version</code>が自分と違う版を指していれば、その版をダウンロードし、チェックサムを確かめてから実行を任せます。</li>
         <li>製品のActionsの版（いまは<code>v0.3.0</code>）は、CLIの版とは別の番号です。各Actionsは、使えるCLIの範囲（<code>v0.3.0</code>では<code>&gt;=0.5.0 &lt;0.6.0</code>）を持っています。</li>
       </ul>
       <p>いまの版はすべて0.xのプレリリースで、版をまたぐ互換性は約束されていません。ただし、CLIは書き込む前に、配置された閲覧アプリがその形式を読めるかを毎回確かめます。</p>
@@ -89,7 +89,7 @@ Config and stored formats are compatible with web.version.
     <section class="doc-section" aria-labelledby="catch-up">
       <h2 id="catch-up">固定のない古い環境を追いつかせる</h2>
       <ul>
-        <li>設定に<code>cli</code>も<code>web</code>もない環境では、入れてあるCLIがそのまま動きます。まず<code>web.version</code>（必要なら<code>cli.version</code>）を書き足します。<code>web.version</code>がないと、<code>app deploy</code>は閲覧アプリを選べず終了コード2で止まります。</li>
+        <li>設定に<code>cli</code>も<code>web</code>もない環境では、入れてあるCLIがそのまま動きます。古いCLIはこれらのキーを知らずに拒否するので、まず使うCLIとActionsを、これらのキーに対応する版に上げます。そのあとで<code>web.version</code>（必要なら<code>cli.version</code>）を書き足します。閲覧アプリとCLIのリリースが分かれたあとのCLIでは、<code>cli.version</code>だけを書いて<code>web.version</code>がないと、<code>app deploy</code>は閲覧アプリを選べず終了コード2で止まります。</li>
         <li>版の記録がない古いサイトは、互換かどうか判断できないものとして扱われます。登録を反映し、全サイトを公開し直して記録を作ってから閲覧アプリを置くか、上の「形式が変わる更新」の順で移ります。</li>
         <li>AWSでは、CLI 0.5.0以降が、サイトの一覧と検索のデータを圧縮して保存します。一度0.5.0以降で公開したサイトには、そのあと0.5.0より古いCLIで書き込まないでください。移る前に、そのサイトに書き込むすべての実行（手元、定期実行、Actions）を0.5.0以降にそろえます。</li>
       </ul>
