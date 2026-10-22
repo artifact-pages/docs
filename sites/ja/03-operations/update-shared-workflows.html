@@ -1,0 +1,86 @@
+<!doctype html>
+<html lang="ja">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="description" content="管理リポジトリが配る共通の公開・プレビューのワークフローを作り直し、その変更がいつ各チームに届くかを、参照の固定のしかたごとに確かめる。">
+  <title>共通の公開・プレビューの仕組みを更新する — Artifact Pages ドキュメント</title>
+  <script>
+    // Copy the reader app's theme (same-origin parent) before first paint; assets/site.js keeps it in sync.
+    (() => {
+      const root = document.documentElement;
+      root.classList.add('js');
+      try {
+        const theme = window.parent !== window && window.parent.document.documentElement.dataset.theme;
+        if (theme === 'light' || theme === 'dark') root.dataset.theme = theme;
+      } catch { /* cross-origin: fall back to prefers-color-scheme */ }
+    })();
+  </script>
+  <link rel="icon" href="data:,">
+  <link rel="stylesheet" href="../assets/site.css">
+  <script src="../assets/site.js" defer></script>
+</head>
+<body>
+  <a class="skip" href="#main">本文へ移動</a>
+  <main id="main" class="wrap">
+    <header class="page-head">
+      <div>
+        <p class="eyebrow">社内展開と運用</p>
+        <h1>共通の公開・プレビューの仕組みを更新する</h1>
+      </div>
+      <p class="lead">管理リポジトリの共通のワークフローは、CLIのコマンドで生成したファイルです。新しいCLIで作り直すと、使う製品のActionsも新しくなります。その変更が各チームに届くかどうかは、チームのワークフローが共通のワークフローをどう参照しているかで決まります。</p>
+    </header>
+
+    <section class="doc-section" aria-labelledby="layers">
+      <h2 id="layers">何がどこで固定されているか</h2>
+      <p>チームのジョブが実際に動かすものは、3か所の固定で決まります。</p>
+      <div class="table-wrap"><table>
+        <thead><tr><th>固定する場所</th><th>決まるもの</th><th>変わるとき</th></tr></thead>
+        <tbody>
+          <tr><td>チームのワークフローの<code>uses: …/publish-site.yml@&lt;参照&gt;</code></td><td>どの時点の共通のワークフローと、同じコミットにある<code>artifact-pages.yaml</code>を使うか</td><td><code>@main</code>なら、管理リポジトリの<code>main</code>が変わったあとの次の実行から。コミットのSHAなら、チームが参照を書き換えるまで変わりません。</td></tr>
+          <tr><td>共通のワークフローの中の製品Actionの参照</td><td>製品の<code>publish-action</code>と<code>preview-action</code>の版（コミットのSHAで固定）</td><td>新しいCLIで共通のワークフローを作り直したとき。製品の新しいリリースが出ただけでは変わりません。</td></tr>
+          <tr><td><code>artifact-pages.yaml</code>の<code>cli.version</code></td><td>実際に公開を行うCLIの版</td><td>管理者がこの値を変えたとき。ただし、チームが古いコミットを参照していれば、古い設定の値のままです。</td></tr>
+        </tbody>
+      </table></div>
+      <p>共通のワークフローは、自分と同じコミットにある<code>artifact-pages.yaml</code>を製品のActionに渡します。チームのリポジトリに設定ファイルは要らず、管理者が<code>main</code>で設定を変えれば、<code>@main</code>を参照するチームの次の公開からその設定が使われます。</p>
+      <div class="callout warn" role="note">
+        <span class="ico">自動では届かない場合</span>
+        <div>
+          <p><strong>チームがSHAやタグで参照している場合、管理リポジトリの変更は届きません。</strong>管理者が各チームに参照の更新を依頼するか、プルリクエストを出します。製品には、全チームの参照をまとめて書き換える機能はありません。どのチームが何を参照しているかは、管理者が把握しておきます。</p>
+        </div>
+      </div>
+    </section>
+
+    <section class="doc-section" aria-labelledby="regenerate">
+      <h2 id="regenerate">共通のワークフローを作り直す</h2>
+      <p>共通のワークフローのファイルは手で編集せず、<code>registry setup</code>で作り直します。このコマンドは、実行したCLIの版に組み込まれた製品Actionsの参照を書き込みます。設定の<code>cli.version</code>は使いません。新しいActionsにしたいときは、新しいCLIを入れてから実行します。</p>
+      <div class="term" aria-label="共通のワークフローを作り直す">
+        <div class="term-head"><span>ターミナル / 管理リポジトリ</span><button class="copy-btn" type="button">コピー</button></div>
+<pre><span class="p">$</span> <span data-copy>artifact-pages registry setup --directory . --config artifact-pages.yaml --repository acme/platform-admin</span>
+<span class="c"># 生成済みのファイルが最新かだけを確かめる</span>
+<span class="p">$</span> <span data-copy>artifact-pages registry setup --directory . --config artifact-pages.yaml --repository acme/platform-admin --check</span></pre>
+      </div>
+      <ul>
+        <li>生成したファイルの差分はプルリクエストでレビューしてからマージします。</li>
+        <li><code>--check</code>で差がある場合は<code>generated files are out of date: …</code>と表示されます。</li>
+        <li>手で編集したファイルや、このコマンドが作ったのではないファイルは上書きされず、<code>refusing to overwrite unmanaged or manually edited file …</code>で止まります。そのファイルを退避して中身を確かめ、もう一度実行します。</li>
+      </ul>
+      <p>共通のワークフローの入力（<code>site</code>と<code>environment</code>）が変わる更新では、チームのワークフローも合わせて変える必要があります。</p>
+    </section>
+
+    <section class="doc-section" aria-labelledby="check">
+      <h2 id="check">届いたことを確かめる</h2>
+      <ol>
+        <li>管理リポジトリの変更をマージしたら、各チームのワークフローの参照を一覧にし、SHAやタグのチームに更新を依頼します。</li>
+        <li>チームの次の公開のジョブの概要（Job Summary）で、実行されたCLIの版（<strong>CLI executed</strong>）を確かめます。</li>
+      </ol>
+      <p>実行中のジョブや、失敗したジョブだけを再実行した場合に、新しいコミットが使われるかは確かめていません。確実に新しい内容で動かすには、新しく実行します。</p>
+    </section>
+
+    <nav class="pager" aria-label="ページ送り">
+      <a class="prev" href="onboard-team.html"><small>前へ</small><strong>新しいチーム・サイトを受け入れる</strong></a>
+      <a class="next" href="upgrade.html"><small>次へ</small><strong>閲覧アプリ・CLI・Actionsを更新する</strong></a>
+    </nav>
+  </main>
+</body>
+</html>
