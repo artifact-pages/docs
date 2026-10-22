@@ -29,6 +29,7 @@
         <h1>コストとパフォーマンス</h1>
       </div>
       <p class="lead">費用と速さは、公開と閲覧の処理のどこで、何がどれだけ動くかで決まります。このページでは共通の要因と、これまでの計測の結果を、計測の条件とあわせて示します。数字は計測した条件での値で、性能や請求額の保証ではありません。</p>
+      <p class="answer"><span class="answer-label">要点</span>費用と時間を決めるのは、資料の数とサイトの一覧の大きさ、公開の回数、キャッシュの削除です。数字はすべて計測した条件でのもので、保証値ではありません。</p>
     </header>
 
     <section class="doc-section" aria-labelledby="factors">
@@ -63,6 +64,11 @@
     <section class="doc-section" aria-labelledby="browser">
       <h2 id="browser">ブラウザでの計測</h2>
       <p>合成した資料（1千から5万件）のサイトを、手元のnginxで配信して計測しました。Apple M4（32 GB）、Chromium 153、3回の中央値です。nginxは圧縮していません。閲覧アプリは計測時点の版で、いまの版での再計測ではありません。</p>
+      <figure class="fg" aria-labelledby="size-fig">
+        <div class="fg-head"><strong id="size-fig">資料の数と<code>index.json</code>の大きさ（展開後）</strong></div>
+        <div class="fg-body"><div class="br" role="table" aria-label="資料の数ごとのindex.jsonの大きさ"><div class="br-r" role="row"><span class="br-l" role="rowheader">1,000件</span><span class="br-v" role="cell" data-kind="site" style="--v:0.017">0.78 MB</span></div><div class="br-r" role="row"><span class="br-l" role="rowheader">5,000件</span><span class="br-v" role="cell" data-kind="site" style="--v:0.096">4.39 MB</span></div><div class="br-r" role="row"><span class="br-l" role="rowheader">10,000件</span><span class="br-v" role="cell" data-kind="site" style="--v:0.194">8.92 MB</span></div><div class="br-r" role="row"><span class="br-l" role="rowheader">50,000件</span><span class="br-v" role="cell" data-kind="site" style="--v:1.000">45.90 MB</span></div></div></div>
+        <figcaption>資料の数にほぼ比例して大きくなります。値は下の表と同じ計測です。</figcaption>
+      </figure>
       <div class="table-wrap"><table>
         <thead><tr><th>資料の数</th><th><code>index.json</code>（展開後 / gzip換算）</th><th>検索のデータ（ファイル数 / 量）</th><th>手元での<code>site sync</code></th></tr></thead>
         <tbody>
@@ -100,6 +106,11 @@
     <section class="doc-section" aria-labelledby="model">
       <h2 id="model">費用のモデル</h2>
       <p>操作の回数を数えるだけの仮の配信先で公開と閲覧を再現し、2026年10月18日の公開価格を当てはめて月額を見積もりました。実際のHTTPのリクエスト数や請求の記録ではありません。プレビュー、登録の反映、閲覧アプリの配置の費用は含めていません。配信先ごとの結果は各ページにあります。</p>
+      <figure class="fg" aria-labelledby="cost-fig">
+        <div class="fg-head"><strong id="cost-fig">月額の見積もり（キャッシュに当たらない割合10%）</strong></div>
+        <div class="fg-body"><div class="br" role="table" aria-label="想定ごとの月額の見積もり"><div class="br-r" role="row"><span class="br-l" role="rowheader">S</span><span class="br-v" role="cell" data-kind="cloudflare" style="--v:0.000">$0.09</span><span class="br-v" role="cell" data-kind="aws" style="--v:0.002">$4.05</span></div><div class="br-r" role="row"><span class="br-l" role="rowheader">M</span><span class="br-v" role="cell" data-kind="cloudflare" style="--v:0.001">$1.86</span><span class="br-v" role="cell" data-kind="aws" style="--v:0.179">$353.67</span></div><div class="br-r" role="row"><span class="br-l" role="rowheader">L</span><span class="br-v" role="cell" data-kind="cloudflare" style="--v:0.003">$5.93</span><span class="br-v" role="cell" data-kind="aws" style="--v:1.000">$1,972.66</span></div></div><ul class="br-k"><li data-kind="cloudflare">Cloudflare（R2）</li><li data-kind="aws">AWS（S3とCloudFront）</li></ul></div>
+        <figcaption>Cloudflareは無料枠を引く前、AWSは無料枠をこの用途に使える前提の額です。S、M、Lの想定と内訳は、配信先ごとのページにあります。AWSの額の多くは、圧縮しない一覧を毎回取得すると仮定した転送と、キャッシュの無効化です。</figcaption>
+      </figure>
       <ul class="cards two">
         <li><a class="card" href="cloudflare.html"><span class="tag">R2 · Cloudflare Cache</span><h3>Cloudflare</h3><p>構成、キャッシュの削除のまとめ方、見積もり。</p><span class="go">詳しく →</span></a></li>
         <li><a class="card" href="aws.html"><span class="tag">S3 · CloudFront</span><h3>AWS</h3><p>構成、一覧の圧縮、キャッシュの無効化の費用、見積もり。</p><span class="go">詳しく →</span></a></li>

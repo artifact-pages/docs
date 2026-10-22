@@ -31,6 +31,8 @@
       <p class="lead">ここからはチームの作業です。<code>acme/sre</code>に公開する資料のディレクトリと、共通のワークフローを呼び出すワークフローを置きます。プルリクエストでは試し実行、<code>main</code>へのマージで公開されます。</p>
     </header>
 
+    <nav class="sm" aria-label="導入のステップ"><ol><li class="is-done"><a href="01-infrastructure/index.html"><span class="sm-n">1</span><b>インフラを構築する</b></a></li><li class="is-done"><a href="02-admin-repository.html"><span class="sm-n">2</span><b>管理リポジトリを準備する</b></a></li><li class="is-done"><a href="03-reader-app.html"><span class="sm-n">3</span><b>閲覧アプリをデプロイする</b></a></li><li class="is-done"><a href="04-register-site.html"><span class="sm-n">4</span><b>サイトを登録する</b></a></li><li><a href="05-first-site.html" aria-current="step"><span class="sm-n">5</span><b>最初のサイトを公開する</b></a></li><li><a href="06-pr-previews.html"><span class="sm-n">6</span><b>PRプレビューを使えるようにする</b></a></li></ol></nav>
+
     <section class="doc-section" aria-labelledby="directory">
       <h2 id="directory">公開するディレクトリを整える</h2>
       <p>登録した<code>sourcePath</code>（例では<code>docs</code>）の中身が、そのままサイトになります。</p>
@@ -44,6 +46,10 @@
 └── postmortems/
     └── 2026-09-db-failover.md</pre>
       </div>
+      <figure class="fg" aria-labelledby="url-fig">
+        <div class="fg-head"><strong id="url-fig">ファイルがどのURLになるか</strong><span class="fg-note">説明用の例</span></div>
+        <div class="fg-body"><div class="mp" role="table" aria-label="公開元のファイルと読者が開くURL"><div class="mp-h" role="row"><span role="columnheader">acme/sreのファイル</span><span role="columnheader">読者が開くURL</span></div><div class="mp-r" role="row"><span role="cell"><code>docs/README.md</code></span><span role="cell"><code>/sre/README.md</code><small>サイトのトップ<code>/sre</code>のOverviewにもなる</small></span></div><div class="mp-r" role="row"><span role="cell"><code>docs/runbooks/README.md</code></span><span role="cell"><code>/sre/runbooks/README.md</code><small>フォルダの画面<code>/sre/runbooks</code>にも表示される</small></span></div><div class="mp-r" role="row"><span role="cell"><code>docs/runbooks/on-call.html</code></span><span role="cell"><code>/sre/runbooks/on-call.html</code></span></div><div class="mp-r" role="row"><span role="cell"><code>docs/postmortems/2026-09-db-failover.md</code></span><span role="cell"><code>/sre/postmortems/2026-09-db-failover.md</code></span></div></div></div>
+      </figure>
       <ul>
         <li><strong>そのまま配信できる形にしておきます。</strong>Artifact Pagesは生成やビルドをしません。ほかのツールで生成するなら、公開の前のステップで生成します。</li>
         <li><strong>公開したくないものは入れません。</strong>このディレクトリの中のファイルは、リンクされていなくても、Gitで追跡していなくても公開されます。<code>.html</code>のテンプレートや部分的なファイルも資料として載ります。シンボリックリンクがあると公開は失敗します。<code>.git</code>は公開されません。</li>
@@ -139,6 +145,14 @@
         <li><code>sourcePath</code>は<code>docs</code>のように資料だけのディレクトリにします。リポジトリ全体にすると、設定ファイルやワークフローも公開されます。</li>
         <li>この場合も、登録の反映と閲覧アプリの配置は別のジョブで行います。</li>
       </ul>
+    </section>
+
+    <section class="doc-section" aria-labelledby="state">
+      <h2 id="state">このステップのあとの状態</h2>
+      <figure class="fg" aria-labelledby="state-fig">
+        <div class="fg-head"><strong id="state-fig">ステップ5のあとの状態</strong><span class="fg-note">説明用の例</span></div>
+        <div class="fg-body"><div class="bd"><section class="bd-col"><h4 class="bd-h">GitHub</h4><div class="nd" data-kind="admin"><b>管理リポジトリ</b><small><code>artifact-pages.yaml</code>、共通のワークフロー、配置のワークフロー、<code>sites</code>に<code>sre</code></small></div><div class="nd is-new" data-kind="team"><b>チームのリポジトリ</b><small>acme/sre：<code>docs/</code>、公開のワークフロー</small><span class="nd-badge">このステップ</span></div></section><div class="bd-a"><span>書き込む</span></div><section class="bd-col"><h4 class="bd-h">配信先</h4><div class="nd" data-kind="store"><b>ストレージとCDN</b><small>ホスト名、配信の規則、認証情報</small></div><div class="nd" data-kind="app"><b>閲覧アプリ</b><small>ホスト名のトップで開く</small></div><div class="nd" data-kind="registry"><b>サイトの登録情報</b><small><code>sre</code></small></div><div class="nd is-new" data-kind="site"><b>サイト<code>sre</code></b><small>資料と一覧、本文検索のデータ</small><span class="nd-badge">このステップ</span></div><div class="nd is-dim" data-kind="preview"><b>プレビュー</b><small>ステップ6で用意</small></div></section><div class="bd-a"><span>読む</span></div><section class="bd-col"><h4 class="bd-h">ブラウザ</h4><div class="nd is-new" data-kind="reader"><b>読者</b><small><code>sre</code>の資料を読める</small><span class="nd-badge">このステップ</span></div></section></div></div>
+      </figure>
     </section>
 
     <nav class="pager" aria-label="ページ送り">

@@ -65,11 +65,20 @@
         <li>同じサイトへの公開とプレビューは、ロックで1つずつ順に行われます。別のサイトの公開とは並んで進みます。</li>
         <li>公開は多数のファイルの書き込みなので、すべてが一瞬で切り替わるわけではありません。公開の直後は、キャッシュによって少しの間、古い内容が見えることがあります。</li>
       </ul>
+      <figure class="fg" aria-labelledby="lock-fig">
+        <div class="fg-head"><strong id="lock-fig">同時に公開したとき、何が待つか</strong><span class="fg-note">説明用の例</span></div>
+        <div class="fg-body"><div class="bn" style="--cols:6"><div class="bn-t"><span>1</span><span>2</span><span>3</span><span>4</span><span>5</span><span>6</span></div><div class="bn-r"><span class="bn-l">公開（<code>sre</code>）</span><span class="bn-b" data-kind="lock" style="--from:1;--to:3">ロックを持って書く</span></div><div class="bn-r"><span class="bn-l">プレビュー（<code>sre</code>）</span><span class="bn-b" data-kind="wait" style="--from:1;--to:3">待つ</span><span class="bn-b" data-kind="lock" style="--from:4;--to:6">ロックを持って書く</span></div><div class="bn-r"><span class="bn-l">公開（<code>checkout</code>）</span><span class="bn-b" data-kind="lock" style="--from:2;--to:5">ロックを持って書く</span></div><ul class="bn-k"><li data-kind="lock">サイトのロックを持っている</li><li data-kind="wait">同じサイトのロックが空くのを待つ</li></ul></div></div>
+        <figcaption>横は時間の流れです。同じサイト<code>sre</code>の公開とプレビューは順に進み、別のサイト<code>checkout</code>の公開はそれと並んで進みます。<span class="fg-scroll">図は横にスクロールして見られます。</span></figcaption>
+      </figure>
     </section>
 
     <section class="doc-section" aria-labelledby="preview">
       <h2 id="preview">プルリクエストをプレビューで確かめる</h2>
       <p>プレビューは、プルリクエストの変更を、本公開とは別の場所に公開したものです。レビューする人は、マージの前に、変更後の資料を閲覧アプリの中で読めます。</p>
+      <figure class="fg" aria-labelledby="preview-split-fig">
+        <div class="fg-head"><strong id="preview-split-fig">プレビューと本公開の行き先</strong><span class="fg-note">説明用の例</span></div>
+        <div class="fg-body"><div class="bd"><section class="bd-col"><h4 class="bd-h">チームのリポジトリ</h4><div class="nd" data-kind="team"><b>プルリクエスト</b><small>先頭のコミット</small></div><div class="nd" data-kind="team"><b><code>main</code>へのマージ</b></div></section><div class="bd-a"><span>公開する</span></div><section class="bd-col"><h4 class="bd-h">配信先</h4><div class="nd" data-kind="preview"><b>プレビュー</b><small><code>/sre/_previews/…</code>。本公開の一覧と検索には混ざらない</small></div><div class="nd" data-kind="site"><b>本公開のサイト<code>sre</code></b><small><code>/sre/…</code></small></div></section><div class="bd-a"><span>読む</span></div><section class="bd-col"><h4 class="bd-h">ブラウザ</h4><div class="nd" data-kind="reader"><b>レビューする人</b><small>マージの前にプレビューを読む</small></div><div class="nd" data-kind="reader"><b>読者</b><small>本公開を読む</small></div></section></div></div>
+      </figure>
       <div class="table-wrap"><table>
         <thead><tr><th>項目</th><th>内容</th></tr></thead>
         <tbody>

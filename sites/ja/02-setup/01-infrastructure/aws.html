@@ -31,6 +31,8 @@
       <p class="lead">S3のバケットとCloudFrontで、Artifact Pagesの配信環境を作ります。公開ジョブが使うIAMロールもモジュールが作り、各ジョブはGitHubのOIDCでそのロールを引き受けます。GitHubにAWSのアクセスキーは置きません。</p>
     </header>
 
+    <nav class="sm" aria-label="導入のステップ"><ol><li><a href="../01-infrastructure/index.html" aria-current="step"><span class="sm-n">1</span><b>インフラを構築する</b></a></li><li><a href="../02-admin-repository.html"><span class="sm-n">2</span><b>管理リポジトリを準備する</b></a></li><li><a href="../03-reader-app.html"><span class="sm-n">3</span><b>閲覧アプリをデプロイする</b></a></li><li><a href="../04-register-site.html"><span class="sm-n">4</span><b>サイトを登録する</b></a></li><li><a href="../05-first-site.html"><span class="sm-n">5</span><b>最初のサイトを公開する</b></a></li><li><a href="../06-pr-previews.html"><span class="sm-n">6</span><b>PRプレビューを使えるようにする</b></a></li></ol></nav>
+
     <section class="doc-section" aria-labelledby="result">
       <h2 id="result">できあがるもの</h2>
       <ul>
@@ -40,6 +42,11 @@
         <li><strong>IAMロール。</strong>管理リポジトリ用のロール1つと、サイトごとのロールです（<a href="#roles">IAMロールとOIDC</a>）。</li>
       </ul>
       <p>DNSのレコード、ACMの証明書、GitHub ActionsのOIDCプロバイダー、GitHubのEnvironmentとシークレットは、モジュールが作りません。</p>
+      <figure class="fg" aria-labelledby="aws-path-fig">
+        <div class="fg-head"><strong id="aws-path-fig">読者のリクエストが通る道</strong><span class="fg-note">説明用の例</span></div>
+        <div class="fg-body"><div class="fl"><div class="nd" data-kind="reader"><b>読者</b><small><code>https://docs.example.com/…</code></small></div><span class="fl-a"><span>開く</span></span><div class="nd" data-kind="cdn"><b>CloudFront</b><small>振り分け、キャッシュ、応答ヘッダー</small></div><span class="fl-a"><span>読む</span></span><div class="nd" data-kind="store"><b>S3バケット</b><small>非公開。CloudFrontだけが読める</small></div></div></div>
+        <figcaption>ページのURLには閲覧アプリが返り、閲覧アプリが一覧や資料のファイルを読みます。資料のファイルを直接指すURLで、そのファイルがなければ404です。</figcaption>
+      </figure>
     </section>
 
     <section class="doc-section" aria-labelledby="before">
@@ -55,6 +62,11 @@
     <section class="doc-section" aria-labelledby="roles">
       <h2 id="roles">IAMロールとOIDC</h2>
       <p>モジュールが作るロールは2種類だけです。</p>
+      <figure class="fg" aria-labelledby="aws-roles-fig">
+        <div class="fg-head"><strong id="aws-roles-fig">どのジョブが、どのロールで、どこに書けるか</strong><span class="fg-note">説明用の例</span></div>
+        <div class="fg-body"><div class="bd"><section class="bd-col"><h4 class="bd-h">GitHub Actionsのジョブ</h4><div class="nd" data-kind="admin"><b>管理リポジトリのジョブ</b><small>acme/platform-admin</small></div><div class="nd" data-kind="team"><b>チームのジョブ</b><small>acme/sre</small></div></section><div class="bd-a"><span>OIDCで引き受ける（<code>sub</code>が完全に一致するときだけ）</span></div><section class="bd-col"><h4 class="bd-h">IAMロール</h4><div class="nd" data-kind="admin"><b><code>artifact-pages-admin-publisher</code></b><small>管理用。1つ</small></div><div class="nd" data-kind="team"><b><code>artifact-pages-sre-publisher</code></b><small>サイトごと</small></div></section><div class="bd-a"><span>書く</span></div><section class="bd-col"><h4 class="bd-h">S3とCloudFront</h4><div class="nd" data-kind="app"><b>閲覧アプリ</b><small>管理用のロールだけ</small></div><div class="nd" data-kind="registry"><b>サイトの登録情報と内部の記録</b><small>管理用のロールだけ</small></div><div class="nd" data-kind="site"><b>サイト<code>sre</code>とそのプレビュー</b><small>サイト<code>sre</code>のロールだけ</small></div></section></div></div>
+        <figcaption>名前は<code>name_prefix</code>が既定の<code>artifact-pages</code>の場合です。サイト<code>sre</code>のロールは、ほかのサイト、サイトの登録情報、閲覧アプリに書けません。</figcaption>
+      </figure>
       <div class="table-wrap"><table>
         <thead><tr><th>ロール</th><th>名前</th><th>使うジョブとできること</th></tr></thead>
         <tbody>
@@ -209,6 +221,14 @@
         </tbody>
       </table></div>
       <p>ロールのARNは設定ファイルには書かず、ジョブの設定で使います。次のステップで、設定ファイルにCLIと閲覧アプリのバージョン、登録するサイトを書き足し、ジョブを用意します。閲覧アプリやサイトを置いたあとの動作の確認も、次のステップ以降で行います。</p>
+    </section>
+
+    <section class="doc-section" aria-labelledby="state">
+      <h2 id="state">このステップのあとの状態</h2>
+      <figure class="fg" aria-labelledby="state-fig">
+        <div class="fg-head"><strong id="state-fig">ステップ1のあとの状態</strong><span class="fg-note">説明用の例</span></div>
+        <div class="fg-body"><div class="bd"><section class="bd-col"><h4 class="bd-h">GitHub</h4><div class="nd is-dim" data-kind="admin"><b>管理リポジトリ</b><small>ステップ2で用意</small></div><div class="nd is-dim" data-kind="team"><b>チームのリポジトリ</b><small>ステップ5で用意</small></div></section><div class="bd-a"><span>書き込む</span></div><section class="bd-col"><h4 class="bd-h">配信先</h4><div class="nd is-new" data-kind="store"><b>ストレージとCDN</b><small>ホスト名、配信の規則、認証情報</small><span class="nd-badge">このステップ</span></div><div class="nd is-dim" data-kind="app"><b>閲覧アプリ</b><small>ステップ3で用意</small></div><div class="nd is-dim" data-kind="registry"><b>サイトの登録情報</b><small>ステップ4で用意</small></div><div class="nd is-dim" data-kind="site"><b>サイト<code>sre</code></b><small>ステップ5で用意</small></div><div class="nd is-dim" data-kind="preview"><b>プレビュー</b><small>ステップ6で用意</small></div></section><div class="bd-a"><span>読む</span></div><section class="bd-col"><h4 class="bd-h">ブラウザ</h4><div class="nd is-dim" data-kind="reader"><b>読者</b><small>まだ開けない</small></div></section></div></div>
+      </figure>
     </section>
 
     <nav class="pager" aria-label="ページ送り">

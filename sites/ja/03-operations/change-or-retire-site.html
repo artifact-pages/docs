@@ -56,6 +56,11 @@
     <section class="doc-section" aria-labelledby="retire">
       <h2 id="retire">サイトを取り下げる</h2>
       <p>サイトを廃止するには、<code>sites</code>からそのIDを消して反映します。取り下げ専用のコマンドや、一時停止の状態はありません。</p>
+      <figure class="fg" aria-labelledby="retire-fig">
+        <div class="fg-head"><strong id="retire-fig">取り下げで消えるもの、残るもの</strong><span class="fg-note">説明用の例</span></div>
+        <div class="fg-body"><div class="bd"><section class="bd-col"><h4 class="bd-h"><code>registry sync</code>が削除する</h4><div class="nd" data-kind="site"><b>サイトの資料と一覧</b><small>本文検索のデータも</small></div><div class="nd" data-kind="preview"><b>そのサイトのプレビュー</b></div><div class="nd" data-kind="registry"><b>登録と内部の記録</b><small>公開の状態など</small></div></section><section class="bd-col"><h4 class="bd-h">残る（別に片づける）</h4><div class="nd" data-kind="team"><b>チームのワークフロー</b></div><div class="nd" data-kind="admin"><b>AWSのロール</b><small><code>satellite_github_subjects</code>のエントリ</small></div><div class="nd" data-kind="ci"><b>Cloudflareで渡した認証情報</b></div><div class="nd is-dim" data-kind="registry"><b>ロックの記録</b></div></section></div></div>
+        <figcaption>ほかのサイトと閲覧アプリには触れません。キャッシュに残った写しや、開いたままの画面がすぐに消えるとは限りません。</figcaption>
+      </figure>
       <div class="term" aria-label="サイトを取り下げる">
         <div class="term-head"><span>ターミナル / 管理リポジトリ</span><button class="copy-btn" type="button">コピー</button></div>
 <pre><span class="p">$</span> <span data-copy>artifact-pages registry sync --config artifact-pages.yaml --dry-run</span>

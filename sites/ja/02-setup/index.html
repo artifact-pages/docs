@@ -39,21 +39,15 @@
         <li>チームのリポジトリ<code>acme/sre</code>のサイト<code>sre</code>が登録され、マージすると公開され、プルリクエストにはプレビューが付く。</li>
       </ul>
       <p>リポジトリとサイトの名前は説明用の例です。お使いの名前に置き換えて読んでください。</p>
+      <figure class="fg" aria-labelledby="goal-fig">
+        <div class="fg-head"><strong id="goal-fig">導入がすべて終わった状態</strong><span class="fg-note">説明用の例</span></div>
+        <div class="fg-body"><div class="bd"><section class="bd-col"><h4 class="bd-h">GitHub</h4><div class="nd" data-kind="admin"><b>管理リポジトリ</b><small><code>artifact-pages.yaml</code>、共通のワークフロー、配置のワークフロー、<code>sites</code>に<code>sre</code></small></div><div class="nd" data-kind="team"><b>チームのリポジトリ</b><small>acme/sre：<code>docs/</code>、公開のワークフロー、プレビューのワークフロー</small></div><div class="nd" data-kind="ci"><b>プルリクエスト</b><small>プレビューのコメント</small></div></section><div class="bd-a"><span>書き込む</span></div><section class="bd-col"><h4 class="bd-h">配信先</h4><div class="nd" data-kind="store"><b>ストレージとCDN</b><small>ホスト名、配信の規則、認証情報</small></div><div class="nd" data-kind="app"><b>閲覧アプリ</b><small>ホスト名のトップで開く</small></div><div class="nd" data-kind="registry"><b>サイトの登録情報</b><small><code>sre</code></small></div><div class="nd" data-kind="site"><b>サイト<code>sre</code></b><small>資料と一覧、本文検索のデータ</small></div><div class="nd" data-kind="preview"><b>プレビュー</b><small>プルリクエストごと</small></div></section><div class="bd-a"><span>読む</span></div><section class="bd-col"><h4 class="bd-h">ブラウザ</h4><div class="nd" data-kind="reader"><b>読者</b><small><code>sre</code>の資料を読める、プレビューを開ける</small></div></section></div></div>
+      </figure>
     </section>
 
     <section class="doc-section" aria-labelledby="flow">
       <h2 id="flow">全体の流れ</h2>
-      <div class="table-wrap"><table>
-        <thead><tr><th>ステップ</th><th>行う人</th><th>終わったときの状態</th></tr></thead>
-        <tbody>
-          <tr><td><a href="01-infrastructure/index.html">1. インフラを構築する</a></td><td>管理者</td><td>ストレージ、ホスト名、配信の規則、認証情報がそろい、配信先の設定が手元にある</td></tr>
-          <tr><td><a href="02-admin-repository.html">2. 管理リポジトリを準備する</a></td><td>管理者</td><td>設定ファイルと共通のワークフローが管理リポジトリにある</td></tr>
-          <tr><td><a href="03-reader-app.html">3. 閲覧アプリをデプロイする</a></td><td>管理者</td><td>ホスト名を開くと閲覧アプリが表示される</td></tr>
-          <tr><td><a href="04-register-site.html">4. サイトを登録する</a></td><td>管理者</td><td>サイト<code>sre</code>が一覧に出る（まだ資料はない）</td></tr>
-          <tr><td><a href="05-first-site.html">5. 最初のサイトを公開する</a></td><td>チーム</td><td><code>acme/sre</code>の資料が読める</td></tr>
-          <tr><td><a href="06-pr-previews.html">6. PRプレビューを使えるようにする</a></td><td>チーム</td><td>プルリクエストにプレビューのコメントが付く</td></tr>
-        </tbody>
-      </table></div>
+      <ol class="st"><li><span class="st-who" data-kind="admin">管理者</span><b><a href="01-infrastructure/index.html">インフラを構築する</a></b><p>ストレージ、ホスト名、配信の規則、認証情報がそろい、配信先の設定が手元にある</p></li><li><span class="st-who" data-kind="admin">管理者</span><b><a href="02-admin-repository.html">管理リポジトリを準備する</a></b><p>設定ファイルと共通のワークフローが管理リポジトリにある</p></li><li><span class="st-who" data-kind="admin">管理者</span><b><a href="03-reader-app.html">閲覧アプリをデプロイする</a></b><p>ホスト名を開くと閲覧アプリが表示される</p></li><li><span class="st-who" data-kind="admin">管理者</span><b><a href="04-register-site.html">サイトを登録する</a></b><p>サイト<code>sre</code>が一覧に出る（まだ資料はない）</p></li><li><span class="st-who" data-kind="team">チーム</span><b><a href="05-first-site.html">最初のサイトを公開する</a></b><p><code>acme/sre</code>の資料が読める</p></li><li><span class="st-who" data-kind="team">チーム</span><b><a href="06-pr-previews.html">PRプレビューを使えるようにする</a></b><p>プルリクエストにプレビューのコメントが付く</p></li></ol>
     </section>
 
     <section class="doc-section" aria-labelledby="repos">
@@ -94,6 +88,10 @@
     <section class="doc-section" aria-labelledby="local">
       <h2 id="local">クラウドの前にローカルで試す</h2>
       <p>配信環境を作る前に、手元のディレクトリを配信先にして、公開から閲覧までを試せます。クラウドのアカウントは要りません（リリースのダウンロードにネットワークは要ります）。プレビューの保持期間、権限、CDN、閲覧の制限は試せません。</p>
+      <figure class="fg" aria-labelledby="local-fig">
+        <div class="fg-head"><strong id="local-fig">ローカルで試すときの形</strong></div>
+        <div class="fg-body"><div class="fl"><div class="nd" data-kind="cli"><b>手元のCLI</b><small><code>app deploy</code>、<code>registry sync</code>、<code>site sync</code></small></div><span class="fl-a"><span>書き込む</span></span><div class="nd" data-kind="store"><b><code>.local/storage</code></b><small>配信先の代わりのディレクトリ</small></div><span class="fl-a"><span>配る</span></span><div class="nd" data-kind="cdn"><b>Webサーバー</b><small>パスごとの振り分けを設定する</small></div><span class="fl-a"><span>開く</span></span><div class="nd" data-kind="reader"><b>ブラウザ</b></div></div></div>
+      </figure>
       <ol>
         <li>試すリポジトリ（説明用の例では<code>acme/sre</code>のクローン）の直下に、次の設定ファイルを置きます。<code>repository</code>はそのリポジトリの<code>origin</code>と同じにし、<code>sourcePath</code>は公開したい資料のディレクトリにします。</li>
       </ol>

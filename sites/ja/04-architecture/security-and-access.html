@@ -29,10 +29,16 @@
         <h1>セキュリティとアクセス</h1>
       </div>
       <p class="lead">Artifact Pagesは、公開する人を信頼し、読む人の制限は配信先に任せる設計です。何が守られ、何が守られないかを知ったうえで、公開の権限と閲覧の制限を設計してください。</p>
+      <p class="answer"><span class="answer-label">要点</span>HTMLの資料は、閲覧アプリと同じオリジンで動く信頼したコードです。読者の制限は、配信先のホスト名に対して行います。</p>
     </header>
 
     <section class="doc-section" aria-labelledby="html">
       <h2 id="html">HTMLとMarkdownの信頼</h2>
+      <figure class="fg" aria-labelledby="origin-fig">
+        <div class="fg-head"><strong id="origin-fig">HTMLの資料のスクリプトが届く範囲</strong><span class="fg-note">説明用の例</span></div>
+        <div class="fg-body"><div class="zn" data-kind="origin"><span class="zn-l">同じオリジン（<code>https://docs.example.com</code>）</span><div class="nd" data-kind="app"><b>閲覧アプリ</b></div><div class="nd is-warn" data-kind="site"><b>HTMLの資料</b><small><code>sandbox</code>のないiframe。スクリプトが動く</small></div><div class="nd" data-kind="site"><b>ほかのサイトの資料</b></div><div class="nd" data-kind="app"><b>ブラウザの保存領域</b><small>ピン留め、最近読んだ資料</small></div><div class="nd" data-kind="site"><b>Markdownの資料</b><small>閲覧アプリが描画。スクリプトは動かない</small></div></div></div>
+        <figcaption>枠の中はすべて1つのオリジンで、1つの信頼の範囲です。iframeが分けるのはレイアウトとCSSで、スクリプトは分けません。</figcaption>
+      </figure>
       <div class="table-wrap"><table>
         <thead><tr><th></th><th>HTML</th><th>Markdown</th></tr></thead>
         <tbody>
@@ -57,6 +63,11 @@
       <h2 id="viewers">閲覧の制限</h2>
       <p>製品には、利用者のアカウント、ログイン、役割、サイトごとの閲覧の設定がありません。サイトを登録しないこと、一覧に出さないこと、推測しにくいURLを使うことは、どれも閲覧の制限になりません。</p>
       <p>読者を限るのは、配信先のホスト名に対する制限です。読者が開く論理的なURLだけでなく、一覧、資料、プレビューのファイルのパスにも効き、キャッシュから返す前に判定される必要があります。</p>
+      <figure class="fg" aria-labelledby="gate-fig">
+        <div class="fg-head"><strong id="gate-fig">閲覧の制限を置く場所</strong></div>
+        <div class="fg-body"><div class="fl"><div class="nd" data-kind="reader"><b>読者</b></div><span class="fl-a"></span><div class="nd is-new" data-kind="cdn"><b>閲覧の制限</b><small>IPアドレス、WAF、Cloudflare Accessなど</small><span class="nd-badge">ここ</span></div><span class="fl-a"></span><div class="nd" data-kind="cdn"><b>キャッシュ</b></div><span class="fl-a"></span><div class="nd" data-kind="store"><b>ストレージ</b></div></div></div>
+        <figcaption>制限はキャッシュより手前に置き、<code>/</code>や<code>/:site</code>のURLだけでなく、<code>/_indexes/</code>、<code>/_artifacts/</code>、<code>/_previews/</code>のすべてのパスに効かせます。</figcaption>
+      </figure>
       <div class="table-wrap"><table>
         <thead><tr><th>配信先</th><th>モジュールで設定できるもの</th><th>別に用意するもの</th></tr></thead>
         <tbody>

@@ -68,10 +68,10 @@ Config and stored formats are compatible with web.version.
     <section class="doc-section" aria-labelledby="breaking">
       <h2 id="breaking">形式が変わる更新</h2>
       <p>新しい版で保存の形式が変わり、古い閲覧アプリでは読めなくなる場合は、<code>config check</code>が失敗します。そのときは、次の順で計画的に移ります。</p>
-      <ol>
-        <li><code>registry sync --accept-breaking</code>で登録を新しい形式にします。</li>
-        <li><code>app deploy --accept-breaking</code>で新しい閲覧アプリを置きます。</li>
-        <li>新しいCLIで、すべてのサイトを公開し直します。</li>
+      <ol class="st">
+        <li><span class="st-who" data-kind="admin">管理者</span><b>登録を新しい形式にする</b><p><code>registry sync --accept-breaking</code></p></li>
+        <li><span class="st-who" data-kind="admin">管理者</span><b>新しい閲覧アプリを置く</b><p><code>app deploy --accept-breaking</code>。ここから、まだ古い形式のサイトを開くと<strong>This site needs to be republished</strong>と表示されます。</p></li>
+        <li><span class="st-who" data-kind="team">各サイト</span><b>新しいCLIで公開し直す</b><p>すべてのサイトを公開し直すと、表示が戻ります。</p></li>
       </ol>
       <p><code>--accept-breaking</code>があるのは<code>registry sync</code>と<code>app deploy</code>だけです。公開し直すまでの間、まだ古い形式のサイトを開くと、閲覧アプリは<strong>This site needs to be republished</strong>と表示します。</p>
     </section>

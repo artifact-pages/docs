@@ -29,10 +29,15 @@
         <h1>公開とプレビューの仕組み</h1>
       </div>
       <p class="lead">公開は、公開元のディレクトリと配信先の投影の差分を同期する操作です。データベースやサーバーはなく、ストレージの上のファイルと、ロックや状態の記録だけで、途中で失敗してもやり直せば収まるように作られています。</p>
+      <p class="answer"><span class="answer-label">要点</span>公開は、ロックの中で差分を書く同期です。途中で失敗しても、同じ公開をやり直せば収まります。ただし、複数のファイルは一度には切り替わりません。</p>
     </header>
 
     <section class="doc-section" aria-labelledby="layout">
       <h2 id="layout">配信先のファイルの配置</h2>
+      <figure class="fg" aria-labelledby="layout-fig">
+        <div class="fg-head"><strong id="layout-fig">バケットの中の領域</strong></div>
+        <div class="fg-body"><div class="zn" data-kind="cloud"><span class="zn-l">配信先のバケット</span><div class="zn" data-kind="plain"><span class="zn-l">読者に返す</span><div class="nd" data-kind="app"><b>閲覧アプリ</b><small><code>/index.html</code>、<code>/assets/…</code></small></div><div class="nd" data-kind="registry"><b>サイトの登録情報</b><small><code>/_indexes/sites.json</code></small></div><div class="nd" data-kind="site"><b>サイトの一覧と検索のデータ</b><small><code>/_indexes/&lt;site&gt;/…</code></small></div><div class="nd" data-kind="site"><b>公開元のファイル</b><small><code>/_artifacts/&lt;site&gt;/…</code></small></div><div class="nd" data-kind="preview"><b>プレビュー</b><small><code>/_previews/&lt;site&gt;/…</code></small></div></div><div class="zn" data-kind="private"><span class="zn-l">読者に返さない</span><div class="nd" data-kind="registry"><b>内部の記録</b><small><code>/_control/sites/&lt;site&gt;/…</code>：ロック、公開の状態、再試行の記録、書いた形式</small></div></div></div></div>
+      </figure>
       <div class="table-wrap"><table>
         <thead><tr><th>パス</th><th>中身</th></tr></thead>
         <tbody>
@@ -49,6 +54,11 @@
 
     <section class="doc-section" aria-labelledby="sync">
       <h2 id="sync">同期、状態の記録、再試行</h2>
+      <figure class="fg" aria-labelledby="sync-fig">
+        <div class="fg-head"><strong id="sync-fig">1回の公開の中で、何がいつ起こるか</strong></div>
+        <div class="fg-body"><div class="bn" style="--cols:9"><div class="bn-t"><span>ロック</span><span>登録</span><span>比較</span><span>計画</span><span>記録</span><span>書く</span><span>消す</span><span>キャッシュ</span><span>終了</span></div><div class="bn-r"><span class="bn-l">サイトのロック</span><span class="bn-b" data-kind="lock" style="--from:1;--to:9">持っている</span></div><div class="bn-r"><span class="bn-l">再試行の記録</span><span class="bn-b" data-kind="cache" style="--from:5;--to:9">残っている</span></div><div class="bn-r"><span class="bn-l">配信先への書き込み</span><span class="bn-b" data-kind="work" style="--from:6;--to:7">新旧が混ざりうる</span></div><div class="bn-r"><span class="bn-l">試し実行</span><span class="bn-b" data-kind="wait" style="--from:2;--to:4">読むだけ（ロックなし）</span></div><ul class="bn-k"><li data-kind="lock">サイトのロックを持つ期間</li><li data-kind="cache">再試行の記録がある期間</li><li data-kind="work">配信先のファイルを書き換える期間</li><li data-kind="wait">試し実行が行う範囲</li></ul></div></div>
+        <figcaption>前回と同じなら「比較」で<code>no-op</code>として終わり、書き込みはありません。「記録」のあとのどこで失敗しても再試行の記録が残り、次の公開が続きを行います。<span class="fg-scroll">図は横にスクロールして見られます。</span></figcaption>
+      </figure>
       <ol>
         <li><strong>ロックを取り、登録を確かめる。</strong>サイトのロックを取ってから、配信先の登録を読み直し、公開元のリポジトリとディレクトリが登録どおりかを確かめます。同じサイトの公開、プレビュー、登録の変更は同じロックを使い、別のサイトの公開とは並んで進みます。</li>
         <li><strong>前回と同じなら何もしない。</strong>公開元の内容から求めた値を、前回の公開の状態の記録（<code>publish-state.json.gz</code>）と比べます。同じなら、投影を組み立てず、配信先の個々のファイルも確かめずに<code>no-op</code>で終わります。</li>
@@ -67,6 +77,10 @@
 
     <section class="doc-section" aria-labelledby="preview">
       <h2 id="preview">プレビューのリビジョンとグループ</h2>
+      <figure class="fg" aria-labelledby="rev-fig">
+        <div class="fg-head"><strong id="rev-fig">グループとリビジョン</strong><span class="fg-note">説明用の例</span></div>
+        <div class="fg-body"><div class="bd"><section class="bd-col"><h4 class="bd-h">グループの一覧</h4><div class="nd" data-kind="preview"><b><code>pr:42</code></b><small><code>/sre/_previews?group=pr%3A42</code>。いつも最新のリビジョンを指す</small></div></section><div class="bd-a"><span>最新を指す</span></div><section class="bd-col"><h4 class="bd-h">リビジョン（コミットごと）</h4><div class="nd is-dim" data-kind="preview"><b><code>a1b2c3d</code></b><small>古いリビジョン。一覧からは外れるが、ファイルが残る間は開ける</small></div><div class="nd is-new" data-kind="preview"><b><code>e4f5a6b</code></b><small>最新のリビジョン。一度できたら変わらない</small><span class="nd-badge">最新</span></div></section></div></div>
+      </figure>
       <ul>
         <li><strong>入力。</strong>本公開は作業ツリーのファイル（生成したファイルや未追跡のファイルも含む）を使いますが、プレビューはプルリクエストの先頭のコミットに含まれるファイルを使います。</li>
         <li><strong>対象の選び方。</strong>既定のブランチとのmerge baseからの変更を調べ、追加・変更した資料と、変更したリソースを参照している資料、それらが使うリソースを含めます。</li>
