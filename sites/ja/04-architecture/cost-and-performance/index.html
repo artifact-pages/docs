@@ -1,0 +1,115 @@
+<!doctype html>
+<html lang="ja">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="description" content="Artifact Pagesの費用、処理時間、転送量がどこで生まれるか。キャッシュの設定と、ブラウザの計測、CLIのメモリの計測、費用のモデルの結果と、その条件。">
+  <title>コストとパフォーマンス — Artifact Pages ドキュメント</title>
+  <script>
+    // Copy the reader app's theme (same-origin parent) before first paint; assets/site.js keeps it in sync.
+    (() => {
+      const root = document.documentElement;
+      root.classList.add('js');
+      try {
+        const theme = window.parent !== window && window.parent.document.documentElement.dataset.theme;
+        if (theme === 'light' || theme === 'dark') root.dataset.theme = theme;
+      } catch { /* cross-origin: fall back to prefers-color-scheme */ }
+    })();
+  </script>
+  <link rel="icon" href="data:,">
+  <link rel="stylesheet" href="../../assets/site.css">
+  <script src="../../assets/site.js" defer></script>
+</head>
+<body>
+  <a class="skip" href="#main">本文へ移動</a>
+  <main id="main" class="wrap">
+    <header class="page-head">
+      <div>
+        <p class="eyebrow">アーキテクチャ · コストとパフォーマンス</p>
+        <h1>コストとパフォーマンス</h1>
+      </div>
+      <p class="lead">費用と速さは、公開と閲覧の処理のどこで、何がどれだけ動くかで決まります。このページでは共通の要因と、これまでの計測の結果を、計測の条件とあわせて示します。数字は計測した条件での値で、性能や請求額の保証ではありません。</p>
+    </header>
+
+    <section class="doc-section" aria-labelledby="factors">
+      <h2 id="factors">費用と時間の要因</h2>
+      <div class="table-wrap"><table>
+        <thead><tr><th>場面</th><th>何が動くか</th></tr></thead>
+        <tbody>
+          <tr><td>保存</td><td>公開した資料、一覧、検索のデータ、プレビューのリビジョン（保持期間の間）、閲覧アプリのファイル</td></tr>
+          <tr><td>公開</td><td>ロックと状態の記録の読み書き、変わったファイルと一覧の書き込み、キャッシュの削除。資料が1つ変わっただけでも、サイトの<code>index.json</code>全体を読み書きします。変更がなければ小さな記録の読み書きだけです</td></tr>
+          <tr><td>閲覧</td><td>閲覧アプリ、サイトの一覧、資料の取得。キャッシュに当たらなかったリクエストはストレージまで届きます。キャッシュに当たっても、読者への転送の費用がなくなるとは限りません</td></tr>
+          <tr><td>検索</td><td>検索のデータのうち、必要な区画だけの取得</td></tr>
+        </tbody>
+      </table></div>
+    </section>
+
+    <section class="doc-section" aria-labelledby="cache">
+      <h2 id="cache">キャッシュの設定</h2>
+      <div class="table-wrap"><table>
+        <thead><tr><th>対象</th><th><code>Cache-Control</code></th></tr></thead>
+        <tbody>
+          <tr><td>閲覧アプリの入口のファイル</td><td><code>no-cache, max-age=0, must-revalidate</code></td></tr>
+          <tr><td>ハッシュ付きの閲覧アプリのファイル</td><td><code>public, max-age=31536000, immutable</code></td></tr>
+          <tr><td>登録情報、概要、一覧、検索の目次</td><td><code>public, max-age=0, s-maxage=60, must-revalidate</code></td></tr>
+          <tr><td>公開した資料</td><td><code>public, max-age=0, s-maxage=300, must-revalidate</code></td></tr>
+          <tr><td>検索のデータの区画</td><td><code>public, max-age=31536000, immutable</code></td></tr>
+          <tr><td>内部の記録</td><td><code>no-store</code>（読者には返さない）</td></tr>
+        </tbody>
+      </table></div>
+      <p>CDNは一覧を最大60秒、資料を最大300秒キャッシュするので、公開の直後はその間、古い内容が返ることがあります。公開のたびに変わったURLのキャッシュを削除して、これを短くしています。</p>
+    </section>
+
+    <section class="doc-section" aria-labelledby="browser">
+      <h2 id="browser">ブラウザでの計測</h2>
+      <p>合成した資料（1千から5万件）のサイトを、手元のnginxで配信して計測しました。Apple M4（32 GB）、Chromium 153、3回の中央値です。nginxは圧縮していません。閲覧アプリは計測時点の版で、いまの版での再計測ではありません。</p>
+      <div class="table-wrap"><table>
+        <thead><tr><th>資料の数</th><th><code>index.json</code>（展開後 / gzip換算）</th><th>検索のデータ（ファイル数 / 量）</th><th>手元での<code>site sync</code></th></tr></thead>
+        <tbody>
+          <tr><td>1,000</td><td>0.78 MB / 39.9 kB</td><td>175 / 0.46 MB</td><td>12.9秒</td></tr>
+          <tr><td>5,000</td><td>4.39 MB / 265.6 kB</td><td>350 / 2.07 MB</td><td>62.0秒</td></tr>
+          <tr><td>10,000</td><td>8.92 MB / 529.5 kB</td><td>567 / 4.07 MB</td><td>146.4秒</td></tr>
+          <tr><td>50,000</td><td>45.90 MB / 2.63 MB</td><td>1,478 / 13.85 MB</td><td>656.1秒</td></tr>
+        </tbody>
+      </table></div>
+      <ul>
+        <li>サイトの一覧の画面（<code>/</code>）は、どの規模でも約840 kB、6リクエストでした。資料の数には比例しません。</li>
+        <li>通信を絞らない条件で、資料（Mermaidの図を含むMarkdown）を初めて開いて図が描かれるまでは、1千件で260 ms、5万件で1,369 msでした。転送量は2.42 MBから47.54 MBに増えます。</li>
+        <li>通信を絞った条件（CPU 4倍遅く、往復150 ms、下り1.6 Mbps）では、1千件で13.8秒かかり、5千件以上は<code>index.json</code>の読み込みが20秒の制限を超えて失敗しました。</li>
+        <li>5万件のサイトの本文検索は、最初の検索が282 ms（6ファイル、1.93 MB）で、続く検索は前の検索で読んだデータを使うため74から118 msでした。</li>
+        <li>5万件のうち18,956件（約38%）は、抜粋のデータの上限のため抜粋なしになりました。</li>
+      </ul>
+      <p>詳しい条件と、ここに載せていない数値は、製品の<a href="https://github.com/artifact-pages/artifact-pages/blob/main/docs/research/web-scale-benchmark.md" target="_blank" rel="noopener">計測の報告（英語）</a>にあります。</p>
+    </section>
+
+    <section class="doc-section" aria-labelledby="cli">
+      <h2 id="cli">CLIのメモリ</h2>
+      <p>CLIは公開元をメモリに読み込んで処理します。Mac（arm64、32 GiB）の手元のファイルシステムに公開し、ピーク時のメモリ（RSS）を3回の中央値で測りました。クラウドへのアップロードやGitHubのランナーでは測っていません。</p>
+      <div class="table-wrap"><table>
+        <thead><tr><th>公開元</th><th>初回 / 変更なし / 差分あり</th></tr></thead>
+        <tbody>
+          <tr><td>小さなファイル10,000個（195.3 MiB）</td><td>749.9 / 236.8 / 783.9 MiB</td></tr>
+          <tr><td>256 MiBのファイル1つ</td><td>542.2 / 278.0 / 541.8 MiB</td></tr>
+          <tr><td>512 MiBのファイル1つ</td><td>1054.3 / 534.3 / 1055.5 MiB</td></tr>
+          <tr><td>大きなファイルで合計1000.2 MiB</td><td>2032.1 / 1023.6 / 2032.7 MiB</td></tr>
+        </tbody>
+      </table></div>
+      <p>大きな公開元では、書き込みを伴う公開で公開元の約2倍、変更なしで約1倍のメモリを使います。文書で示している対応の範囲は、1ファイル512 MiB、1回の公開の合計1 GiBまでです。CLIはこれを超える入力を拒否しないので、ランナーのメモリに注意してください。</p>
+    </section>
+
+    <section class="doc-section" aria-labelledby="model">
+      <h2 id="model">費用のモデル</h2>
+      <p>操作の回数を数えるだけの仮の配信先で公開と閲覧を再現し、2026年10月18日の公開価格を当てはめて月額を見積もりました。実際のHTTPのリクエスト数や請求の記録ではありません。プレビュー、登録の反映、閲覧アプリの配置の費用は含めていません。配信先ごとの結果は各ページにあります。</p>
+      <ul class="cards two">
+        <li><a class="card" href="cloudflare.html"><span class="tag">R2 · Cloudflare Cache</span><h3>Cloudflare</h3><p>構成、キャッシュの削除のまとめ方、見積もり。</p><span class="go">詳しく →</span></a></li>
+        <li><a class="card" href="aws.html"><span class="tag">S3 · CloudFront</span><h3>AWS</h3><p>構成、一覧の圧縮、キャッシュの無効化の費用、見積もり。</p><span class="go">詳しく →</span></a></li>
+      </ul>
+    </section>
+
+    <nav class="pager" aria-label="ページ送り">
+      <a class="prev" href="../security-and-access.html"><small>前へ</small><strong>セキュリティとアクセス</strong></a>
+      <a class="next" href="cloudflare.html"><small>次へ</small><strong>コストとパフォーマンス：Cloudflare</strong></a>
+    </nav>
+  </main>
+</body>
+</html>

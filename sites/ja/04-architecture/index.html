@@ -1,0 +1,85 @@
+<!doctype html>
+<html lang="ja">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="description" content="Artifact Pagesの全体構成と設計方針。Gitを正本にしたサイトごとの静的な公開、共通の閲覧アプリ、リクエストを処理するサーバーのない配信。">
+  <title>アーキテクチャ — Artifact Pages ドキュメント</title>
+  <script>
+    // Copy the reader app's theme (same-origin parent) before first paint; assets/site.js keeps it in sync.
+    (() => {
+      const root = document.documentElement;
+      root.classList.add('js');
+      try {
+        const theme = window.parent !== window && window.parent.document.documentElement.dataset.theme;
+        if (theme === 'light' || theme === 'dark') root.dataset.theme = theme;
+      } catch { /* cross-origin: fall back to prefers-color-scheme */ }
+    })();
+  </script>
+  <link rel="icon" href="data:,">
+  <link rel="stylesheet" href="../assets/site.css">
+  <script src="../assets/site.js" defer></script>
+</head>
+<body>
+  <a class="skip" href="#main">本文へ移動</a>
+  <main id="main" class="wrap">
+    <header class="page-head">
+      <div>
+        <p class="eyebrow">アーキテクチャ</p>
+        <h1>アーキテクチャの全体像</h1>
+      </div>
+      <p class="lead">Artifact Pagesは、各サイトの静的なファイルをオブジェクトストレージに置き、ブラウザで動く閲覧アプリがそれを読む構成です。この章では、なぜこの形なのか、どこに境界とトレードオフがあるのかを説明します。</p>
+    </header>
+
+    <section class="doc-section" aria-labelledby="shape">
+      <h2 id="shape">全体の構成</h2>
+      <p>Gitのリポジトリから、CLIがサイトごとに静的なファイルの集まり（以下、投影）を作り、配信先のストレージに同期します。読者のブラウザは、CDNから閲覧アプリとそのファイルを受け取り、すべての画面をブラウザの中で組み立てます。</p>
+      <div class="term" aria-label="公開から閲覧までの経路">
+        <div class="term-head"><span>経路</span></div>
+<pre>Gitのリポジトリ ──CLI（site sync）──▶ オブジェクトストレージ ──CDN──▶ ブラウザの閲覧アプリ
+                                       R2 / S3                Cloudflare / CloudFront</pre>
+      </div>
+      <p>読者のリクエストを処理するアプリケーションサーバーはありません。配信の経路にあるのは、ストレージと、URLの振り分けとキャッシュの規則だけです（AWSでは、URLの振り分けにCloudFront Functionsを使います）。</p>
+      <div class="table-wrap"><table>
+        <thead><tr><th>領域</th><th>パス</th><th>中身</th></tr></thead>
+        <tbody>
+          <tr><td>閲覧アプリ</td><td><code>/index.html</code>、<code>/assets/*</code>など</td><td>ブラウザで動くアプリ（React）</td></tr>
+          <tr><td>コンテンツ</td><td><code>/_indexes/*</code>、<code>/_artifacts/*</code>、<code>/_previews/*</code></td><td>サイトの登録情報と一覧、公開された資料、プレビュー</td></tr>
+          <tr><td>内部の記録</td><td><code>/_control/*</code></td><td>ロックや公開の状態。読者には中身を返しません。</td></tr>
+          <tr><td>読者が開くURL</td><td><code>/</code>、<code>/:site</code>、<code>/:site/*</code></td><td>閲覧アプリが解釈する論理的なURL</td></tr>
+        </tbody>
+      </table></div>
+    </section>
+
+    <section class="doc-section" aria-labelledby="principles">
+      <h2 id="principles">設計方針</h2>
+      <ul>
+        <li><strong>Gitが正本。</strong>資料はGitで書いてレビューし、配信先にあるのはその写しです。Artifact Pagesの中で編集はしません。CLIはテンプレートの展開やビルドをせず、公開元のファイルをそのまま扱います。</li>
+        <li><strong>サイトごとに独立して公開する。</strong>全サイトをまとめるビルドはなく、各サイトは自分の領域だけを同期します。ただし、閲覧アプリの配置は形式の確認のために全サイトのロックを取るなど、すべての操作がまったく無関係というわけではありません。</li>
+        <li><strong>読む場所はひとつ。</strong>閲覧アプリは全サイトに共通です。探し方と読み方がサイトごとに違うことはありません。</li>
+        <li><strong>URLは公開元のパス。</strong>読者が共有するURLは<code>/&lt;サイト&gt;/&lt;公開元からのパス&gt;</code>で、ストレージの内部のパスではありません。拡張子も残ります。</li>
+        <li><strong>閲覧の制限は配信の端で。</strong>製品には利用者のアカウントがなく、閲覧の制限は配信先のホスト名に対して行います。</li>
+      </ul>
+    </section>
+
+    <section class="doc-section" aria-labelledby="pages">
+      <h2 id="pages">この章のページ</h2>
+      <div class="table-wrap"><table>
+        <thead><tr><th>ページ</th><th>扱うこと</th></tr></thead>
+        <tbody>
+          <tr><td><a href="repositories-and-updates.html">リポジトリと更新の単位</a></td><td>管理リポジトリとサテライト、何がどの単位で更新されるか</td></tr>
+          <tr><td><a href="publishing-and-previews.html">公開とプレビューの仕組み</a></td><td>保存の配置、同期と状態の記録、プレビューのリビジョン、削除と保持</td></tr>
+          <tr><td><a href="reading-and-search.html">閲覧と検索の仕組み</a></td><td>閲覧アプリが読むもの、名前の検索、静的な本文検索、規模の限界</td></tr>
+          <tr><td><a href="security-and-access.html">セキュリティとアクセス</a></td><td>HTMLとMarkdownの信頼、CSP、閲覧の制限、公開の認証情報の分け方</td></tr>
+          <tr><td><a href="cost-and-performance/index.html">コストとパフォーマンス</a></td><td>費用、処理時間、転送量の要因と、配信先ごとの最適化</td></tr>
+        </tbody>
+      </table></div>
+    </section>
+
+    <nav class="pager" aria-label="ページ送り">
+      <a class="prev" href="../03-operations/troubleshooting.html"><small>前へ</small><strong>問題を調べ、復旧する</strong></a>
+      <a class="next" href="repositories-and-updates.html"><small>次へ</small><strong>リポジトリと更新の単位</strong></a>
+    </nav>
+  </main>
+</body>
+</html>

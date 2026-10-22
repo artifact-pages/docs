@@ -1,0 +1,80 @@
+<!doctype html>
+<html lang="ja">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="description" content="AWSのS3とCloudFrontでの構成、大きな一覧の事前の圧縮、キャッシュの無効化の費用、費用のモデルによる月額の見積もりとその前提。">
+  <title>コストとパフォーマンス：AWS — Artifact Pages ドキュメント</title>
+  <script>
+    // Copy the reader app's theme (same-origin parent) before first paint; assets/site.js keeps it in sync.
+    (() => {
+      const root = document.documentElement;
+      root.classList.add('js');
+      try {
+        const theme = window.parent !== window && window.parent.document.documentElement.dataset.theme;
+        if (theme === 'light' || theme === 'dark') root.dataset.theme = theme;
+      } catch { /* cross-origin: fall back to prefers-color-scheme */ }
+    })();
+  </script>
+  <link rel="icon" href="data:,">
+  <link rel="stylesheet" href="../../assets/site.css">
+  <script src="../../assets/site.js" defer></script>
+</head>
+<body>
+  <a class="skip" href="#main">本文へ移動</a>
+  <main id="main" class="wrap">
+    <header class="page-head">
+      <div>
+        <p class="eyebrow">アーキテクチャ · コストとパフォーマンス</p>
+        <h1>AWS：構成と最適化</h1>
+      </div>
+      <p class="lead">AWSではS3の非公開バケットをCloudFrontで配信します。費用の中心は、CloudFrontから読者への転送と、公開のたびに行うキャッシュの無効化です。</p>
+    </header>
+
+    <section class="doc-section" aria-labelledby="shape">
+      <h2 id="shape">構成</h2>
+      <ul>
+        <li>S3はOAC（オリジンアクセスコントロール）でCloudFrontからだけ読めるようにし、CloudFront Functionsで読者が開くURLを閲覧アプリへ振り分けます。各ビヘイビアで圧縮を有効にします。</li>
+        <li>配信する地域は既定で<code>PriceClass_100</code>です。WAF、独自ドメイン、証明書を使うと、その分の構成と費用が増えます。</li>
+      </ul>
+    </section>
+
+    <section class="doc-section" aria-labelledby="gzip">
+      <h2 id="gzip">大きな一覧の事前の圧縮</h2>
+      <p>CloudFrontが自動で圧縮するのは1,000バイトから10,000,000バイトのファイルです。大きなサイトの<code>index.json</code>はこれを超えるので、CLI 0.5.0以降はAWSに書くときに、<code>index.json</code>と検索の目次<code>search/manifest.json</code>を自分でgzipにして、<code>Content-Encoding: gzip</code>を付けて置きます。URL、<code>Content-Type</code>、キャッシュの設定は変わりません。</p>
+      <p>手元のnginxで5万件のサイトを配り、通信を絞った条件（CPU 4倍遅く、往復150 ms、下り1.6 Mbps）で測ると、<code>index.json</code>は転送が約2.48 MB（展開後約45.9 MB）になり、3回とも約12.8秒で読み込みが終わりました（20秒の制限の内）。これはAWSでの実際の配信の計測ではありません。圧縮しても、ブラウザが展開して読み込む量は変わりません。</p>
+      <p>一度0.5.0以降で書いたサイトには、それより古いCLIで書き込まないでください。圧縮を止める設定や、自動で元の形式に戻す仕組みはありません。移る手順は「<a href="../../03-operations/upgrade.html#catch-up">閲覧アプリ・CLI・Actionsを更新する</a>」にあります。</p>
+    </section>
+
+    <section class="doc-section" aria-labelledby="invalidation">
+      <h2 id="invalidation">キャッシュの無効化</h2>
+      <p>公開のたびに、変わったURLを無効化します。資料の無効化が1,000パスを超えるときなどは、そのサイトの<code>/_artifacts/&lt;site&gt;/*</code>にまとめます。ディストリビューション全体の<code>/*</code>には広げません。</p>
+      <p>CloudFrontの無効化は、アカウント全体で月1,000パスまで無料で、それを超えると1パスごとに課金されます（ワイルドカードは1パスとして数えます）。計測では、初回の公開で1千件、5千件、5万件のサイトがそれぞれ178、353、1,481パス、資料1つの変更で3パスでした。公開の回数が多い環境では、無効化が費用の大きな部分になります。</p>
+    </section>
+
+    <section class="doc-section" aria-labelledby="model">
+      <h2 id="model">費用のモデル</h2>
+      <p>S3（us-east-1）とCloudFront（PriceClass_100）の2026年10月18日の公開価格を、操作を数えた結果に当てはめた30日の見積もりです。想定はCloudflareのページと同じです。</p>
+      <div class="table-wrap"><table>
+        <thead><tr><th>想定</th><th>キャッシュに当たらない割合 10%</th><th>50%</th><th>100%</th></tr></thead>
+        <tbody>
+          <tr><td>S</td><td>$4.05</td><td>$4.21</td><td>$4.42</td></tr>
+          <tr><td>M</td><td>$353.67</td><td>$356.97</td><td>$361.09</td></tr>
+          <tr><td>L</td><td>$1,972.66</td><td>$1,989.16</td><td>$2,009.79</td></tr>
+        </tbody>
+      </table></div>
+      <ul>
+        <li>このモデルでは、読者が資料を開くたびに圧縮していない<code>index.json</code>を取得すると仮定しています。転送の費用（Mで約$225、Lで約$1,745）は多めに見積もった上限で、事前の圧縮を入れたいまの配信での予測ではありません。</li>
+        <li>キャッシュの無効化（Mで約$115、Lで約$125）を含みます。圧縮は転送を減らしますが、無効化のパス数は減らしません。</li>
+        <li>CloudFront Functionsの費用、プレビュー、登録の反映、閲覧アプリの配置、WAFの費用は含みません。</li>
+      </ul>
+      <p>前提と内訳は製品の<a href="https://github.com/artifact-pages/artifact-pages/blob/main/docs/research/hosting-cost-model.md" target="_blank" rel="noopener">費用のモデル（英語）</a>にあります。最新の価格は<a href="https://aws.amazon.com/cloudfront/pricing/" target="_blank" rel="noopener">CloudFront</a>と<a href="https://aws.amazon.com/s3/pricing/" target="_blank" rel="noopener">S3</a>の料金で確かめてください。</p>
+    </section>
+
+    <nav class="pager" aria-label="ページ送り">
+      <a class="prev" href="cloudflare.html"><small>前へ</small><strong>コストとパフォーマンス：Cloudflare</strong></a>
+      <a class="next" href="../../05-reference/index.html"><small>次へ</small><strong>リファレンス</strong></a>
+    </nav>
+  </main>
+</body>
+</html>
