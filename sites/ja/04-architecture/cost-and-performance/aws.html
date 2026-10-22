@@ -42,7 +42,7 @@
     <section class="doc-section" aria-labelledby="gzip">
       <h2 id="gzip">大きな一覧の事前の圧縮</h2>
       <p>CloudFrontが自動で圧縮するのは1,000バイトから10,000,000バイトのファイルです。大きなサイトの<code>index.json</code>はこれを超えるので、CLI 0.5.0以降はAWSに書くときに、<code>index.json</code>と検索の目次<code>search/manifest.json</code>を自分でgzipにして、<code>Content-Encoding: gzip</code>を付けて置きます。URL、<code>Content-Type</code>、キャッシュの設定は変わりません。</p>
-      <p>手元のnginxで5万件のサイトを配り、通信を絞った条件（CPU 4倍遅く、往復150 ms、下り1.6 Mbps）で測ると、<code>index.json</code>は転送が約2.48 MB（展開後約45.9 MB）になり、3回とも約12.8秒で読み込みが終わりました（20秒の制限の内）。これはAWSでの実際の配信の計測ではありません。圧縮しても、ブラウザが展開して読み込む量は変わりません。</p>
+      <p>手元のnginxで5万件のサイトを配り、通信を絞った条件（CPU 4倍遅く、往復150 ms、下り1.6 Mbps）で測ると、<code>index.json</code>は転送が約2.48 MB（展開後約45.9 MB）になり、3回とも約12.8秒で読み込みが終わりました（20秒の制限の内）。2026年10月18日の計測で、AWSでの実際の配信の計測ではありません。記録は製品の<a href="https://github.com/artifact-pages/artifact-pages/blob/main/docs/backlog/issues/ISSUE-112-aws-large-generated-json-delivery.md" target="_blank" rel="noopener">ISSUE-112（英語）</a>にあります。圧縮しても、ブラウザが展開して読み込む量は変わりません。</p>
       <p>一度0.5.0以降で書いたサイトには、それより古いCLIで書き込まないでください。圧縮を止める設定や、自動で元の形式に戻す仕組みはありません。移る手順は「<a href="../../03-operations/upgrade.html#catch-up">閲覧アプリ・CLI・Actionsを更新する</a>」にあります。</p>
     </section>
 
@@ -54,7 +54,7 @@
 
     <section class="doc-section" aria-labelledby="model">
       <h2 id="model">費用のモデル</h2>
-      <p>S3（us-east-1）とCloudFront（PriceClass_100）の2026年10月18日の公開価格を、操作を数えた結果に当てはめた30日の見積もりです。想定はCloudflareのページと同じです。</p>
+      <p>S3（us-east-1）とCloudFront（PriceClass_100）の2026年10月18日の公開価格を、操作を数えた結果に当てはめた30日の見積もりです。想定（ページ数の代用、公開と検索の回数を含む）はCloudflareのページと同じです。</p>
       <div class="table-wrap"><table>
         <thead><tr><th>想定</th><th>キャッシュに当たらない割合10%</th><th>50%</th><th>100%</th></tr></thead>
         <tbody>
@@ -66,6 +66,7 @@
       <ul>
         <li>このモデルでは、読者が資料を開くたびに圧縮していない<code>index.json</code>を取得すると仮定しています。転送の費用（Mで約$225、Lで約$1,745）は多めに見積もった上限で、事前の圧縮を入れたいまの配信での予測ではありません。</li>
         <li>キャッシュの無効化（Mで約$115、Lで約$125）を含みます。圧縮は転送を減らしますが、無効化のパス数は減らしません。</li>
+        <li>CloudFrontのリクエストは、米国・カナダの単価で計算し、無料枠（月1 TB、1,000万リクエスト）をこの用途に使える前提です。PriceClass_100の中で最も高い地域の単価では、キャッシュに当たらない割合10%でMが$355.91、Lが$1,991.89になります。</li>
         <li>CloudFront Functionsの費用、プレビュー、登録の反映、閲覧アプリの配置、WAFの費用は含みません。</li>
       </ul>
       <p>前提と内訳は製品の<a href="https://github.com/artifact-pages/artifact-pages/blob/main/docs/research/hosting-cost-model.md" target="_blank" rel="noopener">費用のモデル（英語）</a>にあります。最新の価格は<a href="https://aws.amazon.com/cloudfront/pricing/" target="_blank" rel="noopener">CloudFront</a>と<a href="https://aws.amazon.com/s3/pricing/" target="_blank" rel="noopener">S3</a>の料金で確かめてください。</p>

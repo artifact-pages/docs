@@ -76,8 +76,8 @@
       <p>誰かが配信先のファイルを直接消したり置き換えたりすると、公開の内容とずれます。通常の公開は、公開元が前回と同じなら配信先の個々のファイルを確かめずに<code>no-op</code>で終わるので、このずれには気付きません。</p>
       <div class="term" aria-label="配信先と突き合わせて直す">
         <div class="term-head"><span>ターミナル / チームのリポジトリ</span><button class="copy-btn" type="button">コピー</button></div>
-<pre><span class="p">$</span> <span data-copy>artifact-pages site sync --site sre --config artifact-pages.yaml --reconcile --dry-run</span>
-<span class="p">$</span> <span data-copy>artifact-pages site sync --site sre --config artifact-pages.yaml --reconcile</span></pre>
+<pre><span class="p">$</span> <span data-copy>artifact-pages site sync --site sre --config 'github://acme/platform-admin/artifact-pages.yaml?ref=main' --reconcile --dry-run</span>
+<span class="p">$</span> <span data-copy>artifact-pages site sync --site sre --config 'github://acme/platform-admin/artifact-pages.yaml?ref=main' --reconcile</span></pre>
       </div>
       <p><code>--reconcile</code>は、配信先のファイルの一覧とメタデータを公開元と突き合わせ、足りないファイル、余分なファイル、メタデータの違いを直します。ファイルの中身までは読まないので、メタデータを保ったまま中身だけが壊れた場合は見つけられません。公開した内容そのものが間違っている場合は、正しいコミットを取り出して公開し直します。<code>--ref</code>は表示用の情報を変えるだけで、公開する内容は変えません。</p>
     </section>

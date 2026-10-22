@@ -54,7 +54,7 @@
           <tr><td><code>account_id</code>、<code>zone_id</code></td><td>string</td><td>必須。32桁の16進数。</td></tr>
           <tr><td><code>public_hostname</code></td><td>string</td><td>必須。スキーム、ポート、パスなし。最大253文字、各ラベル63文字。</td></tr>
           <tr><td><code>preview_retention_days</code></td><td>number</td><td>必須。1から36500の整数。</td></tr>
-          <tr><td><code>bucket_name</code></td><td>string</td><td><code>"artifact-pages"</code>。空とnullは不可。</td></tr>
+          <tr><td><code>bucket_name</code></td><td>string</td><td><code>"artifact-pages"</code>。空の文字列は不可。nullを渡すと既定値になる。</td></tr>
           <tr><td><code>access_key_id_env</code></td><td>string</td><td><code>"CF_R2_ACCESS_KEY_ID"</code></td></tr>
           <tr><td><code>secret_access_key_env</code></td><td>string</td><td><code>"CF_R2_SECRET_ACCESS_KEY"</code></td></tr>
           <tr><td><code>api_token_env</code></td><td>string</td><td><code>"CF_API_TOKEN"</code></td></tr>
@@ -85,7 +85,7 @@
           <tr><td><code>github_oidc_issuer_url</code></td><td>string</td><td><code>"https://token.actions.githubusercontent.com"</code></td></tr>
           <tr><td><code>aliases</code></td><td>list(string)</td><td><code>[]</code>。DNSは呼び出し側で作る。</td></tr>
           <tr><td><code>acm_certificate_arn</code></td><td>string</td><td><code>null</code>。<code>aliases</code>を使うなら<code>us-east-1</code>の証明書。</td></tr>
-          <tr><td><code>viewer_protocol_policy</code></td><td>string</td><td>既定は<code>"redirect-to-https"</code>。ほかに<code>"https-only"</code>を選べる。nullは不可。</td></tr>
+          <tr><td><code>viewer_protocol_policy</code></td><td>string</td><td>既定は<code>"redirect-to-https"</code>。ほかに<code>"https-only"</code>を選べる。nullを渡すと既定値になる。</td></tr>
           <tr><td><code>price_class</code></td><td>string</td><td><code>"PriceClass_100"</code>。<code>PriceClass_200</code>、<code>PriceClass_All</code>も可。</td></tr>
           <tr><td><code>web_acl_arn</code></td><td>string</td><td><code>null</code>。自分で管理するWAFのACL。<code>waf_custom_rules</code>とは同時に使えない。</td></tr>
           <tr><td><code>waf_custom_rules</code></td><td>object</td><td><code>null</code>。<code>default_action</code>（既定は許可）、<code>presets</code>（<code>ip_allowlist</code>）、<code>rules</code>、<code>custom_response_bodies</code>、可視化の設定。</td></tr>

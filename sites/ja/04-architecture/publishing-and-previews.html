@@ -73,7 +73,7 @@
         <li><strong>リビジョン。</strong>プレビューはコミットのSHAごとに<code>/_previews/&lt;site&gt;/revisions/&lt;SHA&gt;/</code>に置かれ、一度できたら変わりません。そのURLは<code>/:site/_previews/&lt;SHA&gt;/&lt;資料のパス&gt;</code>です。</li>
         <li><strong>グループ。</strong>プルリクエストのプレビューは<code>pr:&lt;番号&gt;</code>、プルリクエストに結び付けないプレビューは<code>head:&lt;SHA&gt;</code>というグループにまとまります。グループの一覧のURL（<code>/:site/_previews?group=pr%3A42</code>）は、いつも最新のリビジョンを指します。</li>
       </ul>
-      <p>資料の中のリンクは、静的に読み取れるものなら、同じプレビューの資料か本公開の資料へ付け替えて開きます。JavaScriptが実行時に組み立てるURLまでは変換できません。必要なファイルが自動で選ばれない場合は、<code>--include</code>で足せます。</p>
+      <p>資料の中のリンクは、静的に読み取れるものなら、同じプレビューの資料か本公開の資料へ付け替えて開きます。JavaScriptが実行時に組み立てるURLまでは変換できません。JavaScriptが名前を組み立てる画像のように、必要なリソースが自動で選ばれない場合は、<code>--include</code>で資料以外のファイルを足せます。変更していないHTMLやMarkdownの資料は<code>--include</code>では足せず、変更したリソースを使う資料だけがプレビューに入ります。</p>
     </section>
 
     <section class="doc-section" aria-labelledby="remove">

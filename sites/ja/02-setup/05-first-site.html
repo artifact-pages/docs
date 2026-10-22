@@ -112,7 +112,12 @@
       <p>小さな組織や試験的な導入では、管理リポジトリの中のディレクトリを1つのサイトとして公開することもできます。この場合は、共通のワークフローを通さずに、製品の<code>publish-action</code>を同じリポジトリの設定ファイルで直接呼び出せます。</p>
       <div class="term" aria-label="同じリポジトリで公開する">
         <div class="term-head"><span>.github/workflows/publish.yml / 管理とサイトが同じリポジトリ（Cloudflare）</span><button class="copy-btn" type="button">コピー</button></div>
-<pre><span data-copy><span class="k">jobs</span>:
+<pre><span data-copy><span class="k">on</span>:
+  <span class="k">pull_request</span>:
+  <span class="k">push</span>:
+    <span class="k">branches</span>: [main]
+
+<span class="k">jobs</span>:
   <span class="k">publish</span>:
     <span class="k">runs-on</span>: ubuntu-24.04
     <span class="k">permissions</span>:
