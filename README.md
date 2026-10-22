@@ -1,15 +1,15 @@
 # Artifact Pages documentation
 
-Public documentation for [Git Artifact Pages](https://github.com/artifact-pages/artifact-pages), published as two Artifact Pages sites:
+Public documentation for [Artifact Pages](https://github.com/artifact-pages/artifact-pages), published as per-language Artifact Pages sites:
 
-| Site | Source | For |
+| Site | Source | Language |
 | --- | --- | --- |
-| `guide` | [`sites/guide/`](sites/guide/) | Adopting, publishing and reading |
-| `architecture` | [`sites/architecture/`](sites/architecture/) | How it works and why |
+| `ja` | [`sites/ja/`](sites/ja/) | Japanese, published at <https://artifact-pages.dev/ja> |
+| `en` | `sites/en/` (planned) | English |
 
-The sites are moving to per-language sites `ja` and `en` (sources `sites/ja/` and `sites/en/`) as decided in [DOC-23](backlog/DOC-23-structure-and-site-migration.md); the table above stays current until launch.
+Both sites hold the same structure at identical relative paths ([DOC-23](backlog/DOC-23-structure-and-site-migration.md)). The former sites `guide` and `architecture` were unregistered and removed on 2026-10-23; their pages remain in the Git history.
 
-Until launch, each current site (`guide`, `architecture`) has Japanese (`ja/`) and English (`en/`) pages; the planned `ja` and `en` sites are one language each and use identical relative paths (DOC-23). This repository is a satellite: it publishes its own sites with `artifact-pages site sync` (the CLI always builds the full-text search data; the former `--fulltext` flag was removed and is now an unknown-flag error). The registry, the reader app and the publish workflow are operated from `artifact-pages/admin`.
+This repository is a satellite: it publishes its own sites with `artifact-pages site sync` through the shared workflows of `artifact-pages/admin` (every publish builds the full-text search data; there is no `--fulltext` flag). The registry, the reader app and the shared workflows are operated from `artifact-pages/admin`.
 
 ## Working on the pages
 

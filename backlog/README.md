@@ -8,23 +8,19 @@ There is one ticket per chapter of the agreed [structure](structure.md) (owner-a
 
 ## Site lineup
 
-Decided 2026-10-18 ([DOC-23](DOC-23-structure-and-site-migration.md)): one site per language, each holding the whole [structure.md](structure.md) tree. The new sites are planned; `guide` and `architecture` stay registered and current until the new sites launch, then they are unregistered with no stub pages.
+Decided 2026-10-18 ([DOC-23](DOC-23-structure-and-site-migration.md)): one site per language, each holding the whole [structure.md](structure.md) tree. `ja` is published; `en` is planned. The former sites `guide` and `architecture` were unregistered and their sources removed on 2026-10-23 (owner), with no stub pages; their pages remain in the Git history.
 
 | Site ID | Display name | Language | Source | Status |
 | --- | --- | --- | --- | --- |
-| `ja` | Artifact Pages ドキュメント | Japanese | `sites/ja/` | Registered and published as a draft for the owner's whole-set review (2026-10-23); not yet linked from the current sites. |
+| `ja` | Artifact Pages ドキュメント | Japanese | `sites/ja/` | Registered and published (2026-10-23); in the owner's whole-set review. |
 | `en` | Artifact Pages Documentation | English | `sites/en/` | Planned (DOC-23); not yet created or registered. |
-| `guide` | Guide | Japanese and English | `sites/guide/` | Current; unregistered at launch. |
-| `architecture` | Architecture | Japanese and English | `sites/architecture/` | Current; unregistered at launch. |
 
 Contributor-facing material stays in the GitHub repository and is not a site.
 
 Registry metadata:
 
-- `ja` (planned) — name `Artifact Pages ドキュメント`.
+- `ja` (registered) — name `Artifact Pages ドキュメント`; description `Artifact Pages の日本語ドキュメント。機能、導入、運用、アーキテクチャ、リファレンス。`
 - `en` (planned) — name `Artifact Pages Documentation`.
-- `guide` (registered) — name `Guide`; description `Adopt, publish, and read with Git Artifact Pages. 導入・公開・閲覧のガイド。`
-- `architecture` (registered) — name `Architecture`; description `How Git Artifact Pages works and why. 仕組みと設計の考え方。`
 
 Each new site is one language, so its name and description are single-language strings. The descriptions of `ja` and `en` are written at registration.
 
@@ -33,7 +29,7 @@ Each new site is one language, so its name and description are single-language s
 - Layout: `sites/<ja|en>/` with `README.md` at the root and the folders `01-features/`, `02-setup/`, `03-operations/`, `04-architecture/`, `05-reference/` (the full tree is in DOC-23). Both sites use identical relative paths; a page's translation is the same path in the other site.
 - Format: the root is `README.md` (Markdown); every folder below the root has an `index.html` entry page and every other page is HTML. One page per leaf of the structure tree.
 - File names are English. Numeric `01-` prefixes only where order is information (chapter folders, the four feature pages, the setup steps); none inside operations, architecture or reference, because the reader orders by filename, not title.
-- The language switch in each page links to the same path in the other site (see the open check in DOC-23 on relative versus absolute links). The old `ja/<file>.html` layout applies only to `guide` and `architecture` until launch.
+- The language switch in each page links to the same path in the other site (see the open check in DOC-23 on relative versus absolute links).
 - Each site is self-contained: it owns its CSS and JavaScript in `sites/<site>/assets/`, edited directly, with no shared source or sync step (a site never loads another site's assets; per-site CSP blocks cross-site asset paths only over plain HTTP, such as local nginx, because over HTTPS its `https:` source matches every same-origin path).
 - Pages are as rich as the current HTML manuscript pages; their content may be partly reused.
 - Facts come from the linked primary sources (specification, technical design, CLI help). A page must not introduce behavior that the specification does not state.

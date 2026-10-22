@@ -1,7 +1,7 @@
 # DOC-23 — Structure and site migration
 
 - Status: Open
-- Site: `ja`, `en` (new, planned); `guide` and `architecture` stay current until launch
+- Site: `ja` (published 2026-10-23), `en` (planned); `guide` and `architecture` unregistered and removed 2026-10-23
 - Depends on: the reader UI improvements (ISSUE-107, ISSUE-108, ISSUE-109) for final operating instructions and screenshots only; migration work has not started
 
 ## Decisions (owner, 2026-10-18)
@@ -45,7 +45,7 @@ Record the physical shape of the documentation (sites, URLs, files, format; deci
 - Keep `AGENTS.md`, the [README](README.md) site lineup and the repository `README.md` in line with the decisions above.
 - Create `sites/ja/` and `sites/en/` with the agreed layout and their own `assets/`, then register the sites `ja` and `en` in the registry configuration in `artifact-pages/admin` (a separate pull request there), once the owner approves.
 - Before launch, fix the known links to the old `/guide/…` and `/architecture/…` URLs (product repository, `admin`, release notes).
-- At launch, unregister `guide` and `architecture`; no stub pages are left.
+- At launch, unregister `guide` and `architecture`; no stub pages are left. Done 2026-10-23 at the owner's request, right after `ja` was published (docs #31, admin #26).
 - Resolve the open check above.
 
 ## Gate

@@ -38,7 +38,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        site: [guide, architecture, ja]
+        site: [ja]
     uses: artifact-pages/admin/.github/workflows/preview-site.yml@main
     with:
       site: ${{ matrix.site }}
