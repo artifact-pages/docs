@@ -33,6 +33,17 @@
 
     <section class="doc-section" aria-labelledby="formats">
       <h2 id="formats">HTMLとMarkdownを同じ画面で</h2>
+      <figure class="fg" aria-labelledby="doc-fig">
+        <div class="fg-head"><strong id="doc-fig">資料を開いた画面</strong><span class="fg-note">閲覧アプリ（簡略化した見本）</span></div>
+        <div class="fg-body"><div class="sc" data-view="doc" aria-hidden="true"><aside class="sc-side"><div class="sc-site"><b>S</b>SREチーム<i>3</i></div>
+<div class="sc-filter"><span>Filter pages…</span></div>
+<div class="sc-h">Browse <i class="sc-m">1</i></div><div class="sc-tree">
+<div class="sc-dir is-open">runbooks<small>3</small></div><div class="sc-file is-active">障害対応の手順</div><div class="sc-file">オンコール引き継ぎ</div><div class="sc-file">デプロイの戻し方</div>
+<div class="sc-dir">incidents<small>4</small></div><div class="sc-dir">slo<small>2</small></div></div></aside>
+<div class="sc-main"><div class="sc-crumb">sre / runbooks / <strong>障害対応の手順</strong> <i class="sc-m">2</i></div>
+<div class="sc-body"><div class="sc-doc"><h4 class="sc-title">障害対応の手順 <i class="sc-m">3</i></h4><p>最初の15分で何をするか。連絡先、判断の基準、記録の残し方。</p><div class="sc-ln"></div><div class="sc-ln m"></div><h5>1. 影響を確かめる</h5><div class="sc-ln"></div><div class="sc-ln s"></div><h5>2. 連絡する</h5><div class="sc-ln m"></div></div>
+<div class="sc-col"><h5>Details <i class="sc-m">4</i></h5><dl><dt>Updated</dt><dd>Oct 21</dd><dt>Author</dt><dd>acme-sre</dd><dt>Source</dt><dd>acme/sre ↗</dd></dl><h5>Contents <i class="sc-m">5</i></h5><ul class="sc-toc"><li class="is-active">1. 影響を確かめる</li><li>2. 連絡する</li><li>3. 記録を残す</li></ul></div></div></div></div><ol class="sc-legend"><li><span>サイドバー。サイトの構造をたどる。</span></li><li><span>パンくず。いまの資料の場所。</span></li><li><span>資料の本文。HTMLもMarkdownもここに表示される。</span></li><li><span><strong>Details</strong>。更新日、最後に変更した人、GitHubの公開元。</span></li><li><span><strong>Contents</strong>。資料の見出しの一覧。狭い画面では右の列が隠れ、ボタンから開く。</span></li></ol></div>
+      </figure>
       <div class="table-wrap"><table>
         <thead><tr><th></th><th>HTML</th><th>Markdown</th></tr></thead>
         <tbody>
@@ -96,6 +107,14 @@
 
     <section class="doc-section" aria-labelledby="previews">
       <h2 id="previews">プレビューを読む</h2>
+      <figure class="fg" aria-labelledby="preview-doc-fig">
+        <div class="fg-head"><strong id="preview-doc-fig">プレビューの資料を開いた画面</strong><span class="fg-note">閲覧アプリ（簡略化した見本）</span></div>
+        <div class="fg-body"><div class="sc" data-view="preview" aria-hidden="true"><aside class="sc-side"><div class="sc-site"><b>S</b>SREチーム<i>3</i></div>
+<div class="sc-h">This preview <i class="sc-m">2</i></div><div class="sc-tree"><div class="sc-dir" style="color:var(--quiet);font-size:10.5px">Changed pages</div><div class="sc-file is-active">障害対応の手順</div><div class="sc-file">デプロイの戻し方</div></div></aside>
+<div class="sc-main"><div class="sc-crumb"><span class="sc-tag">Preview</span> <i class="sc-m">1</i> PR #482 / runbooks / <strong>障害対応の手順</strong></div>
+<div class="sc-body"><div class="sc-doc"><h4 class="sc-title">障害対応の手順</h4><div class="sc-ln"></div><div class="sc-ln m"></div><div class="sc-ln s"></div></div>
+<div class="sc-col"><h5>Details <i class="sc-m">3</i></h5><dl><dt>Pull request</dt><dd>#482 ↗</dd><dt>Revision</dt><dd>3f9a1c2</dd><dt>Built</dt><dd>2 hours ago</dd></dl><h5>Contents</h5><ul class="sc-toc"><li class="is-active">1. 影響を確かめる</li><li>2. 連絡する</li></ul></div></div></div></div><ol class="sc-legend"><li><span>プレビューであることと、どのプルリクエストのものか。</span></li><li><span>サイドバーには、このプレビューの資料だけが並ぶ。</span></li><li><span><strong>Details</strong>に、プルリクエスト、リビジョン、プレビューを作った時刻。</span></li></ol></div>
+      </figure>
       <p>プレビューも同じ画面で開きます。左には、そのプレビューに含まれる資料だけが並び、変更した資料と、変更したファイルの影響を受けた資料が分けて示されます。画面の上部には、プレビューであることと、それが最新のリビジョンだと確かめられた場合はどのプルリクエストのものかが表示されます。</p>
       <ul>
         <li>Detailsには、プレビューを作った日時やコミットが表示されます。本公開の更新日や名前は表示されません。</li>
