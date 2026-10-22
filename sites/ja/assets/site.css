@@ -598,12 +598,20 @@ td:first-child { white-space: nowrap; font-weight: 600; }
   .sc-col { display: none; }
 }
 @container sc (max-width: 460px) {
-  .sc { grid-template-columns: minmax(0, 1fr); padding: 6px; }
   .sc-side { display: none; }
+  .sc-main { grid-column: 1 / -1; margin-left: 6px; }
   .sc-doc, .sc-home, .sc-sp, .sc-pv { padding-inline: 14px; }
   .sc-scrim { padding: 18px 8px 8px; }
   .sc-search { min-width: 0; flex: 1 1 100%; }
 }
+
+/* コマンドパレットの見本：パレットを中身の高さで置き、背後の文書がその下に広がる（切れない） */
+.sc[data-view="palette"] .sc-main { display: grid; grid-template-columns: minmax(0, 1fr); grid-template-rows: auto 1fr; }
+.sc[data-view="palette"] .sc-main > .sc-scrim { position: relative; inset: auto; grid-column: 1; grid-row: 1 / -1; }
+.sc[data-view="palette"] .sc-main > .sc-crumb, .sc[data-view="palette"] .sc-main > .sc-body { grid-column: 1; }
+.sc[data-view="palette"] .sc-main > .sc-crumb { grid-row: 1; }
+.sc[data-view="palette"] .sc-main > .sc-body { grid-row: 2; }
+.sc[data-view="palette"] .sc-scrim { padding-bottom: 20px; }
 
 /* ── 閲覧画面のデモ（.sc-demo）：場面を切り替える。自動では始まらない ── */
 .sc-demo { display: grid; gap: 14px; }
