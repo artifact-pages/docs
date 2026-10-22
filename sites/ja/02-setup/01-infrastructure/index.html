@@ -1,0 +1,119 @@
+<!doctype html>
+<html lang="ja">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="description" content="Artifact Pagesの配信環境を、公開済みのTerraformモジュールでCloudflareかAWSに構築する。用意するもの、配信先の選び方、共通の流れ、事前の準備。">
+  <title>インフラを構築する — Artifact Pages ドキュメント</title>
+  <script>
+    // Copy the reader app's theme (same-origin parent) before first paint; assets/site.js keeps it in sync.
+    (() => {
+      const root = document.documentElement;
+      root.classList.add('js');
+      try {
+        const theme = window.parent !== window && window.parent.document.documentElement.dataset.theme;
+        if (theme === 'light' || theme === 'dark') root.dataset.theme = theme;
+      } catch { /* cross-origin: fall back to prefers-color-scheme */ }
+    })();
+  </script>
+  <link rel="icon" href="data:,">
+  <link rel="stylesheet" href="../../assets/site.css">
+  <script src="../../assets/site.js" defer></script>
+</head>
+<body>
+  <a class="skip" href="#main">本文へ移動</a>
+  <main id="main" class="wrap">
+    <header class="page-head">
+      <div>
+        <p class="eyebrow">導入する · ステップ1</p>
+        <h1>インフラを構築する</h1>
+      </div>
+      <p class="lead">資料を置くストレージと、それを読者に届ける配信の仕組みを、CloudflareかAWSに用意します。どちらも製品が公開しているTerraformモジュールを呼び出して作ります。このステップで閲覧アプリやサイトはまだ置きません。それは次のステップからです。</p>
+    </header>
+
+    <section class="doc-section" aria-labelledby="outcome">
+      <h2 id="outcome">このステップで用意するもの</h2>
+      <p>モジュールを適用すると、配信先に次のものがそろいます。中身はまだ空で、閲覧アプリ、サイトの登録情報、各サイトの資料は、このあとのステップで置きます。</p>
+      <ul>
+        <li><strong>非公開のストレージ。</strong>CloudflareではR2のバケット、AWSではS3のバケットです。閲覧アプリと公開された資料は、すべてここに入ります。バケット自体は直接公開しません。</li>
+        <li><strong>読者が開くホスト名。</strong>Cloudflareでは、お使いのゾーンにあるホスト名（例：<code>docs.example.com</code>）です。AWSでは、最初はCloudFrontが割り当てるホスト名をそのまま使え、独自ドメインはあとから付けられます。</li>
+        <li><strong>URLの振り分けとキャッシュの規則。</strong>ページや見出しのURLを閲覧アプリへ届け、内部用の記録はストレージの中身を返さないようにします。資料の種類ごとにキャッシュの長さとHTMLの応答ポリシーも決まります。</li>
+        <li><strong>PRプレビューの保持期間。</strong>プレビューは、指定した日数が過ぎると自動で削除されます。日数はTerraformの入力<code>preview_retention_days</code>で決め、CLIの設定ファイルには書きません。</li>
+        <li><strong>公開ジョブの認証情報。</strong>管理リポジトリのジョブ（閲覧アプリの配置とサイトの登録）と、各チームのジョブ（自分のサイトの公開とプレビュー）が配信先に書き込むための認証情報です。用意のしかたは配信先によって異なります（下の表を参照）。</li>
+      </ul>
+      <div class="callout" role="note">
+        <span class="ico">閲覧の制限</span>
+        <div>
+          <p><strong>サイトを登録しても、読める人は限定されません。</strong>Artifact Pagesには、ユーザーアカウントやログイン、サイトごとの閲覧権限がありません。ホスト名に届く人は、登録されたどのサイトも読めます。社内だけに見せたい場合は、ホスト名の単位で制限します。方法は各配信先のページで説明します。</p>
+        </div>
+      </div>
+    </section>
+
+    <section class="doc-section" aria-labelledby="choose">
+      <h2 id="choose">CloudflareとAWSのどちらを選ぶか</h2>
+      <p>できることはほぼ同じで、違いは主に、ホスト名の用意のしかたと、ジョブの認証のしかたです。社内ですでに使っているほうを選ぶのが近道です。</p>
+      <div class="table-wrap"><table>
+        <thead><tr><th></th><th>Cloudflare</th><th>AWS</th></tr></thead>
+        <tbody>
+          <tr><td>ストレージと配信</td><td>R2と、ゾーンのルール</td><td>S3と、CloudFront</td></tr>
+          <tr><td>ホスト名</td><td>Cloudflareで管理しているゾーンの中のホスト名が必要です。</td><td>CloudFrontのホスト名（<code>*.cloudfront.net</code>）で始められます。独自ドメインは任意です。</td></tr>
+          <tr><td>ジョブの認証</td><td>R2のアクセスキーやAPIトークンを自分で発行し、GitHubのシークレットに入れます。モジュールは発行しません。</td><td>モジュールがIAMロールを作り、各ジョブはGitHubのOIDCでそのロールを引き受けます。GitHubに長期のキーは置きません。</td></tr>
+          <tr><td>閲覧の制限</td><td>IPアドレスでの制限とHTTPSのみの許可を、モジュールで設定できます。本人の認証にはCloudflare Accessを別に設定します。</td><td>IPアドレスでの制限を、モジュールでAWS WAFとして設定できます。本人の認証は別の仕組みが必要です。</td></tr>
+          <tr><td>モジュール</td><td><code>artifact-pages/artifact-pages/cloudflare</code></td><td><code>artifact-pages/artifact-pages/aws</code></td></tr>
+        </tbody>
+      </table></div>
+      <p>費用は、保存する量、配信する量、キャッシュの削除、WAFを使うかどうかで変わります。ここでは一律にどちらが安いとは言えません。費用がどこで生まれるかは「<a href="../../04-architecture/cost-and-performance/index.html">コストとパフォーマンス</a>」で説明します。</p>
+    </section>
+
+    <section class="doc-section" aria-labelledby="flow">
+      <h2 id="flow">共通の流れ</h2>
+      <p>どちらの配信先でも、手順の形は同じです。自分のTerraformの設定（以下、呼び出し側）からモジュールを呼び出します。</p>
+      <ol>
+        <li><strong>モジュールを指定する。</strong>Terraform Registryのアドレスを<code>source</code>に、使うバージョンを<code>version</code>に書きます。バージョンは範囲でなく、<code>0.1.1</code>のように正確に固定します。</li>
+        <li><strong>プロバイダーと入力を書く。</strong>プロバイダー（<code>cloudflare</code>か<code>aws</code>）の設定は呼び出し側で行います。必須の入力は、どちらのモジュールも4つです。</li>
+        <li><strong>計画を確かめて適用する。</strong><code>terraform init</code>、<code>terraform plan</code>で作られるものを確かめてから、<code>terraform apply</code>を実行します。</li>
+        <li><strong>出力を取り出す。</strong>モジュールは、CLIの設定ファイルにそのまま貼れる配信先の設定を出力します。呼び出し側でこれを<code>output</code>として公開しておくと、<code>terraform output</code>で読めます。</li>
+      </ol>
+      <div class="term" aria-label="適用の流れ">
+        <div class="term-head"><span>ターミナル / 呼び出し側のディレクトリ</span><button class="copy-btn" type="button">コピー</button></div>
+<pre><span class="p">$</span> <span data-copy>terraform init</span>
+<span class="p">$</span> <span data-copy>terraform plan</span>
+<span class="p">$</span> <span data-copy>terraform apply</span></pre>
+      </div>
+      <p>Terraform Registryを使えない環境では、モジュールのGitリポジトリを直接指定できます。その場合は<code>version</code>を書かず、タグを<code>?ref=</code>で固定します。</p>
+      <div class="term" aria-label="Gitのソースで指定する">
+        <div class="term-head"><span>HCL / Registryの代わりにGitを使う</span><button class="copy-btn" type="button">コピー</button></div>
+<pre><span class="k">source</span> = <span data-copy>"git::https://github.com/artifact-pages/terraform-cloudflare-artifact-pages.git?ref=v0.1.1"</span>
+<span class="c"># AWSは terraform-aws-artifact-pages.git</span></pre>
+      </div>
+    </section>
+
+    <section class="doc-section" aria-labelledby="prepare">
+      <h2 id="prepare">事前に用意するもの</h2>
+      <div class="table-wrap"><table>
+        <thead><tr><th>対象</th><th>必要なもの</th></tr></thead>
+        <tbody>
+          <tr><td>Terraform</td><td>1.5.0以降。Cloudflareのモジュールは2.0.0未満にも対応を限っています。</td></tr>
+          <tr><td>プロバイダー</td><td>Cloudflareは<code>cloudflare/cloudflare</code>の5.24.0以上6.0.0未満、AWSは<code>hashicorp/aws</code>の6系（<code>~&gt; 6.0</code>）。</td></tr>
+          <tr><td>Cloudflare</td><td>アカウント、R2の利用開始、Cloudflareで管理しているゾーンと、その中のホスト名、Terraform用のAPIトークン。</td></tr>
+          <tr><td>AWS</td><td>アカウント、Terraformを適用できる権限、アカウントに登録済みのGitHub ActionsのOIDCプロバイダー、管理リポジトリと各サイトのリポジトリのジョブを特定する値（OIDCの<code>sub</code>）。独自ドメインを使う場合は、DNSと<code>us-east-1</code>のACM証明書。</td></tr>
+          <tr><td>GitHub</td><td>管理リポジトリにするリポジトリと、最初にサイトを公開するチームのリポジトリ。中身は次のステップで用意します。</td></tr>
+        </tbody>
+      </table></div>
+    </section>
+
+    <section class="doc-section" aria-labelledby="providers">
+      <h2 id="providers">配信先ごとの手順</h2>
+      <ul class="cards two">
+        <li><a class="card" href="cloudflare.html"><span class="tag">R2 · ゾーンのルール</span><h3>Cloudflareに構築する</h3><p>R2の利用開始、認証情報、モジュールの呼び出し、ホスト名の制限、出力の受け渡し。</p><span class="go">手順を見る →</span></a></li>
+        <li><a class="card" href="aws.html"><span class="tag">S3 · CloudFront</span><h3>AWSに構築する</h3><p>IAMロールとOIDC、モジュールの呼び出し、ホスト名と独自ドメイン、出力の受け渡し。</p><span class="go">手順を見る →</span></a></li>
+      </ul>
+    </section>
+
+    <nav class="pager" aria-label="ページ送り">
+      <a class="prev" href="../index.html"><small>前へ</small><strong>導入する</strong></a>
+      <a class="next" href="cloudflare.html"><small>次へ</small><strong>Cloudflareに構築する</strong></a>
+    </nav>
+  </main>
+</body>
+</html>
