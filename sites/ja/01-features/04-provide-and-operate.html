@@ -33,7 +33,7 @@
 
     <section class="doc-section" aria-labelledby="infra">
       <h2 id="infra">配信環境をTerraformで作る</h2>
-      <p>配信環境は、CloudflareのR2とゾーンのルール、またはAWSのS3とCloudFrontに作ります。どちらも製品が公開しているTerraformのモジュールで、ストレージ、ホスト名、URLの振り分けとキャッシュ、プレビューの保持期間、公開ジョブの認証情報（AWSではIAMロール）を用意します。</p>
+      <p>配信環境は、CloudflareのR2とゾーンのルール、またはAWSのS3とCloudFrontに作ります。どちらも製品が公開しているTerraformのモジュールで、ストレージ、ホスト名、URLの振り分けとキャッシュ、プレビューの保持期間を用意します。公開ジョブの認証には、AWSではモジュールが作るIAMロールを使い、Cloudflareでは管理者がR2のキーやAPIトークンを発行します。</p>
       <p>閲覧を社内に限るには、配信先のホスト名に対してIPアドレスの制限や、CloudflareではCloudflare Accessを設定します。Artifact Pages自体には、利用者のアカウントやサイトごとの閲覧権限はありません。手順は「<a href="../02-setup/01-infrastructure/index.html">インフラを構築する</a>」で説明します。</p>
     </section>
 
