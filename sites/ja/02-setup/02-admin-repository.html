@@ -1,0 +1,159 @@
+<!doctype html>
+<html lang="ja">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="description" content="管理リポジトリに設定ファイルを置き、各チームが呼び出す共通の公開・プレビューのワークフローをregistry setupで生成し、認証情報とOrganizationからの呼び出しを設定する。">
+  <title>管理リポジトリを準備する — Artifact Pages ドキュメント</title>
+  <script>
+    // Copy the reader app's theme (same-origin parent) before first paint; assets/site.js keeps it in sync.
+    (() => {
+      const root = document.documentElement;
+      root.classList.add('js');
+      try {
+        const theme = window.parent !== window && window.parent.document.documentElement.dataset.theme;
+        if (theme === 'light' || theme === 'dark') root.dataset.theme = theme;
+      } catch { /* cross-origin: fall back to prefers-color-scheme */ }
+    })();
+  </script>
+  <link rel="icon" href="data:,">
+  <link rel="stylesheet" href="../assets/site.css">
+  <script src="../assets/site.js" defer></script>
+</head>
+<body>
+  <a class="skip" href="#main">本文へ移動</a>
+  <main id="main" class="wrap">
+    <header class="page-head">
+      <div>
+        <p class="eyebrow">導入する · ステップ2</p>
+        <h1>管理リポジトリを準備する</h1>
+      </div>
+      <p class="lead">管理リポジトリ<code>acme/platform-admin</code>に、配信先の設定と、各チームが呼び出す共通のワークフローを用意します。このステップが終わると、チームは短いワークフローを1つ置くだけで公開できるようになります。</p>
+    </header>
+
+    <section class="doc-section" aria-labelledby="config">
+      <h2 id="config">設定ファイルを置く</h2>
+      <p>管理リポジトリの直下に<code>artifact-pages.yaml</code>を作ります。前のステップのTerraformの出力（配信先の設定）を貼り、閲覧アプリとCLIの版と、登録するサイトを書き足します。サイトはステップ4で登録するので、ここでは空にしておきます。</p>
+      <div class="term" aria-label="Cloudflareの設定ファイル">
+        <div class="term-head"><span>artifact-pages.yaml / Cloudflareの場合（説明用の値）</span><button class="copy-btn" type="button">コピー</button></div>
+<pre><span data-copy><span class="k">schemaVersion</span>: 1
+<span class="k">provider</span>: cloudflare
+<span class="k">cloudflare</span>:                 <span class="c"># terraform output の内容</span>
+  <span class="k">accountId</span>: 0123456789abcdef0123456789abcdef
+  <span class="k">bucket</span>: artifact-pages
+  <span class="k">publicBaseURL</span>: https://docs.example.com
+  <span class="k">zoneId</span>: fedcba9876543210fedcba9876543210
+<span class="k">cli</span>:
+  <span class="k">version</span>: x.y.z
+<span class="k">web</span>:
+  <span class="k">version</span>: x.y.z
+<span class="k">sites</span>: {}</span></pre>
+      </div>
+      <div class="term" aria-label="AWSの設定ファイル">
+        <div class="term-head"><span>artifact-pages.yaml / AWSの場合（説明用の値）</span><button class="copy-btn" type="button">コピー</button></div>
+<pre><span data-copy><span class="k">schemaVersion</span>: 1
+<span class="k">provider</span>: aws
+<span class="k">aws</span>:                        <span class="c"># terraform output の内容</span>
+  <span class="k">accountId</span>: "123456789012"
+  <span class="k">bucket</span>: artifact-pages-123456789012-us-east-1
+  <span class="k">distributionId</span>: E1ABCDEFGHIJKL
+  <span class="k">region</span>: us-east-1
+<span class="k">publicBaseURL</span>: https://d111111abcdef8.cloudfront.net   <span class="c"># AWSでは自分で足す</span>
+<span class="k">cli</span>:
+  <span class="k">version</span>: x.y.z
+<span class="k">web</span>:
+  <span class="k">version</span>: x.y.z
+<span class="k">sites</span>: {}</span></pre>
+      </div>
+      <ul>
+        <li><strong><code>cli.version</code>と<code>web.version</code></strong>は、<a href="https://github.com/artifact-pages/artifact-pages/releases" target="_blank" rel="noopener">GitHub Releases</a>にあるCLIと閲覧アプリ（<code>web/vx.y.z</code>）の版を、先頭の<code>v</code>を付けずに正確に書きます。2つの版の番号はそろっていなくて構いません。</li>
+        <li><strong>AWSでは<code>publicBaseURL</code>を足します。</strong>Terraformの出力には読者が開くURLが含まれません。これがないと、プレビューのURLを作れずにプレビューが失敗します。独自ドメインを使うならそのURLにします。</li>
+        <li><strong>認証情報の値は書きません。</strong>設定ファイルに書けるのは、値を読む環境変数の名前だけです。既定の名前を使うなら、それも書きません。</li>
+      </ul>
+    </section>
+
+    <section class="doc-section" aria-labelledby="generate">
+      <h2 id="generate">共通のワークフローを生成する</h2>
+      <p>各チームが呼び出す共通のワークフローは、CLIの<code>registry setup</code>で生成します。手で書く必要はありません。</p>
+      <div class="term" aria-label="共通のワークフローを生成する">
+        <div class="term-head"><span>ターミナル / 管理リポジトリの直下</span><button class="copy-btn" type="button">コピー</button></div>
+<pre><span class="p">$</span> <span data-copy>artifact-pages registry setup --directory . --config artifact-pages.yaml --repository acme/platform-admin</span></pre>
+      </div>
+      <div class="table-wrap"><table>
+        <thead><tr><th>生成されるファイル</th><th>役割</th></tr></thead>
+        <tbody>
+          <tr><td><code>.github/workflows/publish-site.yml</code></td><td>チームが呼び出す、サイトの公開のワークフロー</td></tr>
+          <tr><td><code>.github/workflows/preview-site.yml</code></td><td>チームが呼び出す、PRプレビューのワークフロー</td></tr>
+          <tr><td><code>.github/actions/site-sync/action.yml</code></td><td>上の2つが使う中身。製品の<code>publish-action</code>と<code>preview-action</code>を、この管理リポジトリの設定ファイルで呼び出します。</td></tr>
+          <tr><td><code>.github/workflows/registry.yml</code></td><td>管理リポジトリで、設定の変更をサイトの登録に反映するワークフロー</td></tr>
+        </tbody>
+      </table></div>
+      <ul>
+        <li>このコマンドは手元のファイルを書くだけです。シークレットを読んだり、GitHubを操作したりはしません。続けて行う設定を、<code>gh</code>のコマンドとして表示します。</li>
+        <li>使う製品のActionsの版は、実行したCLIの版に組み込まれたものです。設定の<code>cli.version</code>には切り替わりません。</li>
+        <li>生成したファイルは手で編集しないでください。直したいときは作り直します（「<a href="../03-operations/update-shared-workflows.html">共通の公開・プレビューの仕組みを更新する</a>」）。</li>
+        <li>対応する配信先はCloudflareとAWSです。設定ファイルは管理リポジトリの中の通常のファイルである必要があります。</li>
+      </ul>
+      <p>生成したファイルと設定ファイルをコミットし、<code>main</code>にマージします。</p>
+    </section>
+
+    <section class="doc-section" aria-labelledby="how">
+      <h2 id="how">共通のワークフローの動き方</h2>
+      <p>チームのワークフローが<code>uses: acme/platform-admin/.github/workflows/publish-site.yml@main</code>で呼び出すと、共通のワークフローは、自分と同じコミットにある<code>artifact-pages.yaml</code>を使って、そのチームのリポジトリを公開します。</p>
+      <div class="table-wrap"><table>
+        <thead><tr><th>項目</th><th>内容</th></tr></thead>
+        <tbody>
+          <tr><td>入力</td><td><code>site</code>（必須、サイトID）と<code>environment</code>（任意、チームのリポジトリのEnvironmentの名前）。ほかの入力はありません。</td></tr>
+          <tr><td>動く権限</td><td>呼び出したチームのリポジトリの権限、シークレット、OIDCで動きます。</td></tr>
+          <tr><td>本番に書き込むとき</td><td><code>main</code>へのプッシュと、<code>main</code>での手動実行だけ。プルリクエストなど、それ以外は試し実行です。</td></tr>
+          <tr><td>プレビュー</td><td>同じリポジトリのブランチからのプルリクエストだけ。プルリクエストにコメントを付けます。</td></tr>
+          <tr><td>実行環境</td><td>GitHubのホストするUbuntuのランナー。</td></tr>
+        </tbody>
+      </table></div>
+    </section>
+
+    <section class="doc-section" aria-labelledby="access">
+      <h2 id="access">Organizationから呼び出せるようにする</h2>
+      <p>管理リポジトリが非公開の場合は、同じOrganizationのリポジトリから共通のワークフローを呼び出せるように設定します。<code>registry setup</code>が表示するコマンドと同じです。</p>
+      <div class="term" aria-label="Organizationからの呼び出しを許す">
+        <div class="term-head"><span>ターミナル / GitHub CLI</span><button class="copy-btn" type="button">コピー</button></div>
+<pre><span class="p">$</span> <span data-copy>gh api --method PUT repos/acme/platform-admin/actions/permissions/access --field access_level=organization</span></pre>
+      </div>
+      <p>呼び出したチームのリポジトリで共通のワークフローが動くので、そのリポジトリのジョブのログを読める人は、共通のワークフローの実行の様子も読めます。</p>
+    </section>
+
+    <section class="doc-section" aria-labelledby="secrets">
+      <h2 id="secrets">認証情報を置く</h2>
+      <h3 id="cloudflare">Cloudflare</h3>
+      <p>公開ジョブの認証情報（<code>CF_R2_ACCESS_KEY_ID</code>、<code>CF_R2_SECRET_ACCESS_KEY</code>、<code>CF_API_TOKEN</code>）は、それを使うジョブが動くリポジトリのシークレットに置きます。</p>
+      <ul>
+        <li><strong>管理リポジトリ。</strong>登録の反映と閲覧アプリの配置に使います。<code>registry.yml</code>はプルリクエストではEnvironmentなしで試し実行し、それ以外では<code>production</code>のEnvironmentで動きます。リポジトリのシークレットに置けば両方から読めます。<code>production</code>のEnvironmentのシークレットだけに置くと、プルリクエストの試し実行が配信先を読めません。</li>
+        <li><strong>各チームのリポジトリ。</strong>共通のワークフローは、呼び出したリポジトリのシークレットを使います（呼び出す側に<code>secrets: inherit</code>）。管理リポジトリのシークレットはチームのジョブには届きません。Organizationのシークレットにまとめることもできます。</li>
+      </ul>
+      <h3 id="aws">AWS</h3>
+      <p>AWSではシークレットを置かず、各ジョブがIAMロールを引き受けます。管理リポジトリのリポジトリ変数<code>ARTIFACT_PAGES_REGISTRY_ADMIN_ROLE_ARN</code>に、Terraformの出力<code>admin_role_arn</code>を設定します（<code>registry setup</code>がコマンドを表示します）。各チームのジョブのロールは、共通のワークフローがサイトIDと設定の<code>aws.accountId</code>から求めるので、チームに設定は要りません。Terraformの<code>admin_github_subjects</code>と<code>satellite_github_subjects</code>に、実際に動くジョブの<code>sub</code>が入っていることを確かめてください。</p>
+      <h3 id="environments">Environment</h3>
+      <p>本番の書き込みに承認やブランチの制限をかけたい場合は、GitHubのEnvironmentを使います。管理リポジトリには<code>production</code>を作ります。チームが<code>environment</code>入力で名前を渡すと、共通のワークフローは呼び出したリポジトリのそのEnvironmentを使います。存在しない名前を渡すとGitHubが制限なしで作ってしまうので、先に作っておきます。</p>
+    </section>
+
+    <section class="doc-section" aria-labelledby="direct">
+      <h2 id="direct">共通のワークフローを使わずにCLIで設定を読む</h2>
+      <p>手元のCLIや独自のジョブから、管理リポジトリの設定を直接読むこともできます。<code>--config</code>に<code>github://</code>の指定を渡します。</p>
+      <div class="term" aria-label="管理リポジトリの設定を直接読む">
+        <div class="term-head"><span>ターミナル</span><button class="copy-btn" type="button">コピー</button></div>
+<pre><span class="p">$</span> <span data-copy>artifact-pages site sync --site sre --config 'github://acme/platform-admin/artifact-pages.yaml?ref=main' --dry-run</span></pre>
+      </div>
+      <ul>
+        <li>形は<code>github://OWNER/REPO[/FILE]?ref=REF</code>です。<code>FILE</code>を省くと<code>artifact-pages.yaml</code>、<code>ref</code>を省くと既定のブランチになります。<code>?</code>を含むので、シェルでは引用符で囲みます。</li>
+        <li>非公開のリポジトリなら、そのリポジトリの<code>contents:read</code>を持つトークンを<code>GITHUB_TOKEN</code>か<code>GH_TOKEN</code>に設定します。GitHub Appのインストールトークンや、fine-grained personal access tokenを使えます。製品のActionsには、別のトークンを渡す入力はありません。</li>
+        <li>読めないときのメッセージと原因は「<a href="../03-operations/troubleshooting.html#remote">問題を調べ、復旧する</a>」にあります。</li>
+      </ul>
+    </section>
+
+    <nav class="pager" aria-label="ページ送り">
+      <a class="prev" href="01-infrastructure/aws.html"><small>前へ</small><strong>AWSに構築する</strong></a>
+      <a class="next" href="03-reader-app.html"><small>次へ</small><strong>閲覧アプリをデプロイする</strong></a>
+    </nav>
+  </main>
+</body>
+</html>

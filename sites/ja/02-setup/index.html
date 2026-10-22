@@ -1,0 +1,148 @@
+<!doctype html>
+<html lang="ja">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="description" content="Artifact Pagesを組織に導入し、最初のチームが自分のリポジトリから資料を公開してPRプレビューで確かめられるところまで進める。到達する状態、全体の流れ、事前の準備、ローカルでの試し方。">
+  <title>導入する — Artifact Pages ドキュメント</title>
+  <script>
+    // Copy the reader app's theme (same-origin parent) before first paint; assets/site.js keeps it in sync.
+    (() => {
+      const root = document.documentElement;
+      root.classList.add('js');
+      try {
+        const theme = window.parent !== window && window.parent.document.documentElement.dataset.theme;
+        if (theme === 'light' || theme === 'dark') root.dataset.theme = theme;
+      } catch { /* cross-origin: fall back to prefers-color-scheme */ }
+    })();
+  </script>
+  <link rel="icon" href="data:,">
+  <link rel="stylesheet" href="../assets/site.css">
+  <script src="../assets/site.js" defer></script>
+</head>
+<body>
+  <a class="skip" href="#main">本文へ移動</a>
+  <main id="main" class="wrap">
+    <header class="page-head">
+      <div>
+        <p class="eyebrow">導入する</p>
+        <h1>導入する</h1>
+      </div>
+      <p class="lead">この章では、配信環境を作るところから始めて、最初のチームが自分のリポジトリから資料を公開し、プルリクエストのプレビューで確かめられるところまで進めます。全体を通して、同じ説明用の例を使います。</p>
+    </header>
+
+    <section class="doc-section" aria-labelledby="goal">
+      <h2 id="goal">到達する状態</h2>
+      <ul>
+        <li>CloudflareかAWSに配信環境があり、閲覧アプリが置かれている。</li>
+        <li>管理リポジトリ<code>acme/platform-admin</code>に、設定ファイルと、各チームが呼び出す共通の公開・プレビューのワークフローがある。</li>
+        <li>チームのリポジトリ<code>acme/sre</code>のサイト<code>sre</code>が登録され、マージすると公開され、プルリクエストにはプレビューが付く。</li>
+      </ul>
+      <p>リポジトリとサイトの名前は説明用の例です。お使いの名前に置き換えて読んでください。</p>
+    </section>
+
+    <section class="doc-section" aria-labelledby="flow">
+      <h2 id="flow">全体の流れ</h2>
+      <div class="table-wrap"><table>
+        <thead><tr><th>ステップ</th><th>行う人</th><th>終わったときの状態</th></tr></thead>
+        <tbody>
+          <tr><td><a href="01-infrastructure/index.html">1. インフラを構築する</a></td><td>管理者</td><td>ストレージ、ホスト名、配信の規則、認証情報がそろい、配信先の設定が手元にある</td></tr>
+          <tr><td><a href="02-admin-repository.html">2. 管理リポジトリを準備する</a></td><td>管理者</td><td>設定ファイルと共通のワークフローが管理リポジトリにある</td></tr>
+          <tr><td><a href="03-reader-app.html">3. 閲覧アプリをデプロイする</a></td><td>管理者</td><td>ホスト名を開くと閲覧アプリが表示される</td></tr>
+          <tr><td><a href="04-register-site.html">4. サイトを登録する</a></td><td>管理者</td><td>サイト<code>sre</code>が一覧に出る（まだ資料はない）</td></tr>
+          <tr><td><a href="05-first-site.html">5. 最初のサイトを公開する</a></td><td>チーム</td><td><code>acme/sre</code>の資料が読める</td></tr>
+          <tr><td><a href="06-pr-previews.html">6. PRプレビューを使えるようにする</a></td><td>チーム</td><td>プルリクエストにプレビューのコメントが付く</td></tr>
+        </tbody>
+      </table></div>
+    </section>
+
+    <section class="doc-section" aria-labelledby="repos">
+      <h2 id="repos">2種類のリポジトリ</h2>
+      <p>管理リポジトリは環境に1つで、配信先の設定、登録するサイトの一覧、CLIと閲覧アプリのバージョン、共通のワークフローを持ちます。チームのリポジトリ（サテライトリポジトリ）はいくつでもあり、公開する資料のディレクトリと、共通のワークフローを呼び出す短いワークフローを持ちます。チームのリポジトリに設定ファイルは置きません。</p>
+      <p>サイトの登録は、どのリポジトリのどのディレクトリがそのサイトに公開してよいかを決めるものです。読者を限定するものではありません。</p>
+    </section>
+
+    <section class="doc-section" aria-labelledby="prepare">
+      <h2 id="prepare">事前に用意するもの</h2>
+      <ul>
+        <li><strong>CloudflareかAWSのアカウント。</strong>必要な権限は「<a href="01-infrastructure/index.html#prepare">インフラを構築する</a>」にあります。</li>
+        <li><strong>GitHubのOrganization。</strong>管理リポジトリとチームのリポジトリを同じOrganizationに置きます。共通のワークフローは同じOrganizationの中から呼び出す前提です。既定のブランチは<code>main</code>にします。共通のワークフローは<code>main</code>からの実行だけを本番の書き込みにします。</li>
+        <li><strong>手元のCLI。</strong>管理者の作業（共通のワークフローの生成、試し実行）で使います。</li>
+      </ul>
+      <h3 id="install">CLIを入れる</h3>
+      <p>CLIは<a href="https://github.com/artifact-pages/artifact-pages/releases" target="_blank" rel="noopener">GitHub Releases</a>から、LinuxとmacOS（amd64、arm64）向けの単体のバイナリを入れます。Windows向けはありません。<code>x.y.z</code>は使うリリースの版で、先頭の<code>v</code>は付けません。</p>
+      <div class="term" aria-label="リリースからCLIを入れる">
+        <div class="term-head"><span>ターミナル / インストール</span><button class="copy-btn" type="button">コピー</button></div>
+<pre><span class="p">$</span> <span data-copy>VERSION=x.y.z</span>
+<span class="p">$</span> <span data-copy>OS=$(uname -s | tr '[:upper:]' '[:lower:]')</span>
+<span class="p">$</span> <span data-copy>ARCH=$(uname -m | sed -e 's/x86_64/amd64/' -e 's/aarch64/arm64/')</span>
+<span class="p">$</span> <span data-copy>BASE=https://github.com/artifact-pages/artifact-pages/releases/download/v$VERSION</span>
+<span class="p">$</span> <span data-copy>curl -fsSLO "$BASE/artifact-pages_v${VERSION}_${OS}_${ARCH}"</span>
+<span class="p">$</span> <span data-copy>curl -fsSLO "$BASE/artifact-pages_v${VERSION}_checksums.txt"</span>
+<span class="p">$</span> <span data-copy>grep "artifact-pages_v${VERSION}_${OS}_${ARCH}\$" "artifact-pages_v${VERSION}_checksums.txt" | shasum -a 256 -c -</span>
+<span class="p">$</span> <span data-copy>install -m 0755 "artifact-pages_v${VERSION}_${OS}_${ARCH}" ~/.local/bin/artifact-pages</span>
+<span class="p">$</span> <span data-copy>artifact-pages version</span></pre>
+      </div>
+      <ul>
+        <li>チェックサムの確認で<code>OK</code>と出ないバイナリは使わないでください。<code>shasum</code>がないLinuxでは<code>sha256sum -c -</code>を使います。</li>
+        <li><code>~/.local/bin</code>は一例です。<code>PATH</code>の通ったディレクトリに置きます。</li>
+        <li>入れたCLIは入口です。設定ファイルに<code>cli.version</code>があれば、ほとんどのコマンドはその版をダウンロードして確かめ、そちらで実行します。</li>
+      </ul>
+      <p>コマンドの多くは<code>--dry-run</code>で試し実行ができます。試し実行は配信先を読みますが、書き込み、削除、ロック、キャッシュの変更はしません。結果は通常は文章で、<code>--format json</code>で機械向けに出せます。</p>
+    </section>
+
+    <section class="doc-section" aria-labelledby="local">
+      <h2 id="local">クラウドの前にローカルで試す</h2>
+      <p>配信環境を作る前に、手元のディレクトリを配信先にして、公開から閲覧までを試せます。クラウドのアカウントは要りません（リリースのダウンロードにネットワークは要ります）。プレビューの保持期間、権限、CDN、閲覧の制限は試せません。</p>
+      <ol>
+        <li>試すリポジトリ（説明用の例では<code>acme/sre</code>のクローン）の直下に、次の設定ファイルを置きます。<code>repository</code>はそのリポジトリの<code>origin</code>と同じにし、<code>sourcePath</code>は公開したい資料のディレクトリにします。</li>
+      </ol>
+      <div class="term" aria-label="ローカルの設定">
+        <div class="term-head"><span>artifact-pages.yaml / 試すリポジトリ（説明用の例）</span><button class="copy-btn" type="button">コピー</button></div>
+<pre><span data-copy><span class="k">schemaVersion</span>: 1
+<span class="k">provider</span>: local
+<span class="k">local</span>:
+  <span class="k">root</span>: .local/storage   <span class="c"># 公開元の外に置く</span>
+<span class="k">cli</span>:
+  <span class="k">version</span>: x.y.z
+<span class="k">web</span>:
+  <span class="k">version</span>: x.y.z
+<span class="k">sites</span>:
+  <span class="k">sre</span>:
+    <span class="k">name</span>: SREチーム
+    <span class="k">repository</span>: acme/sre
+    <span class="k">sourcePath</span>: docs</span></pre>
+      </div>
+      <ol start="2">
+        <li>閲覧アプリを置き、サイトを登録し、サイトを公開します。それぞれ試し実行で確かめてから実行します。</li>
+      </ol>
+      <div class="term" aria-label="ローカルで公開する">
+        <div class="term-head"><span>ターミナル / 試すリポジトリ</span><button class="copy-btn" type="button">コピー</button></div>
+<pre><span class="p">$</span> <span data-copy>artifact-pages app deploy --config artifact-pages.yaml</span>
+<span class="p">$</span> <span data-copy>artifact-pages registry sync --config artifact-pages.yaml</span>
+<span class="p">$</span> <span data-copy>artifact-pages site sync --site sre --config artifact-pages.yaml</span></pre>
+      </div>
+      <ol start="3">
+        <li><code>.local/storage</code>をWebサーバーで配信して開きます。ファイルをそのまま返すだけのサーバーでは足りません。<code>/_indexes/</code>、<code>/_artifacts/</code>、<code>/_previews/</code>、<code>/assets/</code>はファイルを返してなければ404、<code>/_control</code>以下は返さず、それ以外のURLはすべて<code>/index.html</code>を返す設定にします。</li>
+      </ol>
+      <div class="term" aria-label="ローカルのnginxの設定">
+        <div class="term-head"><span>nginx / server ブロックの例</span><button class="copy-btn" type="button">コピー</button></div>
+<pre><span data-copy>root /srv/artifact-pages;   <span class="c"># .local/storage を読み取り専用で置いた場所</span>
+location = /_control { return 404; }
+location ^~ /_control/ { return 404; }
+location ^~ /_indexes/  { try_files $uri =404; }
+location ^~ /_artifacts/ { try_files $uri =404; }
+location ^~ /_previews/ { try_files $uri =404; }
+location ^~ /assets/ { try_files $uri =404; }
+location / { try_files $uri $uri/ /index.html; }</span></pre>
+      </div>
+      <p>この試し方では、共通のワークフローの生成（<code>registry setup</code>）は使えません。クラウドで導入するときは、ステップ1から進めます。</p>
+    </section>
+
+    <nav class="pager" aria-label="ページ送り">
+      <a class="prev" href="../01-features/04-provide-and-operate.html"><small>前へ</small><strong>基盤を提供・運用する</strong></a>
+      <a class="next" href="01-infrastructure/index.html"><small>次へ</small><strong>インフラを構築する</strong></a>
+    </nav>
+  </main>
+</body>
+</html>
