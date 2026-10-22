@@ -1,0 +1,74 @@
+<!doctype html>
+<html lang="ja">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="description" content="閲覧アプリがブラウザに保存するもの（ピン留め、最近読んだ資料、テーマ）、保存しないもの、端末やブラウザの間の扱い、消し方。">
+  <title>ピン留め・閲覧履歴などの保存と扱い — Artifact Pages ドキュメント</title>
+  <script>
+    // Copy the reader app's theme (same-origin parent) before first paint; assets/site.js keeps it in sync.
+    (() => {
+      const root = document.documentElement;
+      root.classList.add('js');
+      try {
+        const theme = window.parent !== window && window.parent.document.documentElement.dataset.theme;
+        if (theme === 'light' || theme === 'dark') root.dataset.theme = theme;
+      } catch { /* cross-origin: fall back to prefers-color-scheme */ }
+    })();
+  </script>
+  <link rel="icon" href="data:,">
+  <link rel="stylesheet" href="../../assets/site.css">
+  <script src="../../assets/site.js" defer></script>
+</head>
+<body>
+  <a class="skip" href="#main">本文へ移動</a>
+  <main id="main" class="wrap">
+    <header class="page-head">
+      <div>
+        <p class="eyebrow">リファレンス · 閲覧アプリ</p>
+        <h1>ピン留め・閲覧履歴などの保存と扱い</h1>
+      </div>
+      <p class="lead">閲覧アプリは、読者の操作の一部をブラウザのlocalStorageに保存します。アカウントはないので、配信先やほかの人には送られず、別のブラウザや端末にも引き継がれません。</p>
+    </header>
+
+    <section class="doc-section" aria-labelledby="stored">
+      <h2 id="stored">保存するもの</h2>
+      <div class="table-wrap"><table>
+        <thead><tr><th>キー</th><th>中身</th></tr></thead>
+        <tbody>
+          <tr><td><code>git-artifact-pages:pinned-artifacts:v1</code></td><td>サイトごとの、ピン留めした資料のID。件数の上限はありません。資料の本文は保存しません。</td></tr>
+          <tr><td><code>git-artifact-pages:recent-artifacts:v1</code></td><td>サイトごとの、最近開いた資料のIDと開いた時刻。サイトごとに最大20件で、同じ資料は時刻を更新します。</td></tr>
+          <tr><td><code>git-artifact-pages-theme</code></td><td>テーマ（<code>system</code>、<code>light</code>、<code>dark</code>）。ないときや値が正しくないときは<code>system</code>。</td></tr>
+        </tbody>
+      </table></div>
+      <p>保存は、そのブラウザのプロファイルと、閲覧アプリのオリジン（ホスト名）ごとです。同じ端末でも、別のブラウザや別のホスト名の環境とは共有しません。プレビューの資料は、ピン留めや最近読んだ資料に入りません。</p>
+    </section>
+
+    <section class="doc-section" aria-labelledby="not-stored">
+      <h2 id="not-stored">保存しないもの</h2>
+      <ul>
+        <li>スクロールの位置は、ブラウザの履歴とメモリに一時的に持つだけです。</li>
+        <li>サイトの一覧（30秒、最大4サイト分）と本文検索のデータは、開いている間のメモリに持ちます。ブラウザのHTTPキャッシュは、上の保存とは別のものです。</li>
+        <li>localStorageが使えない環境（一部のプライベートブラウズなど）では、ピン留め、最近読んだ資料、テーマは、そのページを開いている間だけ有効です。</li>
+      </ul>
+    </section>
+
+    <section class="doc-section" aria-labelledby="clear">
+      <h2 id="clear">消す</h2>
+      <p>ピン留めは、資料のメニューの<strong>Unpin</strong>で1件ずつ外せます。まとめて消す画面はありません。すべて消すには、閲覧アプリを開いたブラウザで、そのホスト名のサイトデータを消すか、開発者ツールのコンソールで次を実行してから再読み込みします。</p>
+      <div class="term" aria-label="保存を消す">
+        <div class="term-head"><span>ブラウザのコンソール</span><button class="copy-btn" type="button">コピー</button></div>
+<pre><span data-copy>localStorage.removeItem('git-artifact-pages:pinned-artifacts:v1');
+localStorage.removeItem('git-artifact-pages:recent-artifacts:v1');
+localStorage.removeItem('git-artifact-pages-theme');</span></pre>
+      </div>
+      <p>開いたまま消すと、画面に残っている状態が保存し直されることがあるので、消したらすぐに再読み込みします。</p>
+    </section>
+
+    <nav class="pager" aria-label="ページ送り">
+      <a class="prev" href="urls.html"><small>前へ</small><strong>ページ・見出し・プレビューのURL</strong></a>
+      <a class="next" href="../configuration.html"><small>次へ</small><strong>設定ファイル</strong></a>
+    </nav>
+  </main>
+</body>
+</html>

@@ -1,0 +1,99 @@
+<!doctype html>
+<html lang="ja">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="description" content="artifact-pagesコマンドの一覧と主なフラグ、使うCLIの版の選ばれ方、試し実行、出力の形式、結果の値、終了コード。">
+  <title>CLI — Artifact Pages ドキュメント</title>
+  <script>
+    // Copy the reader app's theme (same-origin parent) before first paint; assets/site.js keeps it in sync.
+    (() => {
+      const root = document.documentElement;
+      root.classList.add('js');
+      try {
+        const theme = window.parent !== window && window.parent.document.documentElement.dataset.theme;
+        if (theme === 'light' || theme === 'dark') root.dataset.theme = theme;
+      } catch { /* cross-origin: fall back to prefers-color-scheme */ }
+    })();
+  </script>
+  <link rel="icon" href="data:,">
+  <link rel="stylesheet" href="../assets/site.css">
+  <script src="../assets/site.js" defer></script>
+</head>
+<body>
+  <a class="skip" href="#main">本文へ移動</a>
+  <main id="main" class="wrap">
+    <header class="page-head">
+      <div>
+        <p class="eyebrow">リファレンス</p>
+        <h1>CLI</h1>
+      </div>
+      <p class="lead"><code>artifact-pages</code>は、公開、登録、閲覧アプリの配置、ロック、設定の確認を行う1つのコマンドです。各コマンドの詳しいフラグは<code>artifact-pages &lt;command&gt; --help</code>で確かめられます。</p>
+    </header>
+
+    <section class="doc-section" aria-labelledby="commands">
+      <h2 id="commands">コマンド</h2>
+      <div class="table-wrap"><table>
+        <thead><tr><th>コマンド</th><th>用途と主なフラグ</th></tr></thead>
+        <tbody>
+          <tr><td><code>site sync</code></td><td>登録済みのサイトを1つ同期する。<code>--site</code>（必須）、<code>--source</code>（既定は登録の<code>sourcePath</code>）、<code>--ref</code>（記録する参照の表示だけ）、<code>--reconcile</code>、<code>--config</code>、<code>--dry-run</code>、<code>--format</code>。</td></tr>
+          <tr><td><code>preview publish</code></td><td>変更した資料のプレビューを公開する。<code>--site</code>（必須）、<code>--source</code>、<code>--head</code>（既定<code>HEAD</code>）、<code>--default-ref</code>（既定<code>origin/HEAD</code>）、<code>--pull-request</code>（番号かPRのURL。省くとプルリクエストに結び付けない）、<code>--include</code>（繰り返し可）、<code>--base-url</code>、<code>--config</code>、<code>--dry-run</code>、<code>--format</code>。</td></tr>
+          <tr><td><code>preview remove</code></td><td>プレビューのグループを削除する。<code>--site</code>と<code>--group</code>（<code>pr:&lt;番号&gt;</code>か<code>head:&lt;SHA&gt;</code>）が必須。<code>--config</code>、<code>--dry-run</code>、<code>--format</code>。</td></tr>
+          <tr><td><code>registry sync</code></td><td>設定の<code>sites</code>のとおりに登録を反映し、外したサイトを片づける。<code>--config</code>、<code>--accept-breaking</code>、<code>--dry-run</code>、<code>--format</code>。</td></tr>
+          <tr><td><code>registry setup</code></td><td>管理リポジトリの共通のワークフローを生成する。<code>--directory</code>（既定<code>.</code>）、<code>--config</code>、<code>--repository</code>、<code>--check</code>。</td></tr>
+          <tr><td><code>registry role-arn</code></td><td>AWSのサイトのロールのARNを表示する。<code>--config</code>と<code>--site</code>が必須。手元の設定ファイルだけを読み、AWSには問い合わせない。</td></tr>
+          <tr><td><code>app deploy</code></td><td>閲覧アプリを置く。<code>web.version</code>のリリースか、<code>--archive</code>の手元のバンドル。<code>--repository</code>、<code>--config</code>、<code>--accept-breaking</code>、<code>--dry-run</code>、<code>--format</code>。</td></tr>
+          <tr><td><code>app remove</code></td><td>閲覧アプリのファイルだけを削除する。<code>--config</code>、<code>--dry-run</code>、<code>--format</code>。</td></tr>
+          <tr><td><code>lock inspect</code></td><td>ロックの状態を見る。<code>--site</code>、または<code>--scope registry</code>か<code>--scope application</code>。</td></tr>
+          <tr><td><code>lock recover</code></td><td>残ったロックを解く。<code>lock inspect</code>と同じ指定と、<code>--observed-etag</code>（必須）。</td></tr>
+          <tr><td><code>config check</code></td><td>このCLIが書く形式と、配信先に記録された形式を、<code>web.version</code>の閲覧アプリが読めるかを確かめる。書き込みはしない。</td></tr>
+          <tr><td><code>config set-default</code></td><td>既定の設定の指定を保存する。</td></tr>
+          <tr><td><code>index build</code></td><td>手元で一覧だけを作る。公開はしない。<code>--site</code>（必須）、<code>--source</code>、<code>--out</code>（既定<code>.local/storage</code>）など。</td></tr>
+          <tr><td><code>compatibility --format json</code></td><td>このCLIが読み書きする形式を出力する。</td></tr>
+          <tr><td><code>version</code></td><td>CLIの版を表示する（<code>--format json</code>も可）。</td></tr>
+        </tbody>
+      </table></div>
+      <p><code>registry unregister</code>や<code>site publish</code>のような取り下げや公開の別コマンドはありません。サイトの取り下げは、<code>sites</code>から外して<code>registry sync</code>します。</p>
+    </section>
+
+    <section class="doc-section" aria-labelledby="version">
+      <h2 id="version">使うCLIの版</h2>
+      <p>配信先を操作するコマンドは、<code>--cli-version</code>、環境変数<code>ARTIFACT_PAGES_CLI_VERSION</code>、設定の<code>cli.version</code>の順に版を決めます。いまのCLIと違う版なら、その版をダウンロードし、チェックサムを確かめてから実行を任せます。<code>--cli-version</code>はコマンド名の前後どちらにも置けます。<code>registry setup</code>と<code>registry role-arn</code>は、実行したCLIそのものを使い、版の指定を受け付けません。</p>
+    </section>
+
+    <section class="doc-section" aria-labelledby="dry-run">
+      <h2 id="dry-run">試し実行</h2>
+      <p><code>--dry-run</code>は、設定と配信先を読み、何をするかを表示します。ロックの取得、記録の書き込み、配信先への書き込みと削除、キャッシュの変更、ロックの解除はしません。リリースのダウンロードや認証情報の導出は行うことがあります。</p>
+    </section>
+
+    <section class="doc-section" aria-labelledby="output">
+      <h2 id="output">出力と結果</h2>
+      <p>結果は既定で文章、<code>--format json</code>で標準出力にJSONを出します。失敗の説明は標準エラーに出ます。JSONには<code>operation</code>、<code>outcome</code>、<code>changes</code>などが入り、<code>github://</code>の設定を使った場合は<code>configCommitSha</code>も入ります。</p>
+      <div class="table-wrap"><table>
+        <thead><tr><th>操作</th><th><code>outcome</code></th></tr></thead>
+        <tbody>
+          <tr><td><code>site sync</code>、<code>registry sync</code></td><td><code>planned</code>（試し実行）、<code>synced</code>、<code>no-op</code></td></tr>
+          <tr><td><code>preview publish</code></td><td><code>planned</code>、<code>published</code>、<code>no-op</code>、<code>no-preview</code></td></tr>
+          <tr><td><code>app deploy</code></td><td><code>planned</code>、<code>deployed</code>、<code>no-op</code></td></tr>
+          <tr><td><code>preview remove</code>、<code>app remove</code></td><td><code>planned</code>、<code>removed</code>、<code>no-op</code></td></tr>
+          <tr><td><code>config check</code></td><td><code>checked</code></td></tr>
+          <tr><td><code>lock inspect</code>、<code>lock recover</code></td><td><code>inspected</code>、<code>recovered</code></td></tr>
+        </tbody>
+      </table></div>
+      <div class="table-wrap"><table>
+        <thead><tr><th>終了コード</th><th>意味</th></tr></thead>
+        <tbody>
+          <tr><td><code>0</code></td><td>成功。<code>no-op</code>と<code>no-preview</code>も成功です。</td></tr>
+          <tr><td><code>2</code></td><td>引数、設定、版の指定、Actionsの対応範囲の誤り。</td></tr>
+          <tr><td><code>1</code></td><td>配信先、ダウンロード、突き合わせ、互換性の確認の失敗。</td></tr>
+        </tbody>
+      </table></div>
+    </section>
+
+    <nav class="pager" aria-label="ページ送り">
+      <a class="prev" href="configuration.html"><small>前へ</small><strong>設定ファイル</strong></a>
+      <a class="next" href="github-actions.html"><small>次へ</small><strong>GitHub Actions</strong></a>
+    </nav>
+  </main>
+</body>
+</html>

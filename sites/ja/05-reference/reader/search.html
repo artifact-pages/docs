@@ -1,0 +1,89 @@
+<!doctype html>
+<html lang="ja">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="description" content="パレットのタイトル・パス・見出し・サイトの検索と、本文検索の対象、除外、一致の規則、結果の並び、抜粋、上限。">
+  <title>検索の対象と範囲 — Artifact Pages ドキュメント</title>
+  <script>
+    // Copy the reader app's theme (same-origin parent) before first paint; assets/site.js keeps it in sync.
+    (() => {
+      const root = document.documentElement;
+      root.classList.add('js');
+      try {
+        const theme = window.parent !== window && window.parent.document.documentElement.dataset.theme;
+        if (theme === 'light' || theme === 'dark') root.dataset.theme = theme;
+      } catch { /* cross-origin: fall back to prefers-color-scheme */ }
+    })();
+  </script>
+  <link rel="icon" href="data:,">
+  <link rel="stylesheet" href="../../assets/site.css">
+  <script src="../../assets/site.js" defer></script>
+</head>
+<body>
+  <a class="skip" href="#main">本文へ移動</a>
+  <main id="main" class="wrap">
+    <header class="page-head">
+      <div>
+        <p class="eyebrow">リファレンス · 閲覧アプリ</p>
+        <h1>検索の対象と範囲</h1>
+      </div>
+      <p class="lead">検索は2種類です。パレットは読み込み済みの一覧からタイトルやパスを探し、本文検索は公開のときに作られたデータから本文の言葉を探します。どちらも、いま開いているサイトだけが対象です。</p>
+    </header>
+
+    <section class="doc-section" aria-labelledby="palette">
+      <h2 id="palette">パレットの検索</h2>
+      <div class="table-wrap"><table>
+        <thead><tr><th>入力</th><th>対象と件数</th></tr></thead>
+        <tbody>
+          <tr><td>記号なし</td><td>サイトの資料のタイトル、パス、ファイル名（あいまい一致）。続いて本文検索への入口、フォルダ（最大4）、ほかの資料の見出し（最大6、1資料3まで）。資料に一致がなければ、開いている資料の見出しとコマンドも出る。</td></tr>
+          <tr><td><code>#言葉</code></td><td>サイトの全資料の見出し。開いている資料を先に、ほかの資料は最大20（1資料5まで）。</td></tr>
+          <tr><td><code>#</code>だけ</td><td>開いている資料の見出し。</td></tr>
+          <tr><td><code>@言葉</code></td><td>サイトの名前、ID、説明。名前とIDの一致を先に並べる。</td></tr>
+          <tr><td><code>&gt;</code></td><td>コマンド。</td></tr>
+        </tbody>
+      </table></div>
+      <p>入力はNFKCで正規化して小文字にしてから比べます。全角の英数字や記号も半角と同じに扱います。</p>
+    </section>
+
+    <section class="doc-section" aria-labelledby="fulltext">
+      <h2 id="fulltext">本文検索</h2>
+      <h3 id="scope">対象と除外</h3>
+      <div class="table-wrap"><table>
+        <thead><tr><th></th><th>内容</th></tr></thead>
+        <tbody>
+          <tr><td>対象</td><td>HTMLの<code>&lt;title&gt;</code>と静的な本文。Markdownの表示タイトルと、描画後のテキスト（コードブロックとリンクの文字を含む）。</td></tr>
+          <tr><td>除外</td><td>プレビュー、画像の代替テキスト、パス。HTMLの<code>script</code>、<code>style</code>、<code>template</code>、<code>noscript</code>、<code>&lt;title&gt;</code>以外の<code>head</code>、<code>hidden</code>や<code>aria-hidden="true"</code>や<code>data-search-ignore</code>の付いた要素の中。</td></tr>
+          <tr><td>見ないもの</td><td>JavaScriptが作る文字、CSSでの表示・非表示。CSSで隠しただけの部分は対象のままです。</td></tr>
+          <tr><td>使えるサイト</td><td>検索のデータがあるサイト。データは公開のたびに必ず作られます。古いCLIで公開したままのサイトは、公開し直すと使えます。</td></tr>
+        </tbody>
+      </table></div>
+      <h3 id="matching">一致の規則</h3>
+      <ul>
+        <li>NFKC、小文字化、空白の整理をしたうえで、スペースで区切ったすべての言葉が、資料のどこかの語の一部として含まれれば一致します。語順は問いません。</li>
+        <li>フレーズの完全一致、誤字の補正、意味での検索、複数サイトの横断はありません。</li>
+        <li>検索語は最大4096（UTF-16のコード単位）です。</li>
+      </ul>
+      <h3 id="results">結果</h3>
+      <div class="table-wrap"><table>
+        <thead><tr><th>項目</th><th>仕様</th></tr></thead>
+        <tbody>
+          <tr><td>検索の開始</td><td>入力が止まって約200 ms後。Enterならすぐ。日本語入力の変換中と確定のEnterでは検索しない。</td></tr>
+          <tr><td>500件以下</td><td>すべて取得し、タイトルに一致、見出しに一致（1つの見出しにすべての言葉がある）、本文だけに一致の順。同じ順位の中はパスの順。</td></tr>
+          <tr><td>500件超</td><td>パスの順に20件ずつ（<strong>Show more</strong>）。フォルダごとの件数は出さない。</td></tr>
+          <tr><td>フォルダで絞る</td><td><code>in=&lt;folder&gt;</code>で、その下の資料に絞る。</td></tr>
+          <tr><td>抜粋</td><td>最初の20件、そのあと20件ずつ。言葉を最も多く含む区切り（h1からh3の見出しごと）から、約160文字。</td></tr>
+          <tr><td>抜粋の上限</td><td>1資料262,144バイト、1サイト33,554,432バイト。資料の上限を超えた部分は切り、サイトの上限に入らない資料は抜粋なし（一致は残る）。</td></tr>
+          <tr><td>結果を開いたあと</td><td><code>?q=</code>で一致をハイライトし、最初の一致へ移る（見出しのURLで開いたときや、すでにスクロールしたときは移らない）。一致のバーを閉じてもURLの<code>?q=</code>は残る。</td></tr>
+        </tbody>
+      </table></div>
+      <p>サイトの一覧の読み込みは20秒で打ち切ります。資料がとても多いサイトでは、本文検索の前にサイトを開けないことがあります（「<a href="../../04-architecture/reading-and-search.html">閲覧と検索の仕組み</a>」）。</p>
+    </section>
+
+    <nav class="pager" aria-label="ページ送り">
+      <a class="prev" href="keyboard-shortcuts.html"><small>前へ</small><strong>キーボードショートカット</strong></a>
+      <a class="next" href="urls.html"><small>次へ</small><strong>ページ・見出し・プレビューのURL</strong></a>
+    </nav>
+  </main>
+</body>
+</html>

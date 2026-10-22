@@ -1,0 +1,114 @@
+<!doctype html>
+<html lang="ja">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="description" content="CloudflareとAWSのTerraformモジュールのRegistryのアドレスと版、要件、全入力の型と既定値と制約、出力。">
+  <title>Terraform — Artifact Pages ドキュメント</title>
+  <script>
+    // Copy the reader app's theme (same-origin parent) before first paint; assets/site.js keeps it in sync.
+    (() => {
+      const root = document.documentElement;
+      root.classList.add('js');
+      try {
+        const theme = window.parent !== window && window.parent.document.documentElement.dataset.theme;
+        if (theme === 'light' || theme === 'dark') root.dataset.theme = theme;
+      } catch { /* cross-origin: fall back to prefers-color-scheme */ }
+    })();
+  </script>
+  <link rel="icon" href="data:,">
+  <link rel="stylesheet" href="../assets/site.css">
+  <script src="../assets/site.js" defer></script>
+</head>
+<body>
+  <a class="skip" href="#main">本文へ移動</a>
+  <main id="main" class="wrap">
+    <header class="page-head">
+      <div>
+        <p class="eyebrow">リファレンス</p>
+        <h1>Terraform</h1>
+      </div>
+      <p class="lead">配信環境を作る2つのモジュールの入力と出力です。使い方の手順は「<a href="../02-setup/01-infrastructure/index.html">インフラを構築する</a>」にあります。詳しい説明は各モジュールのREADME（<a href="https://github.com/artifact-pages/artifact-pages/blob/main/terraform/modules/cloudflare/README.md" target="_blank" rel="noopener">Cloudflare</a>、<a href="https://github.com/artifact-pages/artifact-pages/blob/main/terraform/modules/aws/README.md" target="_blank" rel="noopener">AWS</a>）にあります。</p>
+    </header>
+
+    <section class="doc-section" aria-labelledby="modules">
+      <h2 id="modules">モジュールと要件</h2>
+      <div class="table-wrap"><table>
+        <thead><tr><th></th><th>Cloudflare</th><th>AWS</th></tr></thead>
+        <tbody>
+          <tr><td>Registryのアドレス</td><td><code>artifact-pages/artifact-pages/cloudflare</code></td><td><code>artifact-pages/artifact-pages/aws</code></td></tr>
+          <tr><td>版</td><td><code>0.1.1</code></td><td><code>0.1.1</code></td></tr>
+          <tr><td>Terraform</td><td><code>&gt;= 1.5.0, &lt; 2.0.0</code></td><td><code>&gt;= 1.5.0</code></td></tr>
+          <tr><td>プロバイダー</td><td><code>cloudflare/cloudflare &gt;= 5.24.0, &lt; 6.0.0</code></td><td><code>hashicorp/aws ~&gt; 6.0</code></td></tr>
+          <tr><td>Gitのソース</td><td colspan="2"><code>git::https://github.com/artifact-pages/terraform-&lt;provider&gt;-artifact-pages.git?ref=v0.1.1</code>（<code>version</code>は書かない）</td></tr>
+        </tbody>
+      </table></div>
+      <p>2つのモジュールは、それぞれ別の版の系列でリリースされます。</p>
+    </section>
+
+    <section class="doc-section" aria-labelledby="cloudflare">
+      <h2 id="cloudflare">Cloudflareの入力</h2>
+      <div class="table-wrap"><table>
+        <thead><tr><th>入力</th><th>型</th><th>既定と制約</th></tr></thead>
+        <tbody>
+          <tr><td><code>account_id</code>、<code>zone_id</code></td><td>string</td><td>必須。32桁の16進数。</td></tr>
+          <tr><td><code>public_hostname</code></td><td>string</td><td>必須。スキーム、ポート、パスなし。最大253文字、各ラベル63文字。</td></tr>
+          <tr><td><code>preview_retention_days</code></td><td>number</td><td>必須。1から36500の整数。</td></tr>
+          <tr><td><code>bucket_name</code></td><td>string</td><td><code>"artifact-pages"</code>。空とnullは不可。</td></tr>
+          <tr><td><code>access_key_id_env</code></td><td>string</td><td><code>"CF_R2_ACCESS_KEY_ID"</code></td></tr>
+          <tr><td><code>secret_access_key_env</code></td><td>string</td><td><code>"CF_R2_SECRET_ACCESS_KEY"</code></td></tr>
+          <tr><td><code>api_token_env</code></td><td>string</td><td><code>"CF_API_TOKEN"</code></td></tr>
+          <tr><td><code>registry_reader</code></td><td>object</td><td><code>null</code>。<code>access_key_id_env</code>と<code>secret_access_key_env</code>が必須、<code>session_token_env</code>は任意。</td></tr>
+          <tr><td><code>additional_lifecycle_rules</code></td><td>list(any)</td><td><code>[]</code>。残したいほかのライフサイクルの規則。</td></tr>
+          <tr><td><code>minimum_tls_version</code></td><td>string</td><td><code>"1.2"</code>。<code>1.0</code>、<code>1.1</code>、<code>1.2</code>、<code>1.3</code>。</td></tr>
+          <tr><td><code>connect_custom_domain</code></td><td>bool</td><td><code>true</code>。すでにつないであるホスト名なら<code>false</code>。</td></tr>
+          <tr><td><code>existing_transform_rules</code>、<code>existing_cache_rules</code>、<code>existing_response_header_rules</code>、<code>existing_config_rules</code></td><td>list(any)</td><td><code>[]</code>。取り込んだ既存のルールセットの、すべてのルールを順番どおりに。</td></tr>
+          <tr><td><code>transform_ruleset_name</code>ほか3つの<code>*_ruleset_name</code></td><td>string</td><td>既定は<code>Artifact Pages logical routes</code>、<code>Artifact Pages origin cache policy</code>、<code>Artifact Pages trusted HTML resource policy</code>、<code>Artifact Pages unchanged delivery</code>。既存を取り込むときはその名前。</td></tr>
+          <tr><td><code>waf_custom_rules</code></td><td>object</td><td><code>null</code>（WAFを管理しない）。<code>enabled</code>（既定<code>true</code>）、<code>ruleset_name</code>、<code>presets</code>（<code>https_only</code>、<code>ip_allowlist</code>）、<code>existing_rules</code>、<code>rules</code>。</td></tr>
+        </tbody>
+      </table></div>
+      <p>出力は<code>bucket_name</code>、<code>public_base_url</code>、<code>artifact_pages_deployment_config_yaml</code>です。</p>
+    </section>
+
+    <section class="doc-section" aria-labelledby="aws">
+      <h2 id="aws">AWSの入力</h2>
+      <div class="table-wrap"><table>
+        <thead><tr><th>入力</th><th>型</th><th>既定と制約</th></tr></thead>
+        <tbody>
+          <tr><td><code>aws_region</code></td><td>string</td><td>必須。</td></tr>
+          <tr><td><code>preview_retention_days</code></td><td>number</td><td>必須。1から36500の整数。</td></tr>
+          <tr><td><code>github_oidc_provider_arn</code></td><td>string</td><td>必須。登録済みのOIDCプロバイダー。適用先と同じアカウント。</td></tr>
+          <tr><td><code>admin_github_subjects</code></td><td>list(string)</td><td>必須。1つ以上の、<code>repo:</code>で始まる正確な<code>sub</code>。</td></tr>
+          <tr><td><code>satellite_github_subjects</code></td><td>map(list(string))</td><td><code>{}</code>。サイトIDごとの正確な<code>sub</code>。</td></tr>
+          <tr><td><code>name_prefix</code></td><td>string</td><td><code>"artifact-pages"</code>。英小文字で始まり、英小文字・数字・ハイフンの2から31文字。</td></tr>
+          <tr><td><code>bucket_name</code></td><td>string</td><td><code>null</code>（アカウントとリージョンから作る）。</td></tr>
+          <tr><td><code>github_oidc_issuer_url</code></td><td>string</td><td><code>"https://token.actions.githubusercontent.com"</code></td></tr>
+          <tr><td><code>aliases</code></td><td>list(string)</td><td><code>[]</code>。DNSは呼び出し側で作る。</td></tr>
+          <tr><td><code>acm_certificate_arn</code></td><td>string</td><td><code>null</code>。<code>aliases</code>を使うなら<code>us-east-1</code>の証明書。</td></tr>
+          <tr><td><code>viewer_protocol_policy</code></td><td>string</td><td><code>"redirect-to-https"</code>か<code>"https-only"</code>。</td></tr>
+          <tr><td><code>price_class</code></td><td>string</td><td><code>"PriceClass_100"</code>。<code>PriceClass_200</code>、<code>PriceClass_All</code>も可。</td></tr>
+          <tr><td><code>web_acl_arn</code></td><td>string</td><td><code>null</code>。自分で管理するWAFのACL。<code>waf_custom_rules</code>とは同時に使えない。</td></tr>
+          <tr><td><code>waf_custom_rules</code></td><td>object</td><td><code>null</code>。<code>default_action</code>（既定は許可）、<code>presets</code>（<code>ip_allowlist</code>）、<code>rules</code>、<code>custom_response_bodies</code>、可視化の設定。</td></tr>
+          <tr><td><code>tags</code></td><td>map(string)</td><td><code>{}</code></td></tr>
+        </tbody>
+      </table></div>
+      <div class="table-wrap"><table>
+        <thead><tr><th>出力</th><th>中身</th></tr></thead>
+        <tbody>
+          <tr><td><code>aws_deployment_config_yaml</code></td><td>設定ファイルに入れる配信先の設定</td></tr>
+          <tr><td><code>admin_role_arn</code></td><td>管理用のロール</td></tr>
+          <tr><td><code>satellite_role_arns</code></td><td>サイトIDごとのロール</td></tr>
+          <tr><td><code>distribution_domain_name</code>、<code>distribution_hosted_zone_id</code></td><td>ホスト名とRoute 53のエイリアス用</td></tr>
+          <tr><td><code>bucket_name</code>、<code>distribution_id</code>、<code>distribution_arn</code></td><td>識別子</td></tr>
+        </tbody>
+      </table></div>
+      <p>サイトのロールの名前は<code>&lt;name_prefix&gt;-&lt;サイトID&gt;-publisher</code>で、64文字を超える場合はサイトIDのハッシュを使った名前になります。<code>sites</code>を変えてもロールは変わらないので、<code>satellite_github_subjects</code>を変えて適用します。</p>
+    </section>
+
+    <nav class="pager" aria-label="ページ送り">
+      <a class="prev" href="github-actions.html"><small>前へ</small><strong>GitHub Actions</strong></a>
+      <a class="next" href="versions.html"><small>次へ</small><strong>バージョンと互換性</strong></a>
+    </nav>
+  </main>
+</body>
+</html>

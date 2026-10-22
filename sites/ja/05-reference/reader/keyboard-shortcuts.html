@@ -1,0 +1,119 @@
+<!doctype html>
+<html lang="ja">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="description" content="閲覧アプリのキーボード操作の一覧。全体で使えるキー、パレット、サイドバーの絞り込み、本文検索の画面、資料の中の一致、フォルダと一覧、メニュー。">
+  <title>キーボードショートカット — Artifact Pages ドキュメント</title>
+  <script>
+    // Copy the reader app's theme (same-origin parent) before first paint; assets/site.js keeps it in sync.
+    (() => {
+      const root = document.documentElement;
+      root.classList.add('js');
+      try {
+        const theme = window.parent !== window && window.parent.document.documentElement.dataset.theme;
+        if (theme === 'light' || theme === 'dark') root.dataset.theme = theme;
+      } catch { /* cross-origin: fall back to prefers-color-scheme */ }
+    })();
+  </script>
+  <link rel="icon" href="data:,">
+  <link rel="stylesheet" href="../../assets/site.css">
+  <script src="../../assets/site.js" defer></script>
+</head>
+<body>
+  <a class="skip" href="#main">本文へ移動</a>
+  <main id="main" class="wrap">
+    <header class="page-head">
+      <div>
+        <p class="eyebrow">リファレンス · 閲覧アプリ</p>
+        <h1>キーボードショートカット</h1>
+      </div>
+      <p class="lead">macOSでは<kbd>⌘</kbd>、WindowsとLinuxでは<kbd>Ctrl</kbd>を使います。どこで効くかもあわせて示します。</p>
+    </header>
+
+    <section class="doc-section" aria-labelledby="global">
+      <h2 id="global">どこでも使えるキー</h2>
+      <div class="table-wrap"><table>
+        <thead><tr><th>キー</th><th>動作</th></tr></thead>
+        <tbody>
+          <tr><td><kbd>⌘</kbd> <kbd>K</kbd> / <kbd>Ctrl</kbd> <kbd>K</kbd></td><td>パレットを開く（開いていれば閉じる）。サイトの一覧ではサイトのパレットを開く。</td></tr>
+          <tr><td><kbd>⌘</kbd> <kbd>B</kbd> / <kbd>Ctrl</kbd> <kbd>B</kbd></td><td>サイドバーの表示を切り替える。</td></tr>
+          <tr><td><kbd>⌘</kbd> <kbd>⇧</kbd> <kbd>F</kbd> / <kbd>Ctrl</kbd> <kbd>⇧</kbd> <kbd>F</kbd></td><td>本文検索の画面を開く、またはその検索欄へ移る。</td></tr>
+          <tr><td><kbd>⌘</kbd> <kbd>⇧</kbd> <kbd>O</kbd> / <kbd>Ctrl</kbd> <kbd>⇧</kbd> <kbd>O</kbd></td><td>Contents。狭い画面ではパネルを開閉し、右の列がある画面ではContentsへ移る。</td></tr>
+          <tr><td><kbd>Tab</kbd> → <kbd>Enter</kbd></td><td>最初の<strong>Skip to content</strong>で本文へ移る。</td></tr>
+        </tbody>
+      </table></div>
+      <p>HTMLの資料の中にフォーカスがあるときに効くのは、<kbd>⌘</kbd> <kbd>K</kbd>、<kbd>⌘</kbd> <kbd>⇧</kbd> <kbd>F</kbd>、<kbd>⌘</kbd> <kbd>B</kbd>と、一致のナビゲーターを閉じる<kbd>Esc</kbd>です。<kbd>⌘</kbd> <kbd>⇧</kbd> <kbd>O</kbd>はHTMLの中では効きません。</p>
+    </section>
+
+    <section class="doc-section" aria-labelledby="palette">
+      <h2 id="palette">パレット</h2>
+      <div class="table-wrap"><table>
+        <thead><tr><th>キー</th><th>動作</th></tr></thead>
+        <tbody>
+          <tr><td><kbd>↑</kbd> <kbd>↓</kbd> / <kbd>Ctrl</kbd> <kbd>K</kbd> <kbd>Ctrl</kbd> <kbd>J</kbd></td><td>候補を移る。</td></tr>
+          <tr><td><kbd>Enter</kbd></td><td>選んだ候補を開く。日本語入力の確定のEnterでは動かない。</td></tr>
+          <tr><td><kbd>⌘</kbd> <kbd>Enter</kbd> / <kbd>Ctrl</kbd> <kbd>Enter</kbd></td><td>入力した言葉で本文を検索する（記号なしの入力のとき）。</td></tr>
+          <tr><td><kbd>Tab</kbd> / <kbd>Shift</kbd> <kbd>Tab</kbd></td><td>パレットの中でフォーカスを回す。</td></tr>
+          <tr><td><kbd>Esc</kbd></td><td>パレットを閉じ、開く前の場所へ戻る。</td></tr>
+        </tbody>
+      </table></div>
+    </section>
+
+    <section class="doc-section" aria-labelledby="filter">
+      <h2 id="filter">サイドバーの絞り込み</h2>
+      <div class="table-wrap"><table>
+        <thead><tr><th>キー</th><th>動作</th></tr></thead>
+        <tbody>
+          <tr><td><kbd>Enter</kbd></td><td>入力した言葉で本文検索の画面を開く。</td></tr>
+          <tr><td><kbd>↓</kbd></td><td>最初の候補へ移る。</td></tr>
+          <tr><td><kbd>Esc</kbd></td><td>入力を消す。空ならフォーカスを外す。</td></tr>
+        </tbody>
+      </table></div>
+    </section>
+
+    <section class="doc-section" aria-labelledby="results">
+      <h2 id="results">本文検索の画面</h2>
+      <div class="table-wrap"><table>
+        <thead><tr><th>キー</th><th>動作</th></tr></thead>
+        <tbody>
+          <tr><td><kbd>Enter</kbd>（検索欄）</td><td>すぐに検索する。失敗のあとなら同じ言葉でやり直す。</td></tr>
+          <tr><td><kbd>↓</kbd>（検索欄）</td><td>最初の結果へ移る。</td></tr>
+          <tr><td><kbd>↑</kbd> <kbd>↓</kbd>（結果）</td><td>結果を移る。最初の結果で<kbd>↑</kbd>なら検索欄へ戻る。</td></tr>
+          <tr><td><kbd>Esc</kbd></td><td>結果からは検索欄へ戻る。検索欄では言葉を消し、空ならフォーカスを外す。</td></tr>
+        </tbody>
+      </table></div>
+    </section>
+
+    <section class="doc-section" aria-labelledby="matches">
+      <h2 id="matches">資料の中の一致</h2>
+      <div class="table-wrap"><table>
+        <thead><tr><th>キー</th><th>動作</th></tr></thead>
+        <tbody>
+          <tr><td><kbd>Enter</kbd> / <kbd>Shift</kbd> <kbd>Enter</kbd></td><td>次 / 前の一致へ。</td></tr>
+          <tr><td><kbd>Esc</kbd></td><td>一致のナビゲーターを閉じる。</td></tr>
+        </tbody>
+      </table></div>
+    </section>
+
+    <section class="doc-section" aria-labelledby="lists">
+      <h2 id="lists">フォルダ、一覧、メニュー</h2>
+      <div class="table-wrap"><table>
+        <thead><tr><th>場所</th><th>キー</th><th>動作</th></tr></thead>
+        <tbody>
+          <tr><td>サイドバーのフォルダ</td><td><kbd>→</kbd> / <kbd>←</kbd>、<kbd>Enter</kbd></td><td>開く / 閉じる。Enterでフォルダの画面へ。</td></tr>
+          <tr><td>資料の一覧</td><td><kbd>↑</kbd> <kbd>↓</kbd>、<kbd>Home</kbd> <kbd>End</kbd></td><td>行を移る、先頭 / 末尾へ。</td></tr>
+          <tr><td>資料のメニュー</td><td><kbd>P</kbd>、<kbd>L</kbd></td><td>Pinの切り替え、Copy link（メニューを開いているときだけ）。</td></tr>
+          <tr><td>各メニュー</td><td><kbd>↑</kbd> <kbd>↓</kbd>、<kbd>Home</kbd> <kbd>End</kbd>、<kbd>Esc</kbd>、<kbd>Space</kbd></td><td>項目を移る、閉じる、リンクを開く。</td></tr>
+          <tr><td>More actions</td><td><kbd>↓</kbd>、<kbd>Tab</kbd></td><td>ボタンの上で開く、メニューを閉じる。</td></tr>
+        </tbody>
+      </table></div>
+    </section>
+
+    <nav class="pager" aria-label="ページ送り">
+      <a class="prev" href="index.html"><small>前へ</small><strong>閲覧アプリ：画面と操作</strong></a>
+      <a class="next" href="search.html"><small>次へ</small><strong>検索の対象と範囲</strong></a>
+    </nav>
+  </main>
+</body>
+</html>
