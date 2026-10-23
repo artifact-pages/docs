@@ -50,34 +50,35 @@
     <section class="doc-section" aria-labelledby="publish">
       <h2 id="publish">チームのリポジトリから公開する</h2>
       <p>公開は、チームのリポジトリのGitHub Actionsのジョブで行います。チームが書くワークフローは短く、管理リポジトリが用意した共通の公開ワークフローを、サイトIDを指定して呼び出すだけです。共通のワークフローの中で、製品の<code>publish-action</code>が<code>artifact-pages site sync</code>を実行します。</p>
-      <ol>
-        <li>資料をプルリクエストで変更し、チームの中でレビューします。</li>
-        <li>マージすると、ワークフローが自分のサイトを公開します。変わったファイルだけが書き込まれ、消えたファイルは削除されます。</li>
-        <li>読者は、閲覧アプリでそのサイトを開けば新しい内容を読めます。</li>
-      </ol>
+      <figure class="fg" aria-labelledby="publish-structure-fig">
+        <div class="fg-head"><strong id="publish-structure-fig">各チームは、自分のサイトにだけ公開する</strong><span class="fg-note">説明用の例</span></div>
+        <div class="fg-body"><div class="tp"><div class="zn" data-kind="cloud"><span class="zn-l">配信先</span><div class="nd" data-kind="app"><b>閲覧アプリ</b><small>どのサイトも同じ画面で読む</small></div><div class="tp-row"><div class="nd" data-kind="site"><b>チームAのサイト</b></div><div class="nd" data-kind="site"><b>チームBのサイト</b></div><div class="nd" data-kind="site"><b>チームCのサイト</b></div></div></div><div class="tp-row"><div class="fl is-v"><span class="fl-a" data-dir="back"><span>公開</span></span></div><div class="fl is-v"><span class="fl-a" data-dir="back"><span>公開</span></span></div><div class="fl is-v"><span class="fl-a" data-dir="back"><span>公開</span></span></div></div><div class="tp-row"><div class="nd" data-kind="team"><b>チームAのリポジトリ</b><small>資料と短いワークフロー</small></div><div class="nd" data-kind="team"><b>チームBのリポジトリ</b><small>資料と短いワークフロー</small></div><div class="nd" data-kind="team"><b>チームCのリポジトリ</b><small>資料と短いワークフロー</small></div></div><div class="nd" data-kind="admin"><b>管理リポジトリ</b><small>共通の公開ワークフローとサイトの登録。どのチームの公開も、ここのワークフローを通る</small></div></div></div>
+        <figcaption>チームが持つのは、資料と短いワークフローだけです。公開の手順は管理リポジトリの共通のワークフローにまとまり、書き込む先は登録された自分のサイトに限られます。</figcaption>
+      </figure>
       <p>公開は試し実行（dry-run）もでき、何が変わるかを書き込まずに確かめられます。ワークフローの書き方は「<a href="../02-setup/05-first-site.html">最初のサイトを公開する</a>」で説明します。</p>
     </section>
 
     <section class="doc-section" aria-labelledby="independent">
       <h2 id="independent">サイトごとに独立した公開</h2>
-      <p>公開が書き込むのは、そのサイトの資料と一覧だけです。ほかのサイトの資料や閲覧アプリには触れないので、各チームは自分の都合で公開できます。</p>
+      <p>公開が書き込むのは、そのサイトの資料と一覧だけです。ほかのサイトの資料や閲覧アプリには触れません。全部のサイトをまとめて作り直す工程もないので、各チームは自分の資料をマージしたときに、自分のサイトだけを公開できます。</p>
+      <figure class="fg" aria-labelledby="independent-fig">
+        <div class="fg-head"><strong id="independent-fig">それぞれのタイミングで公開する</strong><span class="fg-note">説明用の例</span></div>
+        <div class="fg-body"><div class="tp tp-live"><div class="tp-row"><div class="nd" data-kind="site" data-tp-col="A" data-tp-ago="95"><b>チームAのサイト</b><small class="tp-t">最後の公開：<span>1時間前</span></small></div><div class="nd" data-kind="site" data-tp-col="B" data-tp-ago="12"><b>チームBのサイト</b><small class="tp-t">最後の公開：<span>12分前</span></small></div><div class="nd" data-kind="site" data-tp-col="C" data-tp-ago="240"><b>チームCのサイト</b><small class="tp-t">最後の公開：<span>4時間前</span></small></div></div><div class="tp-row"><div class="fl is-v"><span class="fl-a is-dashed" data-dir="back" data-tp-col="A"><span>公開</span><i class="tp-dot"></i></span></div><div class="fl is-v"><span class="fl-a is-dashed" data-dir="back" data-tp-col="B"><span>公開</span><i class="tp-dot"></i></span></div><div class="fl is-v"><span class="fl-a is-dashed" data-dir="back" data-tp-col="C"><span>公開</span><i class="tp-dot"></i></span></div></div><div class="tp-row"><div class="nd" data-kind="team"><b>チームAのリポジトリ</b></div><div class="nd" data-kind="team"><b>チームBのリポジトリ</b></div><div class="nd" data-kind="team"><b>チームCのリポジトリ</b></div></div></div></div>
+        <figcaption>各サイトは、担当するチームのリポジトリから公開されます。再生すると、チームがマージするたびに、そのチームのサイトだけが新しくなる様子を早回しで見られます。どのチームの公開も、ほかのチームの公開を待ちません。</figcaption>
+      </figure>
       <ul>
-        <li>同じサイトへの公開とプレビューは、ロックで1つずつ順に行われます。別のサイトの公開とは並んで進みます。</li>
+        <li>同じサイトへの公開とプレビューが重なったときは、ロックで1つずつ順に行われます。別のサイトの公開とは並んで進みます。</li>
         <li>公開は多数のファイルの書き込みなので、すべてが一瞬で切り替わるわけではありません。公開の直後は、キャッシュによって少しの間、古い内容が見えることがあります。</li>
       </ul>
-      <figure class="fg" aria-labelledby="lock-fig">
-        <div class="fg-head"><strong id="lock-fig">同時に公開したとき、何が待つか</strong><span class="fg-note">説明用の例</span></div>
-        <div class="fg-body"><div class="bn" style="--cols:6"><div class="bn-t"><span>1</span><span>2</span><span>3</span><span>4</span><span>5</span><span>6</span></div><div class="bn-r"><span class="bn-l">公開（<code>sre</code>）</span><span class="bn-b" data-kind="lock" style="--from:1;--to:3">ロックを持って書く</span></div><div class="bn-r"><span class="bn-l">プレビュー（<code>sre</code>）</span><span class="bn-b" data-kind="wait" style="--from:1;--to:3">待つ</span><span class="bn-b" data-kind="lock" style="--from:4;--to:6">ロックを持って書く</span></div><div class="bn-r"><span class="bn-l">公開（<code>checkout</code>）</span><span class="bn-b" data-kind="lock" style="--from:2;--to:5">ロックを持って書く</span></div><ul class="bn-k"><li data-kind="lock">サイトのロックを持っている</li><li data-kind="wait">同じサイトのロックが空くのを待つ</li></ul></div></div>
-        <figcaption>横は時間の流れです。同じサイト<code>sre</code>の公開とプレビューは順に進み、別のサイト<code>checkout</code>の公開はそれと並んで進みます。<span class="fg-scroll">図は横にスクロールして見られます。</span></figcaption>
-      </figure>
     </section>
 
     <section class="doc-section" aria-labelledby="preview">
       <h2 id="preview">プルリクエストをプレビューで確かめる</h2>
       <p>プレビューは、プルリクエストの変更を、本公開とは別の場所に公開したものです。レビューする人は、マージの前に、変更後の資料を閲覧アプリの中で読めます。</p>
-      <figure class="fg" aria-labelledby="preview-split-fig">
-        <div class="fg-head"><strong id="preview-split-fig">プレビューと本公開の行き先</strong><span class="fg-note">説明用の例</span></div>
-        <div class="fg-body"><div class="bd"><section class="bd-col"><h4 class="bd-h">チームのリポジトリ</h4><div class="nd" data-kind="team"><b>プルリクエスト</b><small>先頭のコミット</small></div><div class="nd" data-kind="team"><b><code>main</code>へのマージ</b></div></section><div class="bd-a"><span>公開する</span></div><section class="bd-col"><h4 class="bd-h">配信先</h4><div class="nd" data-kind="preview"><b>プレビュー</b><small><code>/sre/_previews/…</code>。本公開の一覧と検索には混ざらない</small></div><div class="nd" data-kind="site"><b>本公開のサイト<code>sre</code></b><small><code>/sre/…</code></small></div></section><div class="bd-a"><span>読む</span></div><section class="bd-col"><h4 class="bd-h">ブラウザ</h4><div class="nd" data-kind="reader"><b>レビューする人</b><small>マージの前にプレビューを読む</small></div><div class="nd" data-kind="reader"><b>読者</b><small>本公開を読む</small></div></section></div></div>
+      <figure class="fg" aria-labelledby="preview-flow-fig">
+        <div class="fg-head"><strong id="preview-flow-fig">PRからプレビューを開いて、マージする</strong><span class="fg-note">画面は簡略化した見本</span></div>
+        <div class="fg-body"><div class="fl pr"><div class="pr-step"><b><span class="pr-n">1</span>PRにコメントが付く</b><div class="pr-gh"><div class="pr-gh-h"><span class="pr-av"></span>github-actions <small>commented</small></div><div class="pr-gh-b"><strong>Artifact Pages preview: <code>team-a</code></strong><p><u>Open the preview list for this pull request</u></p><table><tr><th>Page</th><th>Path</th></tr><tr><td><u>障害対応の手順</u></td><td><code>runbooks/incident.md</code></td></tr></table><p class="pr-gh-f">Latest preview for commit <code>3f9a1c2</code>. This comment is updated in place on each push.</p></div></div></div><span class="fl-a"><span>リンクを開く</span></span><div class="pr-step"><b><span class="pr-n">2</span>閲覧アプリでプレビューを読む</b><div class="pr-app"><div class="pr-crumb">チームA / Previews / PR #482 / <strong>障害対応の手順</strong></div><div class="pr-doc"><h5>障害対応の手順</h5><i></i><i class="m"></i><i class="s"></i></div><dl class="pr-dl"><dt>Pull request</dt><dd><u>#482 on GitHub</u></dd><dt>Revision</dt><dd>3f9a1c2d8b4e</dd></dl></div></div><span class="fl-a"><span>OKならマージ</span></span><div class="pr-step"><b><span class="pr-n">3</span>本公開に載る</b><div class="pr-app"><div class="pr-crumb">チームA / runbooks / <strong>障害対応の手順</strong></div><div class="pr-doc"><h5>障害対応の手順</h5><i></i><i class="m"></i><i class="s"></i></div><p class="pr-meta">一覧と検索に載るのは、ここから</p></div></div></div></div>
+        <figcaption>プレビューはPRごとにまとまり、本公開の一覧と検索には混ざりません。PRのコメントは、有効にしたときだけ付きます。</figcaption>
       </figure>
       <div class="table-wrap"><table>
         <thead><tr><th>項目</th><th>内容</th></tr></thead>
