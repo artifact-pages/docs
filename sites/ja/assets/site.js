@@ -218,7 +218,7 @@
           last[i] = now();
           label();
           site.classList.add('is-hit');
-          setTimeout(() => site.classList.remove('is-hit'), 900);
+          timers[i + 2 * cols.length] = setTimeout(() => site.classList.remove('is-hit'), 900);
         }, 800);
         loop(i);
       }, 1200 + Math.random() * 5800);
@@ -231,6 +231,8 @@
       if (started) { base = now(); started = 0; }
       timers.forEach(clearTimeout);
       timers = [];
+      // 途中の点と光りも、その場で消す
+      cols.forEach(({ arrow, site }) => { arrow.classList.remove('is-go'); site.classList.remove('is-hit'); });
       clearInterval(ticker);
       ticker = 0;
       setPlayLabel(false);
