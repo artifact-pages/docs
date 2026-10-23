@@ -80,17 +80,12 @@
         <div class="fg-body"><div class="fl pr"><div class="pr-step"><b><span class="pr-n">1</span>PRにコメントが付く</b><div class="pr-gh"><div class="pr-gh-h"><span class="pr-av"></span>github-actions <small>commented</small></div><div class="pr-gh-b"><strong>Artifact Pages preview: <code>team-a</code></strong><p><u>Open the preview list for this pull request</u></p><table><tr><th>Page</th><th>Path</th></tr><tr><td><u>障害対応の手順</u></td><td><code>runbooks/incident.md</code></td></tr></table><p class="pr-gh-f">Latest preview for commit <code>3f9a1c2</code>. This comment is updated in place on each push.</p></div></div></div><span class="fl-a"><span>リンクを開く</span></span><div class="pr-step"><b><span class="pr-n">2</span>閲覧アプリでプレビューを読む</b><div class="pr-app"><div class="pr-crumb">チームA / Previews / PR #482 / <strong>障害対応の手順</strong></div><div class="pr-doc"><h5>障害対応の手順</h5><i></i><i class="m"></i><i class="s"></i></div><dl class="pr-dl"><dt>Pull request</dt><dd><u>#482 on GitHub</u></dd><dt>Revision</dt><dd>3f9a1c2d8b4e</dd></dl></div></div><span class="fl-a"><span>OKならマージ</span></span><div class="pr-step"><b><span class="pr-n">3</span>本公開に載る</b><div class="pr-app"><div class="pr-crumb">チームA / runbooks / <strong>障害対応の手順</strong></div><div class="pr-doc"><h5>障害対応の手順</h5><i></i><i class="m"></i><i class="s"></i></div><p class="pr-meta">一覧と検索に載るのは、ここから</p></div></div></div></div>
         <figcaption>プレビューはPRごとにまとまり、本公開の一覧と検索には混ざりません。PRのコメントは、有効にしたときだけ付きます。</figcaption>
       </figure>
-      <div class="table-wrap"><table>
-        <thead><tr><th>項目</th><th>内容</th></tr></thead>
-        <tbody>
-          <tr><td>対象</td><td>プルリクエストで追加・変更した資料と、変更したCSSや画像などを参照している資料。参照は資料のファイルから読み取れるものに限り、JavaScriptが実行時に組み立てる参照は含みません。削除した資料にプレビューはありません。</td></tr>
-          <tr><td>内容</td><td>プルリクエストの先頭のコミットの内容です。マージしたあとの姿を合成したものではありません。</td></tr>
-          <tr><td>開き方</td><td>サイトのトップの<strong>Previews</strong>、パレットの<strong>Open previews</strong>、共有されたプレビューのURL、またはプルリクエストのコメント。</td></tr>
-          <tr><td>コメント</td><td>任意です。有効にすると、サイトごとに1つのコメントを作り、プレビューを更新するたびにそのコメントを書き換えます。</td></tr>
-          <tr><td>残る期間</td><td>配信先の設定で決めた日数が過ぎると、自動で削除されます。プルリクエストを閉じただけでは消えません。</td></tr>
-        </tbody>
-      </table></div>
-      <p>プレビューは、本公開の一覧、最近更新された資料、検索には混ざりません。プレビューの中のリンクは、同じプレビューに含まれる資料ならそのプレビューへ、それ以外なら本公開の資料へ移ります。</p>
+      <ul>
+        <li>プレビューの中身は、プルリクエストの先頭のコミットです。プッシュするたびに作り直されます。</li>
+        <li>PRのコメントのほか、サイトのトップの<strong>Previews</strong>からも開けます。</li>
+        <li>プレビューの中のリンクは、同じプレビューにある資料ならプレビューへ、それ以外は本公開の資料へ移ります。</li>
+        <li>フォークからのプルリクエストにはプレビューを作りません。プレビューは、配信先で決めた日数が過ぎると自動で消えます。</li>
+      </ul>
       <figure class="fg" aria-labelledby="previews-fig">
         <div class="fg-head"><strong id="previews-fig">サイトのPreviews</strong><span class="fg-note">閲覧アプリ（簡略化した見本）</span></div>
         <div class="fg-body"><div class="sc" data-view="preview" aria-hidden="true"><aside class="sc-side"><div class="sc-site"><b>S</b>SREチーム<i>3</i></div>
@@ -104,12 +99,6 @@
 <div class="sc-grp"><header><div><span class="sc-ey">Manual preview</span> <i class="sc-m">2</i><h6>Revision 8c01d7ae</h6><span class="sc-meta">8c01d7ae51f2 · Oct 22, 2026, 4:12 PM GMT+9</span></div></header>
 <ul class="sc-rows"><li><span><b>SLOの見直し</b><code>slo/review.md</code></span></li></ul></div></div></div></div><ol class="sc-legend"><li><span>プルリクエストのプレビュー。変わった資料が並ぶ。</span></li><li><span>プルリクエストに結び付けないで作ったプレビュー。</span></li></ol></div>
       </figure>
-      <div class="callout" role="note">
-        <span class="ico">対象のPR</span>
-        <div>
-          <p><strong>プレビューは、同じリポジトリのブランチからのプルリクエストだけが対象です。</strong>フォークからのプルリクエストにはプレビューを作りません。プレビューのHTMLも本公開と同じく、そのまま動く資料として扱われます。</p>
-        </div>
-      </div>
       <p>プレビューを使えるようにする手順は「<a href="../02-setup/06-pr-previews.html">PRプレビューを使えるようにする</a>」で説明します。</p>
     </section>
 
