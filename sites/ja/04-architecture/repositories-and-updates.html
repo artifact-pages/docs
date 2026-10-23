@@ -4,7 +4,7 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <meta name="description" content="管理リポジトリとサテライトリポジトリの役割の分け方と、サイトの資料、登録、閲覧アプリ、共通のワークフロー、製品のActionsがそれぞれ別の単位で更新される理由。">
-  <title>リポジトリと更新の単位 — Artifact Pages ドキュメント</title>
+  <title>リポジトリと更新の単位</title>
   <script>
     // Copy the reader app's theme (same-origin parent) before first paint; assets/site.js keeps it in sync.
     (() => {
@@ -29,6 +29,7 @@
         <h1>リポジトリと更新の単位</h1>
       </div>
       <p class="lead">Artifact Pagesでは、何をどこに置くかと、何がどの単位で更新されるかを分けています。そうすることで、各チームは管理者を待たずに公開でき、管理者は各チームを止めずに全体を更新できます。</p>
+      <p class="answer"><span class="answer-label">要点</span>管理リポジトリは環境全体を、サテライトは自分のサイトだけを更新します。別のサイトの公開は並んで進み、同じサイトにかかわる登録の変更や閲覧アプリの配置とだけ、サイトのロックで順番になります。</p>
     </header>
 
     <section class="doc-section" aria-labelledby="repos">
@@ -47,6 +48,10 @@
 
     <section class="doc-section" aria-labelledby="units">
       <h2 id="units">更新の単位</h2>
+      <figure class="fg" aria-labelledby="units-fig">
+        <div class="fg-head"><strong id="units-fig">どのジョブが、配信先のどこを書くか</strong><span class="fg-note">説明用の例</span></div>
+        <div class="fg-body"><div class="bd"><section class="bd-col"><h4 class="bd-h">ジョブ</h4><div class="nd" data-kind="team"><b>チームのジョブ</b><small><code>site sync</code>、<code>preview publish</code></small></div><div class="nd" data-kind="admin"><b>管理リポジトリのジョブ</b><small><code>registry sync</code></small></div><div class="nd" data-kind="admin"><b>管理リポジトリのジョブ</b><small><code>app deploy</code></small></div></section><div class="bd-a"><span>書く</span></div><section class="bd-col"><h4 class="bd-h">配信先の領域</h4><div class="nd" data-kind="site"><b>そのサイトの資料、一覧、プレビュー</b><small>サイトごとに分かれる</small></div><div class="nd" data-kind="registry"><b>サイトの登録情報</b><small>取り下げたサイトの削除も</small></div><div class="nd" data-kind="app"><b>閲覧アプリのファイル</b><small>資料とは別</small></div></section></div></div>
+      </figure>
       <div class="table-wrap"><table>
         <thead><tr><th>更新するもの</th><th>操作</th><th>影響する範囲</th></tr></thead>
         <tbody>
@@ -64,7 +69,7 @@
     <section class="doc-section" aria-labelledby="why">
       <h2 id="why">なぜ分けるのか</h2>
       <ul>
-        <li><strong>チームの公開が、ほかを待たない。</strong>サイトの資料の更新は、そのサイトの領域だけを書くので、ほかのチームの公開と並んで進められます。閲覧アプリの配置とは、サイトのロックで順番に進みます。配置の間、チームの公開は配置が終わるのを待ちます。</li>
+        <li><strong>チームの公開が、ほかを待たない。</strong>サイトの資料の更新は、そのサイトの領域だけを書くので、ほかのチームの公開と並んで進められます。閲覧アプリの配置や、そのサイトの登録の変更とは、サイトのロックで順番に進みます。先にロックを持った側が終わるまで、もう一方が待ちます。</li>
         <li><strong>閲覧アプリの更新で、全サイトを公開し直さない。</strong>閲覧アプリは資料とは別のファイルで、形式が変わらない限り、資料をそのままにして入れ替えられます。</li>
         <li><strong>変更がいつ届くかを、参照の固定で選べる。</strong>チームのワークフローが共通のワークフローを<code>@main</code>で参照すれば管理者の変更にすぐ追従し、SHAで固定すれば自分で更新するまで変わりません。どちらを選ぶかは組織の運用です（「<a href="../03-operations/update-shared-workflows.html">共通の公開・プレビューの仕組みを更新する</a>」）。</li>
       </ul>

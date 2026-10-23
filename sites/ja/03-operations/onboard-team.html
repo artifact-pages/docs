@@ -4,7 +4,7 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <meta name="description" content="次のチームのサイトを管理リポジトリに登録し、配信先の権限を足し、共通のワークフローを呼び出すワークフローを渡して、最初の公開まで進める。">
-  <title>新しいチーム・サイトを受け入れる — Artifact Pages ドキュメント</title>
+  <title>新しいチーム・サイトを受け入れる</title>
   <script>
     // Copy the reader app's theme (same-origin parent) before first paint; assets/site.js keeps it in sync.
     (() => {
@@ -30,6 +30,10 @@
       </div>
       <p class="lead">2つ目以降のチームを受け入れるときに必要なのは、サイトの登録、配信先の権限、チームのワークフローの3つだけです。環境はすでにあるので作り直しません。ここでは、説明用の例として<code>acme/billing</code>のサイト<code>billing</code>を受け入れます。</p>
     </header>
+
+    <section class="doc-section" aria-label="受け入れの流れ">
+      <ol class="st"><li><span class="st-who" data-kind="admin">管理者</span><b><a href="#request">サイトを登録する</a></b><p><code>sites</code>に<code>billing</code>を足して反映する</p></li><li><span class="st-who" data-kind="admin">管理者</span><b><a href="#access">配信先の権限を足す</a></b><p>AWSはロール、Cloudflareは認証情報</p></li><li><span class="st-who" data-kind="admin">管理者</span><b><a href="#workflow">チームにワークフローを渡す</a></b><p>共通のワークフローを呼び出す短いワークフロー</p></li><li><span class="st-who" data-kind="team">チーム</span><b><a href="#first">最初の公開を確かめる</a></b><p>手動で動かすか、<code>main</code>にマージして公開する</p></li></ol>
+    </section>
 
     <section class="doc-section" aria-labelledby="request">
       <h2 id="request">1. サイトを登録する</h2>

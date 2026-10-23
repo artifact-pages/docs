@@ -4,7 +4,7 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <meta name="description" content="管理リポジトリが配る共通の公開・プレビューのワークフローを作り直し、その変更がいつ各チームに届くかを、参照の固定のしかたごとに確かめる。">
-  <title>共通の公開・プレビューの仕組みを更新する — Artifact Pages ドキュメント</title>
+  <title>共通の公開・プレビューの仕組みを更新する</title>
   <script>
     // Copy the reader app's theme (same-origin parent) before first paint; assets/site.js keeps it in sync.
     (() => {
@@ -34,6 +34,11 @@
     <section class="doc-section" aria-labelledby="layers">
       <h2 id="layers">何がどこで固定されているか</h2>
       <p>チームのジョブが実際に動かすものは、3か所の固定で決まります。</p>
+      <figure class="fg" aria-labelledby="pins-fig">
+        <div class="fg-head"><strong id="pins-fig">3か所の固定</strong><span class="fg-note">説明用の例</span></div>
+        <div class="fg-body"><div class="fl"><div class="nd" data-kind="team"><b>チームのワークフロー</b><small>acme/sre</small></div><span class="fl-a"><span>固定1：<code>@main</code>かSHA</span></span><div class="nd" data-kind="admin"><b>共通のワークフローと<code>artifact-pages.yaml</code></b><small>参照したコミットのもの</small></div><span class="fl-a"><span>固定2：ActionのSHA</span></span><div class="nd" data-kind="ci"><b>製品のAction</b><small><code>publish-action</code>、<code>preview-action</code></small></div><span class="fl-a"><span>固定3：<code>cli.version</code></span></span><div class="nd" data-kind="cli"><b>公開を行うCLI</b></div></div></div>
+        <figcaption>チームが<code>@main</code>を参照していれば、管理リポジトリの<code>main</code>の変更は次の実行から届きます。SHAやタグで参照していると、固定1から先はすべて古いままです。</figcaption>
+      </figure>
       <div class="table-wrap"><table>
         <thead><tr><th>固定する場所</th><th>決まるもの</th><th>変わるとき</th></tr></thead>
         <tbody>

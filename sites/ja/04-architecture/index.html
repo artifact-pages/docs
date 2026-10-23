@@ -4,7 +4,7 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <meta name="description" content="Artifact Pagesの全体構成と設計方針。Gitを正本にしたサイトごとの静的な公開、共通の閲覧アプリ、リクエストを処理するサーバーのない配信。">
-  <title>アーキテクチャ — Artifact Pages ドキュメント</title>
+  <title>アーキテクチャ</title>
   <script>
     // Copy the reader app's theme (same-origin parent) before first paint; assets/site.js keeps it in sync.
     (() => {
@@ -29,16 +29,17 @@
         <h1>アーキテクチャの全体像</h1>
       </div>
       <p class="lead">Artifact Pagesは、各サイトの静的なファイルをオブジェクトストレージに置き、ブラウザで動く閲覧アプリがそれを読む構成です。この章では、なぜこの形なのか、どこに境界とトレードオフがあるのかを説明します。</p>
+      <p class="answer"><span class="answer-label">要点</span>Gitが正本です。各サイトはCLIで配信先へ別々に同期され、ブラウザの共通の閲覧アプリがそれを読みます。閲覧に必要なアプリケーションサーバーはありません（AWSでは、CloudFront FunctionsがURLを振り分けます）。</p>
     </header>
 
     <section class="doc-section" aria-labelledby="shape">
       <h2 id="shape">全体の構成</h2>
       <p>Gitのリポジトリから、CLIがサイトごとに静的なファイルの集まり（以下、投影）を作り、配信先のストレージに同期します。読者のブラウザは、CDNから閲覧アプリとそのファイルを受け取り、すべての画面をブラウザの中で組み立てます。</p>
-      <div class="term" aria-label="公開から閲覧までの経路">
-        <div class="term-head"><span>経路</span></div>
-<pre>Gitのリポジトリ ──CLI（site sync）──▶ オブジェクトストレージ ──CDN──▶ ブラウザの閲覧アプリ
-                                       R2 / S3                Cloudflare / CloudFront</pre>
-      </div>
+      <figure class="fg" aria-labelledby="shape-fig">
+        <div class="fg-head"><strong id="shape-fig">Gitからブラウザまで</strong></div>
+        <div class="fg-body"><div class="fl"><div class="nd" data-kind="team"><b>Gitのリポジトリ</b><small>正本</small></div><span class="fl-a"><span>CLIが投影を作る</span></span><div class="nd" data-kind="cli"><b><code>site sync</code></b><small>サイトごと</small></div><span class="fl-a"><span>同期する</span></span><div class="nd" data-kind="store"><b>オブジェクトストレージ</b><small>R2 / S3</small></div><span class="fl-a"><span>配る</span></span><div class="nd" data-kind="cdn"><b>CDN</b><small>Cloudflare / CloudFront。振り分けとキャッシュの規則</small></div><span class="fl-a"><span>読む</span></span><div class="nd" data-kind="app"><b>閲覧アプリ</b><small>読者のブラウザの中で画面を組み立てる</small></div></div></div>
+        <figcaption>リクエストの経路にアプリケーションサーバーはありません。</figcaption>
+      </figure>
       <p>読者のリクエストを処理するアプリケーションサーバーはありません。配信の経路にあるのは、ストレージと、URLの振り分けとキャッシュの規則だけです（AWSでは、URLの振り分けにCloudFront Functionsを使います）。</p>
       <div class="table-wrap"><table>
         <thead><tr><th>領域</th><th>パス</th><th>中身</th></tr></thead>

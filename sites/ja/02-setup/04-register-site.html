@@ -4,7 +4,7 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <meta name="description" content="管理リポジトリのsitesに最初のサイトを書き、registry.ymlのワークフローで試し実行してから配信先に反映する。sitesが完全な一覧であることと、登録が認めること。">
-  <title>サイトを登録する — Artifact Pages ドキュメント</title>
+  <title>サイトを登録する</title>
   <script>
     // Copy the reader app's theme (same-origin parent) before first paint; assets/site.js keeps it in sync.
     (() => {
@@ -30,6 +30,8 @@
       </div>
       <p class="lead">最初のチームのサイト<code>sre</code>を登録します。登録すると、<code>acme/sre</code>の指定したディレクトリから、このサイトに公開できるようになります。</p>
     </header>
+
+    <nav class="sm" aria-label="導入のステップ"><ol><li class="is-done"><a href="01-infrastructure/index.html"><span class="sm-n">1</span><b>インフラを構築する</b></a></li><li class="is-done"><a href="02-admin-repository.html"><span class="sm-n">2</span><b>管理リポジトリを準備する</b></a></li><li class="is-done"><a href="03-reader-app.html"><span class="sm-n">3</span><b>閲覧アプリをデプロイする</b></a></li><li><a href="04-register-site.html" aria-current="step"><span class="sm-n">4</span><b>サイトを登録する</b></a></li><li><a href="05-first-site.html"><span class="sm-n">5</span><b>最初のサイトを公開する</b></a></li><li><a href="06-pr-previews.html"><span class="sm-n">6</span><b>PRプレビューを使えるようにする</b></a></li></ol></nav>
 
     <section class="doc-section" aria-labelledby="write">
       <h2 id="write">sitesに書く</h2>
@@ -84,6 +86,14 @@
         <li>この確認は、配信先の権限の代わりにはなりません。バケットに広く書ける認証情報を持つ人は、CLIを通さずに書き込めます。AWSでは、サイトのIAMロールがTerraformで作られていることも必要です（<a href="01-infrastructure/aws.html#roles">IAMロールとOIDC</a>）。</li>
         <li>登録は、読者を限定しません。</li>
       </ul>
+    </section>
+
+    <section class="doc-section" aria-labelledby="state">
+      <h2 id="state">このステップのあとの状態</h2>
+      <figure class="fg" aria-labelledby="state-fig">
+        <div class="fg-head"><strong id="state-fig">ステップ4のあとの状態</strong><span class="fg-note">説明用の例</span></div>
+        <div class="fg-body"><div class="bd"><section class="bd-col"><h4 class="bd-h">GitHub</h4><div class="nd is-new" data-kind="admin"><b>管理リポジトリ</b><small><code>artifact-pages.yaml</code>、共通のワークフロー、配置のワークフロー、<code>sites</code>に<code>sre</code></small><span class="nd-badge">このステップ</span></div><div class="nd is-dim" data-kind="team"><b>チームのリポジトリ</b><small>ステップ5で用意</small></div></section><div class="bd-a"><span>書き込む</span></div><section class="bd-col"><h4 class="bd-h">配信先</h4><div class="nd" data-kind="store"><b>ストレージとCDN</b><small>ホスト名、配信の規則、認証情報</small></div><div class="nd" data-kind="app"><b>閲覧アプリ</b><small>ホスト名のトップで開く</small></div><div class="nd is-new" data-kind="registry"><b>サイトの登録情報</b><small><code>sre</code>（資料はまだない）</small><span class="nd-badge">このステップ</span></div><div class="nd is-dim" data-kind="site"><b>サイト<code>sre</code></b><small>ステップ5で用意</small></div><div class="nd is-dim" data-kind="preview"><b>プレビュー</b><small>ステップ6で用意</small></div></section><div class="bd-a"><span>読む</span></div><section class="bd-col"><h4 class="bd-h">ブラウザ</h4><div class="nd" data-kind="reader"><b>読者</b><small>閲覧アプリが開く（資料はまだない）</small></div></section></div></div>
+      </figure>
     </section>
 
     <nav class="pager" aria-label="ページ送り">

@@ -4,7 +4,7 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <meta name="description" content="閲覧アプリが読み込むもの、タイトルとパスの検索、静的なファイルだけで動く本文検索の形と制約、サイトの規模による限界。">
-  <title>閲覧と検索の仕組み — Artifact Pages ドキュメント</title>
+  <title>閲覧と検索の仕組み</title>
   <script>
     // Copy the reader app's theme (same-origin parent) before first paint; assets/site.js keeps it in sync.
     (() => {
@@ -29,10 +29,16 @@
         <h1>閲覧と検索の仕組み</h1>
       </div>
       <p class="lead">検索のためのサーバーはありません。閲覧アプリは、公開のときに作られた一覧と検索のデータを、必要な分だけ配信先から読み込み、ブラウザの中で検索します。</p>
+      <p class="answer"><span class="answer-label">要点</span>閲覧アプリは、公開のときに作られた静的な一覧と検索のデータを必要な分だけ読み、検索をブラウザの中で行います。</p>
     </header>
 
     <section class="doc-section" aria-labelledby="loading">
       <h2 id="loading">閲覧アプリが読み込むもの</h2>
+      <figure class="fg" aria-labelledby="load-fig">
+        <div class="fg-head"><strong id="load-fig">閲覧アプリが、いつ何を読むか</strong></div>
+        <div class="fg-body">      <ol class="st"><li><span class="st-who" data-kind="auto">起動</span><b>サイトの登録情報と概要を読む</b><p><code>/_indexes/sites.json</code>と各サイトの<code>meta.json</code></p></li><li><span class="st-who" data-kind="reader">読者</span><b>サイトを開く</b><p>そのサイトの<code>index.json</code>だけ</p></li><li><span class="st-who" data-kind="reader">読者</span><b>資料を開く</b><p>その資料のファイル</p></li><li><span class="st-who" data-kind="reader">読者</span><b>本文を検索する</b><p>検索の目次<code>manifest.json</code>と、必要な区画のファイル</p></li></ol></div>
+        <figcaption>2から4は、読者がその操作をしたときだけ起こります。</figcaption>
+      </figure>
       <ol>
         <li>起動すると、サイトの登録情報<code>/_indexes/sites.json</code>と、各サイトの小さな概要<code>meta.json</code>を読みます。サイトの一覧に出る資料の数や更新日は、この概要から出します。</li>
         <li>サイトを開くと、そのサイトの全資料の情報<code>index.json</code>を読みます。ほかのサイトの一覧は先読みしません。</li>
@@ -49,6 +55,11 @@
     <section class="doc-section" aria-labelledby="fulltext">
       <h2 id="fulltext">静的な本文検索</h2>
       <p>本文検索のデータは、公開のたびに<code>site sync</code>が作ります。データは、変わりうる目次（<code>manifest.json</code>）と、中身から名前を決めた変わらないファイル（<code>root-…gz</code>、最大128個の<code>leaf-…gz</code>、抜粋用の<code>sections-…gz</code>と<code>text-…gz</code>）でできています。</p>
+      <figure class="fg" aria-labelledby="search-fig">
+        <div class="fg-head"><strong id="search-fig">1回の本文検索で読むもの</strong></div>
+        <div class="fg-body"><div class="fl"><div class="nd" data-kind="reader"><b>検索語</b><small>正規化して言葉に分ける</small></div><span class="fl-a"></span><div class="nd" data-kind="site"><b><code>manifest.json</code></b><small>検索の目次。60秒たつと確かめ直す</small></div><span class="fl-a"></span><div class="nd" data-kind="site"><b><code>root-…gz</code></b><small>辞書と資料のパス</small></div><span class="fl-a"><span>必要な区画だけ</span></span><div class="fl-stack"><div class="nd" data-kind="site"><b><code>leaf-…gz</code></b></div><div class="nd" data-kind="site"><b><code>leaf-…gz</code></b></div></div><span class="fl-a"><span>表示する分だけ</span></span><div class="nd" data-kind="site"><b><code>sections-…gz</code>、<code>text-…gz</code></b><small>抜粋</small></div></div></div>
+        <figcaption><code>manifest.json</code>のほかは中身から名前を決めたファイルなので、長くキャッシュできます。</figcaption>
+      </figure>
       <ul>
         <li>検索のときは、目次と、必要な区画のファイルだけを読みます。資料のファイルを1件ずつ取り寄せることはしません。抜粋は、表示する分の抜粋用のファイルから作ります。</li>
         <li>中身から名前を決めたファイルは変わらないので、長くキャッシュできます。目次は60秒たつと次の検索で確かめ直します。</li>

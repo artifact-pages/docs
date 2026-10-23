@@ -4,7 +4,7 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <meta name="description" content="管理リポジトリに設定ファイルを置き、各チームが呼び出す共通の公開・プレビューのワークフローをregistry setupで生成し、認証情報とOrganizationからの呼び出しを設定する。">
-  <title>管理リポジトリを準備する — Artifact Pages ドキュメント</title>
+  <title>管理リポジトリを準備する</title>
   <script>
     // Copy the reader app's theme (same-origin parent) before first paint; assets/site.js keeps it in sync.
     (() => {
@@ -30,6 +30,8 @@
       </div>
       <p class="lead">管理リポジトリ<code>acme/platform-admin</code>に、配信先の設定と、各チームが呼び出す共通のワークフローを用意します。このステップが終わると、チームは短いワークフローを1つ置くだけで公開できるようになります。</p>
     </header>
+
+    <nav class="sm" aria-label="導入のステップ"><ol><li class="is-done"><a href="01-infrastructure/index.html"><span class="sm-n">1</span><b>インフラを構築する</b></a></li><li><a href="02-admin-repository.html" aria-current="step"><span class="sm-n">2</span><b>管理リポジトリを準備する</b></a></li><li><a href="03-reader-app.html"><span class="sm-n">3</span><b>閲覧アプリをデプロイする</b></a></li><li><a href="04-register-site.html"><span class="sm-n">4</span><b>サイトを登録する</b></a></li><li><a href="05-first-site.html"><span class="sm-n">5</span><b>最初のサイトを公開する</b></a></li><li><a href="06-pr-previews.html"><span class="sm-n">6</span><b>PRプレビューを使えるようにする</b></a></li></ol></nav>
 
     <section class="doc-section" aria-labelledby="config">
       <h2 id="config">設定ファイルを置く</h2>
@@ -100,6 +102,11 @@
     <section class="doc-section" aria-labelledby="how">
       <h2 id="how">共通のワークフローの動き方</h2>
       <p>チームのワークフローが<code>uses: acme/platform-admin/.github/workflows/publish-site.yml@main</code>で呼び出すと、共通のワークフローは、自分と同じコミットにある<code>artifact-pages.yaml</code>を使って、そのチームのリポジトリを公開します。</p>
+      <figure class="fg" aria-labelledby="chain-fig">
+        <div class="fg-head"><strong id="chain-fig">チームが公開するとき、何が何を呼び出すか</strong><span class="fg-note">説明用の例</span></div>
+        <div class="fg-body"><div class="fl"><div class="nd" data-kind="team"><b>チームのワークフロー</b><small>acme/sreの<code>publish.yml</code></small></div><span class="fl-a"><span>呼び出す</span></span><div class="nd" data-kind="admin"><b>共通のワークフロー</b><small><code>publish-site.yml</code></small></div><span class="fl-a"><span>呼び出す</span></span><div class="nd" data-kind="admin"><b>共通のアクション</b><small><code>site-sync</code>：同じコミットの<code>artifact-pages.yaml</code>を渡す</small></div><span class="fl-a"><span>呼び出す</span></span><div class="nd" data-kind="ci"><b>製品のAction</b><small><code>publish-action</code></small></div><span class="fl-a"><span>実行する</span></span><div class="nd" data-kind="cli"><b>CLI</b><small><code>site sync</code></small></div><span class="fl-a"><span>書き込む</span></span><div class="nd" data-kind="store"><b>配信先</b></div></div></div>
+        <figcaption>左から右まで、すべてチームのリポジトリのジョブとして動きます。管理リポジトリが提供するのは手順と設定で、権限、シークレット、OIDCはチームのリポジトリのものです。</figcaption>
+      </figure>
       <div class="table-wrap"><table>
         <thead><tr><th>項目</th><th>内容</th></tr></thead>
         <tbody>
@@ -157,6 +164,14 @@
         <li>CLIの<code>--config</code>に、上の<code>github://</code>の指定を渡します。</li>
       </ol>
       <p>製品のActionsにはトークンを渡す入力がないので、この方法はCLIを直接動かすジョブに限ります。</p>
+    </section>
+
+    <section class="doc-section" aria-labelledby="state">
+      <h2 id="state">このステップのあとの状態</h2>
+      <figure class="fg" aria-labelledby="state-fig">
+        <div class="fg-head"><strong id="state-fig">ステップ2のあとの状態</strong><span class="fg-note">説明用の例</span></div>
+        <div class="fg-body"><div class="bd"><section class="bd-col"><h4 class="bd-h">GitHub</h4><div class="nd is-new" data-kind="admin"><b>管理リポジトリ</b><small><code>artifact-pages.yaml</code>、共通のワークフロー</small><span class="nd-badge">このステップ</span></div><div class="nd is-dim" data-kind="team"><b>チームのリポジトリ</b><small>ステップ5で用意</small></div></section><div class="bd-a"><span>書き込む</span></div><section class="bd-col"><h4 class="bd-h">配信先</h4><div class="nd" data-kind="store"><b>ストレージとCDN</b><small>ホスト名、配信の規則、認証情報</small></div><div class="nd is-dim" data-kind="app"><b>閲覧アプリ</b><small>ステップ3で用意</small></div><div class="nd is-dim" data-kind="registry"><b>サイトの登録情報</b><small>ステップ4で用意</small></div><div class="nd is-dim" data-kind="site"><b>サイト<code>sre</code></b><small>ステップ5で用意</small></div><div class="nd is-dim" data-kind="preview"><b>プレビュー</b><small>ステップ6で用意</small></div></section><div class="bd-a"><span>読む</span></div><section class="bd-col"><h4 class="bd-h">ブラウザ</h4><div class="nd is-dim" data-kind="reader"><b>読者</b><small>まだ開けない</small></div></section></div></div>
+      </figure>
     </section>
 
     <nav class="pager" aria-label="ページ送り">

@@ -4,7 +4,7 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <meta name="description" content="設定ファイルのweb.versionで選んだ閲覧アプリを、管理リポジトリのワークフローとapp-deploy-actionで配信先に置き、ホスト名を開いて確かめる。">
-  <title>閲覧アプリをデプロイする — Artifact Pages ドキュメント</title>
+  <title>閲覧アプリをデプロイする</title>
   <script>
     // Copy the reader app's theme (same-origin parent) before first paint; assets/site.js keeps it in sync.
     (() => {
@@ -30,6 +30,8 @@
       </div>
       <p class="lead">読者が開く閲覧アプリを、配信先に置きます。置くのは設定ファイルの<code>web.version</code>で選んだリリースです。共通のワークフローは閲覧アプリの配置を含まないので、管理リポジトリに配置用のワークフローを1つ書きます。</p>
     </header>
+
+    <nav class="sm" aria-label="導入のステップ"><ol><li class="is-done"><a href="01-infrastructure/index.html"><span class="sm-n">1</span><b>インフラを構築する</b></a></li><li class="is-done"><a href="02-admin-repository.html"><span class="sm-n">2</span><b>管理リポジトリを準備する</b></a></li><li><a href="03-reader-app.html" aria-current="step"><span class="sm-n">3</span><b>閲覧アプリをデプロイする</b></a></li><li><a href="04-register-site.html"><span class="sm-n">4</span><b>サイトを登録する</b></a></li><li><a href="05-first-site.html"><span class="sm-n">5</span><b>最初のサイトを公開する</b></a></li><li><a href="06-pr-previews.html"><span class="sm-n">6</span><b>PRプレビューを使えるようにする</b></a></li></ol></nav>
 
     <section class="doc-section" aria-labelledby="workflow">
       <h2 id="workflow">配置のワークフローを書く</h2>
@@ -86,6 +88,14 @@
     <section class="doc-section" aria-labelledby="open">
       <h2 id="open">開いて確かめる</h2>
       <p>配信先のホスト名を開きます。Cloudflareでは<code>publicBaseURL</code>、AWSではCloudFrontのホスト名（独自ドメインならそのホスト名）です。閲覧アプリが表示されれば配置は完了です。まだサイトを登録していないので、サイトの一覧は空です。</p>
+    </section>
+
+    <section class="doc-section" aria-labelledby="state">
+      <h2 id="state">このステップのあとの状態</h2>
+      <figure class="fg" aria-labelledby="state-fig">
+        <div class="fg-head"><strong id="state-fig">ステップ3のあとの状態</strong><span class="fg-note">説明用の例</span></div>
+        <div class="fg-body"><div class="bd"><section class="bd-col"><h4 class="bd-h">GitHub</h4><div class="nd is-new" data-kind="admin"><b>管理リポジトリ</b><small><code>artifact-pages.yaml</code>、共通のワークフロー、配置のワークフロー</small><span class="nd-badge">このステップ</span></div><div class="nd is-dim" data-kind="team"><b>チームのリポジトリ</b><small>ステップ5で用意</small></div></section><div class="bd-a"><span>書き込む</span></div><section class="bd-col"><h4 class="bd-h">配信先</h4><div class="nd" data-kind="store"><b>ストレージとCDN</b><small>ホスト名、配信の規則、認証情報</small></div><div class="nd is-new" data-kind="app"><b>閲覧アプリ</b><small>ホスト名のトップで開く</small><span class="nd-badge">このステップ</span></div><div class="nd is-dim" data-kind="registry"><b>サイトの登録情報</b><small>ステップ4で用意</small></div><div class="nd is-dim" data-kind="site"><b>サイト<code>sre</code></b><small>ステップ5で用意</small></div><div class="nd is-dim" data-kind="preview"><b>プレビュー</b><small>ステップ6で用意</small></div></section><div class="bd-a"><span>読む</span></div><section class="bd-col"><h4 class="bd-h">ブラウザ</h4><div class="nd is-new" data-kind="reader"><b>読者</b><small>閲覧アプリが開く</small><span class="nd-badge">このステップ</span></div></section></div></div>
+      </figure>
     </section>
 
     <nav class="pager" aria-label="ページ送り">

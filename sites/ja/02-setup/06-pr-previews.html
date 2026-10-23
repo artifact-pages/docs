@@ -4,7 +4,7 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <meta name="description" content="チームのリポジトリに共通のプレビューのワークフローを呼び出すワークフローを置き、プルリクエストの変更をレビューの前に閲覧アプリで読めるようにする。見えるもの、閉じたあとの扱い、保持期間。">
-  <title>PRプレビューを使えるようにする — Artifact Pages ドキュメント</title>
+  <title>PRプレビューを使えるようにする</title>
   <script>
     // Copy the reader app's theme (same-origin parent) before first paint; assets/site.js keeps it in sync.
     (() => {
@@ -30,6 +30,8 @@
       </div>
       <p class="lead">最後に、プルリクエストで変えた資料を、マージの前に閲覧アプリで読めるようにします。チームのリポジトリに、共通のプレビューのワークフローを呼び出すワークフローを1つ足します。</p>
     </header>
+
+    <nav class="sm" aria-label="導入のステップ"><ol><li class="is-done"><a href="01-infrastructure/index.html"><span class="sm-n">1</span><b>インフラを構築する</b></a></li><li class="is-done"><a href="02-admin-repository.html"><span class="sm-n">2</span><b>管理リポジトリを準備する</b></a></li><li class="is-done"><a href="03-reader-app.html"><span class="sm-n">3</span><b>閲覧アプリをデプロイする</b></a></li><li class="is-done"><a href="04-register-site.html"><span class="sm-n">4</span><b>サイトを登録する</b></a></li><li class="is-done"><a href="05-first-site.html"><span class="sm-n">5</span><b>最初のサイトを公開する</b></a></li><li><a href="06-pr-previews.html" aria-current="step"><span class="sm-n">6</span><b>PRプレビューを使えるようにする</b></a></li></ol></nav>
 
     <section class="doc-section" aria-labelledby="workflow">
       <h2 id="workflow">ワークフローを置く</h2>
@@ -67,6 +69,10 @@
 
     <section class="doc-section" aria-labelledby="see">
       <h2 id="see">レビューする人に見えるもの</h2>
+      <figure class="fg" aria-labelledby="preview-fig">
+        <div class="fg-head"><strong id="preview-fig">プルリクエストからプレビューまで</strong><span class="fg-note">説明用の例</span></div>
+        <div class="fg-body"><div class="fl"><div class="nd" data-kind="team"><b>プルリクエスト</b><small>ブランチにプッシュする</small></div><span class="fl-a"><span>起動する</span></span><div class="nd" data-kind="ci"><b>プレビューのジョブ</b><small>共通のワークフロー</small></div><span class="fl-a"><span>公開する</span></span><div class="nd" data-kind="preview"><b>プレビュー</b><small>先頭のコミットの、変わった資料</small></div><span class="fl-a"><span>リンクする</span></span><div class="nd" data-kind="ci"><b>プルリクエストのコメント</b><small>サイトごとに1つ。作り直すと書き換わる</small></div><span class="fl-a"><span>開く</span></span><div class="nd" data-kind="reader"><b>レビューする人</b><small>閲覧アプリの中で読む</small></div></div></div>
+      </figure>
       <ol>
         <li>プルリクエストに、サイトごとに1つのコメントが付きます。変わった資料の一覧とプレビューへのリンクがあり、プレビューを作り直すたびに書き換わります。</li>
         <li>リンクを開くと、閲覧アプリの中でプレビューが開きます。左には、変更した資料と、変更したファイルの影響を受けた資料だけが並びます。</li>
@@ -97,6 +103,14 @@
     <section class="doc-section" aria-labelledby="done">
       <h2 id="done">導入の完了</h2>
       <p>これで、最初のチームが自分のリポジトリから資料を公開し、プルリクエストをプレビューで確かめられるようになりました。次のチームを受け入れるときは「<a href="../03-operations/onboard-team.html">新しいチーム・サイトを受け入れる</a>」に進みます。</p>
+    </section>
+
+    <section class="doc-section" aria-labelledby="state">
+      <h2 id="state">このステップのあとの状態</h2>
+      <figure class="fg" aria-labelledby="state-fig">
+        <div class="fg-head"><strong id="state-fig">ステップ6のあとの状態</strong><span class="fg-note">説明用の例</span></div>
+        <div class="fg-body"><div class="bd"><section class="bd-col"><h4 class="bd-h">GitHub</h4><div class="nd" data-kind="admin"><b>管理リポジトリ</b><small><code>artifact-pages.yaml</code>、共通のワークフロー、配置のワークフロー、<code>sites</code>に<code>sre</code></small></div><div class="nd is-new" data-kind="team"><b>チームのリポジトリ</b><small>acme/sre：<code>docs/</code>、公開のワークフロー、プレビューのワークフロー</small><span class="nd-badge">このステップ</span></div><div class="nd is-new" data-kind="ci"><b>プルリクエスト</b><small>プレビューのコメント</small><span class="nd-badge">このステップ</span></div></section><div class="bd-a"><span>書き込む</span></div><section class="bd-col"><h4 class="bd-h">配信先</h4><div class="nd" data-kind="store"><b>ストレージとCDN</b><small>ホスト名、配信の規則、認証情報</small></div><div class="nd" data-kind="app"><b>閲覧アプリ</b><small>ホスト名のトップで開く</small></div><div class="nd" data-kind="registry"><b>サイトの登録情報</b><small><code>sre</code></small></div><div class="nd" data-kind="site"><b>サイト<code>sre</code></b><small>資料と一覧、本文検索のデータ</small></div><div class="nd is-new" data-kind="preview"><b>プレビュー</b><small>プルリクエストごと</small><span class="nd-badge">このステップ</span></div></section><div class="bd-a"><span>読む</span></div><section class="bd-col"><h4 class="bd-h">ブラウザ</h4><div class="nd" data-kind="reader"><b>読者</b><small><code>sre</code>の資料を読める、プレビューを開ける</small></div></section></div></div>
+      </figure>
     </section>
 
     <nav class="pager" aria-label="ページ送り">

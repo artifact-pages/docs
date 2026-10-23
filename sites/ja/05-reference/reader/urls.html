@@ -4,7 +4,7 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <meta name="description" content="閲覧アプリが解釈するURLの形。サイトの一覧、サイトのトップ、資料、フォルダ、見出し、本文検索、プレビューの一覧とリビジョン。">
-  <title>ページ・見出し・プレビューのURL — Artifact Pages ドキュメント</title>
+  <title>ページ・見出し・プレビューのURL</title>
   <script>
     // Copy the reader app's theme (same-origin parent) before first paint; assets/site.js keeps it in sync.
     (() => {
@@ -33,6 +33,10 @@
 
     <section class="doc-section" aria-labelledby="forms">
       <h2 id="forms">URLの形</h2>
+      <figure class="fg" aria-labelledby="url-anatomy-fig">
+        <div class="fg-head"><strong id="url-anatomy-fig"><code>https://docs.example.com/sre/runbooks/on-call.html#escalation</code>の読み方</strong><span class="fg-note">説明用の例</span></div>
+        <div class="fg-body"><div class="mp" role="table" aria-label="URLの部分と意味"><div class="mp-h" role="row"><span role="columnheader">URLの部分</span><span role="columnheader">意味</span></div><div class="mp-r" role="row"><span role="cell"><code>/sre</code></span><span role="cell">サイトID</span></div><div class="mp-r" role="row"><span role="cell"><code>/runbooks/on-call.html</code></span><span role="cell">公開元のディレクトリからのパス。拡張子まで含む</span></div><div class="mp-r" role="row"><span role="cell"><code>#escalation</code></span><span role="cell">資料の中の見出しのID</span></div></div></div>
+      </figure>
       <div class="table-wrap"><table>
         <thead><tr><th>URL</th><th>開くもの</th></tr></thead>
         <tbody>
