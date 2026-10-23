@@ -735,11 +735,11 @@ td:first-child { white-space: nowrap; font-weight: 600; }
 .sc-pdl code { color: var(--quiet); font-size: calc(10 * var(--u)); }
 
 /* レビューの道のりの小さな画面（.pr-app）：サイドバーを省いた作業領域だけ。右の列が入らない幅なので、Details は文書の下に置く */
-.sc.is-mini { --u: .8px; display: block; min-height: 0; background: var(--m-surface); }
+.sc.is-mini { --u: .64px; display: block; min-height: 0; background: var(--m-surface); }
 .sc.is-mini .sc-main { border-left: 0; }
 .sc.is-mini .sc-ctx { height: calc(40 * var(--u)); }
 .sc.is-mini .sc-doc { padding: calc(22 * var(--u)) calc(22 * var(--u)) calc(12 * var(--u)); }
-.sc.is-mini .sc-title { margin-bottom: calc(14 * var(--u)); font-size: calc(28 * var(--u)); }
+.sc.is-mini .sc-title { margin-bottom: calc(14 * var(--u)); font-size: calc(38 * var(--u)); }
 .sc.is-mini .sc-ln { margin: calc(10 * var(--u)) 0; }
 .sc-minidet { padding: calc(12 * var(--u)) calc(22 * var(--u)) calc(16 * var(--u)); border-top: 1px solid var(--line-soft); }
 .sc-minidet h5 { margin: 0 0 calc(8 * var(--u)); color: var(--quiet); font-size: calc(10.5 * var(--u)); font-weight: 500; letter-spacing: .06em; text-transform: uppercase; }
