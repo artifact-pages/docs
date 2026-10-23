@@ -8,8 +8,12 @@
   const inFrame = (() => { try { return window.parent !== window; } catch { return true; } })();
   const lang = (document.documentElement.lang || '').toLowerCase().startsWith('ja') ? 'ja' : 'en';
   const T = {
-    ja: { copy: 'コピー', copied: 'コピーしました', selectToCopy: '選択してコピー', play: '自動再生', pause: '一時停止', playOff: '自動再生（動きを減らす設定のため無効）', scene: '場面' },
-    en: { copy: 'Copy', copied: 'Copied', selectToCopy: 'Select to copy', play: 'Play', pause: 'Pause', playOff: 'Play (off: reduced motion is on)', scene: 'Scene' },
+    ja: { copy: 'コピー', copied: 'コピーしました', selectToCopy: '選択してコピー', play: '自動再生', pause: '一時停止', playOff: '自動再生（動きを減らす設定のため無効）', scene: '場面',
+      anim: '再生', animOff: '再生（動きを減らす設定のため無効）',
+      justNow: 'たった今', minAgo: (n) => `${n}分前`, hourAgo: (n) => `${n}時間前` },
+    en: { copy: 'Copy', copied: 'Copied', selectToCopy: 'Select to copy', play: 'Play', pause: 'Pause', playOff: 'Play (off: reduced motion is on)', scene: 'Scene',
+      anim: 'Play', animOff: 'Play (off: reduced motion is on)',
+      justNow: 'just now', minAgo: (n) => `${n} min ago`, hourAgo: (n) => (n === 1 ? '1 hour ago' : `${n} hours ago`) },
   }[lang];
 
   /* ── 0. テーマ ─────────────────────────────
@@ -166,6 +170,81 @@
     const syncMotion = () => { if (motion.matches) stop(); play.disabled = motion.matches; setPlayLabel(!!timer); };
     if (motion.addEventListener) motion.addEventListener('change', syncMotion);
     show(0);
+    syncMotion();
+  });
+
+  /* ── 5. 公開の動き（.fg .tp-live） ──
+     再生ボタンを押すと、各列のリポジトリからばらばらの間隔で公開の点が上がり、そのサイトだけが光って
+     「最後の公開」の時刻（.tp-t の span）が新しくなる。表示する時間は早回し（実時間の1秒が2分）。自分では始まらない。
+     「動きを減らす」設定では再生ボタンを無効にする。JavaScript が無効なら、HTML に書いた静止状態のまま。 */
+  document.querySelectorAll('.fg').forEach((fig) => {
+    const live = fig.querySelector('.tp-live');
+    const head = fig.querySelector('.fg-head');
+    if (!live || !head) return;
+    const cols = [...live.querySelectorAll('.nd[data-kind="site"][data-tp-col]')].map((site) => ({
+      site,
+      arrow: live.querySelector(`.fl-a[data-tp-col="${site.dataset.tpCol}"]`),
+    })).filter((col) => col.arrow);
+    if (!cols.length) return;
+    const motion = window.matchMedia ? window.matchMedia('(prefers-reduced-motion: reduce)') : { matches: false };
+    const play = document.createElement('button');
+    play.type = 'button';
+    play.className = 'fg-play';
+    head.append(play);
+
+    // 早回しの時計（分）。静止状態の「最後の公開」は HTML の data-tp-ago（分）から始める。
+    let base = 0;
+    let started = 0;
+    const now = () => base + (started ? (performance.now() - started) / 500 : 0);
+    const last = cols.map((col) => -Number(col.site.dataset.tpAgo || 0));
+    const ago = (m) => {
+      const d = Math.floor(now() - m);
+      return d < 2 ? T.justNow : d < 60 ? T.minAgo(d) : T.hourAgo(Math.floor(d / 60));
+    };
+    const label = () => cols.forEach((col, i) => {
+      const t = col.site.querySelector('.tp-t > span');
+      if (t) t.textContent = ago(last[i]);
+    });
+
+    let timers = [];
+    let ticker = 0;
+    const loop = (i) => {
+      timers[i] = setTimeout(() => {
+        const { arrow, site } = cols[i];
+        arrow.classList.remove('is-go');
+        void arrow.offsetWidth;
+        arrow.classList.add('is-go');
+        timers[i + cols.length] = setTimeout(() => {
+          last[i] = now();
+          label();
+          site.classList.add('is-hit');
+          setTimeout(() => site.classList.remove('is-hit'), 900);
+        }, 800);
+        loop(i);
+      }, 1200 + Math.random() * 5800);
+    };
+    function setPlayLabel(playing) {
+      play.setAttribute('aria-pressed', String(playing));
+      play.textContent = playing ? T.pause : (motion.matches ? T.animOff : T.anim);
+    }
+    function stop() {
+      if (started) { base = now(); started = 0; }
+      timers.forEach(clearTimeout);
+      timers = [];
+      clearInterval(ticker);
+      ticker = 0;
+      setPlayLabel(false);
+    }
+    function start() {
+      if (motion.matches) return;
+      started = performance.now();
+      cols.forEach((_, i) => loop(i));
+      ticker = setInterval(label, 500);
+      setPlayLabel(true);
+    }
+    play.addEventListener('click', () => { if (ticker) stop(); else start(); });
+    const syncMotion = () => { if (motion.matches) stop(); play.disabled = motion.matches; setPlayLabel(!!ticker); };
+    if (motion.addEventListener) motion.addEventListener('change', syncMotion);
     syncMotion();
   });
 })();
