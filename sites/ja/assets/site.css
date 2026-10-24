@@ -630,6 +630,16 @@ td:first-child { white-space: nowrap; font-weight: 600; }
 /* 数字マーカー：説明用の目印で、アプリの部品ではない。白い縁取りと影で、画面の上に浮かせる */
 .sc-m { display: inline-grid; flex: none; place-items: center; width: 17px; height: 17px; margin-inline: 8px 2px; border-radius: 50%; background: var(--accent); box-shadow: 0 0 0 2px var(--m-surface), 0 1px 5px 2px rgba(0, 0, 0, .3); color: var(--m-surface); font: 700 10.5px/1 var(--sans); font-style: normal; vertical-align: middle; position: relative; z-index: 3; }
 .sc-m.is-abs { position: absolute; z-index: 3; }
+/* 見出しや部品のすぐ横には置かず、行の空いたところへ出す */
+.sc-ctx, .sc-grp, .sc-res li, .sc-facets, .sc-pal-in, .sc-sp-in, .sc-sp-st { position: relative; }
+.sc-m.is-end { float: right; margin: -2px 0 -4px auto; }
+.sc-m.is-far { margin-left: auto; }
+.sc-m.is-mid { position: absolute; top: 50%; left: 50%; margin: -9px 0 0; }
+.sc-pal-in .sc-m.is-mid { top: 100%; }
+.sc-m.is-corner { position: absolute; top: calc(16 * var(--u)); right: calc(18 * var(--u)); margin: 0; }
+.sc-res .sc-m.is-corner { top: calc(14 * var(--u)); right: calc(10 * var(--u)); }
+.sc-m.is-side { position: absolute; top: 0; right: -24px; margin: 0; }
+.sc-m.is-below { position: absolute; top: 100%; left: calc(60 * var(--u)); margin: 5px 0 0; }
 .sc-legend { display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 8px 24px; margin: 14px 0 0; padding: 0; list-style: none; counter-reset: scl; color: var(--muted); font-size: 13px; line-height: 1.7; }
 .sc-legend li { display: flex; gap: 10px; counter-increment: scl; }
 .sc-legend li::before { content: counter(scl); display: grid; flex: none; place-items: center; width: 18px; height: 18px; margin-top: 3px; border-radius: 50%; background: var(--accent); color: var(--bg); font: 700 10.5px/1 var(--sans); }
@@ -772,6 +782,7 @@ td:first-child { white-space: nowrap; font-weight: 600; }
   .sc-row b { max-width: 100%; }
   .sc-row code { flex: none; max-width: 100%; }
   .sc-keys { display: none; }
+  .sc-sp-st .sc-m.is-mid { left: auto; right: 6px; }
   .sc-sbody { grid-template-columns: minmax(0, 1fr); gap: calc(10 * var(--u)); }
   .sc-facets { display: flex; gap: calc(6 * var(--u)); overflow-x: auto; padding-bottom: calc(2 * var(--u)); }
   .sc-facets > i:not(.sc-m) { display: none; }
