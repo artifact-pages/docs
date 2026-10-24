@@ -21,14 +21,14 @@
   <script src="../assets/site.js" defer></script>
 </head>
 <body>
-  <a class="skip" href="#main">本文へ移動</a>
+  <a class="skip" href="#main" data-search-ignore>本文へ移動</a>
   <main id="main" class="wrap">
     <header class="page-head">
       <div>
-        <p class="eyebrow">リファレンス</p>
+        <p class="eyebrow" data-search-ignore>リファレンス</p>
         <h1>GitHub Actions</h1>
       </div>
-      <p class="lead">製品は4つのActionsを配っています。どれもCLIを入れて対応するコマンドを実行する薄いラッパーです。ここに書くのはv0.3.0の契約です。管理リポジトリの共通のワークフローの使い方は「<a href="../02-setup/02-admin-repository.html">管理リポジトリを準備する</a>」にあります。</p>
+      <p class="lead">製品は4つのActionsを配っています。どれも、CLIを用意して対応するコマンドを実行します。ここに書くのは、v0.3.0の入力と出力です。管理リポジトリの共通のワークフローの使い方は「<a href="../02-setup/02-admin-repository.html">管理リポジトリを準備する</a>」にあります。</p>
     </header>
 
     <section class="doc-section" aria-labelledby="actions">
@@ -64,13 +64,20 @@
 
     <section class="doc-section" aria-labelledby="specific">
       <h2 id="specific">Actionごとの入力</h2>
+      <h3 id="publish-action">publish</h3>
       <div class="table-wrap"><table>
-        <thead><tr><th>Action</th><th>入力</th><th>既定と意味</th></tr></thead>
+        <thead><tr><th>入力</th><th>既定と意味</th></tr></thead>
         <tbody>
-          <tr><td rowspan="3">publish</td><td><code>site</code></td><td>必須。サイトID。</td></tr>
+          <tr><td><code>site</code></td><td>必須。サイトID。</td></tr>
           <tr><td><code>source</code></td><td><code>""</code>。省くと登録の<code>sourcePath</code>。</td></tr>
           <tr><td><code>ref</code></td><td><code>""</code>。記録する参照の表示だけ。チェックアウトは変えない。</td></tr>
-          <tr><td rowspan="8">preview</td><td><code>site</code></td><td>必須。</td></tr>
+        </tbody>
+      </table></div>
+      <h3 id="preview-action">preview</h3>
+      <div class="table-wrap"><table>
+        <thead><tr><th>入力</th><th>既定と意味</th></tr></thead>
+        <tbody>
+          <tr><td><code>site</code></td><td>必須。</td></tr>
           <tr><td><code>source</code></td><td><code>""</code>。書くなら登録の<code>sourcePath</code>と同じにする。</td></tr>
           <tr><td><code>head</code></td><td><code>""</code>。プルリクエストのイベントではその先頭のSHA、それ以外は<code>HEAD</code>。</td></tr>
           <tr><td><code>default-ref</code></td><td><code>""</code>。プルリクエストのイベントでは<code>origin/&lt;base&gt;</code>、それ以外は<code>origin/HEAD</code>。</td></tr>
@@ -78,8 +85,15 @@
           <tr><td><code>include</code></td><td><code>""</code>。Artifactではない追加のリソースを、公開元のディレクトリからの相対パスか、Goの<code>path.Match</code>のパターンで改行区切りに指定する。HTMLやMarkdownのArtifactに一致するとエラーになる。</td></tr>
           <tr><td><code>base-url</code></td><td><code>""</code>。省くと設定の<code>publicBaseURL</code>。どちらもなければ失敗。</td></tr>
           <tr><td><code>comment</code></td><td><code>"false"</code>。<code>"true"</code>でサイトごとに1つのコメントを作り、更新する。コメントの失敗は警告で、プレビューは失敗にしない。</td></tr>
-          <tr><td>registry</td><td colspan="2">共通の入力だけ。</td></tr>
-          <tr><td rowspan="2">app-deploy</td><td><code>archive</code></td><td><code>""</code>。手元のバンドル。省くと設定の<code>web.version</code>。</td></tr>
+        </tbody>
+      </table></div>
+      <h3 id="registry-action">registry</h3>
+      <p>共通の入力だけです。</p>
+      <h3 id="app-deploy-action">app-deploy</h3>
+      <div class="table-wrap"><table>
+        <thead><tr><th>入力</th><th>既定と意味</th></tr></thead>
+        <tbody>
+          <tr><td><code>archive</code></td><td><code>""</code>。手元のバンドル。省くと設定の<code>web.version</code>。</td></tr>
           <tr><td><code>repository</code></td><td><code>artifact-pages/artifact-pages</code>。</td></tr>
         </tbody>
       </table></div>
@@ -110,7 +124,7 @@
       </ul>
     </section>
 
-    <nav class="pager" aria-label="ページ送り">
+    <nav class="pager" data-search-ignore aria-label="ページ送り">
       <a class="prev" href="cli.html"><small>前へ</small><strong>CLI</strong></a>
       <a class="next" href="terraform.html"><small>次へ</small><strong>Terraform</strong></a>
     </nav>

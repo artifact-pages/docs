@@ -21,11 +21,11 @@
   <script src="../assets/site.js" defer></script>
 </head>
 <body>
-  <a class="skip" href="#main">本文へ移動</a>
+  <a class="skip" href="#main" data-search-ignore>本文へ移動</a>
   <main id="main" class="wrap">
     <header class="page-head">
       <div>
-        <p class="eyebrow">社内展開と運用</p>
+        <p class="eyebrow" data-search-ignore>社内展開と運用</p>
         <h1>問題を調べ、復旧する</h1>
       </div>
       <p class="lead">ほとんどの失敗は、同じ操作をもう一度実行すれば収まるように作られています。まず何が失敗したかを確かめ、必要ならロックを解いてから、元の操作をやり直します。</p>
@@ -122,7 +122,7 @@
       <p>内部の記録が壊れた場合の扱いなど、まれな状況の手順は、製品の<a href="https://github.com/artifact-pages/artifact-pages/blob/main/docs/guides/operator-recovery.md" target="_blank" rel="noopener">復旧ガイド（英語）</a>にあります。そこにある手順の多くは、実際の環境ではまだ試されていません。内部の記録を手で消す操作は、そのガイドの条件を満たす場合だけにしてください。</p>
     </section>
 
-    <nav class="pager" aria-label="ページ送り">
+    <nav class="pager" data-search-ignore aria-label="ページ送り">
       <a class="prev" href="change-or-retire-site.html"><small>前へ</small><strong>サイトを変更・廃止する</strong></a>
       <a class="next" href="../04-architecture/index.html"><small>次へ</small><strong>アーキテクチャ</strong></a>
     </nav>

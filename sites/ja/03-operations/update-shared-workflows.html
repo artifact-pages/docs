@@ -21,11 +21,11 @@
   <script src="../assets/site.js" defer></script>
 </head>
 <body>
-  <a class="skip" href="#main">本文へ移動</a>
+  <a class="skip" href="#main" data-search-ignore>本文へ移動</a>
   <main id="main" class="wrap">
     <header class="page-head">
       <div>
-        <p class="eyebrow">社内展開と運用</p>
+        <p class="eyebrow" data-search-ignore>社内展開と運用</p>
         <h1>共通の公開・プレビューの仕組みを更新する</h1>
       </div>
       <p class="lead">管理リポジトリの共通のワークフローは、CLIのコマンドで生成したファイルです。そのCLIに新しい製品Actionsの参照が組み込まれていれば、作り直すと共通のワークフローが使うActionsも新しくなります。その変更が各チームに届くかどうかは、チームのワークフローが共通のワークフローをどう参照しているかで決まります。</p>
@@ -82,7 +82,7 @@
       <p>実行中のジョブや、失敗したジョブだけを再実行した場合に、新しいコミットが使われるかは確かめていません。確実に新しい内容で動かすには、新しく実行します。</p>
     </section>
 
-    <nav class="pager" aria-label="ページ送り">
+    <nav class="pager" data-search-ignore aria-label="ページ送り">
       <a class="prev" href="onboard-team.html"><small>前へ</small><strong>新しいチーム・サイトを受け入れる</strong></a>
       <a class="next" href="upgrade.html"><small>次へ</small><strong>閲覧アプリ・CLI・Actionsを更新する</strong></a>
     </nav>

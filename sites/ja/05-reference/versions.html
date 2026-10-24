@@ -21,11 +21,11 @@
   <script src="../assets/site.js" defer></script>
 </head>
 <body>
-  <a class="skip" href="#main">本文へ移動</a>
+  <a class="skip" href="#main" data-search-ignore>本文へ移動</a>
   <main id="main" class="wrap">
     <header class="page-head">
       <div>
-        <p class="eyebrow">リファレンス</p>
+        <p class="eyebrow" data-search-ignore>リファレンス</p>
         <h1>バージョンと互換性</h1>
       </div>
       <p class="lead">版を持つ部品は、CLI、閲覧アプリ、4つのActions、2つのTerraformモジュールで、それぞれ別にリリースされます。いまの版はすべて0.xのプレリリースで、版をまたぐ互換性は約束されていません。互いに合っているかは、版の番号ではなく、読み書きする形式で確かめます。</p>
@@ -82,7 +82,7 @@
       <p>更新の手順は「<a href="../03-operations/upgrade.html">閲覧アプリ・CLI・Actionsを更新する</a>」にあります。</p>
     </section>
 
-    <nav class="pager" aria-label="ページ送り">
+    <nav class="pager" data-search-ignore aria-label="ページ送り">
       <a class="prev" href="terraform.html"><small>前へ</small><strong>Terraform</strong></a>
       <a class="next" href="../README.md"><small>次へ</small><strong>Artifact Pages ドキュメント</strong></a>
     </nav>

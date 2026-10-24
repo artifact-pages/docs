@@ -21,17 +21,17 @@
   <script src="../../assets/site.js" defer></script>
 </head>
 <body>
-  <a class="skip" href="#main">本文へ移動</a>
+  <a class="skip" href="#main" data-search-ignore>本文へ移動</a>
   <main id="main" class="wrap">
     <header class="page-head">
       <div>
-        <p class="eyebrow">導入する · ステップ1</p>
+        <p class="eyebrow" data-search-ignore>導入する · ステップ1</p>
         <h1>インフラを構築する</h1>
       </div>
       <p class="lead">Artifactを置くストレージと、それを読者に届ける配信の仕組みを、CloudflareかAWSに用意します。どちらも製品が公開しているTerraformモジュールを呼び出して作ります。このステップで閲覧アプリやサイトはまだ置きません。それは次のステップからです。</p>
     </header>
 
-    <nav class="sm" aria-label="導入のステップ"><ol><li><a href="../01-infrastructure/index.html" aria-current="step"><span class="sm-n">1</span><b>インフラを構築する</b></a></li><li><a href="../02-admin-repository.html"><span class="sm-n">2</span><b>管理リポジトリを準備する</b></a></li><li><a href="../03-reader-app.html"><span class="sm-n">3</span><b>閲覧アプリをデプロイする</b></a></li><li><a href="../04-register-site.html"><span class="sm-n">4</span><b>サイトを登録する</b></a></li><li><a href="../05-first-site.html"><span class="sm-n">5</span><b>最初のサイトを公開する</b></a></li><li><a href="../06-pr-previews.html"><span class="sm-n">6</span><b>PRプレビューを使えるようにする</b></a></li></ol></nav>
+    <nav class="sm" data-search-ignore aria-label="導入のステップ"><ol><li><a href="../01-infrastructure/index.html" aria-current="step"><span class="sm-n">1</span><b>インフラを構築する</b></a></li><li><a href="../02-admin-repository.html"><span class="sm-n">2</span><b>管理リポジトリを準備する</b></a></li><li><a href="../03-reader-app.html"><span class="sm-n">3</span><b>閲覧アプリをデプロイする</b></a></li><li><a href="../04-register-site.html"><span class="sm-n">4</span><b>サイトを登録する</b></a></li><li><a href="../05-first-site.html"><span class="sm-n">5</span><b>最初のサイトを公開する</b></a></li><li><a href="../06-pr-previews.html"><span class="sm-n">6</span><b>PRプレビューを使えるようにする</b></a></li></ol></nav>
 
     <section class="doc-section" aria-labelledby="outcome">
       <h2 id="outcome">このステップで用意するもの</h2>
@@ -112,7 +112,7 @@
       </ul>
     </section>
 
-    <nav class="pager" aria-label="ページ送り">
+    <nav class="pager" data-search-ignore aria-label="ページ送り">
       <a class="prev" href="../index.html"><small>前へ</small><strong>導入する</strong></a>
       <a class="next" href="cloudflare.html"><small>次へ</small><strong>Cloudflareに構築する</strong></a>
     </nav>

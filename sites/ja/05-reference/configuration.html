@@ -21,11 +21,11 @@
   <script src="../assets/site.js" defer></script>
 </head>
 <body>
-  <a class="skip" href="#main">本文へ移動</a>
+  <a class="skip" href="#main" data-search-ignore>本文へ移動</a>
   <main id="main" class="wrap">
     <header class="page-head">
       <div>
-        <p class="eyebrow">リファレンス</p>
+        <p class="eyebrow" data-search-ignore>リファレンス</p>
         <h1>設定ファイル</h1>
       </div>
       <p class="lead">設定ファイル<code>artifact-pages.yaml</code>は、配信先、CLIと閲覧アプリの版、登録するサイトを書くYAMLです。認証情報の値は書かず、値を読む環境変数の名前だけを書きます。</p>
@@ -144,7 +144,7 @@
       <p>トークン1つの方式では、配信先に触れるすべての操作で、試し実行や変更のない実行も含めて<code>CF_API_TOKEN</code>が要ります。トークンには、バケットの<code>Workers R2 Storage Bucket Item Write</code>とゾーンの<code>Cache Purge</code>が必要です（「<a href="../02-setup/01-infrastructure/cloudflare.html#credentials">Cloudflareに構築する</a>」）。</p>
     </section>
 
-    <nav class="pager" aria-label="ページ送り">
+    <nav class="pager" data-search-ignore aria-label="ページ送り">
       <a class="prev" href="reader/local-storage.html"><small>前へ</small><strong>ピン留め・閲覧履歴などの保存と扱い</strong></a>
       <a class="next" href="cli.html"><small>次へ</small><strong>CLI</strong></a>
     </nav>

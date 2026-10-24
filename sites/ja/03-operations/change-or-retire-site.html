@@ -21,11 +21,11 @@
   <script src="../assets/site.js" defer></script>
 </head>
 <body>
-  <a class="skip" href="#main">本文へ移動</a>
+  <a class="skip" href="#main" data-search-ignore>本文へ移動</a>
   <main id="main" class="wrap">
     <header class="page-head">
       <div>
-        <p class="eyebrow">社内展開と運用</p>
+        <p class="eyebrow" data-search-ignore>社内展開と運用</p>
         <h1>サイトを変更・廃止する</h1>
       </div>
       <p class="lead">サイトの変更と廃止は、どれも管理リポジトリの<code>sites</code>を書き換えて<code>registry sync</code>で反映します。変える項目によって、配信先で起きることが違います。</p>
@@ -90,7 +90,7 @@
       <p>ほかのグループからも参照されているプレビューは残ります。指定したグループがなければ、何もせずに終わります。保持期間を変えるには、Terraformの<code>preview_retention_days</code>を変えて適用します。</p>
     </section>
 
-    <nav class="pager" aria-label="ページ送り">
+    <nav class="pager" data-search-ignore aria-label="ページ送り">
       <a class="prev" href="upgrade.html"><small>前へ</small><strong>閲覧アプリ・CLI・Actionsを更新する</strong></a>
       <a class="next" href="troubleshooting.html"><small>次へ</small><strong>問題を調べ、復旧する</strong></a>
     </nav>

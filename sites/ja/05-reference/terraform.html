@@ -21,11 +21,11 @@
   <script src="../assets/site.js" defer></script>
 </head>
 <body>
-  <a class="skip" href="#main">本文へ移動</a>
+  <a class="skip" href="#main" data-search-ignore>本文へ移動</a>
   <main id="main" class="wrap">
     <header class="page-head">
       <div>
-        <p class="eyebrow">リファレンス</p>
+        <p class="eyebrow" data-search-ignore>リファレンス</p>
         <h1>Terraform</h1>
       </div>
       <p class="lead">配信環境を作る2つのモジュールの入力と出力です。使い方の手順は「<a href="../02-setup/01-infrastructure/index.html">インフラを構築する</a>」にあります。詳しい説明は各モジュールのREADME（<a href="https://github.com/artifact-pages/artifact-pages/blob/main/terraform/modules/cloudflare/README.md" target="_blank" rel="noopener">Cloudflare</a>、<a href="https://github.com/artifact-pages/artifact-pages/blob/main/terraform/modules/aws/README.md" target="_blank" rel="noopener">AWS</a>）にあります。</p>
@@ -105,7 +105,7 @@
       <p>サイトのロールの名前は<code>&lt;name_prefix&gt;-&lt;サイトID&gt;-publisher</code>で、64文字を超える場合はサイトIDのハッシュを使った名前になります。<code>sites</code>を変えてもロールは変わらないので、<code>satellite_github_subjects</code>を変えて適用します。</p>
     </section>
 
-    <nav class="pager" aria-label="ページ送り">
+    <nav class="pager" data-search-ignore aria-label="ページ送り">
       <a class="prev" href="github-actions.html"><small>前へ</small><strong>GitHub Actions</strong></a>
       <a class="next" href="versions.html"><small>次へ</small><strong>バージョンと互換性</strong></a>
     </nav>

@@ -21,11 +21,11 @@
   <script src="../assets/site.js" defer></script>
 </head>
 <body>
-  <a class="skip" href="#main">本文へ移動</a>
+  <a class="skip" href="#main" data-search-ignore>本文へ移動</a>
   <main id="main" class="wrap">
     <header class="page-head">
       <div>
-        <p class="eyebrow">体験と機能 · 3</p>
+        <p class="eyebrow" data-search-ignore>体験と機能 · 3</p>
         <h1>Artifactを読む</h1>
       </div>
       <p class="lead">どのサイトのArtifactも、同じ閲覧アプリの画面で読みます。左にサイトの構造、中央にArtifact、広い画面では右にArtifactの情報と目次が並びます。</p>
@@ -56,7 +56,7 @@
 
     <section class="doc-section" aria-labelledby="contents">
       <h2 id="contents">目次で全体をつかみ、見出しへ移る</h2>
-      <p><strong>Contents</strong>はArtifactの見出しの一覧で、押すとその見出しへ移ります。幅が十分ある画面（目安は1200px以上）では、右の列が常にあり、上に<strong>Details</strong>、下に<strong>Contents</strong>が並びます（Markdownでは、読み進めるとDetailsが画面の外に出て、Contentsが残ります）。それより狭い画面では、Artifactの上部のボタンで重ねて開きます。スマートフォンほどの幅では、サイドバーは引き出して使います。</p>
+      <p><strong>Contents</strong>（目次）はArtifactの見出しの一覧で、押すとその見出しへ移ります。幅が十分ある画面（目安は1200px以上）では、右の列が常にあり、上に<strong>Details</strong>（更新の情報と公開元）、下に<strong>Contents</strong>が並びます（Markdownでは、読み進めるとDetailsが画面の外に出て、Contentsが残ります）。それより狭い画面では、Artifactの上部のボタンで重ねて開きます。スマートフォンほどの幅では、サイドバーは引き出して使います。</p>
     </section>
 
     <section class="doc-section" aria-labelledby="urls">
@@ -67,7 +67,13 @@
 <pre>https://docs.example.com/<span class="k">checkout</span>/<span class="v">design/payment-flow.html</span>
 <span class="c"># 見出しを指すURLは、末尾に # と見出しのIDが付く</span></pre>
       </div>
-      <p>共有しても、ブックマークしても、再読み込みしても同じArtifactが開きます。見出しを指すURLも共有できます。コマンドのリンクのコピーは、見出しの指定を残し、自分の検索の条件は外して写します。</p>
+      <p>共有しても、ブックマークしても、再読み込みしても同じArtifactが開きます。見出しを指して共有するときは、次のようにします。</p>
+      <ol>
+        <li><strong>Contents</strong>（目次）で見出しを選びます。URLの末尾に、その見出しのIDが付きます。</li>
+        <li>上部の<strong>Copy link</strong>でリンクをコピーします。見出しの指定は残り、自分の検索の条件（<code>?q=</code>）は外れます。</li>
+        <li>受け取った人がリンクを開くと、その見出しの位置から表示されます。</li>
+      </ol>
+      <p>幅の狭い画面では、ContentsとCopy linkは上部の<strong>…</strong>（More actions）のメニューにあります。</p>
     </section>
 
     <section class="doc-section" aria-labelledby="details">
@@ -112,7 +118,7 @@
       </ul>
     </section>
 
-    <nav class="pager" aria-label="ページ送り">
+    <nav class="pager" data-search-ignore aria-label="ページ送り">
       <a class="prev" href="02-find.html"><small>前へ</small><strong>Artifactを探す</strong></a>
       <a class="next" href="04-provide-and-operate.html"><small>次へ</small><strong>基盤を提供・運用する</strong></a>
     </nav>
