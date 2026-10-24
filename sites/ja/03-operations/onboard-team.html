@@ -72,10 +72,13 @@
       <div class="term" aria-label="サイトのロールを足す">
         <div class="term-head"><span>HCL / module "artifact_pages"（説明用の例）</span><button class="copy-btn" type="button">コピー</button></div>
 <pre><span data-copy><span class="k">satellite_github_subjects</span> = {
-  <span class="k">sre</span>     = ["repo:acme/sre:environment:artifact-pages-production"]
+  <span class="k">sre</span>     = [
+    "repo:acme/sre:environment:production",
+    "repo:acme/sre:pull_request",
+  ]
   <span class="k">billing</span> = [
-    "repo:acme/billing:environment:artifact-pages-production",
-    "repo:acme/billing:pull_request",   <span class="c"># プレビューのジョブ</span>
+    "repo:acme/billing:environment:production",   <span class="c"># mainでの公開</span>
+    "repo:acme/billing:pull_request",             <span class="c"># プルリクエストでの試し実行とプレビュー</span>
   ]
 }</span></pre>
       </div>
@@ -95,9 +98,13 @@
         <div class="term-head"><span>.github/workflows/publish.yml / acme/billing（説明用の例）</span><button class="copy-btn" type="button">コピー</button></div>
 <pre><span data-copy><span class="k">name</span>: Publish docs
 <span class="k">on</span>:
+  <span class="k">pull_request</span>:
   <span class="k">push</span>:
     <span class="k">branches</span>: [main]
   <span class="k">workflow_dispatch</span>:
+<span class="k">concurrency</span>:
+  <span class="k">group</span>: publish-${{ github.ref }}
+  <span class="k">cancel-in-progress</span>: ${{ github.event_name == 'pull_request' }}
 <span class="k">jobs</span>:
   <span class="k">publish</span>:
     <span class="k">permissions</span>:
@@ -106,14 +113,14 @@
     <span class="k">uses</span>: acme/platform-admin/.github/workflows/publish-site.yml@main
     <span class="k">with</span>:
       <span class="k">site</span>: billing
-      <span class="k">environment</span>: artifact-pages-production   <span class="c"># Environmentを使わないなら省く</span>
+      <span class="k">environment</span>: ${{ github.event_name != 'pull_request' &amp;&amp; 'production' || '' }}
     <span class="k">secrets</span>: inherit</span></pre>
       </div>
       <ul>
         <li>呼び出す側の<code>permissions</code>が、共通のワークフローで使える権限の上限になります。AWSではOIDCのために<code>id-token: write</code>が要ります。</li>
         <li>共通のワークフローは、チームのリポジトリの権限とシークレットで動きます。<code>secrets: inherit</code>で、チームのシークレットを共通のワークフローへ渡します。管理リポジトリのシークレットは使われません。</li>
         <li>書き込むのは、<code>main</code>へのプッシュと、<code>main</code>での手動実行のときだけです。それ以外のきっかけでは試し実行になります。</li>
-        <li>Environmentを使う場合は、最初に動かす前にチームのリポジトリでEnvironmentを作り、ブランチの制限をかけておきます。</li>
+        <li>Environmentを使う場合は、最初に動かす前にチームのリポジトリで<code>production</code>を作り、ブランチの制限をかけておきます。使わない場合は<code>environment</code>の行を省きます。AWSでは、<code>main</code>のジョブの<code>sub</code>だけが<code>…:ref:refs/heads/main</code>の形に変わるので、その1つを書き換えます。プルリクエストの<code>…:pull_request</code>はそのまま残します。</li>
       </ul>
       <p>プレビューも同じように<code>preview-site.yml</code>を呼び出します。書き方は「<a href="../02-setup/06-pr-previews.html">PRプレビューを使えるようにする</a>」と同じです。</p>
     </section>

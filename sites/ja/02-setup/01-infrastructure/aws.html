@@ -83,6 +83,17 @@
 <pre><span class="p">$</span> <span data-copy>gh api repos/OWNER/REPO/actions/oidc/customization/sub --jq '.sub_claim_prefix'</span></pre>
       </div>
       <p>表示されたプレフィックスにジョブの部分（<code>:environment:ENV</code>など）を足したものを書きます。リポジトリが独自のテンプレートを使っている場合は、プレフィックスから推測せず、試しのジョブで実際の<code>sub</code>を確かめてください。</p>
+      <p>このガイドの例では、Environmentの名前を管理リポジトリでもチームのリポジトリでも<code>production</code>にそろえ、プルリクエストのジョブはEnvironmentを使いません。そのため、許可する<code>sub</code>はリポジトリごとに次の2つです。</p>
+      <div class="table-wrap"><table>
+        <thead><tr><th>ジョブ</th><th>Environment</th><th>許可する<code>sub</code></th></tr></thead>
+        <tbody>
+          <tr><td>管理リポジトリ：mainでの登録の反映、閲覧アプリの配置</td><td><code>production</code></td><td><code>repo:acme/platform-admin:environment:production</code></td></tr>
+          <tr><td>管理リポジトリ：プルリクエストでの登録の試し実行</td><td>なし</td><td><code>repo:acme/platform-admin:pull_request</code></td></tr>
+          <tr><td>チームのリポジトリ：mainでの公開</td><td><code>production</code></td><td><code>repo:acme/sre:environment:production</code></td></tr>
+          <tr><td>チームのリポジトリ：プルリクエストでの試し実行とプレビュー</td><td>なし</td><td><code>repo:acme/sre:pull_request</code></td></tr>
+        </tbody>
+      </table></div>
+      <p>チームのリポジトリが管理リポジトリの共通のワークフローを呼び出しても、<code>sub</code>に入るのは呼び出したチームのリポジトリと、そのリポジトリのEnvironmentです。試し実行も配信先を読むのでロールを引き受けます。プルリクエストの<code>sub</code>は、最初のプルリクエストを出す前から必要です。</p>
       <div class="callout warn" role="note">
         <span class="ico">Environment</span>
         <div>
@@ -111,11 +122,15 @@
   <span class="k">github_oidc_provider_arn</span> = "arn:aws:iam::123456789012:oidc-provider/token.actions.githubusercontent.com"
 
   <span class="k">admin_github_subjects</span> = [
-    "repo:acme/platform-admin:environment:artifact-pages-production",
+    "repo:acme/platform-admin:environment:production",   <span class="c"># mainでの登録の反映、閲覧アプリの配置</span>
+    "repo:acme/platform-admin:pull_request",            <span class="c"># プルリクエストでの登録の試し実行</span>
   ]
 
   <span class="k">satellite_github_subjects</span> = {
-    <span class="k">sre</span> = ["repo:acme/sre:environment:artifact-pages-production"]
+    <span class="k">sre</span> = [
+      "repo:acme/sre:environment:production",   <span class="c"># mainでの公開</span>
+      "repo:acme/sre:pull_request",             <span class="c"># プルリクエストでの試し実行とプレビュー</span>
+    ]
   }
 }
 

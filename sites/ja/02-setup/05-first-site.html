@@ -86,9 +86,9 @@
     <span class="k">secrets</span>: inherit</span></pre>
       </div>
       <ul>
-        <li><code>site</code>は登録したサイトIDです。<code>environment</code>は、使うならこのリポジトリのEnvironmentの名前で、この例ではプルリクエストのときだけ空にしています。Environmentを使わないなら、この行ごと省きます。</li>
+        <li><code>site</code>は登録したサイトIDです。<code>environment</code>は、使うならこのリポジトリのEnvironmentの名前で、この例ではプルリクエストのときだけ空にしています。Environmentを使わないなら、この行ごと省きます。省いた場合、AWSでは<code>main</code>のジョブの<code>sub</code>が<code>…:ref:refs/heads/main</code>の形になるので、許可する<code>sub</code>もそれに合わせます。</li>
         <li>共通のワークフローは<code>site</code>と<code>environment</code>しか受け取りません。<code>dry-run</code>や<code>fetch-depth</code>などを<code>with</code>で渡すことはできません。</li>
-        <li>Cloudflareでは、このリポジトリ（またはOrganization）のシークレットに公開用の認証情報を入れておきます。AWSでは、このジョブの<code>sub</code>がTerraformの<code>satellite_github_subjects</code>に入っている必要があります。</li>
+        <li>Cloudflareでは、このリポジトリ（またはOrganization）のシークレットに公開用の認証情報を入れておきます。AWSでは、このジョブの<code>sub</code>がTerraformの<code>satellite_github_subjects</code>に入っている必要があります。<code>main</code>での公開の<code>repo:acme/sre:environment:production</code>と、プルリクエストでの試し実行の<code>repo:acme/sre:pull_request</code>の2つです。試し実行も配信先を読むので、最初のプルリクエストを出す前に両方を入れて適用しておきます。</li>
       </ul>
     </section>
 
