@@ -62,7 +62,7 @@
         <li><strong><code>if</code>で、同じリポジトリのブランチからのプルリクエストに限ります。</strong>フォークからのプルリクエストに認証情報を渡さないためです。共通のワークフローも同じ確認をしますが、呼び出す側でも止めておきます。</li>
         <li><strong><code>pull-requests: write</code>は、このプレビューのジョブだけに付けます。</strong>共通のワークフローは、プルリクエストにプレビューのコメントを付けます。本公開のジョブには要りません。</li>
         <li>製品の<code>artifact-pages/preview-action</code>を直接使う場合、コメントの入力<code>comment</code>の既定は<code>false</code>で、コメントは付きません。共通のワークフローは内部で<code>comment: true</code>を指定しています。</li>
-        <li>AWSでは、このジョブの<code>sub</code>（Environmentを使わなければ<code>repo:acme/sre:pull_request</code>の形）を<code>satellite_github_subjects</code>に入れておきます。</li>
+        <li>AWSでは、このジョブの<code>sub</code>は<code>repo:acme/sre:pull_request</code>です。「最初のサイトを公開する」でプルリクエストの試し実行のために入れたものと同じなので、追加は要りません。</li>
       </ul>
       <p>プレビューを作るたびに配信先に書き込むので、すべてのプルリクエストではなく、ラベルを付けたものだけにする運用もあります。その場合は<code>on</code>と<code>if</code>にラベルの条件を足します。</p>
     </section>

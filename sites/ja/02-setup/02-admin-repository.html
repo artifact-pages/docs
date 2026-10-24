@@ -96,7 +96,7 @@
         <li>生成したファイルは手で編集しないでください。直したいときは作り直します（「<a href="../03-operations/update-shared-workflows.html">共通の公開・プレビューの仕組みを更新する</a>」）。</li>
         <li>対応する配信先はCloudflareとAWSです。設定ファイルは管理リポジトリの中の通常のファイルである必要があります。</li>
       </ul>
-      <p>生成したファイルと設定ファイルをコミットし、<code>main</code>にマージします。</p>
+      <p>生成したファイルと設定ファイルをコミットし、<code>main</code>にマージします。生成した登録のワークフローは、プルリクエストと<code>main</code>へのプッシュで動き、配信先を読みます。そのため、プルリクエストを出す前に「<a href="#secrets">認証情報を置く</a>」と「<a href="#environments">Environment</a>」の設定を済ませておきます。</p>
     </section>
 
     <section class="doc-section" aria-labelledby="how">
@@ -138,9 +138,9 @@
         <li><strong>各チームのリポジトリ。</strong>共通のワークフローは、呼び出したリポジトリのシークレットを使います（呼び出す側に<code>secrets: inherit</code>）。管理リポジトリのシークレットはチームのジョブには届きません。Organizationのシークレットにまとめることもできます。</li>
       </ul>
       <h3 id="aws">AWS</h3>
-      <p>AWSではシークレットを置かず、各ジョブがIAMロールを引き受けます。管理リポジトリのリポジトリ変数<code>ARTIFACT_PAGES_REGISTRY_ADMIN_ROLE_ARN</code>に、Terraformの出力<code>admin_role_arn</code>を設定します（<code>registry setup</code>がコマンドを表示します）。各チームのジョブのロールは、共通のワークフローがサイトIDと設定の<code>aws.accountId</code>から求めるので、チームに設定は要りません。Terraformの<code>admin_github_subjects</code>と<code>satellite_github_subjects</code>に、実際に動くジョブの<code>sub</code>が入っていることを確かめてください。</p>
+      <p>AWSではシークレットを置かず、各ジョブがIAMロールを引き受けます。管理リポジトリのリポジトリ変数<code>ARTIFACT_PAGES_REGISTRY_ADMIN_ROLE_ARN</code>に、Terraformの出力<code>admin_role_arn</code>を設定します（<code>registry setup</code>がコマンドを表示します）。各チームのジョブのロールは、共通のワークフローがサイトIDと設定の<code>aws.accountId</code>から求めるので、チームに設定は要りません。Terraformの<code>admin_github_subjects</code>と<code>satellite_github_subjects</code>に、実際に動くジョブの<code>sub</code>が入っていることを確かめてください。管理リポジトリでは、<code>main</code>のジョブ（<code>…:environment:production</code>）と、プルリクエストでの登録の試し実行（<code>…:pull_request</code>）の2つです（「<a href="01-infrastructure/aws.html#subjects">許可するジョブを書く</a>」）。</p>
       <h3 id="environments">Environment</h3>
-      <p>本番の書き込みに承認やブランチの制限をかけたい場合は、GitHubのEnvironmentを使います。非公開のリポジトリでEnvironmentを使えるかどうか、承認のルールまで使えるかどうかは、GitHubのプランによって違うので確かめてください。管理リポジトリには<code>production</code>を作ります。チームが<code>environment</code>入力で名前を渡すと、共通のワークフローは呼び出したリポジトリのそのEnvironmentを使います。存在しない名前を渡すとGitHubが制限なしで作ってしまうので、先に作っておきます。</p>
+      <p>本番の書き込みに承認やブランチの制限をかけたい場合は、GitHubのEnvironmentを使います。非公開のリポジトリでEnvironmentを使えるかどうか、承認のルールまで使えるかどうかは、GitHubのプランによって違うので確かめてください。管理リポジトリには<code>production</code>を作ります。チームが<code>environment</code>入力で名前を渡すと、共通のワークフローは呼び出したリポジトリのそのEnvironmentを使います。存在しない名前を渡すとGitHubが制限なしで作ってしまうので、先に作っておきます。このガイドの例では、チームのリポジトリのEnvironmentも<code>production</code>という名前にします。</p>
     </section>
 
     <section class="doc-section" aria-labelledby="direct">
