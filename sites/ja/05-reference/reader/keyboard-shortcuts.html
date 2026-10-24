@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <meta name="description" content="閲覧アプリのキーボード操作の一覧。全体で使えるキー、パレット、サイドバーの絞り込み、本文検索の画面、資料の中の一致、フォルダと一覧、メニュー。">
+  <meta name="description" content="閲覧アプリのキーボード操作の一覧。全体で使えるキー、パレット、サイドバーの絞り込み、本文検索の画面、Artifactの中の一致、フォルダと一覧、メニュー。">
   <title>キーボードショートカット</title>
   <script>
     // Copy the reader app's theme (same-origin parent) before first paint; assets/site.js keeps it in sync.
@@ -33,7 +33,7 @@
 
     <section class="doc-section" aria-labelledby="global">
       <h2 id="global">サイトの中で使えるキー</h2>
-      <p>サイトを開いている画面で使えます。サイトの一覧（<code>/</code>）で使えるのは<kbd>⌘</kbd> <kbd>K</kbd>だけです。本文検索とContentsのキーは、その機能があるサイトや資料でだけ働きます。</p>
+      <p>サイトを開いている画面で使えます。サイトの一覧（<code>/</code>）で使えるのは<kbd>⌘</kbd> <kbd>K</kbd>だけです。本文検索とContentsのキーは、その機能があるサイトやArtifactでだけ働きます。</p>
       <div class="table-wrap"><table>
         <thead><tr><th>キー</th><th>動作</th></tr></thead>
         <tbody>
@@ -44,7 +44,7 @@
           <tr><td><kbd>Tab</kbd> → <kbd>Enter</kbd></td><td>最初の<strong>Skip to content</strong>で本文へ移る。</td></tr>
         </tbody>
       </table></div>
-      <p>HTMLの資料の中にフォーカスがあるときに効くのは、<kbd>⌘</kbd> <kbd>K</kbd>、<kbd>⌘</kbd> <kbd>⇧</kbd> <kbd>F</kbd>、<kbd>⌘</kbd> <kbd>B</kbd>と、一致のナビゲーターを閉じる<kbd>Esc</kbd>です。<kbd>⌘</kbd> <kbd>⇧</kbd> <kbd>O</kbd>はHTMLの中では効きません。</p>
+      <p>HTMLのArtifactの中にフォーカスがあるときに効くのは、<kbd>⌘</kbd> <kbd>K</kbd>、<kbd>⌘</kbd> <kbd>⇧</kbd> <kbd>F</kbd>、<kbd>⌘</kbd> <kbd>B</kbd>と、一致のナビゲーターを閉じる<kbd>Esc</kbd>です。<kbd>⌘</kbd> <kbd>⇧</kbd> <kbd>O</kbd>はHTMLの中では効きません。</p>
     </section>
 
     <section class="doc-section" aria-labelledby="palette">
@@ -87,7 +87,7 @@
     </section>
 
     <section class="doc-section" aria-labelledby="matches">
-      <h2 id="matches">資料の中の一致</h2>
+      <h2 id="matches">Artifactの中の一致</h2>
       <div class="table-wrap"><table>
         <thead><tr><th>キー</th><th>動作</th></tr></thead>
         <tbody>
@@ -103,8 +103,8 @@
         <thead><tr><th>場所</th><th>キー</th><th>動作</th></tr></thead>
         <tbody>
           <tr><td>サイドバーのフォルダ</td><td><kbd>→</kbd> / <kbd>←</kbd>、<kbd>Enter</kbd></td><td>開く / 閉じる。Enterでフォルダの画面へ。</td></tr>
-          <tr><td>資料の一覧</td><td><kbd>↑</kbd> <kbd>↓</kbd>、<kbd>Home</kbd> <kbd>End</kbd></td><td>行を移る、先頭 / 末尾へ。</td></tr>
-          <tr><td>資料のメニュー</td><td><kbd>P</kbd>、<kbd>L</kbd></td><td>Pinの切り替え、Copy link（メニューを開いているときだけ）。</td></tr>
+          <tr><td>Artifactの一覧</td><td><kbd>↑</kbd> <kbd>↓</kbd>、<kbd>Home</kbd> <kbd>End</kbd></td><td>行を移る、先頭 / 末尾へ。</td></tr>
+          <tr><td>Artifactのメニュー</td><td><kbd>P</kbd>、<kbd>L</kbd></td><td>Pinの切り替え、Copy link（メニューを開いているときだけ）。</td></tr>
           <tr><td>各メニュー</td><td><kbd>↑</kbd> <kbd>↓</kbd>、<kbd>Home</kbd> <kbd>End</kbd>、<kbd>Esc</kbd>、<kbd>Space</kbd></td><td>項目を移る、閉じる、リンクを開く。</td></tr>
           <tr><td>More actions</td><td><kbd>↓</kbd>、<kbd>Tab</kbd></td><td>ボタンの上で開く、メニューを閉じる。</td></tr>
         </tbody>

@@ -33,7 +33,7 @@ Keep agent instruction files and anything that is not a published page outside `
 - Each language is its own site with identical relative paths. The site root is `README.md`; every folder below it has an `index.html` entry page and all other pages are HTML. File names are English, with `01-` prefixes only where order is information (chapter folders, the four feature pages, the setup steps). The in-page language switch links to the same path in the other site. Whether relative links work across sites is an open check in DOC-23; if not, use absolute `https://artifact-pages.dev/<id>/…` URLs.
 - Offer only translations that exist. Preserve file extensions in links; treat `index.html` as an explicitly opened file, not a directory default.
 - Set `lang`, a clear localized H1 and a descriptive `<title>`.
-- Write agent instructions in English and page content in the language of its directory. Japanese: no half-width spaces around ASCII terms; use 認証情報, インデックス, 一覧, プレーン, プレフィックス, サイトの登録情報, アーキテクチャの全体像 consistently.
+- Write agent instructions in English and page content in the language of its directory. Japanese: no half-width spaces around ASCII terms; use 認証情報, インデックス, 一覧, プレーン, プレフィックス, サイトの登録情報, アーキテクチャの全体像 consistently. The published HTML or Markdown file is `Artifact` (owner, 2026-10-24; not 資料), defined at its first use in `README.md` and again on the features overview `01-features/index.html`. Files a page uses (CSS, images) are not Artifacts; write 「Artifactとそれが使うファイル」 or 「公開元のファイル」 where both are meant.
 - Illustrative teams and repositories use the `acme/…` examples (`sre`, `checkout`, `billing`) and say they are illustrative.
 
 ## Visual quality

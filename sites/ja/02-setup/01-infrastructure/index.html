@@ -28,18 +28,18 @@
         <p class="eyebrow">導入する · ステップ1</p>
         <h1>インフラを構築する</h1>
       </div>
-      <p class="lead">資料を置くストレージと、それを読者に届ける配信の仕組みを、CloudflareかAWSに用意します。どちらも製品が公開しているTerraformモジュールを呼び出して作ります。このステップで閲覧アプリやサイトはまだ置きません。それは次のステップからです。</p>
+      <p class="lead">Artifactを置くストレージと、それを読者に届ける配信の仕組みを、CloudflareかAWSに用意します。どちらも製品が公開しているTerraformモジュールを呼び出して作ります。このステップで閲覧アプリやサイトはまだ置きません。それは次のステップからです。</p>
     </header>
 
     <nav class="sm" aria-label="導入のステップ"><ol><li><a href="../01-infrastructure/index.html" aria-current="step"><span class="sm-n">1</span><b>インフラを構築する</b></a></li><li><a href="../02-admin-repository.html"><span class="sm-n">2</span><b>管理リポジトリを準備する</b></a></li><li><a href="../03-reader-app.html"><span class="sm-n">3</span><b>閲覧アプリをデプロイする</b></a></li><li><a href="../04-register-site.html"><span class="sm-n">4</span><b>サイトを登録する</b></a></li><li><a href="../05-first-site.html"><span class="sm-n">5</span><b>最初のサイトを公開する</b></a></li><li><a href="../06-pr-previews.html"><span class="sm-n">6</span><b>PRプレビューを使えるようにする</b></a></li></ol></nav>
 
     <section class="doc-section" aria-labelledby="outcome">
       <h2 id="outcome">このステップで用意するもの</h2>
-      <p>モジュールを適用すると、配信先に次のものがそろいます。閲覧アプリ、サイトの登録情報、各サイトの資料はまだ入っていません。これらは、このあとのステップで置きます（AWSでは、404の応答に使うページだけをモジュールが置きます）。</p>
+      <p>モジュールを適用すると、配信先に次のものがそろいます。閲覧アプリ、サイトの登録情報、各サイトのArtifactはまだ入っていません。これらは、このあとのステップで置きます（AWSでは、404の応答に使うページだけをモジュールが置きます）。</p>
       <ul>
-        <li><strong>非公開のストレージ。</strong>CloudflareではR2のバケット、AWSではS3のバケットです。閲覧アプリと公開された資料は、すべてここに入ります。バケット自体は直接公開しません。</li>
+        <li><strong>非公開のストレージ。</strong>CloudflareではR2のバケット、AWSではS3のバケットです。閲覧アプリと公開されたArtifactは、すべてここに入ります。バケット自体は直接公開しません。</li>
         <li><strong>読者が開くホスト名。</strong>Cloudflareでは、お使いのゾーンにあるホスト名（例：<code>docs.example.com</code>）です。AWSでは、最初はCloudFrontが割り当てるホスト名をそのまま使え、独自ドメインはあとから付けられます。</li>
-        <li><strong>URLの振り分けとキャッシュの規則。</strong>ページや見出しのURLを閲覧アプリへ届け、内部用の記録はストレージの中身を返さないようにします。資料の種類ごとにキャッシュの長さとHTMLの応答ポリシーも決まります。</li>
+        <li><strong>URLの振り分けとキャッシュの規則。</strong>ページや見出しのURLを閲覧アプリへ届け、内部用の記録はストレージの中身を返さないようにします。配信するファイルの区分ごとにキャッシュの長さとHTMLの応答ポリシーも決まります。</li>
         <li><strong>PRプレビューの保持期間。</strong>プレビューは、指定した日数が過ぎると自動で削除されます。日数はTerraformの入力<code>preview_retention_days</code>で決め、CLIの設定ファイルには書きません。</li>
         <li><strong>公開ジョブの認証情報。</strong>管理リポジトリのジョブ（閲覧アプリの配置とサイトの登録）と、各チームのジョブ（自分のサイトの公開とプレビュー）が配信先に書き込むための認証情報です。用意のしかたは配信先によって異なります（下の表を参照）。</li>
       </ul>

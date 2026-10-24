@@ -28,7 +28,7 @@
         <p class="eyebrow">体験と機能</p>
         <h1>体験と機能</h1>
       </div>
-      <p class="lead">Artifact Pagesでできることは、4つの機能群に分かれます。各チームが自分のリポジトリから公開した資料が、共通の閲覧アプリの中で、同じ探し方と読み方でつながります。</p>
+      <p class="lead">Artifact Pagesでできることは、4つの機能群に分かれます。このドキュメントでは、リポジトリから公開して閲覧アプリで1ページとして読む、HTMLやMarkdownのファイルを「Artifact」と呼びます。各チームが自分のリポジトリから公開したArtifactが、共通の閲覧アプリの中で、同じ探し方と読み方でつながります。</p>
     </header>
 
     <section class="doc-section" aria-labelledby="groups">
@@ -39,10 +39,10 @@
         <figcaption>サイトを開き、パレットで探し、<code>@</code>でほかのサイトへ移る流れです。ボタンで場面を切り替えられます。</figcaption>
       </figure>
       <ul class="cards two">
-        <li><a class="card" href="01-publish-and-review.html"><span class="tag">公開者</span><h3>資料を公開・レビューする</h3><p>チームのリポジトリから、HTMLとMarkdownをそのまま公開します。プルリクエストの変更は、本公開とは別のプレビューで確かめます。</p><span class="go">詳しく →</span></a></li>
-        <li><a class="card" href="02-find.html"><span class="tag">読者</span><h3>資料を探す</h3><p>サイトとフォルダをたどる、タイトルやパス、本文の言葉で検索する、ピン留めや最近読んだ資料から戻る、の3つの探し方があります。</p><span class="go">詳しく →</span></a></li>
-        <li><a class="card" href="03-read.html"><span class="tag">読者</span><h3>資料を読む</h3><p>HTMLもMarkdownも同じ画面で読み、目次で見出しへ移り、ページや見出しのURLを共有します。更新日や公開元も確かめられます。</p><span class="go">詳しく →</span></a></li>
-        <li><a class="card" href="04-provide-and-operate.html"><span class="tag">管理者</span><h3>基盤を提供・運用する</h3><p>配信環境をTerraformで作り、サイトを登録し、閲覧アプリを資料とは別に更新します。管理者と各チームの担当がはっきり分かれます。</p><span class="go">詳しく →</span></a></li>
+        <li><a class="card" href="01-publish-and-review.html"><span class="tag">公開者</span><h3>Artifactを公開・レビューする</h3><p>チームのリポジトリから、HTMLとMarkdownをそのまま公開します。プルリクエストの変更は、本公開とは別のプレビューで確かめます。</p><span class="go">詳しく →</span></a></li>
+        <li><a class="card" href="02-find.html"><span class="tag">読者</span><h3>Artifactを探す</h3><p>サイトとフォルダをたどる、タイトルやパス、本文の言葉で検索する、ピン留めや最近読んだArtifactから戻る、の3つの探し方があります。</p><span class="go">詳しく →</span></a></li>
+        <li><a class="card" href="03-read.html"><span class="tag">読者</span><h3>Artifactを読む</h3><p>HTMLもMarkdownも同じ画面で読み、目次で見出しへ移り、ページや見出しのURLを共有します。更新日や公開元も確かめられます。</p><span class="go">詳しく →</span></a></li>
+        <li><a class="card" href="04-provide-and-operate.html"><span class="tag">管理者</span><h3>基盤を提供・運用する</h3><p>配信環境をTerraformで作り、サイトを登録し、閲覧アプリをArtifactとは別に更新します。管理者と各チームの担当がはっきり分かれます。</p><span class="go">詳しく →</span></a></li>
       </ul>
     </section>
 
@@ -57,22 +57,22 @@
       <div class="table-wrap"><table>
         <thead><tr><th>だれが</th><th>何をするか</th><th>どこで</th></tr></thead>
         <tbody>
-          <tr><td>各チーム</td><td>資料を書き、プルリクエストでレビューし、マージで公開する</td><td>自分のリポジトリとGitHub Actions</td></tr>
-          <tr><td>読者</td><td>サイトを選び、資料を探して読み、リンクで共有する</td><td>ブラウザで開く閲覧アプリ</td></tr>
+          <tr><td>各チーム</td><td>Artifactを書き、プルリクエストでレビューし、マージで公開する</td><td>自分のリポジトリとGitHub Actions</td></tr>
+          <tr><td>読者</td><td>サイトを選び、Artifactを探して読み、リンクで共有する</td><td>ブラウザで開く閲覧アプリ</td></tr>
           <tr><td>管理者</td><td>配信環境を用意し、サイトを登録し、閲覧アプリと共通の仕組みを更新する</td><td>管理リポジトリとTerraform</td></tr>
         </tbody>
       </table></div>
       <div class="callout" role="note">
         <span class="ico">範囲</span>
         <div>
-          <p><strong>検索は、いま開いているサイトの中で行います。</strong>全サイトをまとめて検索する機能はありません。別のサイトの資料は、サイトを切り替えてから探します。</p>
+          <p><strong>検索は、いま開いているサイトの中で行います。</strong>全サイトをまとめて検索する機能はありません。別のサイトのArtifactは、サイトを切り替えてから探します。</p>
         </div>
       </div>
     </section>
 
     <nav class="pager" aria-label="ページ送り">
       <a class="prev" href="../README.md"><small>前へ</small><strong>Artifact Pages ドキュメント</strong></a>
-      <a class="next" href="01-publish-and-review.html"><small>次へ</small><strong>資料を公開・レビューする</strong></a>
+      <a class="next" href="01-publish-and-review.html"><small>次へ</small><strong>Artifactを公開・レビューする</strong></a>
     </nav>
   </main>
 </body>

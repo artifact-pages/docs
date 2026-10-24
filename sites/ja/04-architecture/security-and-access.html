@@ -29,40 +29,40 @@
         <h1>セキュリティとアクセス</h1>
       </div>
       <p class="lead">Artifact Pagesは、公開する人を信頼し、読む人の制限は配信先に任せる設計です。何が守られ、何が守られないかを知ったうえで、公開の権限と閲覧の制限を設計してください。</p>
-      <p class="answer"><span class="answer-label">要点</span>HTMLの資料は、閲覧アプリと同じオリジンで動く信頼したコードです。読者の制限は、配信先のホスト名に対して行います。</p>
+      <p class="answer"><span class="answer-label">要点</span>HTMLのArtifactは、閲覧アプリと同じオリジンで動く信頼したコードです。読者の制限は、配信先のホスト名に対して行います。</p>
     </header>
 
     <section class="doc-section" aria-labelledby="html">
       <h2 id="html">HTMLとMarkdownの信頼</h2>
       <figure class="fg" aria-labelledby="origin-fig">
-        <div class="fg-head"><strong id="origin-fig">HTMLの資料のスクリプトが届く範囲</strong><span class="fg-note">説明用の例</span></div>
-        <div class="fg-body"><div class="zn" data-kind="origin"><span class="zn-l">同じオリジン（<code>https://docs.example.com</code>）</span><div class="nd" data-kind="app"><b>閲覧アプリ</b></div><div class="nd is-warn" data-kind="site"><b>HTMLの資料</b><small><code>sandbox</code>のないiframe。スクリプトが動く</small></div><div class="nd" data-kind="site"><b>ほかのサイトの資料</b></div><div class="nd" data-kind="app"><b>ブラウザの保存領域</b><small>ピン留め、最近読んだ資料</small></div><div class="nd" data-kind="site"><b>Markdownの資料</b><small>閲覧アプリが描画。スクリプトは動かない</small></div></div></div>
+        <div class="fg-head"><strong id="origin-fig">HTMLのArtifactのスクリプトが届く範囲</strong><span class="fg-note">説明用の例</span></div>
+        <div class="fg-body"><div class="zn" data-kind="origin"><span class="zn-l">同じオリジン（<code>https://docs.example.com</code>）</span><div class="nd" data-kind="app"><b>閲覧アプリ</b></div><div class="nd is-warn" data-kind="site"><b>HTMLのArtifact</b><small><code>sandbox</code>のないiframe。スクリプトが動く</small></div><div class="nd" data-kind="site"><b>ほかのサイトのArtifact</b></div><div class="nd" data-kind="app"><b>ブラウザの保存領域</b><small>ピン留め、最近読んだArtifact</small></div><div class="nd" data-kind="site"><b>MarkdownのArtifact</b><small>閲覧アプリが描画。スクリプトは動かない</small></div></div></div>
         <figcaption>枠の中はすべて1つのオリジンで、1つの信頼の範囲です。iframeが分けるのはレイアウトとCSSで、スクリプトは分けません。</figcaption>
       </figure>
       <div class="table-wrap"><table>
         <thead><tr><th></th><th>HTML</th><th>Markdown</th></tr></thead>
         <tbody>
           <tr><td>表示</td><td>閲覧アプリと同じオリジンのiframe。<code>sandbox</code>は付けない</td><td>閲覧アプリが描画する</td></tr>
-          <tr><td>スクリプト</td><td>動く。親の画面、同じオリジンのほかの資料、ブラウザの保存領域にアクセスできる</td><td>動かない。埋め込まれたHTMLは、許可していない要素と属性が取り除かれる。Mermaidは制限したモードで描く</td></tr>
-          <tr><td>扱い</td><td>公開する人が信頼したコード</td><td>安全に整えて表示する文書</td></tr>
+          <tr><td>スクリプト</td><td>動く。親の画面、同じオリジンのほかのArtifact、ブラウザの保存領域にアクセスできる</td><td>動かない。埋め込まれたHTMLは、許可していない要素と属性が取り除かれる。Mermaidは制限したモードで描く</td></tr>
+          <tr><td>扱い</td><td>公開する人が信頼したコード</td><td>安全に整えて表示するArtifact</td></tr>
         </tbody>
       </table></div>
-      <p>iframeはCSSとレイアウトを分けるためのもので、悪意のあるスクリプトを閉じ込めるものではありません。HTMLの資料は、ピン留めや最近読んだ資料が入っているブラウザの保存領域も読めます。プレビューのHTMLも同じ扱いで、マージ前のコードを安全に動かす仕組みではありません。だれに公開を任せるかが、そのまま信頼の範囲になります。</p>
+      <p>iframeはCSSとレイアウトを分けるためのもので、悪意のあるスクリプトを閉じ込めるものではありません。HTMLのArtifactは、ピン留めや最近読んだArtifactが入っているブラウザの保存領域も読めます。プレビューのHTMLも同じ扱いで、マージ前のコードを安全に動かす仕組みではありません。だれに公開を任せるかが、そのまま信頼の範囲になります。</p>
     </section>
 
     <section class="doc-section" aria-labelledby="csp">
       <h2 id="csp">CSPと内部の記録</h2>
       <ul>
-        <li>資料の応答に付くCSPは、HTTPSの外部リソース、インラインのスクリプト、<code>eval</code>などを許します。信頼したHTMLをそのまま動かすための方針で、スクリプトを厳しく止める方針ではありません。HTTPの外部リソースは読み込めません。</li>
+        <li>Artifactの応答に付くCSPは、HTTPSの外部リソース、インラインのスクリプト、<code>eval</code>などを許します。信頼したHTMLをそのまま動かすための方針で、スクリプトを厳しく止める方針ではありません。HTTPの外部リソースは読み込めません。</li>
         <li>CSPの<code>https:</code>は同じオリジンのほかのサイトのパスにも当てはまります。サイトの間で機密を分ける仕組みにはなりません。</li>
-        <li><code>/_control/</code>以下の内部の記録は、読者に中身を返しません（閲覧アプリの画面が返ることはあります）。資料、一覧、プレビューのファイルがない場合は404を返します。</li>
+        <li><code>/_control/</code>以下の内部の記録は、読者に中身を返しません（閲覧アプリの画面が返ることはあります）。Artifact、一覧、プレビューのファイルがない場合は404を返します。</li>
       </ul>
     </section>
 
     <section class="doc-section" aria-labelledby="viewers">
       <h2 id="viewers">閲覧の制限</h2>
       <p>製品には、利用者のアカウント、ログイン、役割、サイトごとの閲覧の設定がありません。サイトを登録しないこと、一覧に出さないこと、推測しにくいURLを使うことは、どれも閲覧の制限になりません。</p>
-      <p>読者を限るのは、配信先のホスト名に対する制限です。読者が開く論理的なURLだけでなく、一覧、資料、プレビューのファイルのパスにも効き、キャッシュから返す前に判定される必要があります。</p>
+      <p>読者を限るのは、配信先のホスト名に対する制限です。読者が開く論理的なURLだけでなく、一覧、Artifact、プレビューのファイルのパスにも効き、キャッシュから返す前に判定される必要があります。</p>
       <figure class="fg" aria-labelledby="gate-fig">
         <div class="fg-head"><strong id="gate-fig">閲覧の制限を置く場所</strong></div>
         <div class="fg-body"><div class="fl"><div class="nd" data-kind="reader"><b>読者</b></div><span class="fl-a"></span><div class="nd is-new" data-kind="cdn"><b>閲覧の制限</b><small>IPアドレス、WAF、Cloudflare Accessなど</small><span class="nd-badge">ここ</span></div><span class="fl-a"></span><div class="nd" data-kind="cdn"><b>キャッシュ</b></div><span class="fl-a"></span><div class="nd" data-kind="store"><b>ストレージ</b></div></div></div>

@@ -29,7 +29,7 @@
         <h1>コストとパフォーマンス</h1>
       </div>
       <p class="lead">費用と速さは、公開と閲覧の処理のどこで、何がどれだけ動くかで決まります。このページでは共通の要因と、これまでの計測の結果を、計測の条件とあわせて示します。数字は計測した条件での値で、性能や請求額の保証ではありません。</p>
-      <p class="answer"><span class="answer-label">要点</span>費用と時間を決めるのは、資料の数とサイトの一覧の大きさ、公開の回数、キャッシュの削除です。数字はすべて計測した条件でのもので、保証値ではありません。</p>
+      <p class="answer"><span class="answer-label">要点</span>費用と時間を決めるのは、Artifactの数とサイトの一覧の大きさ、公開の回数、キャッシュの削除です。数字はすべて計測した条件でのもので、保証値ではありません。</p>
     </header>
 
     <section class="doc-section" aria-labelledby="factors">
@@ -37,9 +37,9 @@
       <div class="table-wrap"><table>
         <thead><tr><th>場面</th><th>何が動くか</th></tr></thead>
         <tbody>
-          <tr><td>保存</td><td>公開した資料、一覧、検索のデータ、プレビューのリビジョン（保持期間の間）、閲覧アプリのファイル</td></tr>
-          <tr><td>公開</td><td>ロックと状態の記録の読み書き、変わったファイルと一覧の書き込み、キャッシュの削除。資料が1つ変わっただけでも、サイトの<code>index.json</code>全体を読み書きします。変更がなければ小さな記録の読み書きだけです</td></tr>
-          <tr><td>閲覧</td><td>閲覧アプリ、サイトの一覧、資料の取得。キャッシュに当たらなかったリクエストはストレージまで届きます。キャッシュに当たっても、読者への転送の費用がなくなるとは限りません</td></tr>
+          <tr><td>保存</td><td>公開したArtifact、一覧、検索のデータ、プレビューのリビジョン（保持期間の間）、閲覧アプリのファイル</td></tr>
+          <tr><td>公開</td><td>ロックと状態の記録の読み書き、変わったファイルと一覧の書き込み、キャッシュの削除。Artifactが1つ変わっただけでも、サイトの<code>index.json</code>全体を読み書きします。変更がなければ小さな記録の読み書きだけです</td></tr>
+          <tr><td>閲覧</td><td>閲覧アプリ、サイトの一覧、Artifactの取得。キャッシュに当たらなかったリクエストはストレージまで届きます。キャッシュに当たっても、読者への転送の費用がなくなるとは限りません</td></tr>
           <tr><td>検索</td><td>検索のデータのうち、必要な区画だけの取得</td></tr>
         </tbody>
       </table></div>
@@ -53,24 +53,24 @@
           <tr><td>閲覧アプリの入口のファイル</td><td><code>no-cache, max-age=0, must-revalidate</code></td></tr>
           <tr><td>ハッシュ付きの閲覧アプリのファイル</td><td><code>public, max-age=31536000, immutable</code></td></tr>
           <tr><td>登録情報、概要、一覧、検索の目次</td><td><code>public, max-age=0, s-maxage=60, must-revalidate</code></td></tr>
-          <tr><td>公開した資料</td><td><code>public, max-age=0, s-maxage=300, must-revalidate</code></td></tr>
+          <tr><td>公開したArtifact</td><td><code>public, max-age=0, s-maxage=300, must-revalidate</code></td></tr>
           <tr><td>検索のデータの区画</td><td><code>public, max-age=31536000, immutable</code></td></tr>
           <tr><td>内部の記録</td><td><code>no-store</code>（読者には返さない）</td></tr>
         </tbody>
       </table></div>
-      <p>CDNは一覧を最大60秒、資料を最大300秒キャッシュするので、公開の直後はその間、古い内容が返ることがあります。公開のたびに変わったURLのキャッシュを削除して、これを短くしています。</p>
+      <p>CDNは一覧を最大60秒、Artifactを最大300秒キャッシュするので、公開の直後はその間、古い内容が返ることがあります。公開のたびに変わったURLのキャッシュを削除して、これを短くしています。</p>
     </section>
 
     <section class="doc-section" aria-labelledby="browser">
       <h2 id="browser">ブラウザでの計測</h2>
-      <p>合成した資料（1千から5万件）のサイトを、手元のnginxで配信して計測しました。Apple M4（32 GB）、Chromium 153、3回の中央値です。nginxは圧縮していません。閲覧アプリは計測時点の版で、いまの版での再計測ではありません。</p>
+      <p>合成したArtifact（1千から5万件）のサイトを、手元のnginxで配信して計測しました。Apple M4（32 GB）、Chromium 153、3回の中央値です。nginxは圧縮していません。閲覧アプリは計測時点の版で、いまの版での再計測ではありません。</p>
       <figure class="fg" aria-labelledby="size-fig">
-        <div class="fg-head"><strong id="size-fig">資料の数と<code>index.json</code>の大きさ（展開後）</strong></div>
-        <div class="fg-body"><div class="br" role="table" aria-label="資料の数ごとのindex.jsonの大きさ"><div class="br-r" role="row"><span class="br-l" role="rowheader">1,000件</span><span class="br-v" role="cell" data-kind="site" style="--v:0.017">0.78 MB</span></div><div class="br-r" role="row"><span class="br-l" role="rowheader">5,000件</span><span class="br-v" role="cell" data-kind="site" style="--v:0.096">4.39 MB</span></div><div class="br-r" role="row"><span class="br-l" role="rowheader">10,000件</span><span class="br-v" role="cell" data-kind="site" style="--v:0.194">8.92 MB</span></div><div class="br-r" role="row"><span class="br-l" role="rowheader">50,000件</span><span class="br-v" role="cell" data-kind="site" style="--v:1.000">45.90 MB</span></div></div></div>
-        <figcaption>資料の数にほぼ比例して大きくなります。値は下の表と同じ計測です。</figcaption>
+        <div class="fg-head"><strong id="size-fig">Artifactの数と<code>index.json</code>の大きさ（展開後）</strong></div>
+        <div class="fg-body"><div class="br" role="table" aria-label="Artifactの数ごとのindex.jsonの大きさ"><div class="br-r" role="row"><span class="br-l" role="rowheader">1,000件</span><span class="br-v" role="cell" data-kind="site" style="--v:0.017">0.78 MB</span></div><div class="br-r" role="row"><span class="br-l" role="rowheader">5,000件</span><span class="br-v" role="cell" data-kind="site" style="--v:0.096">4.39 MB</span></div><div class="br-r" role="row"><span class="br-l" role="rowheader">10,000件</span><span class="br-v" role="cell" data-kind="site" style="--v:0.194">8.92 MB</span></div><div class="br-r" role="row"><span class="br-l" role="rowheader">50,000件</span><span class="br-v" role="cell" data-kind="site" style="--v:1.000">45.90 MB</span></div></div></div>
+        <figcaption>Artifactの数にほぼ比例して大きくなります。値は下の表と同じ計測です。</figcaption>
       </figure>
       <div class="table-wrap"><table>
-        <thead><tr><th>資料の数</th><th><code>index.json</code>（展開後 / gzip換算）</th><th>検索のデータ（ファイル数 / 量）</th><th>手元での<code>site sync</code></th></tr></thead>
+        <thead><tr><th>Artifactの数</th><th><code>index.json</code>（展開後 / gzip換算）</th><th>検索のデータ（ファイル数 / 量）</th><th>手元での<code>site sync</code></th></tr></thead>
         <tbody>
           <tr><td>1,000</td><td>0.78 MB / 39.9 kB</td><td>175 / 0.46 MB</td><td>12.9秒</td></tr>
           <tr><td>5,000</td><td>4.39 MB / 265.6 kB</td><td>350 / 2.07 MB</td><td>62.0秒</td></tr>
@@ -79,8 +79,8 @@
         </tbody>
       </table></div>
       <ul>
-        <li>サイトの一覧の画面（<code>/</code>）は、どの規模でも約840 kB、6リクエストでした。資料の数には比例しません。</li>
-        <li>通信を絞らない条件で、資料（Mermaidの図を含むMarkdown）を初めて開いて図が描かれるまでは、1千件で260 ms、5万件で1,369 msでした。転送量は2.42 MBから47.54 MBに増えます。</li>
+        <li>サイトの一覧の画面（<code>/</code>）は、どの規模でも約840 kB、6リクエストでした。Artifactの数には比例しません。</li>
+        <li>通信を絞らない条件で、Artifact（Mermaidの図を含むMarkdown）を初めて開いて図が描かれるまでは、1千件で260 ms、5万件で1,369 msでした。転送量は2.42 MBから47.54 MBに増えます。</li>
         <li>通信を絞った条件（CPU 4倍遅く、往復150 ms、下り1.6 Mbps）では、1千件で13.8秒かかり、5千件以上は<code>index.json</code>の読み込みが20秒の制限を超えて失敗しました。</li>
         <li>5万件のサイトの本文検索は、最初の検索が282 ms（6ファイル、1.93 MB）で、続く検索は前の検索で読んだデータを使うため74から118 msでした。</li>
         <li>5万件のうち18,956件（約38%）は、抜粋のデータの上限のため抜粋なしになりました。</li>

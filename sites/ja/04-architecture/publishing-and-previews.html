@@ -43,10 +43,10 @@
         <tbody>
           <tr><td><code>/_indexes/sites.json</code></td><td>サイトの登録情報（一覧と公開元）</td></tr>
           <tr><td><code>/_indexes/&lt;site&gt;/meta.json</code></td><td>サイトの小さな概要。一覧と検索データの場所を指す</td></tr>
-          <tr><td><code>/_indexes/&lt;site&gt;/index.json</code></td><td>サイトの全資料の情報（タイトル、パス、更新日、目次など）</td></tr>
+          <tr><td><code>/_indexes/&lt;site&gt;/index.json</code></td><td>サイトのすべてのArtifactの情報（タイトル、パス、更新日、目次など）</td></tr>
           <tr><td><code>/_indexes/&lt;site&gt;/search/…</code></td><td>本文検索のデータ</td></tr>
           <tr><td><code>/_artifacts/&lt;site&gt;/&lt;path&gt;</code></td><td>公開元のファイル</td></tr>
-          <tr><td><code>/_previews/&lt;site&gt;/…</code></td><td>プレビューの一覧（<code>catalog.json</code>）と、リビジョンごとの資料</td></tr>
+          <tr><td><code>/_previews/&lt;site&gt;/…</code></td><td>プレビューの一覧（<code>catalog.json</code>）と、リビジョンごとのArtifactと、一緒に入れたファイル（自動で選ばれたものと<code>--include</code>で足したもの）</td></tr>
           <tr><td><code>/_control/sites/&lt;site&gt;/…</code></td><td>ロック、公開の状態、再試行の記録、書いた形式の記録。読者には返さない</td></tr>
         </tbody>
       </table></div>
@@ -62,7 +62,7 @@
       <ol>
         <li><strong>ロックを取り、登録を確かめる。</strong>サイトのロックを取ってから、配信先の登録を読み直し、公開元のリポジトリとディレクトリが登録どおりかを確かめます。同じサイトの公開、プレビュー、登録の変更は同じロックを使い、別のサイトの公開とは並んで進みます。</li>
         <li><strong>前回と同じなら何もしない。</strong>公開元の内容から求めた値を、前回の公開の状態の記録（<code>publish-state.json.gz</code>）と比べます。同じで、前回の投影の書き込みが途中で止まっていなければ、投影を組み立てません。プレビューの一覧の手入れや前回終わらなかったキャッシュの削除も残っていなければ、配信先の個々のファイルも確かめずに<code>no-op</code>で終わります。キャッシュの削除が残っていれば、それを行って<code>synced</code>になります。</li>
-        <li><strong>差分を書く。</strong>違う場合は投影を組み立て、資料、検索データ、<code>index.json</code>、検索の目次、<code>meta.json</code>の順に書き、最後に要らなくなったファイルを消します。</li>
+        <li><strong>差分を書く。</strong>違う場合は投影を組み立て、公開元のファイル、検索データ、<code>index.json</code>、検索の目次、<code>meta.json</code>の順に書き、最後に要らなくなったファイルを消します。</li>
         <li><strong>キャッシュを更新する。</strong>変わったURLのキャッシュの削除を配信先に依頼します。</li>
       </ol>
       <p>書き込みの前に、何を書くつもりかを再試行の記録（<code>site-cache.json</code>）に残し、すべてが終わってから消します。途中で失敗すると記録が残るので、同じ公開をもう一度実行すれば、残りの書き込みやキャッシュの削除を続けます。このとき、内容に差がなくても結果は<code>synced</code>になることがあります。</p>
@@ -83,11 +83,11 @@
       </figure>
       <ul>
         <li><strong>入力。</strong>本公開は作業ツリーのファイル（生成したファイルや未追跡のファイルも含む）を使いますが、プレビューはプルリクエストの先頭のコミットに含まれるファイルを使います。</li>
-        <li><strong>対象の選び方。</strong>既定のブランチとのmerge baseからの変更を調べ、追加・変更した資料と、変更したリソースを参照している資料、それらが使うリソースを含めます。</li>
-        <li><strong>リビジョン。</strong>プレビューはコミットのSHAごとに<code>/_previews/&lt;site&gt;/revisions/&lt;SHA&gt;/</code>に置かれ、一度できたら変わりません。そのURLは<code>/:site/_previews/&lt;SHA&gt;/&lt;資料のパス&gt;</code>です。</li>
+        <li><strong>対象の選び方。</strong>既定のブランチとのmerge baseからの変更を調べ、追加・変更したArtifactと、変更したリソースを参照しているArtifact、それらが使うリソースを含めます。</li>
+        <li><strong>リビジョン。</strong>プレビューはコミットのSHAごとに<code>/_previews/&lt;site&gt;/revisions/&lt;SHA&gt;/</code>に置かれ、一度できたら変わりません。そのURLは<code>/:site/_previews/&lt;SHA&gt;/&lt;Artifactのパス&gt;</code>です。</li>
         <li><strong>グループ。</strong>プルリクエストのプレビューは<code>pr:&lt;番号&gt;</code>、プルリクエストに結び付けないプレビューは<code>head:&lt;SHA&gt;</code>というグループにまとまります。グループの一覧のURL（<code>/:site/_previews?group=pr%3A42</code>）は、いつも最新のリビジョンを指します。</li>
       </ul>
-      <p>資料の中のリンクは、静的に読み取れるものなら、同じプレビューの資料か本公開の資料へ付け替えて開きます。JavaScriptが実行時に組み立てるURLまでは変換できません。JavaScriptが名前を組み立てる画像のように、必要なリソースが自動で選ばれない場合は、<code>--include</code>で資料以外のファイルを足せます。変更していないHTMLやMarkdownの資料は<code>--include</code>では足せず、変更したリソースを使う資料だけがプレビューに入ります。</p>
+      <p>Artifactの中のリンクは、静的に読み取れるものなら、同じプレビューのArtifactか本公開のArtifactへ付け替えて開きます。JavaScriptが実行時に組み立てるURLまでは変換できません。JavaScriptが名前を組み立てる画像のように、必要なリソースが自動で選ばれない場合は、<code>--include</code>でArtifact以外のファイルを足せます。変更していないHTMLやMarkdownのArtifactは<code>--include</code>では足せず、変更したリソースを使うArtifactだけがプレビューに入ります。</p>
     </section>
 
     <section class="doc-section" aria-labelledby="remove">
@@ -97,7 +97,7 @@
         <li><strong>閉じても消えない。</strong>プルリクエストのマージや終了で、プレビューは削除されません。新しいリビジョンができると古いリビジョンは一覧から外れますが、古いURLはファイルが残る間は開けます。</li>
         <li><strong>一覧の手入れ。</strong>公開とプレビューの実行時に、ファイルが消えたことを配信先で確かめられたリビジョンだけを一覧から外します。読み取りの失敗を消えたこととは扱いません。</li>
         <li><strong>手動の削除。</strong><code>preview remove</code>はグループが持つリビジョンを消し、ほかのグループと共有するリビジョンは残します。持ち主の記録が足りない場合は、推測で消さずに止まります。</li>
-        <li><strong>サイトの取り下げ。</strong><code>sites</code>から外して<code>registry sync</code>すると、登録、資料、一覧、プレビューを、再試行の記録を付けて削除します。キャッシュや、読者のブラウザにすでに届いたものを、すぐに取り消すことはできません。</li>
+        <li><strong>サイトの取り下げ。</strong><code>sites</code>から外して<code>registry sync</code>すると、登録、Artifact、一覧、プレビューを、再試行の記録を付けて削除します。キャッシュや、読者のブラウザにすでに届いたものを、すぐに取り消すことはできません。</li>
       </ul>
     </section>
 

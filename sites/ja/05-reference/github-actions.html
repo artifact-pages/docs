@@ -75,7 +75,7 @@
           <tr><td><code>head</code></td><td><code>""</code>。プルリクエストのイベントではその先頭のSHA、それ以外は<code>HEAD</code>。</td></tr>
           <tr><td><code>default-ref</code></td><td><code>""</code>。プルリクエストのイベントでは<code>origin/&lt;base&gt;</code>、それ以外は<code>origin/HEAD</code>。</td></tr>
           <tr><td><code>pull-request</code></td><td><code>""</code>。プルリクエストのイベントではその番号。<code>none</code>でプルリクエストに結び付けない。</td></tr>
-          <tr><td><code>include</code></td><td><code>""</code>。資料ではない追加のリソースを、公開元のディレクトリからの相対パスか、Goの<code>path.Match</code>のパターンで改行区切りに指定する。HTMLやMarkdownの資料に一致するとエラーになる。</td></tr>
+          <tr><td><code>include</code></td><td><code>""</code>。Artifactではない追加のリソースを、公開元のディレクトリからの相対パスか、Goの<code>path.Match</code>のパターンで改行区切りに指定する。HTMLやMarkdownのArtifactに一致するとエラーになる。</td></tr>
           <tr><td><code>base-url</code></td><td><code>""</code>。省くと設定の<code>publicBaseURL</code>。どちらもなければ失敗。</td></tr>
           <tr><td><code>comment</code></td><td><code>"false"</code>。<code>"true"</code>でサイトごとに1つのコメントを作り、更新する。コメントの失敗は警告で、プレビューは失敗にしない。</td></tr>
           <tr><td>registry</td><td colspan="2">共通の入力だけ。</td></tr>

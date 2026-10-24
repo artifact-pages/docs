@@ -28,7 +28,7 @@
         <p class="eyebrow">導入する · ステップ5</p>
         <h1>最初のサイトを公開する</h1>
       </div>
-      <p class="lead">ここからはチームの作業です。<code>acme/sre</code>に公開する資料のディレクトリと、共通のワークフローを呼び出すワークフローを置きます。プルリクエストでは試し実行、<code>main</code>へのマージで公開されます。</p>
+      <p class="lead">ここからはチームの作業です。<code>acme/sre</code>に公開するArtifactのディレクトリと、共通のワークフローを呼び出すワークフローを置きます。プルリクエストでは試し実行、<code>main</code>へのマージで公開されます。</p>
     </header>
 
     <nav class="sm" aria-label="導入のステップ"><ol><li class="is-done"><a href="01-infrastructure/index.html"><span class="sm-n">1</span><b>インフラを構築する</b></a></li><li class="is-done"><a href="02-admin-repository.html"><span class="sm-n">2</span><b>管理リポジトリを準備する</b></a></li><li class="is-done"><a href="03-reader-app.html"><span class="sm-n">3</span><b>閲覧アプリをデプロイする</b></a></li><li class="is-done"><a href="04-register-site.html"><span class="sm-n">4</span><b>サイトを登録する</b></a></li><li><a href="05-first-site.html" aria-current="step"><span class="sm-n">5</span><b>最初のサイトを公開する</b></a></li><li><a href="06-pr-previews.html"><span class="sm-n">6</span><b>PRプレビューを使えるようにする</b></a></li></ol></nav>
@@ -52,9 +52,9 @@
       </figure>
       <ul>
         <li><strong>そのまま配信できる形にしておきます。</strong>Artifact Pagesは生成やビルドをしません。ほかのツールで生成するなら、公開の前のステップで生成します。</li>
-        <li><strong>公開したくないものは入れません。</strong>このディレクトリの中のファイルは、リンクされていなくても、Gitで追跡していなくても公開されます。<code>.html</code>のテンプレートや部分的なファイルも資料として載ります。シンボリックリンクがあると公開は失敗します。<code>.git</code>は公開されません。</li>
-        <li><strong>サイトのトップ。</strong>直下の<code>README.md</code>（なければ<code>index.md</code>）が、サイトのトップのOverviewになります。直下の<code>index.html</code>はその代わりにはならず、<code>/sre/index.html</code>という資料として開きます。</li>
-        <li><strong>URL。</strong>資料のURLは<code>/sre/</code>に続けて、このディレクトリからのパスを拡張子まで付けたものです。</li>
+        <li><strong>公開したくないものは入れません。</strong>このディレクトリの中のファイルは、リンクされていなくても、Gitで追跡していなくても公開されます。<code>.html</code>のテンプレートや部分的なファイルもArtifactとして載ります。シンボリックリンクがあると公開は失敗します。<code>.git</code>は公開されません。</li>
+        <li><strong>サイトのトップ。</strong>直下の<code>README.md</code>（なければ<code>index.md</code>）が、サイトのトップのOverviewになります。直下の<code>index.html</code>はその代わりにはならず、<code>/sre/index.html</code>というArtifactとして開きます。</li>
+        <li><strong>URL。</strong>ArtifactのURLは<code>/sre/</code>に続けて、このディレクトリからのパスを拡張子まで付けたものです。</li>
       </ul>
     </section>
 
@@ -95,21 +95,21 @@
     <section class="doc-section" aria-labelledby="publish">
       <h2 id="publish">試し実行してから公開する</h2>
       <ol>
-        <li>資料とワークフローを追加するプルリクエストを出します。ジョブは試し実行で、何が書き込まれるかがジョブの概要に出ます。</li>
+        <li>Artifactとワークフローを追加するプルリクエストを出します。ジョブは試し実行で、何が書き込まれるかがジョブの概要に出ます。</li>
         <li>マージすると、<code>main</code>へのプッシュで公開されます。結果は<code>synced</code>、何も変わっていなければ<code>no-op</code>です。</li>
-        <li>閲覧アプリでSREチームのサイトを開き、資料が読めることを確かめます。</li>
+        <li>閲覧アプリでSREチームのサイトを開き、Artifactが読めることを確かめます。</li>
       </ol>
       <p>公開は、新しいファイルと変わったファイルを書き込み、一覧と検索のデータを更新し、なくなったファイルを削除します。手元から試すときは、管理リポジトリの設定を<code>github://</code>で読みます（AWSでは手元にもAWSの認証が要ります）。</p>
       <div class="term" aria-label="手元から試す">
         <div class="term-head"><span>ターミナル / acme/sre</span><button class="copy-btn" type="button">コピー</button></div>
 <pre><span class="p">$</span> <span data-copy>artifact-pages site sync --site sre --config github://acme/platform-admin/artifact-pages.yaml --dry-run</span></pre>
       </div>
-      <p><code>--source</code>を省くと、登録した<code>sourcePath</code>を公開します。<code>--ref</code>は資料に記録する参照の表示を変えるだけで、公開するファイルは変えません。</p>
+      <p><code>--source</code>を省くと、登録した<code>sourcePath</code>を公開します。<code>--ref</code>はArtifactに記録する参照の表示を変えるだけで、公開するファイルは変えません。</p>
     </section>
 
     <section class="doc-section" aria-labelledby="dates">
       <h2 id="dates">浅いチェックアウトと日付</h2>
-      <p>資料の更新日と名前は、Gitの履歴から求めます。GitHub Actionsのチェックアウトは既定で直近の1コミットだけですが、CLIは必要なだけ履歴を取り寄せるので、通常は全履歴があるときと同じ結果になります。</p>
+      <p>Artifactの更新日と名前は、Gitの履歴から求めます。GitHub Actionsのチェックアウトは既定で直近の1コミットだけですが、CLIは必要なだけ履歴を取り寄せるので、通常は全履歴があるときと同じ結果になります。</p>
       <p>ただし、前回の公開から内容が同じ状態に戻ったファイル（変更を取り消したコミットなど）は、前回の更新日のまま残ることがあります。どんな場合も履歴どおりの日付にしたいときは、全履歴でチェックアウトします。共通のワークフローは<code>fetch-depth</code>を受け取らないので、その場合は製品の<code>publish-action</code>を直接使う構成にします。</p>
     </section>
 
@@ -142,7 +142,7 @@
       </div>
       <ul>
         <li><code>publish-on</code>に合わないきっかけ（プルリクエストなど）では試し実行になります。</li>
-        <li><code>sourcePath</code>は<code>docs</code>のように資料だけのディレクトリにします。リポジトリ全体にすると、設定ファイルやワークフローも公開されます。</li>
+        <li><code>sourcePath</code>は<code>docs</code>のように、Artifactとそれが使うファイルだけのディレクトリにします。リポジトリ全体にすると、設定ファイルやワークフローも公開されます。</li>
         <li>この場合も、登録の反映と閲覧アプリの配置は別のジョブで行います。</li>
       </ul>
     </section>
@@ -151,7 +151,7 @@
       <h2 id="state">このステップのあとの状態</h2>
       <figure class="fg" aria-labelledby="state-fig">
         <div class="fg-head"><strong id="state-fig">ステップ5のあとの状態</strong><span class="fg-note">説明用の例</span></div>
-        <div class="fg-body"><div class="bd"><section class="bd-col"><h4 class="bd-h">GitHub</h4><div class="nd" data-kind="admin"><b>管理リポジトリ</b><small><code>artifact-pages.yaml</code>、共通のワークフロー、配置のワークフロー、<code>sites</code>に<code>sre</code></small></div><div class="nd is-new" data-kind="team"><b>チームのリポジトリ</b><small>acme/sre：<code>docs/</code>、公開のワークフロー</small><span class="nd-badge">このステップ</span></div></section><div class="bd-a"><span>書き込む</span></div><section class="bd-col"><h4 class="bd-h">配信先</h4><div class="nd" data-kind="store"><b>ストレージとCDN</b><small>ホスト名、配信の規則、認証情報</small></div><div class="nd" data-kind="app"><b>閲覧アプリ</b><small>ホスト名のトップで開く</small></div><div class="nd" data-kind="registry"><b>サイトの登録情報</b><small><code>sre</code></small></div><div class="nd is-new" data-kind="site"><b>サイト<code>sre</code></b><small>資料と一覧、本文検索のデータ</small><span class="nd-badge">このステップ</span></div><div class="nd is-dim" data-kind="preview"><b>プレビュー</b><small>ステップ6で用意</small></div></section><div class="bd-a"><span>読む</span></div><section class="bd-col"><h4 class="bd-h">ブラウザ</h4><div class="nd is-new" data-kind="reader"><b>読者</b><small><code>sre</code>の資料を読める</small><span class="nd-badge">このステップ</span></div></section></div></div>
+        <div class="fg-body"><div class="bd"><section class="bd-col"><h4 class="bd-h">GitHub</h4><div class="nd" data-kind="admin"><b>管理リポジトリ</b><small><code>artifact-pages.yaml</code>、共通のワークフロー、配置のワークフロー、<code>sites</code>に<code>sre</code></small></div><div class="nd is-new" data-kind="team"><b>チームのリポジトリ</b><small>acme/sre：<code>docs/</code>、公開のワークフロー</small><span class="nd-badge">このステップ</span></div></section><div class="bd-a"><span>書き込む</span></div><section class="bd-col"><h4 class="bd-h">配信先</h4><div class="nd" data-kind="store"><b>ストレージとCDN</b><small>ホスト名、配信の規則、認証情報</small></div><div class="nd" data-kind="app"><b>閲覧アプリ</b><small>ホスト名のトップで開く</small></div><div class="nd" data-kind="registry"><b>サイトの登録情報</b><small><code>sre</code></small></div><div class="nd is-new" data-kind="site"><b>サイト<code>sre</code></b><small>Artifactと一覧、本文検索のデータ</small><span class="nd-badge">このステップ</span></div><div class="nd is-dim" data-kind="preview"><b>プレビュー</b><small>ステップ6で用意</small></div></section><div class="bd-a"><span>読む</span></div><section class="bd-col"><h4 class="bd-h">ブラウザ</h4><div class="nd is-new" data-kind="reader"><b>読者</b><small><code>sre</code>のArtifactを読める</small><span class="nd-badge">このステップ</span></div></section></div></div>
       </figure>
     </section>
 

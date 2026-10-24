@@ -36,8 +36,8 @@
     <section class="doc-section" aria-labelledby="result">
       <h2 id="result">できあがるもの</h2>
       <ul>
-        <li><strong>非公開のS3バケット。</strong>パブリックアクセスはブロックし、CloudFrontだけが読めるようにします。閲覧アプリと公開された資料はすべてここに入ります。</li>
-        <li><strong>CloudFrontのディストリビューション。</strong>ページのURLを閲覧アプリへ振り分け、資料の種類ごとのキャッシュと応答ヘッダーを設定します。資料のファイルを直接指すURLで、そのファイルがない場合は404を返します。</li>
+        <li><strong>非公開のS3バケット。</strong>パブリックアクセスはブロックし、CloudFrontだけが読めるようにします。閲覧アプリと公開されたArtifactはすべてここに入ります。</li>
+        <li><strong>CloudFrontのディストリビューション。</strong>ページのURLを閲覧アプリへ振り分け、配信するファイルの区分ごとのキャッシュと応答ヘッダーを設定します。Artifactのファイルを直接指すURLで、そのファイルがない場合は404を返します。</li>
         <li><strong>PRプレビューの保持期間。</strong>バケットのライフサイクルの規則として、<code>_previews/</code>以下を指定日数で削除します。</li>
         <li><strong>IAMロール。</strong>管理リポジトリ用のロール1つと、サイトごとのロールです（<a href="#roles">IAMロールとOIDC</a>）。</li>
       </ul>
@@ -45,7 +45,7 @@
       <figure class="fg" aria-labelledby="aws-path-fig">
         <div class="fg-head"><strong id="aws-path-fig">読者のリクエストが通る道</strong><span class="fg-note">説明用の例</span></div>
         <div class="fg-body"><div class="fl"><div class="nd" data-kind="reader"><b>読者</b><small><code>https://docs.example.com/…</code></small></div><span class="fl-a"><span>開く</span></span><div class="nd" data-kind="cdn"><b>CloudFront</b><small>振り分け、キャッシュ、応答ヘッダー</small></div><span class="fl-a"><span>読む</span></span><div class="nd" data-kind="store"><b>S3バケット</b><small>非公開。CloudFrontだけが読める</small></div></div></div>
-        <figcaption>ページのURLには閲覧アプリが返り、閲覧アプリが一覧や資料のファイルを読みます。資料のファイルを直接指すURLで、そのファイルがなければ404です。</figcaption>
+        <figcaption>ページのURLには閲覧アプリが返り、閲覧アプリが一覧やArtifactのファイルを読みます。Artifactのファイルを直接指すURLで、そのファイルがなければ404です。</figcaption>
       </figure>
     </section>
 
@@ -64,7 +64,7 @@
       <p>モジュールが作るロールは2種類だけです。</p>
       <figure class="fg" aria-labelledby="aws-roles-fig">
         <div class="fg-head"><strong id="aws-roles-fig">どのジョブが、どのロールで、どこに書けるか</strong><span class="fg-note">説明用の例</span></div>
-        <div class="fg-body"><div class="bd"><section class="bd-col"><h4 class="bd-h">GitHub Actionsのジョブ</h4><div class="nd" data-kind="admin"><b>管理リポジトリのジョブ</b><small>acme/platform-admin</small></div><div class="nd" data-kind="team"><b>チームのジョブ</b><small>acme/sre</small></div></section><div class="bd-a"><span>OIDCで引き受ける（<code>sub</code>が完全に一致するときだけ）</span></div><section class="bd-col"><h4 class="bd-h">IAMロール</h4><div class="nd" data-kind="admin"><b><code>artifact-pages-admin-publisher</code></b><small>管理用。1つ</small></div><div class="nd" data-kind="team"><b><code>artifact-pages-sre-publisher</code></b><small>サイトごと</small></div></section><div class="bd-a"><span>書く</span></div><section class="bd-col"><h4 class="bd-h">S3とCloudFront</h4><div class="nd" data-kind="app"><b>閲覧アプリ</b><small>管理用のロールだけ</small></div><div class="nd" data-kind="registry"><b>サイトの登録情報</b><small>管理用のロールだけ</small></div><div class="nd" data-kind="site"><b>サイト<code>sre</code>の資料、一覧、プレビュー</b><small>書くのはサイト<code>sre</code>のロール。管理用のロールは削除だけ</small></div><div class="nd" data-kind="registry"><b>サイト<code>sre</code>の内部の記録</b><small><code>_control/sites/sre/</code>。サイト<code>sre</code>のロールと管理用のロール</small></div></section></div></div>
+        <div class="fg-body"><div class="bd"><section class="bd-col"><h4 class="bd-h">GitHub Actionsのジョブ</h4><div class="nd" data-kind="admin"><b>管理リポジトリのジョブ</b><small>acme/platform-admin</small></div><div class="nd" data-kind="team"><b>チームのジョブ</b><small>acme/sre</small></div></section><div class="bd-a"><span>OIDCで引き受ける（<code>sub</code>が完全に一致するときだけ）</span></div><section class="bd-col"><h4 class="bd-h">IAMロール</h4><div class="nd" data-kind="admin"><b><code>artifact-pages-admin-publisher</code></b><small>管理用。1つ</small></div><div class="nd" data-kind="team"><b><code>artifact-pages-sre-publisher</code></b><small>サイトごと</small></div></section><div class="bd-a"><span>書く</span></div><section class="bd-col"><h4 class="bd-h">S3とCloudFront</h4><div class="nd" data-kind="app"><b>閲覧アプリ</b><small>管理用のロールだけ</small></div><div class="nd" data-kind="registry"><b>サイトの登録情報</b><small>管理用のロールだけ</small></div><div class="nd" data-kind="site"><b>サイト<code>sre</code>のArtifact、一覧、プレビュー</b><small>書くのはサイト<code>sre</code>のロール。管理用のロールは削除だけ</small></div><div class="nd" data-kind="registry"><b>サイト<code>sre</code>の内部の記録</b><small><code>_control/sites/sre/</code>。サイト<code>sre</code>のロールと管理用のロール</small></div></section></div></div>
         <figcaption>名前は<code>name_prefix</code>が既定の<code>artifact-pages</code>の場合です。サイト<code>sre</code>のロールは、ほかのサイト、サイトの登録情報、閲覧アプリに書けません。</figcaption>
       </figure>
       <div class="table-wrap"><table>

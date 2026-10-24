@@ -35,14 +35,14 @@
       <h2 id="shape">構成</h2>
       <ul>
         <li>R2のバケットをカスタムドメインにつなぎ、ゾーンのルールでURLの振り分け、キャッシュ、応答ヘッダーを設定します。PagesやWorkers、検索のサーバーは使いません。バケットの<code>r2.dev</code>のURLは無効にします。</li>
-        <li>メールアドレスの難読化やRocket Loaderなど、HTMLを書き換えるCloudflareの機能は、このホスト名では止めます。資料が公開したバイトのまま届くようにするためです。</li>
+        <li>メールアドレスの難読化やRocket Loaderなど、HTMLを書き換えるCloudflareの機能は、このホスト名では止めます。Artifactが、公開されたバイトのまま届くようにするためです。</li>
         <li>圧縮はCloudflareの配信に任せます。AWSで行う一覧の事前の圧縮は、Cloudflareでは行いません。検索のデータの<code>.gz</code>ファイルは、それ自体がgzipの形式のファイルで、閲覧アプリが展開します。</li>
       </ul>
     </section>
 
     <section class="doc-section" aria-labelledby="purge">
       <h2 id="purge">キャッシュの削除</h2>
-      <p>公開のたびに、変わったURLのキャッシュを削除します。同じサイトの資料か一覧で削除するURLが100件を超えるときは、そのサイトのプレフィックスでの削除にまとめます。ほかのサイト、閲覧アプリ、登録情報には広げません。</p>
+      <p>公開のたびに、変わったURLのキャッシュを削除します。同じサイトの公開元のファイルの領域か、一覧と検索のデータの領域で、削除するURLがそれぞれ100件を超えるときは、そのサイトのプレフィックスでの削除にまとめます。ほかのサイト、閲覧アプリ、登録情報には広げません。</p>
     </section>
 
     <section class="doc-section" aria-labelledby="model">
