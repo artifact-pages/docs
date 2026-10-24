@@ -639,6 +639,8 @@ td:first-child { white-space: nowrap; font-weight: 600; }
 .sc-m.is-corner { position: absolute; top: calc(16 * var(--u)); right: calc(18 * var(--u)); margin: 0; }
 .sc-res .sc-m.is-corner { top: calc(14 * var(--u)); right: calc(10 * var(--u)); }
 .sc-m.is-side { position: absolute; top: 0; right: -24px; margin: 0; }
+.sc-bar { position: relative; }
+.sc-m.is-above { position: absolute; top: -23px; right: 0; margin: 0; }
 .sc-m.is-below { position: absolute; top: 100%; left: calc(60 * var(--u)); margin: 5px 0 0; }
 .sc-legend { display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 8px 24px; margin: 14px 0 0; padding: 0; list-style: none; counter-reset: scl; color: var(--muted); font-size: 13px; line-height: 1.7; }
 .sc-legend li { display: flex; gap: 10px; counter-increment: scl; }
@@ -782,6 +784,8 @@ td:first-child { white-space: nowrap; font-weight: 600; }
   .sc-row b { max-width: 100%; }
   .sc-row code { flex: none; max-width: 100%; }
   .sc-keys { display: none; }
+  .sc-facets:has(> .sc-m.is-side) { padding-bottom: 26px; }
+  .sc-facets > .sc-m.is-side { top: auto; bottom: 0; right: 6px; }
   .sc-sp-st .sc-m.is-mid { left: auto; right: 6px; }
   .sc-sbody { grid-template-columns: minmax(0, 1fr); gap: calc(10 * var(--u)); }
   .sc-facets { display: flex; gap: calc(6 * var(--u)); overflow-x: auto; padding-bottom: calc(2 * var(--u)); }
