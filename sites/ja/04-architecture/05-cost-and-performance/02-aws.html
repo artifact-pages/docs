@@ -43,7 +43,7 @@
       <h2 id="gzip">大きな一覧の事前の圧縮</h2>
       <p>CloudFrontが自動で圧縮するのは1,000バイトから10,000,000バイトのファイルです。大きなサイトの<code>index.json</code>はこれを超えるので、CLI 0.5.0以降はAWSに書くときに、<code>index.json</code>と検索の目次<code>search/manifest.json</code>を自分でgzipにして、<code>Content-Encoding: gzip</code>を付けて置きます。URL、<code>Content-Type</code>、キャッシュの設定は変わりません。</p>
       <p>手元のnginxで5万件のサイトを配り、通信を絞った条件（CPU 4倍遅く、往復150 ms、下り1.6 Mbps）で測ると、<code>index.json</code>は転送が約2.48 MB（展開後約45.9 MB）になり、3回とも約12.8秒で読み込みが終わりました（20秒の制限の内）。2026年10月18日の計測で、AWSでの実際の配信の計測ではありません。記録は製品の<a href="https://github.com/artifact-pages/artifact-pages/blob/main/docs/backlog/issues/ISSUE-112-aws-large-generated-json-delivery.md" target="_blank" rel="noopener">ISSUE-112（英語）</a>にあります。圧縮しても、ブラウザが展開して読み込む量は変わりません。</p>
-      <p>一度0.5.0以降で書いたサイトには、それより古いCLIで書き込まないでください。圧縮を止める設定や、自動で元の形式に戻す仕組みはありません。移る手順は「<a href="../../03-operations/upgrade.html#catch-up">閲覧アプリ・CLI・Actionsを更新する</a>」にあります。</p>
+      <p>一度0.5.0以降で書いたサイトには、それより古いCLIで書き込まないでください。圧縮を止める設定や、自動で元の形式に戻す仕組みはありません。移る手順は「<a href="../../03-operations/03-upgrade.html#catch-up">閲覧アプリ・CLI・Actionsを更新する</a>」にあります。</p>
     </section>
 
     <section class="doc-section" aria-labelledby="invalidation">
@@ -73,7 +73,7 @@
     </section>
 
     <nav class="pager" data-search-ignore aria-label="ページ送り">
-      <a class="prev" href="cloudflare.html"><small>前へ</small><strong>コストとパフォーマンス：Cloudflare</strong></a>
+      <a class="prev" href="01-cloudflare.html"><small>前へ</small><strong>コストとパフォーマンス：Cloudflare</strong></a>
       <a class="next" href="../../05-reference/index.html"><small>次へ</small><strong>リファレンス</strong></a>
     </nav>
   </main>

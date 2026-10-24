@@ -116,16 +116,16 @@
         </tbody>
       </table></div>
       <p>表の額は、キャッシュに当たらない割合を10%とした月額です。Cloudflareは無料枠を引く前、AWS（S3とCloudFront）は無料枠をこの用途に使える前提の額です。</p>
-      <p>AWSの額は多めの試算です。読者がArtifactを開くたびに、圧縮していない<code>index.json</code>を取得すると仮定しているためです。この転送がMで約$225、Lで約$1,745を占めます。実際の閲覧アプリは、同じサイトを読んでいる間、一度読み込んだ<code>index.json</code>を使い回します。CLI 0.5.0以降は、AWSには圧縮した<code>index.json</code>を置きます。一方、キャッシュの無効化（Mで約$115、Lで約$125）は、この仮定にかかわらずかかります。リクエストの単価は米国・カナダのもので、ほかの地域ではやや高くなります（<a href="aws.html">AWSのページ</a>）。</p>
+      <p>AWSの額は多めの試算です。読者がArtifactを開くたびに、圧縮していない<code>index.json</code>を取得すると仮定しているためです。この転送がMで約$225、Lで約$1,745を占めます。実際の閲覧アプリは、同じサイトを読んでいる間、一度読み込んだ<code>index.json</code>を使い回します。CLI 0.5.0以降は、AWSには圧縮した<code>index.json</code>を置きます。一方、キャッシュの無効化（Mで約$115、Lで約$125）は、この仮定にかかわらずかかります。リクエストの単価は米国・カナダのもので、ほかの地域ではやや高くなります（<a href="02-aws.html">AWSのページ</a>）。</p>
       <ul class="cards two">
-        <li><a class="card" href="cloudflare.html"><span class="tag">R2 · Cloudflare Cache</span><h3>Cloudflare</h3><p>構成、キャッシュの削除のまとめ方、見積もり。</p><span class="go">詳しく →</span></a></li>
-        <li><a class="card" href="aws.html"><span class="tag">S3 · CloudFront</span><h3>AWS</h3><p>構成、一覧の圧縮、キャッシュの無効化の費用、見積もり。</p><span class="go">詳しく →</span></a></li>
+        <li><a class="card" href="01-cloudflare.html"><span class="tag">R2 · Cloudflare Cache</span><h3>Cloudflare</h3><p>構成、キャッシュの削除のまとめ方、見積もり。</p><span class="go">詳しく →</span></a></li>
+        <li><a class="card" href="02-aws.html"><span class="tag">S3 · CloudFront</span><h3>AWS</h3><p>構成、一覧の圧縮、キャッシュの無効化の費用、見積もり。</p><span class="go">詳しく →</span></a></li>
       </ul>
     </section>
 
     <nav class="pager" data-search-ignore aria-label="ページ送り">
-      <a class="prev" href="../security-and-access.html"><small>前へ</small><strong>セキュリティとアクセス</strong></a>
-      <a class="next" href="cloudflare.html"><small>次へ</small><strong>コストとパフォーマンス：Cloudflare</strong></a>
+      <a class="prev" href="../04-security-and-access.html"><small>前へ</small><strong>セキュリティとアクセス</strong></a>
+      <a class="next" href="01-cloudflare.html"><small>次へ</small><strong>コストとパフォーマンス：Cloudflare</strong></a>
     </nav>
   </main>
 </body>

@@ -71,18 +71,18 @@
       <ul>
         <li><strong>チームの公開が、ほかを待たない。</strong>サイトのArtifactの更新は、そのサイトの領域だけを書くので、ほかのチームの公開と並んで進められます。閲覧アプリの配置や、そのサイトの登録の変更とは、サイトのロックで順番に進みます。先にロックを持った側が終わるまで、もう一方が待ちます。</li>
         <li><strong>閲覧アプリの更新で、全サイトを公開し直さない。</strong>閲覧アプリはArtifactとは別のファイルで、形式が変わらない限り、Artifactをそのままにして入れ替えられます。</li>
-        <li><strong>変更がいつ届くかを、参照の固定で選べる。</strong>チームのワークフローが共通のワークフローを<code>@main</code>で参照すれば管理者の変更にすぐ追従し、SHAで固定すれば自分で更新するまで変わりません。どちらを選ぶかは組織の運用です（「<a href="../03-operations/update-shared-workflows.html">共通の公開・プレビューの仕組みを更新する</a>」）。</li>
+        <li><strong>変更がいつ届くかを、参照の固定で選べる。</strong>チームのワークフローが共通のワークフローを<code>@main</code>で参照すれば管理者の変更にすぐ追従し、SHAで固定すれば自分で更新するまで変わりません。どちらを選ぶかは組織の運用です（「<a href="../03-operations/02-update-shared-workflows.html">共通の公開・プレビューの仕組みを更新する</a>」）。</li>
       </ul>
     </section>
 
     <section class="doc-section" aria-labelledby="permissions">
       <h2 id="permissions">GitHubの権限と配信先の権限</h2>
-      <p>GitHubのジョブに必要な権限は、通常の公開で<code>contents: read</code>、AWSのOIDCを使うジョブで加えて<code>id-token: write</code>、プルリクエストにコメントするプレビューで加えて<code>pull-requests: write</code>です。これは配信先への書き込みの権限とは別で、配信先の権限はAWSのIAMロールか、Cloudflareで発行した認証情報が決めます（「<a href="security-and-access.html#credentials">セキュリティとアクセス</a>」）。</p>
+      <p>GitHubのジョブに必要な権限は、通常の公開で<code>contents: read</code>、AWSのOIDCを使うジョブで加えて<code>id-token: write</code>、プルリクエストにコメントするプレビューで加えて<code>pull-requests: write</code>です。これは配信先への書き込みの権限とは別で、配信先の権限はAWSのIAMロールか、Cloudflareで発行した認証情報が決めます（「<a href="04-security-and-access.html#credentials">セキュリティとアクセス</a>」）。</p>
     </section>
 
     <nav class="pager" data-search-ignore aria-label="ページ送り">
       <a class="prev" href="index.html"><small>前へ</small><strong>アーキテクチャの全体像</strong></a>
-      <a class="next" href="publishing-and-previews.html"><small>次へ</small><strong>公開とプレビューの仕組み</strong></a>
+      <a class="next" href="02-publishing-and-previews.html"><small>次へ</small><strong>公開とプレビューの仕組み</strong></a>
     </nav>
   </main>
 </body>

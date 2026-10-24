@@ -49,13 +49,13 @@
     <span class="k">repository</span>: acme/sre
     <span class="k">sourcePath</span>: docs</pre>
       </div>
-      <p><code>sites</code>に書いたものが、登録するサイトのすべてです。管理者がこれを配信先に反映すると、登録されたリポジトリだけが、そのサイトに公開できるようになります。これはCLIの確認で、権限で分けるかどうかは配信先の構成によります（「<a href="../04-architecture/security-and-access.html#credentials">公開の認証情報の分け方</a>」）。<code>sites</code>から外したサイトは、次に反映したときに登録が取り下げられ、公開済みの内容も削除されます。1つのサイトの公開元は1つのリポジトリの1つのディレクトリで、同じリポジトリの別のディレクトリを別のサイトとして登録することもできます。</p>
+      <p><code>sites</code>に書いたものが、登録するサイトのすべてです。管理者がこれを配信先に反映すると、登録されたリポジトリだけが、そのサイトに公開できるようになります。これはCLIの確認で、権限で分けるかどうかは配信先の構成によります（「<a href="../04-architecture/04-security-and-access.html#credentials">公開の認証情報の分け方</a>」）。<code>sites</code>から外したサイトは、次に反映したときに登録が取り下げられ、公開済みの内容も削除されます。1つのサイトの公開元は1つのリポジトリの1つのディレクトリで、同じリポジトリの別のディレクトリを別のサイトとして登録することもできます。</p>
     </section>
 
     <section class="doc-section" aria-labelledby="app">
       <h2 id="app">閲覧アプリをArtifactとは別に更新する</h2>
       <p>閲覧アプリは、設定ファイルの<code>web.version</code>で選んだリリースを、管理者が配信先に置きます。閲覧アプリを新しくしても、各サイトを公開し直す必要はありません。公開に使うCLIのバージョンも<code>cli.version</code>で固定でき、閲覧アプリ、CLI、GitHub Actionsは、それぞれ別のバージョンで更新されます。</p>
-      <p>互いに読み書きする形式が合っているかは、公開と配置のときに確かめられます。いまの版はすべて0.xのプレリリースで、版をまたぐ互換性は約束されていません。更新の手順は「<a href="../03-operations/upgrade.html">閲覧アプリ・CLI・Actionsを更新する</a>」で説明します。</p>
+      <p>互いに読み書きする形式が合っているかは、公開と配置のときに確かめられます。いまの版はすべて0.xのプレリリースで、版をまたぐ互換性は約束されていません。更新の手順は「<a href="../03-operations/03-upgrade.html">閲覧アプリ・CLI・Actionsを更新する</a>」で説明します。</p>
     </section>
 
     <section class="doc-section" aria-labelledby="roles">
