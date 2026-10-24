@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <meta name="description" content="配信環境をTerraformでCloudflareかAWSに作り、サイトと公開元を登録し、閲覧アプリを資料とは別に更新する。管理者と各チームの担当の分け方。">
+  <meta name="description" content="配信環境をTerraformでCloudflareかAWSに作り、サイトと公開元を登録し、閲覧アプリをArtifactとは別に更新する。管理者と各チームの担当の分け方。">
   <title>基盤を提供・運用する</title>
   <script>
     // Copy the reader app's theme (same-origin parent) before first paint; assets/site.js keeps it in sync.
@@ -53,7 +53,7 @@
     </section>
 
     <section class="doc-section" aria-labelledby="app">
-      <h2 id="app">閲覧アプリを資料とは別に更新する</h2>
+      <h2 id="app">閲覧アプリをArtifactとは別に更新する</h2>
       <p>閲覧アプリは、設定ファイルの<code>web.version</code>で選んだリリースを、管理者が配信先に置きます。閲覧アプリを新しくしても、各サイトを公開し直す必要はありません。公開に使うCLIのバージョンも<code>cli.version</code>で固定でき、閲覧アプリ、CLI、GitHub Actionsは、それぞれ別のバージョンで更新されます。</p>
       <p>互いに読み書きする形式が合っているかは、公開と配置のときに確かめられます。いまの版はすべて0.xのプレリリースで、版をまたぐ互換性は約束されていません。更新の手順は「<a href="../03-operations/upgrade.html">閲覧アプリ・CLI・Actionsを更新する</a>」で説明します。</p>
     </section>
@@ -63,7 +63,7 @@
       <div class="table-wrap"><table>
         <thead><tr><th>管理者</th><th>各チーム</th></tr></thead>
         <tbody>
-          <tr><td>配信環境と閲覧の制限</td><td>資料の中身と構成</td></tr>
+          <tr><td>配信環境と閲覧の制限</td><td>Artifactの中身と構成</td></tr>
           <tr><td>サイトの登録と取り下げ</td><td>いつ公開するか（マージのたび、など）</td></tr>
           <tr><td>閲覧アプリとCLIのバージョン</td><td>プレビューを使うかどうか</td></tr>
           <tr><td>共通の公開・プレビューのワークフロー</td><td>それを呼び出す短いワークフロー</td></tr>
@@ -73,7 +73,7 @@
     </section>
 
     <nav class="pager" aria-label="ページ送り">
-      <a class="prev" href="03-read.html"><small>前へ</small><strong>資料を読む</strong></a>
+      <a class="prev" href="03-read.html"><small>前へ</small><strong>Artifactを読む</strong></a>
       <a class="next" href="../02-setup/index.html"><small>次へ</small><strong>導入する</strong></a>
     </nav>
   </main>

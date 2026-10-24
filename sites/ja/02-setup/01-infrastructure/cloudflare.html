@@ -36,7 +36,7 @@
     <section class="doc-section" aria-labelledby="result">
       <h2 id="result">できあがるもの</h2>
       <ul>
-        <li><strong>非公開のR2バケット。</strong>名前は既定で<code>artifact-pages</code>です。閲覧アプリと公開された資料はすべてここに入ります。</li>
+        <li><strong>非公開のR2バケット。</strong>名前は既定で<code>artifact-pages</code>です。閲覧アプリと公開されたArtifactはすべてここに入ります。</li>
         <li><strong>指定したホスト名。</strong>R2のカスタムドメインとしてバケットにつなぎます。バケットの<code>r2.dev</code>のURLは無効にしたままにします。</li>
         <li><strong>ゾーンのルール。</strong>URLの振り分け、キャッシュ、応答ヘッダー、HTMLを書き換えるCloudflareの機能を止める設定の4種類です。ページのURLは閲覧アプリへ届き、内部用の<code>/_control/</code>以下のURLでもストレージの中身は返りません。</li>
         <li><strong>PRプレビューの保持期間。</strong>バケットのライフサイクルの規則として、<code>_previews/</code>以下を指定日数で削除します。</li>
@@ -45,7 +45,7 @@
       <figure class="fg" aria-labelledby="cf-path-fig">
         <div class="fg-head"><strong id="cf-path-fig">読者のリクエストが通る道</strong><span class="fg-note">説明用の例</span></div>
         <div class="fg-body"><div class="fl"><div class="nd" data-kind="reader"><b>読者</b><small><code>https://docs.example.com/…</code></small></div><span class="fl-a"><span>開く</span></span><div class="nd" data-kind="cdn"><b>ホスト名とゾーンのルール</b><small>振り分け、キャッシュ、応答ヘッダー、書き換えの停止</small></div><span class="fl-a"><span>読む</span></span><div class="nd" data-kind="store"><b>R2バケット</b><small>非公開。閲覧アプリと全サイトのファイル</small></div></div></div>
-        <figcaption>ページのURLには閲覧アプリが返り、閲覧アプリが一覧や資料のファイルを読みます。<code>/_control/</code>以下のURLにストレージの中身は返りません。</figcaption>
+        <figcaption>ページのURLには閲覧アプリが返り、閲覧アプリが一覧やArtifactのファイルを読みます。<code>/_control/</code>以下のURLにストレージの中身は返りません。</figcaption>
       </figure>
     </section>
 

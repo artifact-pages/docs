@@ -58,7 +58,7 @@
       <div class="callout warn" role="note">
         <span class="ico">完全な一覧</span>
         <div>
-          <p><strong><code>sites</code>は、登録するサイトのすべてです。</strong>ここにないサイトは、反映したときに取り下げられ、公開済みの資料とプレビューも削除されます。すでにサイトがある環境でこの例を貼るときは、既存のサイトを消さないでください。<code>sites</code>そのものを書かないと反映は失敗し、<code>sites: {}</code>はすべてのサイトの取り下げを意味します。</p>
+          <p><strong><code>sites</code>は、登録するサイトのすべてです。</strong>ここにないサイトは、反映したときに取り下げられ、公開済みのArtifactとプレビューも削除されます。すでにサイトがある環境でこの例を貼るときは、既存のサイトを消さないでください。<code>sites</code>そのものを書かないと反映は失敗し、<code>sites: {}</code>はすべてのサイトの取り下げを意味します。</p>
         </div>
       </div>
     </section>
@@ -76,7 +76,7 @@
 <pre><span class="p">$</span> <span data-copy>artifact-pages registry sync --config artifact-pages.yaml --dry-run</span>
 <span class="p">$</span> <span data-copy>artifact-pages registry sync --config artifact-pages.yaml</span></pre>
       </div>
-      <p>反映すると、閲覧アプリのサイトの一覧に<strong>SREチーム</strong>が出ます。資料はまだないので、開いても空です。</p>
+      <p>反映すると、閲覧アプリのサイトの一覧に<strong>SREチーム</strong>が出ます。Artifactはまだないので、開いても空です。</p>
     </section>
 
     <section class="doc-section" aria-labelledby="grants">
@@ -92,7 +92,7 @@
       <h2 id="state">このステップのあとの状態</h2>
       <figure class="fg" aria-labelledby="state-fig">
         <div class="fg-head"><strong id="state-fig">ステップ4のあとの状態</strong><span class="fg-note">説明用の例</span></div>
-        <div class="fg-body"><div class="bd"><section class="bd-col"><h4 class="bd-h">GitHub</h4><div class="nd is-new" data-kind="admin"><b>管理リポジトリ</b><small><code>artifact-pages.yaml</code>、共通のワークフロー、配置のワークフロー、<code>sites</code>に<code>sre</code></small><span class="nd-badge">このステップ</span></div><div class="nd is-dim" data-kind="team"><b>チームのリポジトリ</b><small>ステップ5で用意</small></div></section><div class="bd-a"><span>書き込む</span></div><section class="bd-col"><h4 class="bd-h">配信先</h4><div class="nd" data-kind="store"><b>ストレージとCDN</b><small>ホスト名、配信の規則、認証情報</small></div><div class="nd" data-kind="app"><b>閲覧アプリ</b><small>ホスト名のトップで開く</small></div><div class="nd is-new" data-kind="registry"><b>サイトの登録情報</b><small><code>sre</code>（資料はまだない）</small><span class="nd-badge">このステップ</span></div><div class="nd is-dim" data-kind="site"><b>サイト<code>sre</code></b><small>ステップ5で用意</small></div><div class="nd is-dim" data-kind="preview"><b>プレビュー</b><small>ステップ6で用意</small></div></section><div class="bd-a"><span>読む</span></div><section class="bd-col"><h4 class="bd-h">ブラウザ</h4><div class="nd" data-kind="reader"><b>読者</b><small>閲覧アプリが開く（資料はまだない）</small></div></section></div></div>
+        <div class="fg-body"><div class="bd"><section class="bd-col"><h4 class="bd-h">GitHub</h4><div class="nd is-new" data-kind="admin"><b>管理リポジトリ</b><small><code>artifact-pages.yaml</code>、共通のワークフロー、配置のワークフロー、<code>sites</code>に<code>sre</code></small><span class="nd-badge">このステップ</span></div><div class="nd is-dim" data-kind="team"><b>チームのリポジトリ</b><small>ステップ5で用意</small></div></section><div class="bd-a"><span>書き込む</span></div><section class="bd-col"><h4 class="bd-h">配信先</h4><div class="nd" data-kind="store"><b>ストレージとCDN</b><small>ホスト名、配信の規則、認証情報</small></div><div class="nd" data-kind="app"><b>閲覧アプリ</b><small>ホスト名のトップで開く</small></div><div class="nd is-new" data-kind="registry"><b>サイトの登録情報</b><small><code>sre</code>（Artifactはまだない）</small><span class="nd-badge">このステップ</span></div><div class="nd is-dim" data-kind="site"><b>サイト<code>sre</code></b><small>ステップ5で用意</small></div><div class="nd is-dim" data-kind="preview"><b>プレビュー</b><small>ステップ6で用意</small></div></section><div class="bd-a"><span>読む</span></div><section class="bd-col"><h4 class="bd-h">ブラウザ</h4><div class="nd" data-kind="reader"><b>読者</b><small>閲覧アプリが開く（Artifactはまだない）</small></div></section></div></div>
       </figure>
     </section>
 

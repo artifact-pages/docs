@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <meta name="description" content="Artifact Pagesを組織に導入し、最初のチームが自分のリポジトリから資料を公開してPRプレビューで確かめられるところまで進める。到達する状態、全体の流れ、事前の準備、ローカルでの試し方。">
+  <meta name="description" content="Artifact Pagesを組織に導入し、最初のチームが自分のリポジトリからArtifactを公開してPRプレビューで確かめられるところまで進める。到達する状態、全体の流れ、事前の準備、ローカルでの試し方。">
   <title>導入する</title>
   <script>
     // Copy the reader app's theme (same-origin parent) before first paint; assets/site.js keeps it in sync.
@@ -28,7 +28,7 @@
         <p class="eyebrow">導入する</p>
         <h1>導入する</h1>
       </div>
-      <p class="lead">この章では、配信環境を作るところから始めて、最初のチームが自分のリポジトリから資料を公開し、プルリクエストのプレビューで確かめられるところまで進めます。全体を通して、同じ説明用の例を使います。</p>
+      <p class="lead">この章では、配信環境を作るところから始めて、最初のチームが自分のリポジトリからArtifactを公開し、プルリクエストのプレビューで確かめられるところまで進めます。全体を通して、同じ説明用の例を使います。</p>
     </header>
 
     <section class="doc-section" aria-labelledby="goal">
@@ -41,18 +41,18 @@
       <p>リポジトリとサイトの名前は説明用の例です。お使いの名前に置き換えて読んでください。</p>
       <figure class="fg" aria-labelledby="goal-fig">
         <div class="fg-head"><strong id="goal-fig">導入がすべて終わった状態</strong><span class="fg-note">説明用の例</span></div>
-        <div class="fg-body"><div class="bd"><section class="bd-col"><h4 class="bd-h">GitHub</h4><div class="nd" data-kind="admin"><b>管理リポジトリ</b><small><code>artifact-pages.yaml</code>、共通のワークフロー、配置のワークフロー、<code>sites</code>に<code>sre</code></small></div><div class="nd" data-kind="team"><b>チームのリポジトリ</b><small>acme/sre：<code>docs/</code>、公開のワークフロー、プレビューのワークフロー</small></div><div class="nd" data-kind="ci"><b>プルリクエスト</b><small>プレビューのコメント</small></div></section><div class="bd-a"><span>書き込む</span></div><section class="bd-col"><h4 class="bd-h">配信先</h4><div class="nd" data-kind="store"><b>ストレージとCDN</b><small>ホスト名、配信の規則、認証情報</small></div><div class="nd" data-kind="app"><b>閲覧アプリ</b><small>ホスト名のトップで開く</small></div><div class="nd" data-kind="registry"><b>サイトの登録情報</b><small><code>sre</code></small></div><div class="nd" data-kind="site"><b>サイト<code>sre</code></b><small>資料と一覧、本文検索のデータ</small></div><div class="nd" data-kind="preview"><b>プレビュー</b><small>プルリクエストごと</small></div></section><div class="bd-a"><span>読む</span></div><section class="bd-col"><h4 class="bd-h">ブラウザ</h4><div class="nd" data-kind="reader"><b>読者</b><small><code>sre</code>の資料を読める、プレビューを開ける</small></div></section></div></div>
+        <div class="fg-body"><div class="bd"><section class="bd-col"><h4 class="bd-h">GitHub</h4><div class="nd" data-kind="admin"><b>管理リポジトリ</b><small><code>artifact-pages.yaml</code>、共通のワークフロー、配置のワークフロー、<code>sites</code>に<code>sre</code></small></div><div class="nd" data-kind="team"><b>チームのリポジトリ</b><small>acme/sre：<code>docs/</code>、公開のワークフロー、プレビューのワークフロー</small></div><div class="nd" data-kind="ci"><b>プルリクエスト</b><small>プレビューのコメント</small></div></section><div class="bd-a"><span>書き込む</span></div><section class="bd-col"><h4 class="bd-h">配信先</h4><div class="nd" data-kind="store"><b>ストレージとCDN</b><small>ホスト名、配信の規則、認証情報</small></div><div class="nd" data-kind="app"><b>閲覧アプリ</b><small>ホスト名のトップで開く</small></div><div class="nd" data-kind="registry"><b>サイトの登録情報</b><small><code>sre</code></small></div><div class="nd" data-kind="site"><b>サイト<code>sre</code></b><small>Artifactと一覧、本文検索のデータ</small></div><div class="nd" data-kind="preview"><b>プレビュー</b><small>プルリクエストごと</small></div></section><div class="bd-a"><span>読む</span></div><section class="bd-col"><h4 class="bd-h">ブラウザ</h4><div class="nd" data-kind="reader"><b>読者</b><small><code>sre</code>のArtifactを読める、プレビューを開ける</small></div></section></div></div>
       </figure>
     </section>
 
     <section class="doc-section" aria-labelledby="flow">
       <h2 id="flow">全体の流れ</h2>
-      <ol class="st"><li><span class="st-who" data-kind="admin">管理者</span><b><a href="01-infrastructure/index.html">インフラを構築する</a></b><p>ストレージ、ホスト名、配信の規則、認証情報がそろい、配信先の設定が手元にある</p></li><li><span class="st-who" data-kind="admin">管理者</span><b><a href="02-admin-repository.html">管理リポジトリを準備する</a></b><p>設定ファイルと共通のワークフローが管理リポジトリにある</p></li><li><span class="st-who" data-kind="admin">管理者</span><b><a href="03-reader-app.html">閲覧アプリをデプロイする</a></b><p>ホスト名を開くと閲覧アプリが表示される</p></li><li><span class="st-who" data-kind="admin">管理者</span><b><a href="04-register-site.html">サイトを登録する</a></b><p>サイト<code>sre</code>が一覧に出る（まだ資料はない）</p></li><li><span class="st-who" data-kind="team">チーム</span><b><a href="05-first-site.html">最初のサイトを公開する</a></b><p><code>acme/sre</code>の資料が読める</p></li><li><span class="st-who" data-kind="team">チーム</span><b><a href="06-pr-previews.html">PRプレビューを使えるようにする</a></b><p>プルリクエストにプレビューのコメントが付く</p></li></ol>
+      <ol class="st"><li><span class="st-who" data-kind="admin">管理者</span><b><a href="01-infrastructure/index.html">インフラを構築する</a></b><p>ストレージ、ホスト名、配信の規則、認証情報がそろい、配信先の設定が手元にある</p></li><li><span class="st-who" data-kind="admin">管理者</span><b><a href="02-admin-repository.html">管理リポジトリを準備する</a></b><p>設定ファイルと共通のワークフローが管理リポジトリにある</p></li><li><span class="st-who" data-kind="admin">管理者</span><b><a href="03-reader-app.html">閲覧アプリをデプロイする</a></b><p>ホスト名を開くと閲覧アプリが表示される</p></li><li><span class="st-who" data-kind="admin">管理者</span><b><a href="04-register-site.html">サイトを登録する</a></b><p>サイト<code>sre</code>が一覧に出る（まだArtifactはない）</p></li><li><span class="st-who" data-kind="team">チーム</span><b><a href="05-first-site.html">最初のサイトを公開する</a></b><p><code>acme/sre</code>のArtifactが読める</p></li><li><span class="st-who" data-kind="team">チーム</span><b><a href="06-pr-previews.html">PRプレビューを使えるようにする</a></b><p>プルリクエストにプレビューのコメントが付く</p></li></ol>
     </section>
 
     <section class="doc-section" aria-labelledby="repos">
       <h2 id="repos">2種類のリポジトリ</h2>
-      <p>管理リポジトリは環境に1つで、配信先の設定、登録するサイトの一覧、CLIと閲覧アプリのバージョン、共通のワークフローを持ちます。チームのリポジトリ（サテライトリポジトリ）はいくつでもあり、公開する資料のディレクトリと、共通のワークフローを呼び出す短いワークフローを持ちます。チームのリポジトリに設定ファイルは置きません。</p>
+      <p>管理リポジトリは環境に1つで、配信先の設定、登録するサイトの一覧、CLIと閲覧アプリのバージョン、共通のワークフローを持ちます。チームのリポジトリ（サテライトリポジトリ）はいくつでもあり、公開するArtifactのディレクトリと、共通のワークフローを呼び出す短いワークフローを持ちます。チームのリポジトリに設定ファイルは置きません。</p>
       <p>サイトの登録は、どのリポジトリのどのディレクトリがそのサイトに公開してよいかを決めるものです。読者を限定するものではありません。</p>
     </section>
 
@@ -93,7 +93,7 @@
         <div class="fg-body"><div class="fl"><div class="nd" data-kind="cli"><b>手元のCLI</b><small><code>app deploy</code>、<code>registry sync</code>、<code>site sync</code></small></div><span class="fl-a"><span>書き込む</span></span><div class="nd" data-kind="store"><b><code>.local/storage</code></b><small>配信先の代わりのディレクトリ</small></div><span class="fl-a"><span>配る</span></span><div class="nd" data-kind="cdn"><b>Webサーバー</b><small>パスごとの振り分けを設定する</small></div><span class="fl-a"><span>開く</span></span><div class="nd" data-kind="reader"><b>ブラウザ</b></div></div></div>
       </figure>
       <ol>
-        <li>試すリポジトリ（説明用の例では<code>acme/sre</code>のクローン）の直下に、次の設定ファイルを置きます。<code>repository</code>はそのリポジトリの<code>origin</code>と同じにし、<code>sourcePath</code>は公開したい資料のディレクトリにします。</li>
+        <li>試すリポジトリ（説明用の例では<code>acme/sre</code>のクローン）の直下に、次の設定ファイルを置きます。<code>repository</code>はそのリポジトリの<code>origin</code>と同じにし、<code>sourcePath</code>は公開したいArtifactのディレクトリにします。</li>
       </ol>
       <div class="term" aria-label="ローカルの設定">
         <div class="term-head"><span>artifact-pages.yaml / 試すリポジトリ（説明用の例）</span><button class="copy-btn" type="button">コピー</button></div>

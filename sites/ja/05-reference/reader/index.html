@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <meta name="description" content="閲覧アプリのサイトの一覧、サイトのトップ、サイドバー、資料の画面、ContentsとDetails、パレット、本文検索の画面、プレビューの画面の仕様。">
+  <meta name="description" content="閲覧アプリのサイトの一覧、サイトのトップ、サイドバー、Artifactの画面、ContentsとDetails、パレット、本文検索の画面、プレビューの画面の仕様。">
   <title>閲覧アプリ：画面と操作</title>
   <script>
     // Copy the reader app's theme (same-origin parent) before first paint; assets/site.js keeps it in sync.
@@ -34,9 +34,9 @@
     <section class="doc-section" aria-labelledby="sites">
       <h2 id="sites">サイトの一覧（<code>/</code>）</h2>
       <ul>
-        <li>登録されたサイトをカードで並べます。カードには名前、説明、資料の数、内容の更新日、トップレベルのフォルダの数が出ます。</li>
+        <li>登録されたサイトをカードで並べます。カードには名前、説明、Artifactの数、内容の更新日、トップレベルのフォルダの数が出ます。</li>
         <li>並びはサイトの名前の順です。</li>
-        <li>カードの情報は各サイトの小さな概要から読み、サイトの全資料の一覧は読みません。</li>
+        <li>カードの情報は各サイトの小さな概要から読み、サイトのすべてのArtifactの一覧は読みません。</li>
       </ul>
     </section>
 
@@ -49,8 +49,8 @@
       <div class="table-wrap"><table>
         <thead><tr><th>部分</th><th>仕様</th></tr></thead>
         <tbody>
-          <tr><td><strong>Overview</strong></td><td>サイトの直下の<code>README.md</code>、なければ<code>index.md</code>（大文字と小文字は区別しない）。どちらもなければOverviewは出ず、Filesが開きます。直下の<code>index.html</code>や<code>index.htm</code>はOverviewにならず、Filesの資料として並びます。</td></tr>
-          <tr><td><strong>Files</strong></td><td>直下のフォルダと資料。資料が7つ以上のサイトでは、<strong>Recently updated</strong>に新しい順に6件。</td></tr>
+          <tr><td><strong>Overview</strong></td><td>サイトの直下の<code>README.md</code>、なければ<code>index.md</code>（大文字と小文字は区別しない）。どちらもなければOverviewは出ず、Filesが開きます。直下の<code>index.html</code>や<code>index.htm</code>はOverviewにならず、FilesのArtifactとして並びます。</td></tr>
+          <tr><td><strong>Files</strong></td><td>直下のフォルダとArtifact。Artifactが7つ以上のサイトでは、<strong>Recently updated</strong>に新しい順に6件。</td></tr>
           <tr><td><strong>Previews</strong></td><td>そのサイトのプレビューの一覧。PRプレビューと、手動で作ったプレビュー（<strong>Manual preview</strong>）が並ぶ。</td></tr>
           <tr><td>検索</td><td>どの画面にもサイトを検索する入口。狭い画面では<strong>Search this site</strong>のアイコンボタン。</td></tr>
         </tbody>
@@ -63,7 +63,7 @@
         <li><strong>Pinned</strong>とフォルダの構造が並びます。フォルダが先、そのあとにファイルで、どちらもファイル名の順です（数字も文字として比べるので、<code>10-x</code>は<code>2-x</code>より前）。</li>
         <li>フォルダの名前はフォルダの画面へのリンクで、横の矢印は開閉だけを行います。</li>
         <li>上部の欄はタイトル、パス、ファイル名での絞り込みで、Enterで本文検索の画面に移ります。</li>
-        <li>幅が860pxより広い画面では初めから開いています。それ以下では、資料やフォルダに移ると閉じます。</li>
+        <li>幅が860pxより広い画面では初めから開いています。それ以下では、Artifactやフォルダに移ると閉じます。</li>
       </ul>
     </section>
 
@@ -76,10 +76,10 @@
     </section>
 
     <section class="doc-section" aria-labelledby="document">
-      <h2 id="document">資料の画面</h2>
+      <h2 id="document">Artifactの画面</h2>
       <figure class="fg" aria-labelledby="ref-doc-fig">
-        <div class="fg-head"><strong id="ref-doc-fig">資料を開いた画面の各部分</strong><span class="fg-note">閲覧アプリ（簡略化した見本）</span></div>
-        <div class="fg-body"><div class="sc" data-view="doc" aria-hidden="true"><aside class="sc-side"><div class="sc-top"><div class="sc-top-row"><div class="sc-site"><b>S</b><span>SREチーム</span><small>3</small><i class="ic ic-chev s12"></i></div><span class="sc-ibtn"><i class="ic ic-sidebar s16"></i></span></div><div class="sc-filter"><i class="ic ic-search s14"></i><span>Filter pages…</span><kbd>⌘ ⇧ F</kbd></div></div><div class="sc-sb"><div class="sc-h">Browse <i class="sc-m is-end">1</i> </div><div class="sc-tree"><div class="sc-dir"><i class="ic ic-chev s11"></i><span>incidents</span><small>4</small></div><div class="sc-dir is-open"><i class="ic ic-chev s11"></i><span>runbooks</span><small>3</small></div><div class="sc-kids"><div class="sc-file">デプロイの戻し方</div><div class="sc-file">オンコール引き継ぎ</div><div class="sc-file is-active">障害対応の手順</div></div><div class="sc-dir"><i class="ic ic-chev s11"></i><span>slo</span><small>2</small></div></div></div><div class="sc-foot"><span>Index generated Oct 21</span><i class="ic ic-monitor s15"></i></div></aside><div class="sc-main"><div class="sc-ctx"><div class="sc-crumb"><span class="lk">runbooks</span><i class="ic ic-chev s10"></i><em>/</em><strong>障害対応の手順</strong> <i class="sc-m is-below">2</i></div></div><div class="sc-body"><div class="sc-doc"><h4 class="sc-title">障害対応の手順 <i class="sc-m is-end">3</i></h4><p>最初の15分で何をするか。連絡先、判断の基準、記録の残し方。</p><div class="sc-ln"></div><div class="sc-ln m"></div><h5>1. 影響を確かめる</h5><div class="sc-ln"></div><div class="sc-ln s"></div><h5>2. 連絡する</h5><div class="sc-ln m"></div></div><aside class="sc-rc"><section><h5>Details <i class="sc-m is-end">4</i></h5><div class="sc-det"><div class="sc-by"><span class="sc-av">A</span><span class="sc-who"><b>acme-sre</b><span>Updated Oct 21, 2026</span></span></div><div class="sc-src"><a class="sc-file-l"><i class="ic ic-file s13"></i><code>docs/runbooks/incident.md</code><i class="ic ic-external s12"></i></a><span class="sc-repo"><span>acme/sre</span><i>main</i></span></div></div></section><section class="sc-rcs"><h5>Contents <i class="sc-m is-end">5</i> </h5><ul class="sc-toc"><li class="is-current"><span>1. 影響を確かめる</span></li><li><span>2. 連絡する</span></li><li><span>3. 記録を残す</span></li></ul></section></aside></div></div></div><ol class="sc-legend"><li><span>サイドバー（<kbd>⌘</kbd> <kbd>B</kbd>で表示を切り替える）。</span></li><li><span>パンくず。</span></li><li><span>資料の本文。</span></li><li><span><strong>Details</strong>。</span></li><li><span><strong>Contents</strong>（<kbd>⌘</kbd> <kbd>⇧</kbd> <kbd>O</kbd>）。</span></li></ol></div>
+        <div class="fg-head"><strong id="ref-doc-fig">Artifactを開いた画面の各部分</strong><span class="fg-note">閲覧アプリ（簡略化した見本）</span></div>
+        <div class="fg-body"><div class="sc" data-view="doc" aria-hidden="true"><aside class="sc-side"><div class="sc-top"><div class="sc-top-row"><div class="sc-site"><b>S</b><span>SREチーム</span><small>3</small><i class="ic ic-chev s12"></i></div><span class="sc-ibtn"><i class="ic ic-sidebar s16"></i></span></div><div class="sc-filter"><i class="ic ic-search s14"></i><span>Filter pages…</span><kbd>⌘ ⇧ F</kbd></div></div><div class="sc-sb"><div class="sc-h">Browse <i class="sc-m is-end">1</i> </div><div class="sc-tree"><div class="sc-dir"><i class="ic ic-chev s11"></i><span>incidents</span><small>4</small></div><div class="sc-dir is-open"><i class="ic ic-chev s11"></i><span>runbooks</span><small>3</small></div><div class="sc-kids"><div class="sc-file">デプロイの戻し方</div><div class="sc-file">オンコール引き継ぎ</div><div class="sc-file is-active">障害対応の手順</div></div><div class="sc-dir"><i class="ic ic-chev s11"></i><span>slo</span><small>2</small></div></div></div><div class="sc-foot"><span>Index generated Oct 21</span><i class="ic ic-monitor s15"></i></div></aside><div class="sc-main"><div class="sc-ctx"><div class="sc-crumb"><span class="lk">runbooks</span><i class="ic ic-chev s10"></i><em>/</em><strong>障害対応の手順</strong> <i class="sc-m is-below">2</i></div></div><div class="sc-body"><div class="sc-doc"><h4 class="sc-title">障害対応の手順 <i class="sc-m is-end">3</i></h4><p>最初の15分で何をするか。連絡先、判断の基準、記録の残し方。</p><div class="sc-ln"></div><div class="sc-ln m"></div><h5>1. 影響を確かめる</h5><div class="sc-ln"></div><div class="sc-ln s"></div><h5>2. 連絡する</h5><div class="sc-ln m"></div></div><aside class="sc-rc"><section><h5>Details <i class="sc-m is-end">4</i></h5><div class="sc-det"><div class="sc-by"><span class="sc-av">A</span><span class="sc-who"><b>acme-sre</b><span>Updated Oct 21, 2026</span></span></div><div class="sc-src"><a class="sc-file-l"><i class="ic ic-file s13"></i><code>docs/runbooks/incident.md</code><i class="ic ic-external s12"></i></a><span class="sc-repo"><span>acme/sre</span><i>main</i></span></div></div></section><section class="sc-rcs"><h5>Contents <i class="sc-m is-end">5</i> </h5><ul class="sc-toc"><li class="is-current"><span>1. 影響を確かめる</span></li><li><span>2. 連絡する</span></li><li><span>3. 記録を残す</span></li></ul></section></aside></div></div></div><ol class="sc-legend"><li><span>サイドバー（<kbd>⌘</kbd> <kbd>B</kbd>で表示を切り替える）。</span></li><li><span>パンくず。</span></li><li><span>Artifactの本文。</span></li><li><span><strong>Details</strong>。</span></li><li><span><strong>Contents</strong>（<kbd>⌘</kbd> <kbd>⇧</kbd> <kbd>O</kbd>）。</span></li></ol></div>
       </figure>
       <div class="table-wrap"><table>
         <thead><tr><th>部分</th><th>仕様</th></tr></thead>
@@ -88,14 +88,14 @@
           <tr><td>Markdown</td><td>CommonMarkとGFM（表、チェックリスト、取り消し線、自動リンク、脚注）、Mermaid（strictモード）。埋め込まれたHTMLは、許可していない要素と属性が取り除かれます。</td></tr>
           <tr><td>右の列</td><td>幅1200px以上では常にあり、上に<strong>Details</strong>、下に<strong>Contents</strong>。Markdownでは本文と一緒にDetailsが流れ、Contentsが残ります。HTMLでは右の列だけが別にスクロールします。</td></tr>
           <tr><td>狭い画面</td><td>ContentsとDetailsはボタンで開くパネル。620px以下では、ヘッダーが簡単になり、操作は<strong>More actions</strong>のメニューにまとまります。</td></tr>
-          <tr><td>資料のメニュー</td><td><strong>Pin</strong> / <strong>Unpin</strong>、<strong>Copy link</strong>、<strong>Open source</strong>、<strong>View history</strong>。どれも公開した資料やGitは変えません。</td></tr>
+          <tr><td>Artifactのメニュー</td><td><strong>Pin</strong> / <strong>Unpin</strong>、<strong>Copy link</strong>、<strong>Open source</strong>、<strong>View history</strong>。どれも公開したArtifactやGitは変えません。</td></tr>
         </tbody>
       </table></div>
       <h3 id="details">Details</h3>
       <ul>
-        <li><strong>名前。</strong>資料に関係する最後のコミットの作成者（Gitのauthor）。古い形式のデータではコミッター。最初の著者や管理責任者を表すものではありません。</li>
+        <li><strong>名前。</strong>Artifactに関係する最後のコミットの作成者（Gitのauthor）。古い形式のデータではコミッター。最初の著者や管理責任者を表すものではありません。</li>
         <li><strong>アイコン。</strong>公開のときにGitHubのアカウントを確かめられた場合だけ表示。表示できないときは名前の頭文字。</li>
-        <li><strong>Updated。</strong>資料に関係する変更の日付。一覧を作った日時ではありません。</li>
+        <li><strong>Updated。</strong>Artifactに関係する変更の日付。一覧を作った日時ではありません。</li>
         <li><strong>公開元。</strong>リポジトリ、ファイルのパス、参照。GitHubのファイルへのリンク。</li>
       </ul>
     </section>
@@ -103,9 +103,9 @@
     <section class="doc-section" aria-labelledby="palette">
       <h2 id="palette">パレット</h2>
       <ul>
-        <li>空の状態では<strong>Pinned</strong>、続いて<strong>Recently read</strong>を並べます（同じ資料は1回だけ）。</li>
-        <li>記号なしで資料、<code>@</code>でサイト、<code>#</code>で見出し、<code>&gt;</code>でコマンド。全角の記号も同じように働きます。</li>
-        <li>資料の候補の下に<strong>Search full text for …</strong>が出て、本文検索の画面に渡せます。</li>
+        <li>空の状態では<strong>Pinned</strong>、続いて<strong>Recently read</strong>を並べます（同じArtifactは1回だけ）。</li>
+        <li>記号なしでArtifact、<code>@</code>でサイト、<code>#</code>で見出し、<code>&gt;</code>でコマンド。全角の記号も同じように働きます。</li>
+        <li>Artifactの候補の下に<strong>Search full text for …</strong>が出て、本文検索の画面に渡せます。</li>
       </ul>
     </section>
 
@@ -119,12 +119,12 @@
       <div class="table-wrap"><table>
         <thead><tr><th>部分</th><th>仕様</th></tr></thead>
         <tbody>
-          <tr><td>サイドバー</td><td><strong>Changed pages</strong>と<strong>Affected by a resource change</strong>に分けた、そのリビジョンの資料。公開されたサイトへ戻るリンク。</td></tr>
+          <tr><td>サイドバー</td><td><strong>Changed pages</strong>と<strong>Affected by a resource change</strong>に分けた、そのリビジョンのArtifact。公開されたサイトへ戻るリンク。</td></tr>
           <tr><td>見出し</td><td><strong>Preview · PR #N</strong>、<strong>Preview · manual</strong>、または短いSHA。PR番号は、そのリビジョンがPRのグループの最新だと一覧で確かめられた場合だけ。</td></tr>
           <tr><td>Details</td><td><strong>Pull request</strong>、<strong>Revision</strong>、<strong>Built</strong>、<strong>Path</strong>、<strong>Format</strong>。<strong>More details</strong>に<strong>Default head</strong>、<strong>Merge base</strong>、<strong>Included as</strong>。</td></tr>
-          <tr><td>Built</td><td>プレビューを作った時刻（ローカルの時刻。ツールチップにUTC）。資料を編集した時刻ではありません。</td></tr>
-          <tr><td>古いリビジョン</td><td><strong>This is an older revision of this preview.</strong>と<strong>Open the current preview</strong>。同じ資料が最新のリビジョンになければ、グループの一覧へ移ります。プレビューが消えていれば<strong>Preview unavailable</strong>。</td></tr>
-          <tr><td>保存</td><td>プレビューの資料は、ピン留めや最近読んだ資料に入りません。</td></tr>
+          <tr><td>Built</td><td>プレビューを作った時刻（ローカルの時刻。ツールチップにUTC）。Artifactを編集した時刻ではありません。</td></tr>
+          <tr><td>古いリビジョン</td><td><strong>This is an older revision of this preview.</strong>と<strong>Open the current preview</strong>。同じArtifactが最新のリビジョンになければ、グループの一覧へ移ります。プレビューが消えていれば<strong>Preview unavailable</strong>。</td></tr>
+          <tr><td>保存</td><td>プレビューのArtifactは、ピン留めや最近読んだArtifactに入りません。</td></tr>
         </tbody>
       </table></div>
     </section>

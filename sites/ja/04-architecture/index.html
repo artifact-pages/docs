@@ -45,7 +45,7 @@
         <thead><tr><th>領域</th><th>パス</th><th>中身</th></tr></thead>
         <tbody>
           <tr><td>閲覧アプリ</td><td><code>/index.html</code>、<code>/assets/*</code>など</td><td>ブラウザで動くアプリ（React）</td></tr>
-          <tr><td>コンテンツ</td><td><code>/_indexes/*</code>、<code>/_artifacts/*</code>、<code>/_previews/*</code></td><td>サイトの登録情報と一覧、公開された資料、プレビュー</td></tr>
+          <tr><td>コンテンツ</td><td><code>/_indexes/*</code>、<code>/_artifacts/*</code>、<code>/_previews/*</code></td><td>サイトの登録情報と一覧、公開されたArtifact、プレビュー</td></tr>
           <tr><td>内部の記録</td><td><code>/_control/*</code></td><td>ロックや公開の状態。読者には中身を返しません。</td></tr>
           <tr><td>読者が開くURL</td><td><code>/</code>、<code>/:site</code>、<code>/:site/*</code></td><td>閲覧アプリが解釈する論理的なURL</td></tr>
         </tbody>
@@ -55,7 +55,7 @@
     <section class="doc-section" aria-labelledby="principles">
       <h2 id="principles">設計方針</h2>
       <ul>
-        <li><strong>Gitが正本。</strong>資料はGitで書いてレビューし、配信先にあるのはその写しです。Artifact Pagesの中で編集はしません。CLIはテンプレートの展開やビルドをせず、公開元のファイルをそのまま扱います。</li>
+        <li><strong>Gitが正本。</strong>ArtifactはGitで書いてレビューし、配信先にあるのはその写しです。Artifact Pagesの中で編集はしません。CLIはテンプレートの展開やビルドをせず、公開元のファイルをそのまま扱います。</li>
         <li><strong>サイトごとに独立して公開する。</strong>全サイトをまとめるビルドはなく、各サイトは自分の領域だけを同期します。ただし、閲覧アプリの配置は形式の確認のために全サイトのロックを取るなど、すべての操作がまったく無関係というわけではありません。</li>
         <li><strong>読む場所はひとつ。</strong>閲覧アプリは全サイトに共通です。探し方と読み方がサイトごとに違うことはありません。</li>
         <li><strong>URLは公開元のパス。</strong>読者が共有するURLは<code>/&lt;サイト&gt;/&lt;公開元からのパス&gt;</code>で、ストレージの内部のパスではありません。拡張子も残ります。</li>

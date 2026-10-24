@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <meta name="description" content="閲覧アプリが解釈するURLの形。サイトの一覧、サイトのトップ、資料、フォルダ、見出し、本文検索、プレビューの一覧とリビジョン。">
+  <meta name="description" content="閲覧アプリが解釈するURLの形。サイトの一覧、サイトのトップ、Artifact、フォルダ、見出し、本文検索、プレビューの一覧とリビジョン。">
   <title>ページ・見出し・プレビューのURL</title>
   <script>
     // Copy the reader app's theme (same-origin parent) before first paint; assets/site.js keeps it in sync.
@@ -35,7 +35,7 @@
       <h2 id="forms">URLの形</h2>
       <figure class="fg" aria-labelledby="url-anatomy-fig">
         <div class="fg-head"><strong id="url-anatomy-fig"><code>https://docs.example.com/sre/runbooks/on-call.html#escalation</code>の読み方</strong><span class="fg-note">説明用の例</span></div>
-        <div class="fg-body"><div class="mp" role="table" aria-label="URLの部分と意味"><div class="mp-h" role="row"><span role="columnheader">URLの部分</span><span role="columnheader">意味</span></div><div class="mp-r" role="row"><span role="cell"><code>/sre</code></span><span role="cell">サイトID</span></div><div class="mp-r" role="row"><span role="cell"><code>/runbooks/on-call.html</code></span><span role="cell">公開元のディレクトリからのパス。拡張子まで含む</span></div><div class="mp-r" role="row"><span role="cell"><code>#escalation</code></span><span role="cell">資料の中の見出しのID</span></div></div></div>
+        <div class="fg-body"><div class="mp" role="table" aria-label="URLの部分と意味"><div class="mp-h" role="row"><span role="columnheader">URLの部分</span><span role="columnheader">意味</span></div><div class="mp-r" role="row"><span role="cell"><code>/sre</code></span><span role="cell">サイトID</span></div><div class="mp-r" role="row"><span role="cell"><code>/runbooks/on-call.html</code></span><span role="cell">公開元のディレクトリからのパス。拡張子まで含む</span></div><div class="mp-r" role="row"><span role="cell"><code>#escalation</code></span><span role="cell">Artifactの中の見出しのID</span></div></div></div>
       </figure>
       <div class="table-wrap"><table>
         <thead><tr><th>URL</th><th>開くもの</th></tr></thead>
@@ -43,14 +43,14 @@
           <tr><td><code>/</code></td><td>サイトの一覧</td></tr>
           <tr><td><code>/&lt;site&gt;</code></td><td>サイトのトップ（Overview、なければFiles）</td></tr>
           <tr><td><code>/&lt;site&gt;?section=files</code></td><td>サイトのトップのFiles</td></tr>
-          <tr><td><code>/&lt;site&gt;/&lt;path.ext&gt;</code></td><td>資料。公開元からのパスで、拡張子を含む</td></tr>
+          <tr><td><code>/&lt;site&gt;/&lt;path.ext&gt;</code></td><td>Artifact。公開元からのパスで、拡張子を含む</td></tr>
           <tr><td><code>/&lt;site&gt;/&lt;folder&gt;</code>、<code>/&lt;site&gt;/&lt;folder&gt;/</code></td><td>フォルダの画面</td></tr>
-          <tr><td><code>…#&lt;見出しのID&gt;</code></td><td>資料の中の見出し</td></tr>
+          <tr><td><code>…#&lt;見出しのID&gt;</code></td><td>Artifactの中の見出し</td></tr>
           <tr><td><code>/&lt;site&gt;/_search?q=&lt;言葉&gt;&amp;in=&lt;folder&gt;</code></td><td>本文検索（<code>in</code>は任意）</td></tr>
-          <tr><td><code>/&lt;site&gt;/&lt;path.ext&gt;?q=&lt;言葉&gt;</code></td><td>検索の結果から開いた資料（一致をハイライト）</td></tr>
+          <tr><td><code>/&lt;site&gt;/&lt;path.ext&gt;?q=&lt;言葉&gt;</code></td><td>検索の結果から開いたArtifact（一致をハイライト）</td></tr>
           <tr><td><code>/&lt;site&gt;/_previews</code></td><td>プレビューの一覧</td></tr>
           <tr><td><code>/&lt;site&gt;/_previews?group=pr%3A42</code></td><td>プルリクエスト#42の最新のプレビューの一覧（内容は新しいプレビューで変わる）</td></tr>
-          <tr><td><code>/&lt;site&gt;/_previews/&lt;SHA&gt;/&lt;path&gt;?group=&lt;グループ&gt;</code></td><td>そのコミットのプレビューの資料（<code>group</code>は任意）</td></tr>
+          <tr><td><code>/&lt;site&gt;/_previews/&lt;SHA&gt;/&lt;path&gt;?group=&lt;グループ&gt;</code></td><td>そのコミットのプレビューのArtifact（<code>group</code>は任意）</td></tr>
         </tbody>
       </table></div>
     </section>
@@ -58,8 +58,8 @@
     <section class="doc-section" aria-labelledby="rules">
       <h2 id="rules">決まりごと</h2>
       <ul>
-        <li><strong>拡張子は残ります。</strong><code>index.html</code>も、ほかの資料と同じくファイル名まで書いて開きます。</li>
-        <li><strong>資料とフォルダが同じパスなら資料が優先されます。</strong>そのフォルダは同じURLでは開けません。</li>
+        <li><strong>拡張子は残ります。</strong><code>index.html</code>も、ほかのArtifactと同じくファイル名まで書いて開きます。</li>
+        <li><strong>Artifactとフォルダが同じパスならArtifactが優先されます。</strong>そのフォルダは同じURLでは開けません。</li>
         <li><strong>見出しのID。</strong>Markdownの見出しのIDは、GitHubと同じような形に<code>md-</code>を付けたものです。同じ見出しが重なると番号が付くので、見出しの文字から推測せず、閲覧アプリでリンクを写します。HTMLでは、IDとテキストのあるh1からh3が目次に載ります。IDは自動では付きません。</li>
         <li><strong>Copy link</strong>は、見出しの指定とプレビューの<code>group</code>を残し、検索の<code>?q=</code>だけを外します。</li>
         <li><strong>プレビューのグループ</strong>は<code>pr:&lt;番号&gt;</code>か<code>head:&lt;SHA&gt;</code>です。<code>group</code>のないリビジョンのURLから、プルリクエストは推測しません。</li>
