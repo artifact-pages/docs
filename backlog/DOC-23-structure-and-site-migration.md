@@ -24,13 +24,13 @@ Also from the owner (handoff guidance):
 sites/<ja|en>/
 ├── README.md
 ├── 01-features/ index.html, 01-publish-and-review.html, 02-find.html, 03-read.html, 04-provide-and-operate.html
-├── 02-setup/ index.html, 01-infrastructure/{index.html, aws.html, cloudflare.html}, 02-admin-repository.html, 03-reader-app.html, 04-register-site.html, 05-first-site.html, 06-pr-previews.html
+├── 02-setup/ index.html, 01-infrastructure/{index.html, 01-cloudflare.html, 02-aws.html}, 02-admin-repository.html, 03-reader-app.html, 04-register-site.html, 05-first-site.html, 06-pr-previews.html
 ├── 03-operations/ index.html, 01-onboard-team.html, 02-update-shared-workflows.html, 03-upgrade.html, 04-change-or-retire-site.html, 05-troubleshooting.html
-├── 04-architecture/ index.html, 01-repositories-and-updates.html, 02-publishing-and-previews.html, 03-reading-and-search.html, 04-security-and-access.html, 05-cost-and-performance/{index.html, 01-cloudflare.html, 02-aws.html}
+├── 04-architecture/ index.html, 01-repositories-and-updates.html, 02-publishing-and-previews.html, 03-reading-and-search.html, 04-security-and-access.html, 05-cost-and-performance.html, 06-cost-cloudflare.html, 07-cost-aws.html
 └── 05-reference/ index.html, 01-reader/{index.html, 01-keyboard-shortcuts.html, 02-search.html, 03-urls.html, 04-local-storage.html}, 02-configuration.html, 03-cli.html, 04-github-actions.html, 05-terraform.html, 06-versions.html
 ~~~
 
-Chapters 03–05 got number prefixes on 2026-10-24 (site review F05, owner chose numbering): the folder list and sidebar sort by file name, so the prefixes keep them in the reading order of the chapter index and pager. Their earlier unnumbered URLs no longer resolve.
+Chapters 03–05 got number prefixes on 2026-10-24 (site review F05, owner chose numbering): the folder list and sidebar sort by file name, so the prefixes keep them in the reading order of the chapter index and pager. Their earlier unnumbered URLs no longer resolve. Follow-up the same day (owner): the reader app lists subfolders before pages, so the cost pages left their subfolder and became `04-architecture/05`–`07`; the infrastructure pages were numbered `01-cloudflare`, `02-aws` to match their index, and both lead on to the admin repository page.
 
 DOC-27 still decides where the local-try path (`provider: local`) goes inside `02-setup/`.
 

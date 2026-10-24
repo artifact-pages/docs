@@ -2,7 +2,7 @@
 
 - Status: In progress
 - Assignee: Claude
-- Site: `ja`, `en` ([DOC-23](DOC-23-structure-and-site-migration.md)); owns `04-architecture/` (including `05-cost-and-performance/`) in each, at identical relative paths
+- Site: `ja`, `en` ([DOC-23](DOC-23-structure-and-site-migration.md)); owns `04-architecture/` (including the cost pages `05-cost-and-performance.html`, `06-cost-cloudflare.html`, `07-cost-aws.html`) in each, at identical relative paths
 - Depends on: [DOC-23](DOC-23-structure-and-site-migration.md) for publication only
 
 ## Purpose
