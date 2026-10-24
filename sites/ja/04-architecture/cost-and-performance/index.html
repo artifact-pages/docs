@@ -106,11 +106,17 @@
     <section class="doc-section" aria-labelledby="model">
       <h2 id="model">費用のモデル</h2>
       <p>操作の回数を数えるだけの仮の配信先で公開と閲覧を再現し、2026年10月18日の公開価格を当てはめて月額を見積もりました。実際のHTTPのリクエスト数や請求の記録ではありません。プレビュー、登録の反映、閲覧アプリの配置の費用は含めていません。配信先ごとの結果は各ページにあります。</p>
-      <figure class="fg" aria-labelledby="cost-fig">
-        <div class="fg-head"><strong id="cost-fig">月額の見積もり（キャッシュに当たらない割合10%）</strong></div>
-        <div class="fg-body"><div class="br" role="table" aria-label="想定ごとの月額の見積もり"><div class="br-r" role="row"><span class="br-l" role="rowheader">S</span><span class="br-v" role="cell" data-kind="cloudflare" style="--v:0.000">$0.09</span><span class="br-v" role="cell" data-kind="aws" style="--v:0.002">$4.05</span></div><div class="br-r" role="row"><span class="br-l" role="rowheader">M</span><span class="br-v" role="cell" data-kind="cloudflare" style="--v:0.001">$1.86</span><span class="br-v" role="cell" data-kind="aws" style="--v:0.179">$353.67</span></div><div class="br-r" role="row"><span class="br-l" role="rowheader">L</span><span class="br-v" role="cell" data-kind="cloudflare" style="--v:0.003">$5.93</span><span class="br-v" role="cell" data-kind="aws" style="--v:1.000">$1,972.66</span></div></div><ul class="br-k"><li data-kind="cloudflare">Cloudflare（R2）</li><li data-kind="aws">AWS（S3とCloudFront）</li></ul></div>
-        <figcaption>Cloudflareは無料枠を引く前、AWSは無料枠をこの用途に使える前提の額です。S、M、Lの想定と内訳は、配信先ごとのページにあります。AWSの額の多くは、圧縮しない一覧を毎回取得すると仮定した転送と、キャッシュの無効化です。</figcaption>
-      </figure>
+      <p>想定は3つです。Sは5サイト（各200ページ）を1日1,000回、Mは30サイト（各2,000ページ）を1日20,000回閲覧します。LはMに5万ページのサイトを1つ加え、1日100,000回閲覧します。</p>
+      <div class="table-wrap"><table>
+        <thead><tr><th>想定</th><th>Cloudflare（R2）</th><th>AWS（多めの試算）</th></tr></thead>
+        <tbody>
+          <tr><td>S</td><td>$0.09</td><td>$4.05</td></tr>
+          <tr><td>M</td><td>$1.86</td><td>$353.67</td></tr>
+          <tr><td>L</td><td>$5.93</td><td>$1,972.66</td></tr>
+        </tbody>
+      </table></div>
+      <p>表の額は、キャッシュに当たらない割合を10%とした月額です。Cloudflareは無料枠を引く前、AWS（S3とCloudFront）は無料枠をこの用途に使える前提の額です。</p>
+      <p>AWSの額は多めの試算です。読者がArtifactを開くたびに、圧縮していない<code>index.json</code>を取得すると仮定しているためです。この転送がMで約$225、Lで約$1,745を占めます。実際の閲覧アプリは、同じサイトを読んでいる間、一度読み込んだ<code>index.json</code>を使い回します。CLI 0.5.0以降は、AWSには圧縮した<code>index.json</code>を置きます。一方、キャッシュの無効化（Mで約$115、Lで約$125）は、この仮定にかかわらずかかります。リクエストの単価は米国・カナダのもので、ほかの地域ではやや高くなります（<a href="aws.html">AWSのページ</a>）。</p>
       <ul class="cards two">
         <li><a class="card" href="cloudflare.html"><span class="tag">R2 · Cloudflare Cache</span><h3>Cloudflare</h3><p>構成、キャッシュの削除のまとめ方、見積もり。</p><span class="go">詳しく →</span></a></li>
         <li><a class="card" href="aws.html"><span class="tag">S3 · CloudFront</span><h3>AWS</h3><p>構成、一覧の圧縮、キャッシュの無効化の費用、見積もり。</p><span class="go">詳しく →</span></a></li>
