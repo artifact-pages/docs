@@ -21,11 +21,11 @@
   <script src="../assets/site.js" defer></script>
 </head>
 <body>
-  <a class="skip" href="#main">本文へ移動</a>
+  <a class="skip" href="#main" data-search-ignore>本文へ移動</a>
   <main id="main" class="wrap">
     <header class="page-head">
       <div>
-        <p class="eyebrow">アーキテクチャ</p>
+        <p class="eyebrow" data-search-ignore>アーキテクチャ</p>
         <h1>アーキテクチャの全体像</h1>
       </div>
       <p class="lead">Artifact Pagesは、各サイトの静的なファイルをオブジェクトストレージに置き、ブラウザで動く閲覧アプリがそれを読む構成です。この章では、なぜこの形なのか、どこに境界とトレードオフがあるのかを説明します。</p>
@@ -34,10 +34,10 @@
 
     <section class="doc-section" aria-labelledby="shape">
       <h2 id="shape">全体の構成</h2>
-      <p>Gitのリポジトリから、CLIがサイトごとに静的なファイルの集まり（以下、投影）を作り、配信先のストレージに同期します。読者のブラウザは、CDNから閲覧アプリとそのファイルを受け取り、すべての画面をブラウザの中で組み立てます。</p>
+      <p>Gitのリポジトリから、CLIがサイトごとに配信用のファイル一式を作り、配信先のストレージに同期します。読者のブラウザは、CDNから閲覧アプリとそのファイルを受け取り、すべての画面をブラウザの中で組み立てます。</p>
       <figure class="fg" aria-labelledby="shape-fig">
         <div class="fg-head"><strong id="shape-fig">Gitからブラウザまで</strong></div>
-        <div class="fg-body"><div class="fl"><div class="nd" data-kind="team"><b>Gitのリポジトリ</b><small>正本</small></div><span class="fl-a"><span>CLIが投影を作る</span></span><div class="nd" data-kind="cli"><b><code>site sync</code></b><small>サイトごと</small></div><span class="fl-a"><span>同期する</span></span><div class="nd" data-kind="store"><b>オブジェクトストレージ</b><small>R2 / S3</small></div><span class="fl-a"><span>配る</span></span><div class="nd" data-kind="cdn"><b>CDN</b><small>Cloudflare / CloudFront。振り分けとキャッシュの規則</small></div><span class="fl-a"><span>読む</span></span><div class="nd" data-kind="app"><b>閲覧アプリ</b><small>読者のブラウザの中で画面を組み立てる</small></div></div></div>
+        <div class="fg-body"><div class="fl"><div class="nd" data-kind="team"><b>Gitのリポジトリ</b><small>正本</small></div><span class="fl-a"><span>CLIが配信用のファイルを作る</span></span><div class="nd" data-kind="cli"><b><code>site sync</code></b><small>サイトごと</small></div><span class="fl-a"><span>同期する</span></span><div class="nd" data-kind="store"><b>オブジェクトストレージ</b><small>R2 / S3</small></div><span class="fl-a"><span>配る</span></span><div class="nd" data-kind="cdn"><b>CDN</b><small>Cloudflare / CloudFront。振り分けとキャッシュの規則</small></div><span class="fl-a"><span>読む</span></span><div class="nd" data-kind="app"><b>閲覧アプリ</b><small>読者のブラウザの中で画面を組み立てる</small></div></div></div>
         <figcaption>リクエストの経路にアプリケーションサーバーはありません。</figcaption>
       </figure>
       <p>読者のリクエストを処理するアプリケーションサーバーはありません。配信の経路にあるのは、ストレージと、URLの振り分けとキャッシュの規則だけです（AWSでは、URLの振り分けにCloudFront Functionsを使います）。</p>
@@ -77,7 +77,7 @@
       </table></div>
     </section>
 
-    <nav class="pager" aria-label="ページ送り">
+    <nav class="pager" data-search-ignore aria-label="ページ送り">
       <a class="prev" href="../03-operations/troubleshooting.html"><small>前へ</small><strong>問題を調べ、復旧する</strong></a>
       <a class="next" href="repositories-and-updates.html"><small>次へ</small><strong>リポジトリと更新の単位</strong></a>
     </nav>

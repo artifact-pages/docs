@@ -21,11 +21,11 @@
   <script src="../assets/site.js" defer></script>
 </head>
 <body>
-  <a class="skip" href="#main">本文へ移動</a>
+  <a class="skip" href="#main" data-search-ignore>本文へ移動</a>
   <main id="main" class="wrap">
     <header class="page-head">
       <div>
-        <p class="eyebrow">社内展開と運用</p>
+        <p class="eyebrow" data-search-ignore>社内展開と運用</p>
         <h1>新しいチーム・サイトを受け入れる</h1>
       </div>
       <p class="lead">2つ目以降のチームを受け入れるときに必要なのは、サイトの登録、配信先の権限、チームのワークフローの3つだけです。環境はすでにあるので作り直しません。ここでは、説明用の例として<code>acme/billing</code>のサイト<code>billing</code>を受け入れます。</p>
@@ -46,7 +46,7 @@
     <span class="k">repository</span>: acme/sre
     <span class="k">sourcePath</span>: docs
   <span class="k">billing</span>:
-    <span class="k">name</span>: 決済チーム / Billing
+    <span class="k">name</span>: 請求チーム / Billing
     <span class="k">description</span>: 請求まわりの設計と運用
     <span class="k">repository</span>: acme/billing
     <span class="k">sourcePath</span>: docs</span></pre>
@@ -138,7 +138,7 @@
       <p>閲覧アプリのサイトの一覧に新しいサイトが出て、Artifactが読めれば受け入れは完了です。</p>
     </section>
 
-    <nav class="pager" aria-label="ページ送り">
+    <nav class="pager" data-search-ignore aria-label="ページ送り">
       <a class="prev" href="index.html"><small>前へ</small><strong>社内展開と運用</strong></a>
       <a class="next" href="update-shared-workflows.html"><small>次へ</small><strong>共通の公開・プレビューの仕組みを更新する</strong></a>
     </nav>

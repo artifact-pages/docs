@@ -21,11 +21,11 @@
   <script src="../assets/site.js" defer></script>
 </head>
 <body>
-  <a class="skip" href="#main">本文へ移動</a>
+  <a class="skip" href="#main" data-search-ignore>本文へ移動</a>
   <main id="main" class="wrap">
     <header class="page-head">
       <div>
-        <p class="eyebrow">アーキテクチャ</p>
+        <p class="eyebrow" data-search-ignore>アーキテクチャ</p>
         <h1>セキュリティとアクセス</h1>
       </div>
       <p class="lead">Artifact Pagesは、公開する人を信頼し、読む人の制限は配信先に任せる設計です。何が守られ、何が守られないかを知ったうえで、公開の権限と閲覧の制限を設計してください。</p>
@@ -91,7 +91,7 @@
       <p>サイトごとのロールは、本公開とプレビューの両方に使います。プレビュー専用のロールはありません。プレビューのActionは、フォークからのプルリクエストと<code>pull_request_target</code>を拒否し、プルリクエストのリポジトリとコミットを確かめます。呼び出す側のワークフローでも、同じリポジトリからのプルリクエストに限っておきます。</p>
     </section>
 
-    <nav class="pager" aria-label="ページ送り">
+    <nav class="pager" data-search-ignore aria-label="ページ送り">
       <a class="prev" href="reading-and-search.html"><small>前へ</small><strong>閲覧と検索の仕組み</strong></a>
       <a class="next" href="cost-and-performance/index.html"><small>次へ</small><strong>コストとパフォーマンス</strong></a>
     </nav>

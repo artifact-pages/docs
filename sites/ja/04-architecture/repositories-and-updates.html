@@ -21,11 +21,11 @@
   <script src="../assets/site.js" defer></script>
 </head>
 <body>
-  <a class="skip" href="#main">本文へ移動</a>
+  <a class="skip" href="#main" data-search-ignore>本文へ移動</a>
   <main id="main" class="wrap">
     <header class="page-head">
       <div>
-        <p class="eyebrow">アーキテクチャ</p>
+        <p class="eyebrow" data-search-ignore>アーキテクチャ</p>
         <h1>リポジトリと更新の単位</h1>
       </div>
       <p class="lead">Artifact Pagesでは、何をどこに置くかと、何がどの単位で更新されるかを分けています。そうすることで、各チームは管理者を待たずに公開でき、管理者は各チームを止めずに全体を更新できます。</p>
@@ -80,7 +80,7 @@
       <p>GitHubのジョブに必要な権限は、通常の公開で<code>contents: read</code>、AWSのOIDCを使うジョブで加えて<code>id-token: write</code>、プルリクエストにコメントするプレビューで加えて<code>pull-requests: write</code>です。これは配信先への書き込みの権限とは別で、配信先の権限はAWSのIAMロールか、Cloudflareで発行した認証情報が決めます（「<a href="security-and-access.html#credentials">セキュリティとアクセス</a>」）。</p>
     </section>
 
-    <nav class="pager" aria-label="ページ送り">
+    <nav class="pager" data-search-ignore aria-label="ページ送り">
       <a class="prev" href="index.html"><small>前へ</small><strong>アーキテクチャの全体像</strong></a>
       <a class="next" href="publishing-and-previews.html"><small>次へ</small><strong>公開とプレビューの仕組み</strong></a>
     </nav>

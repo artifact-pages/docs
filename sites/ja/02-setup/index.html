@@ -21,11 +21,11 @@
   <script src="../assets/site.js" defer></script>
 </head>
 <body>
-  <a class="skip" href="#main">本文へ移動</a>
+  <a class="skip" href="#main" data-search-ignore>本文へ移動</a>
   <main id="main" class="wrap">
     <header class="page-head">
       <div>
-        <p class="eyebrow">導入する</p>
+        <p class="eyebrow" data-search-ignore>導入する</p>
         <h1>導入する</h1>
       </div>
       <p class="lead">この章では、配信環境を作るところから始めて、最初のチームが自分のリポジトリからArtifactを公開し、プルリクエストのプレビューで確かめられるところまで進めます。全体を通して、同じ説明用の例を使います。</p>
@@ -137,7 +137,7 @@ location / { try_files $uri $uri/ /index.html; }</span></pre>
       <p>この試し方では、共通のワークフローの生成（<code>registry setup</code>）は使えません。クラウドで導入するときは、ステップ1から進めます。</p>
     </section>
 
-    <nav class="pager" aria-label="ページ送り">
+    <nav class="pager" data-search-ignore aria-label="ページ送り">
       <a class="prev" href="../01-features/04-provide-and-operate.html"><small>前へ</small><strong>基盤を提供・運用する</strong></a>
       <a class="next" href="01-infrastructure/index.html"><small>次へ</small><strong>インフラを構築する</strong></a>
     </nav>

@@ -21,11 +21,11 @@
   <script src="../assets/site.js" defer></script>
 </head>
 <body>
-  <a class="skip" href="#main">本文へ移動</a>
+  <a class="skip" href="#main" data-search-ignore>本文へ移動</a>
   <main id="main" class="wrap">
     <header class="page-head">
       <div>
-        <p class="eyebrow">体験と機能 · 4</p>
+        <p class="eyebrow" data-search-ignore>体験と機能 · 4</p>
         <h1>基盤を提供・運用する</h1>
       </div>
       <p class="lead">ここまでの体験は、管理者が用意する基盤の上で動きます。管理者は、配信環境を作り、サイトを登録し、閲覧アプリと共通の公開の仕組みを保ちます。各チームは、その範囲の中で自由に公開します。</p>
@@ -49,7 +49,7 @@
     <span class="k">repository</span>: acme/sre
     <span class="k">sourcePath</span>: docs</pre>
       </div>
-      <p><code>sites</code>に書いたものが、登録するサイトのすべてです。管理者がこれを配信先に反映すると、登録されたリポジトリだけが、そのサイトに公開できるようになります。<code>sites</code>から外したサイトは、次に反映したときに登録が取り下げられ、公開済みの内容も削除されます。1つのサイトの公開元は1つのリポジトリの1つのディレクトリで、同じリポジトリの別のディレクトリを別のサイトとして登録することもできます。</p>
+      <p><code>sites</code>に書いたものが、登録するサイトのすべてです。管理者がこれを配信先に反映すると、登録されたリポジトリだけが、そのサイトに公開できるようになります。これはCLIの確認で、権限で分けるかどうかは配信先の構成によります（「<a href="../04-architecture/security-and-access.html#credentials">公開の認証情報の分け方</a>」）。<code>sites</code>から外したサイトは、次に反映したときに登録が取り下げられ、公開済みの内容も削除されます。1つのサイトの公開元は1つのリポジトリの1つのディレクトリで、同じリポジトリの別のディレクトリを別のサイトとして登録することもできます。</p>
     </section>
 
     <section class="doc-section" aria-labelledby="app">
@@ -72,7 +72,7 @@
       <p>共通のワークフローは管理リポジトリに置きますが、各チームのジョブは、そのチームのリポジトリの権限とシークレットで動きます。管理リポジトリのシークレットが自動で配られるわけではありません。どの認証情報をだれが持つかは、導入の章で配信先ごとに説明します。</p>
     </section>
 
-    <nav class="pager" aria-label="ページ送り">
+    <nav class="pager" data-search-ignore aria-label="ページ送り">
       <a class="prev" href="03-read.html"><small>前へ</small><strong>Artifactを読む</strong></a>
       <a class="next" href="../02-setup/index.html"><small>次へ</small><strong>導入する</strong></a>
     </nav>

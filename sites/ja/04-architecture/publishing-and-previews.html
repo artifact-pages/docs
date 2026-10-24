@@ -21,15 +21,15 @@
   <script src="../assets/site.js" defer></script>
 </head>
 <body>
-  <a class="skip" href="#main">本文へ移動</a>
+  <a class="skip" href="#main" data-search-ignore>本文へ移動</a>
   <main id="main" class="wrap">
     <header class="page-head">
       <div>
-        <p class="eyebrow">アーキテクチャ</p>
+        <p class="eyebrow" data-search-ignore>アーキテクチャ</p>
         <h1>公開とプレビューの仕組み</h1>
       </div>
-      <p class="lead">公開は、公開元のディレクトリと配信先の投影の差分を同期する操作です。データベースやサーバーはなく、ストレージの上のファイルと、ロックや状態の記録だけで、途中で失敗してもやり直せば収まるように作られています。</p>
-      <p class="answer"><span class="answer-label">要点</span>公開は、ロックの中で差分を書く同期です。途中で失敗しても、同じ公開をやり直せば収まります。ただし、複数のファイルは一度には切り替わりません。</p>
+      <p class="lead">公開は、公開元のディレクトリと、配信先にある配信用のファイル一式との差分を同期する操作です。データベースやサーバーはなく、ストレージの上のファイルと、ロックや状態の記録だけで動きます。途中で失敗しても、次の公開が残りの書き込みとキャッシュの削除を続け、そろった状態にします。</p>
+      <p class="answer"><span class="answer-label">要点</span>公開は、ロックの中で差分を書く同期です。途中で失敗しても、次の公開が残りを続けて、そろった状態にします。ただし、複数のファイルは一度には切り替わりません。</p>
     </header>
 
     <section class="doc-section" aria-labelledby="layout">
@@ -57,12 +57,12 @@
       <figure class="fg" aria-labelledby="sync-fig">
         <div class="fg-head"><strong id="sync-fig">1回の公開の中で、何がいつ起こるか</strong></div>
         <div class="fg-body"><div class="bn" style="--cols:9"><div class="bn-t"><span>ロック</span><span>登録</span><span>比較</span><span>計画</span><span>記録</span><span>書く</span><span>消す</span><span>キャッシュ</span><span>終了</span></div><div class="bn-r"><span class="bn-l">サイトのロック</span><span class="bn-b" data-kind="lock" style="--from:1;--to:9">持っている</span></div><div class="bn-r"><span class="bn-l">再試行の記録</span><span class="bn-b" data-kind="cache" style="--from:5;--to:9">残っている</span></div><div class="bn-r"><span class="bn-l">配信先への書き込み</span><span class="bn-b" data-kind="work" style="--from:6;--to:7">新旧が混ざりうる</span></div><div class="bn-r"><span class="bn-l">試し実行</span><span class="bn-b" data-kind="wait" style="--from:2;--to:4">読むだけ（ロックなし）</span></div><ul class="bn-k"><li data-kind="lock">サイトのロックを持つ期間</li><li data-kind="cache">再試行の記録がある期間</li><li data-kind="work">配信先のファイルを書き換える期間</li><li data-kind="wait">試し実行が行う範囲</li></ul></div></div>
-        <figcaption>前回と同じで、プレビューの一覧の手入れや前回終わらなかったキャッシュの削除も残っていなければ、投影を組み立てずに<code>no-op</code>で終わります。このときも、ロックの読み書きはあります。「記録」のあとのどこで失敗しても再試行の記録が残り、次の公開が続きを行います。<span class="fg-scroll">図は横にスクロールして見られます。</span></figcaption>
+        <figcaption>前回と同じで、プレビューの一覧の手入れや前回終わらなかったキャッシュの削除も残っていなければ、配信用のファイルを組み立てずに<code>no-op</code>で終わります。このときも、ロックの読み書きはあります。「記録」のあとのどこで失敗しても再試行の記録が残り、次の公開が続きを行います。<span class="fg-scroll">図は横にスクロールして見られます。</span></figcaption>
       </figure>
       <ol>
         <li><strong>ロックを取り、登録を確かめる。</strong>サイトのロックを取ってから、配信先の登録を読み直し、公開元のリポジトリとディレクトリが登録どおりかを確かめます。同じサイトの公開、プレビュー、登録の変更は同じロックを使い、別のサイトの公開とは並んで進みます。</li>
-        <li><strong>前回と同じなら何もしない。</strong>公開元の内容から求めた値を、前回の公開の状態の記録（<code>publish-state.json.gz</code>）と比べます。同じで、前回の投影の書き込みが途中で止まっていなければ、投影を組み立てません。プレビューの一覧の手入れや前回終わらなかったキャッシュの削除も残っていなければ、配信先の個々のファイルも確かめずに<code>no-op</code>で終わります。キャッシュの削除が残っていれば、それを行って<code>synced</code>になります。</li>
-        <li><strong>差分を書く。</strong>違う場合は投影を組み立て、公開元のファイル、検索データ、<code>index.json</code>、検索の目次、<code>meta.json</code>の順に書き、最後に要らなくなったファイルを消します。</li>
+        <li><strong>前回と同じなら何もしない。</strong>公開元の内容から求めた値を、前回の公開の状態の記録（<code>publish-state.json.gz</code>）と比べます。同じで、前回の書き込みが途中で止まっていなければ、配信用のファイルを組み立てません。プレビューの一覧の手入れや前回終わらなかったキャッシュの削除も残っていなければ、配信先の個々のファイルも確かめずに<code>no-op</code>で終わります。キャッシュの削除が残っていれば、それを行って<code>synced</code>になります。</li>
+        <li><strong>差分を書く。</strong>違う場合は配信用のファイルを組み立て、公開元のファイル、検索データ、<code>index.json</code>、検索の目次、<code>meta.json</code>の順に書き、最後に要らなくなったファイルを消します。</li>
         <li><strong>キャッシュを更新する。</strong>変わったURLのキャッシュの削除を配信先に依頼します。</li>
       </ol>
       <p>書き込みの前に、何を書くつもりかを再試行の記録（<code>site-cache.json</code>）に残し、すべてが終わってから消します。途中で失敗すると記録が残るので、同じ公開をもう一度実行すれば、残りの書き込みやキャッシュの削除を続けます。このとき、内容に差がなくても結果は<code>synced</code>になることがあります。</p>
@@ -101,7 +101,7 @@
       </ul>
     </section>
 
-    <nav class="pager" aria-label="ページ送り">
+    <nav class="pager" data-search-ignore aria-label="ページ送り">
       <a class="prev" href="repositories-and-updates.html"><small>前へ</small><strong>リポジトリと更新の単位</strong></a>
       <a class="next" href="reading-and-search.html"><small>次へ</small><strong>閲覧と検索の仕組み</strong></a>
     </nav>

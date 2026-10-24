@@ -21,17 +21,17 @@
   <script src="../assets/site.js" defer></script>
 </head>
 <body>
-  <a class="skip" href="#main">本文へ移動</a>
+  <a class="skip" href="#main" data-search-ignore>本文へ移動</a>
   <main id="main" class="wrap">
     <header class="page-head">
       <div>
-        <p class="eyebrow">導入する · ステップ2</p>
+        <p class="eyebrow" data-search-ignore>導入する · ステップ2</p>
         <h1>管理リポジトリを準備する</h1>
       </div>
       <p class="lead">管理リポジトリ<code>acme/platform-admin</code>に、配信先の設定と、各チームが呼び出す共通のワークフローを用意します。このステップが終わると、チームは短いワークフローを1つ置くだけで公開できるようになります。</p>
     </header>
 
-    <nav class="sm" aria-label="導入のステップ"><ol><li class="is-done"><a href="01-infrastructure/index.html"><span class="sm-n">1</span><b>インフラを構築する</b></a></li><li><a href="02-admin-repository.html" aria-current="step"><span class="sm-n">2</span><b>管理リポジトリを準備する</b></a></li><li><a href="03-reader-app.html"><span class="sm-n">3</span><b>閲覧アプリをデプロイする</b></a></li><li><a href="04-register-site.html"><span class="sm-n">4</span><b>サイトを登録する</b></a></li><li><a href="05-first-site.html"><span class="sm-n">5</span><b>最初のサイトを公開する</b></a></li><li><a href="06-pr-previews.html"><span class="sm-n">6</span><b>PRプレビューを使えるようにする</b></a></li></ol></nav>
+    <nav class="sm" data-search-ignore aria-label="導入のステップ"><ol><li class="is-done"><a href="01-infrastructure/index.html"><span class="sm-n">1</span><b>インフラを構築する</b></a></li><li><a href="02-admin-repository.html" aria-current="step"><span class="sm-n">2</span><b>管理リポジトリを準備する</b></a></li><li><a href="03-reader-app.html"><span class="sm-n">3</span><b>閲覧アプリをデプロイする</b></a></li><li><a href="04-register-site.html"><span class="sm-n">4</span><b>サイトを登録する</b></a></li><li><a href="05-first-site.html"><span class="sm-n">5</span><b>最初のサイトを公開する</b></a></li><li><a href="06-pr-previews.html"><span class="sm-n">6</span><b>PRプレビューを使えるようにする</b></a></li></ol></nav>
 
     <section class="doc-section" aria-labelledby="config">
       <h2 id="config">設定ファイルを置く</h2>
@@ -174,7 +174,7 @@
       </figure>
     </section>
 
-    <nav class="pager" aria-label="ページ送り">
+    <nav class="pager" data-search-ignore aria-label="ページ送り">
       <a class="prev" href="01-infrastructure/aws.html"><small>前へ</small><strong>AWSに構築する</strong></a>
       <a class="next" href="03-reader-app.html"><small>次へ</small><strong>閲覧アプリをデプロイする</strong></a>
     </nav>

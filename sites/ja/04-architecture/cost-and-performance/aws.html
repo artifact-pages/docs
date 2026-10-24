@@ -21,11 +21,11 @@
   <script src="../../assets/site.js" defer></script>
 </head>
 <body>
-  <a class="skip" href="#main">本文へ移動</a>
+  <a class="skip" href="#main" data-search-ignore>本文へ移動</a>
   <main id="main" class="wrap">
     <header class="page-head">
       <div>
-        <p class="eyebrow">アーキテクチャ · コストとパフォーマンス</p>
+        <p class="eyebrow" data-search-ignore>アーキテクチャ · コストとパフォーマンス</p>
         <h1>AWS：構成と最適化</h1>
       </div>
       <p class="lead">AWSではS3の非公開バケットをCloudFrontで配信します。費用の中心は、CloudFrontから読者への転送と、公開のたびに行うキャッシュの無効化です。</p>
@@ -72,7 +72,7 @@
       <p>前提と内訳は製品の<a href="https://github.com/artifact-pages/artifact-pages/blob/main/docs/research/hosting-cost-model.md" target="_blank" rel="noopener">費用のモデル（英語）</a>にあります。最新の価格は<a href="https://aws.amazon.com/cloudfront/pricing/" target="_blank" rel="noopener">CloudFront</a>と<a href="https://aws.amazon.com/s3/pricing/" target="_blank" rel="noopener">S3</a>の料金で確かめてください。</p>
     </section>
 
-    <nav class="pager" aria-label="ページ送り">
+    <nav class="pager" data-search-ignore aria-label="ページ送り">
       <a class="prev" href="cloudflare.html"><small>前へ</small><strong>コストとパフォーマンス：Cloudflare</strong></a>
       <a class="next" href="../../05-reference/index.html"><small>次へ</small><strong>リファレンス</strong></a>
     </nav>

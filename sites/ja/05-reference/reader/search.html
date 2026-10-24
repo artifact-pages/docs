@@ -21,11 +21,11 @@
   <script src="../../assets/site.js" defer></script>
 </head>
 <body>
-  <a class="skip" href="#main">本文へ移動</a>
+  <a class="skip" href="#main" data-search-ignore>本文へ移動</a>
   <main id="main" class="wrap">
     <header class="page-head">
       <div>
-        <p class="eyebrow">リファレンス · 閲覧アプリ</p>
+        <p class="eyebrow" data-search-ignore>リファレンス · 閲覧アプリ</p>
         <h1>検索の対象と範囲</h1>
       </div>
       <p class="lead">検索は2種類です。パレットは読み込み済みの一覧からタイトルやパスを探し、本文検索は公開のときに作られたデータから本文の言葉を探します。どちらも、いま開いているサイトのArtifactだけが対象です。パレットの<code>@</code>で探すサイトだけは、登録されているすべてのサイトが対象です。</p>
@@ -80,7 +80,7 @@
       <p>サイトの一覧の読み込みは20秒で打ち切ります。Artifactがとても多いサイトでは、本文検索の前にサイトを開けないことがあります（「<a href="../../04-architecture/reading-and-search.html">閲覧と検索の仕組み</a>」）。</p>
     </section>
 
-    <nav class="pager" aria-label="ページ送り">
+    <nav class="pager" data-search-ignore aria-label="ページ送り">
       <a class="prev" href="keyboard-shortcuts.html"><small>前へ</small><strong>キーボードショートカット</strong></a>
       <a class="next" href="urls.html"><small>次へ</small><strong>ページ・見出し・プレビューのURL</strong></a>
     </nav>

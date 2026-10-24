@@ -21,17 +21,17 @@
   <script src="../../assets/site.js" defer></script>
 </head>
 <body>
-  <a class="skip" href="#main">本文へ移動</a>
+  <a class="skip" href="#main" data-search-ignore>本文へ移動</a>
   <main id="main" class="wrap">
     <header class="page-head">
       <div>
-        <p class="eyebrow">導入する · インフラを構築する</p>
+        <p class="eyebrow" data-search-ignore>導入する · インフラを構築する</p>
         <h1>Cloudflareに構築する</h1>
       </div>
       <p class="lead">R2のバケットと、お使いのゾーンのルールで、Artifact Pagesの配信環境を作ります。モジュールの呼び出しはTerraformで行い、公開ジョブの認証情報はCloudflareのダッシュボードで発行します。</p>
     </header>
 
-    <nav class="sm" aria-label="導入のステップ"><ol><li><a href="../01-infrastructure/index.html" aria-current="step"><span class="sm-n">1</span><b>インフラを構築する</b></a></li><li><a href="../02-admin-repository.html"><span class="sm-n">2</span><b>管理リポジトリを準備する</b></a></li><li><a href="../03-reader-app.html"><span class="sm-n">3</span><b>閲覧アプリをデプロイする</b></a></li><li><a href="../04-register-site.html"><span class="sm-n">4</span><b>サイトを登録する</b></a></li><li><a href="../05-first-site.html"><span class="sm-n">5</span><b>最初のサイトを公開する</b></a></li><li><a href="../06-pr-previews.html"><span class="sm-n">6</span><b>PRプレビューを使えるようにする</b></a></li></ol></nav>
+    <nav class="sm" data-search-ignore aria-label="導入のステップ"><ol><li><a href="../01-infrastructure/index.html" aria-current="step"><span class="sm-n">1</span><b>インフラを構築する</b></a></li><li><a href="../02-admin-repository.html"><span class="sm-n">2</span><b>管理リポジトリを準備する</b></a></li><li><a href="../03-reader-app.html"><span class="sm-n">3</span><b>閲覧アプリをデプロイする</b></a></li><li><a href="../04-register-site.html"><span class="sm-n">4</span><b>サイトを登録する</b></a></li><li><a href="../05-first-site.html"><span class="sm-n">5</span><b>最初のサイトを公開する</b></a></li><li><a href="../06-pr-previews.html"><span class="sm-n">6</span><b>PRプレビューを使えるようにする</b></a></li></ol></nav>
 
     <section class="doc-section" aria-labelledby="result">
       <h2 id="result">できあがるもの</h2>
@@ -91,7 +91,7 @@
       <div class="table-wrap"><table>
         <thead><tr><th>権限</th><th>対象</th></tr></thead>
         <tbody>
-          <tr><td><code>Workers R2 Storage Bucket Item Write</code></td><td>Artifact Pagesのバケットだけ。リソースは<code>com.cloudflare.edge.r2.bucket.&lt;アカウントID&gt;_default_&lt;バケット名&gt;</code>です（このモジュールはジュリスディクションを指定しないので<code>default</code>）。</td></tr>
+          <tr><td><code>Workers R2 Storage Bucket Item Write</code></td><td>Artifact Pagesのバケットだけ。リソースは<code>com.cloudflare.edge.r2.bucket.&lt;アカウントID&gt;_default_&lt;バケット名&gt;</code>です（このモジュールはデータの保存地域の指定（jurisdiction）をしないので<code>default</code>）。</td></tr>
           <tr><td><code>Cache Purge</code></td><td>ホスト名を置いたゾーンだけ。</td></tr>
         </tbody>
       </table></div>
@@ -220,7 +220,7 @@
       </figure>
     </section>
 
-    <nav class="pager" aria-label="ページ送り">
+    <nav class="pager" data-search-ignore aria-label="ページ送り">
       <a class="prev" href="index.html"><small>前へ</small><strong>インフラを構築する</strong></a>
       <a class="next" href="../02-admin-repository.html"><small>次へ</small><strong>管理リポジトリを準備する</strong></a>
     </nav>

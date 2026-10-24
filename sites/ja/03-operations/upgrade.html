@@ -21,11 +21,11 @@
   <script src="../assets/site.js" defer></script>
 </head>
 <body>
-  <a class="skip" href="#main">本文へ移動</a>
+  <a class="skip" href="#main" data-search-ignore>本文へ移動</a>
   <main id="main" class="wrap">
     <header class="page-head">
       <div>
-        <p class="eyebrow">社内展開と運用</p>
+        <p class="eyebrow" data-search-ignore>社内展開と運用</p>
         <h1>閲覧アプリ・CLI・Actionsを更新する</h1>
       </div>
       <p class="lead">閲覧アプリ、CLI、GitHub Actionsは、それぞれ別のバージョンでリリースされます。管理リポジトリの<code>artifact-pages.yaml</code>で閲覧アプリとCLIの版を固定し、それを書き換えて更新します。</p>
@@ -100,7 +100,7 @@ Config and stored formats are compatible with web.version.
       <p>閲覧アプリは、保存の形式が変わっていなければ、<code>web.version</code>を前の版にして<code>config check</code>と<code>app deploy</code>を行えば戻せます。CLIは、上のAWSの制約のように、新しい版で書いたデータを古い版が扱えない場合があります。設定を元に戻せば必ず安全に戻せる、というわけではないので、戻す前に<code>config check</code>で確かめてください。</p>
     </section>
 
-    <nav class="pager" aria-label="ページ送り">
+    <nav class="pager" data-search-ignore aria-label="ページ送り">
       <a class="prev" href="update-shared-workflows.html"><small>前へ</small><strong>共通の公開・プレビューの仕組みを更新する</strong></a>
       <a class="next" href="change-or-retire-site.html"><small>次へ</small><strong>サイトを変更・廃止する</strong></a>
     </nav>

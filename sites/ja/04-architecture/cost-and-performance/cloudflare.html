@@ -21,11 +21,11 @@
   <script src="../../assets/site.js" defer></script>
 </head>
 <body>
-  <a class="skip" href="#main">本文へ移動</a>
+  <a class="skip" href="#main" data-search-ignore>本文へ移動</a>
   <main id="main" class="wrap">
     <header class="page-head">
       <div>
-        <p class="eyebrow">アーキテクチャ · コストとパフォーマンス</p>
+        <p class="eyebrow" data-search-ignore>アーキテクチャ · コストとパフォーマンス</p>
         <h1>Cloudflare：構成と最適化</h1>
       </div>
       <p class="lead">CloudflareではR2の非公開バケットを、カスタムドメインとCloudflare Cacheで配信します。R2は配信の転送量に課金しないので、費用の中心はストレージとリクエストの回数です。</p>
@@ -65,7 +65,7 @@
       <p>前提と内訳は製品の<a href="https://github.com/artifact-pages/artifact-pages/blob/main/docs/research/hosting-cost-model.md" target="_blank" rel="noopener">費用のモデル（英語）</a>にあります。最新の価格は<a href="https://developers.cloudflare.com/r2/pricing/" target="_blank" rel="noopener">R2の料金</a>で確かめてください。</p>
     </section>
 
-    <nav class="pager" aria-label="ページ送り">
+    <nav class="pager" data-search-ignore aria-label="ページ送り">
       <a class="prev" href="index.html"><small>前へ</small><strong>コストとパフォーマンス</strong></a>
       <a class="next" href="aws.html"><small>次へ</small><strong>コストとパフォーマンス：AWS</strong></a>
     </nav>
