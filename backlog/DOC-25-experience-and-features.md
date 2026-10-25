@@ -21,6 +21,24 @@ Chapter contents, as in structure.md:
 - Artifactを読む (read): HTML and Markdown in one screen; table of contents and jumping to headings; sharing page and heading URLs; document information (updated date, last committer, branch); opening the source GitHub repository. Describe the GitHub link as moving to the source, without presuming a purpose such as investigating background or improving the document; call it GitHub, not generic Git; do not present the last committer as the owner of the document.
 - 基盤を提供・運用する (provide and operate the platform): Terraform builds the delivery environment on AWS or Cloudflare, sites and publishing sources are registered, the reader app updates independently of content, and what admins handle versus what teams are free to do. Details go to DOC-26 to DOC-28.
 
+## Live experience (owner, 2026-10-25)
+
+These pages are read in the reader app they describe, so the chapter asks readers to try each feature on the spot instead of showing a simulated demo. This also removes the 2026-10-01 finding that the overview's autoplay palette sample looked identical to the real palette.
+
+- 資料を探す: open the palette with ⌘ K and jump to a page of this site; run page text search with ⌘ ⇧ F; pin this page and see it under Pinned; see recently updated pages on the site home.
+- 資料を読む: jump to a heading from Contents; copy a heading link; read this page's Details (updated date, last committer, branch); open its source in `artifact-pages/docs`.
+- 資料を公開・レビューする: readers cannot publish, so the page itself is the example: Details and the source link show that it was published from `artifact-pages/docs` by GitHub Actions. Point to the site's Previews only for what is actually there; do not promise that a preview exists.
+- 基盤を提供・運用する: explained only; no live step.
+
+Rules:
+
+- Pages only invite the reader to act; they never read or drive the reader app's DOM, even though the unsandboxed same-origin frame would allow it (specification §7). That DOM is not a contract and would break with UI changes.
+- Keyboard steps rely on the specification's guarantee that ⌘ B, ⌘ K and ⌘ ⇧ F work while focus is inside an HTML artifact's frame.
+- Each step has a narrow-screen form: up to 620 px there is no icon rail and secondary actions move to the search button and the More menu, and touch devices have no keyboard.
+- When a page is not inside the reader app (`window.top === window`, for example opened under `/_artifacts/…`), it replaces the live steps with plain description and a link that opens the page in the app.
+- Live steps live in the HTML pages of `01-features/`; the site root `README.md` is Markdown, which runs no script, and links to them.
+- Control names and placement are written only after checking the released UI (see below).
+
 ## Dependencies on the reader UI
 
 - Final screen descriptions come after ISSUE-107 (site landing: compact site information, overview / documents / previews, persistent search, Markdown-only overview), ISSUE-108 (right sidebar with Contents and Details at enough width) and ISSUE-109 (previews opened in the app, extra metadata) are shipped; check the released UI before describing it.
@@ -41,5 +59,6 @@ Chapter contents, as in structure.md:
 - [ ] Both languages exist with matching structure, localized H1 and `<title>`, and a working language switch.
 - [ ] Every command, flag, path, number and behavior matches the cited primary sources and the current CLI help; nothing is stated that the specification does not state.
 - [ ] Renders in light and dark themes and at ~400 px width without page-level horizontal scrolling (checked in the markup and styles).
+- [ ] The live steps work on the real site in the reader app, at wide and narrow widths, and the pages fall back to plain description outside the app.
 - [ ] The owner reviewed and approved the pages on the real site.
 - [ ] Reader UI descriptions match the released UI after ISSUE-107, ISSUE-108 and ISSUE-109.
