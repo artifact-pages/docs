@@ -57,6 +57,17 @@
     <section class="doc-section" aria-labelledby="contents">
       <h2 id="contents">目次で全体をつかみ、見出しへ移る</h2>
       <p><strong>Contents</strong>（目次）はArtifactの見出しの一覧で、押すとその見出しへ移ります。幅が十分ある画面（目安は1200px以上）では、右の列が常にあり、上に<strong>Details</strong>（更新の情報と公開元）、下に<strong>Contents</strong>が並びます（Markdownでは、読み進めるとDetailsが画面の外に出て、Contentsが残ります）。それより狭い画面では、Artifactの上部のボタンで重ねて開きます。スマートフォンほどの幅では、サイドバーは引き出して使います。</p>
+      <aside class="try" aria-labelledby="try-contents">
+        <p class="try-head"><span class="try-label" data-search-ignore>ここで試す</span><strong id="try-contents">目次で見出しへ移る</strong></p>
+        <p class="try-preview">いまはプレビューを開いているので、Pinや、更新日と公開元を示すDetailsなど、本公開のArtifactだけにある操作と表示は出ません。<a class="try-open" target="_top" href="#">本公開のページで試す</a></p>
+        <p class="try-off">閲覧アプリの中でこのページを開くと、ここで実際に試せます。<a class="try-open" target="_top" href="#">閲覧アプリで開く</a></p>
+        <div class="try-steps">
+          <ol>
+          <li><span data-for="column">右の列の<strong>Contents</strong>から、「Artifactの情報を確かめる」を選びます。</span><span data-for="header">上部の<strong>Contents</strong>を押し、「Artifactの情報を確かめる」を選びます。</span><span data-for="narrow">上部の<strong>…</strong>（More actions）のメニューから<strong>Contents</strong>を選び、「Artifactの情報を確かめる」を選びます。</span></li>
+          </ol>
+          <p class="try-check">その見出しまで移り、アドレスバーのURLの末尾に<code>#details</code>が付きます。</p>
+        </div>
+      </aside>
     </section>
 
     <section class="doc-section" aria-labelledby="urls">
@@ -74,6 +85,19 @@
         <li>受け取った人がリンクを開くと、その見出しの位置から表示されます。</li>
       </ol>
       <p>幅の狭い画面では、ContentsとCopy linkは上部の<strong>…</strong>（More actions）のメニューにあります。</p>
+      <aside class="try" aria-labelledby="try-link">
+        <p class="try-head"><span class="try-label" data-search-ignore>ここで試す</span><strong id="try-link">見出しのリンクを共有する</strong></p>
+        <p class="try-preview">いまはプレビューを開いているので、Pinや、更新日と公開元を示すDetailsなど、本公開のArtifactだけにある操作と表示は出ません。<a class="try-open" target="_top" href="#">本公開のページで試す</a></p>
+        <p class="try-off">閲覧アプリの中でこのページを開くと、ここで実際に試せます。<a class="try-open" target="_top" href="#">閲覧アプリで開く</a></p>
+        <div class="try-steps">
+          <ol>
+          <li>上の「目次で見出しへ移る」の手順で、見出しへ移ります。</li>
+          <li><span data-for="header column">上部のコピーのボタン（<strong>Copy link</strong>）を押します。</span><span data-for="narrow">上部の<strong>…</strong>（More actions）のメニューから<strong>Copy link</strong>を選びます。</span></li>
+          <li>新しいタブにリンクを貼り付けて開きます。</li>
+          </ol>
+          <p class="try-check">新しいタブでも、同じ見出しの位置からこのページが開きます。</p>
+        </div>
+      </aside>
     </section>
 
     <section class="doc-section" aria-labelledby="details">
@@ -88,6 +112,19 @@
         </tbody>
       </table></div>
       <p>名前は最後の変更を記録したもので、Artifactを最初に書いた人や、管理する責任者を表すものではありません。</p>
+      <aside class="try" aria-labelledby="try-details">
+        <p class="try-head"><span class="try-label" data-search-ignore>ここで試す</span><strong id="try-details">このページのDetailsを見る</strong></p>
+        <p class="try-preview">いまはプレビューを開いているので、Pinや、更新日と公開元を示すDetailsなど、本公開のArtifactだけにある操作と表示は出ません。<a class="try-open" target="_top" href="#">本公開のページで試す</a></p>
+        <p class="try-off">閲覧アプリの中でこのページを開くと、ここで実際に試せます。<a class="try-open" target="_top" href="#">閲覧アプリで開く</a></p>
+        <div class="try-steps">
+          <ol>
+          <li><span data-for="column">右の列の上にある<strong>Details</strong>を押します。</span><span data-for="header">上部の<strong>Details</strong>を押します。</span><span data-for="narrow">上部の<strong>…</strong>（More actions）のメニューから<strong>Details</strong>を選びます。</span></li>
+          <li>名前と<strong>Updated</strong>のあとの日付、ファイルのパス<code>sites/ja/01-features/03-read.html</code>、リポジトリ<code>artifact-pages/docs</code>と、ブランチなどの参照が並びます。</li>
+          <li>ファイルのパスを押すと、GitHubのそのファイルが新しいタブで開きます。</li>
+          </ol>
+          <p class="try-check">このページの公開元が、GitHubのどのリポジトリのどのファイルなのかを、読者が自分で確かめられます。</p>
+        </div>
+      </aside>
     </section>
 
     <section class="doc-section" aria-labelledby="github">

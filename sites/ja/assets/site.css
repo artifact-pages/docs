@@ -94,7 +94,8 @@ kbd {
   white-space: nowrap;
 }
 .sr-only { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; }
-.wrap { width: min(1180px, 100%); margin-inline: auto; padding-inline: clamp(20px, 4vw, 56px); }
+/* 本文・枠・図・区切り線が同じ1つの列にそろう。880px から左右の余白を引いた幅で、日本語の本文は1行50字前後。 */
+.wrap { width: min(880px, 100%); margin-inline: auto; padding-inline: clamp(20px, 4vw, 56px); }
 .skip { position: absolute; left: 12px; top: -60px; z-index: 30; padding: 8px 14px; border-radius: 8px; background: var(--ink); color: var(--bg); }
 .skip:focus { top: 10px; }
 
@@ -126,7 +127,10 @@ h3 { margin: 0 0 8px; font-size: 16px; font-weight: 650; line-height: 1.55; lett
 .term .k { color: var(--code-key); }
 
 /* ── 解説ページ ── */
-.doc-section { padding-block: clamp(36px, 5vw, 56px); border-top: 1px solid var(--line-soft); }
+/* 区切り線の下（次の見出しまで）は上より狭くし、見出しを自分のセクションに寄せる。
+   最後の要素の下マージンを消して、線の上の余白を padding だけで決める。 */
+.doc-section { padding-block: clamp(28px, 3.5vw, 40px) clamp(36px, 5vw, 56px); border-top: 1px solid var(--line-soft); }
+.doc-section > :last-child { margin-bottom: 0; }
 .doc-section > h2 { margin-bottom: 10px; }
 .doc-section > p, .doc-section > ul { color: var(--muted); }
 .doc-section > p strong, .doc-section li strong { color: var(--ink); }
@@ -160,6 +164,26 @@ td:first-child { white-space: nowrap; font-weight: 600; }
 .callout p { margin: 0; color: var(--muted); font-size: 14px; }
 .callout p + p { margin-top: 8px; }
 .callout strong { color: var(--ink); }
+
+/* ここで試す（.try）：いま開いている閲覧アプリで、説明した機能をその場で試す案内。
+   site.js が <html> に data-reader（app・preview・off）と data-layout（narrow・header・column）を付け、
+   data-for に並べた幅の案内だけを残す。JavaScript がないときは、広い画面（header）の案内を出す。 */
+.try { margin: 24px 0; padding: 16px 18px 18px; border: 1px dashed var(--accent-line); border-radius: 10px; background: var(--paper); }
+.try-head { display: flex; flex-wrap: wrap; align-items: baseline; gap: 2px 12px; margin: 0 0 10px; }
+.try-label { color: var(--accent); font: 600 11px/1.9 var(--mono); letter-spacing: .04em; }
+.try-head strong { color: var(--ink); font-size: 15px; }
+.try ol { margin: 0; padding-left: 1.4em; color: var(--muted); font-size: 14px; }
+.try li + li { margin-top: 6px; }
+.try strong { color: var(--ink); }
+.try-check { margin: 10px 0 0; color: var(--muted); font-size: 14px; }
+.try-off, .try-preview { display: none; margin: 0; color: var(--muted); font-size: 14px; }
+.try-preview { margin-bottom: 10px; }
+html[data-reader="off"] .try-steps { display: none; }
+html[data-reader="off"] .try-off, html[data-reader="preview"] .try-preview { display: block; }
+html[data-layout="narrow"] .try [data-for]:not([data-for~="narrow"]),
+html[data-layout="header"] .try [data-for]:not([data-for~="header"]),
+html[data-layout="column"] .try [data-for]:not([data-for~="column"]),
+html:not([data-layout]) .try [data-for]:not([data-for~="header"]) { display: none; }
 .doc-section > .term { margin-top: 16px; }
 .doc-section > .term + p, .doc-section > .callout + p { margin-top: 16px; }
 .doc-section > .table-wrap + ul { margin-top: 16px; }

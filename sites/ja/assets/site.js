@@ -216,4 +216,33 @@
     if (motion5.addEventListener) motion5.addEventListener('change', sync);
     sync();
   });
+
+  /* ── 6. ここで試す（.try） ──
+     このページは、説明している閲覧アプリの中で読まれるので、機能をその場で試すよう案内する。
+     案内するだけで、アプリの画面を読んだり操作したりはしない（アプリのDOMは約束されたものではない）。
+     使うのは、アプリのURL（論理ルート）と画面の幅だけ。幅は閲覧アプリの切り替わりに合わせる：
+     620px以下は狭い画面のヘッダー（narrow）、1200px以上は右の列（column）、その間は上部のボタン（header）。
+     アプリの外で開いたときは案内を隠して閲覧アプリで開くリンクを出し、プレビューでは本公開へのリンクを添える。 */
+  if (document.querySelector('.try')) {
+    const root = document.documentElement;
+    let app = null;
+    try { if (inFrame && window.top.location.origin === location.origin) app = window.top; } catch { app = null; }
+    const route = app ? app.location.pathname : '';
+    const previewRoute = /^\/[^/]+\/_previews\/[^/]+\//;
+    root.dataset.reader = !app ? 'off' : previewRoute.test(route) ? 'preview' : 'app';
+    const marker = '/_artifacts/';
+    const href = root.dataset.reader === 'preview' ? route.replace(previewRoute, (prefix) => '/' + prefix.split('/')[1] + '/')
+      : root.dataset.reader === 'off' && location.pathname.startsWith(marker) ? '/' + location.pathname.slice(marker.length) + location.hash
+        : '';
+    document.querySelectorAll('.try-open').forEach((anchor) => {
+      if (href) anchor.href = href; else anchor.hidden = true;
+    });
+    if (app && typeof app.matchMedia === 'function') {
+      const narrow = app.matchMedia('(max-width: 620px)');
+      const column = app.matchMedia('(min-width: 1200px)');
+      const sync = () => { root.dataset.layout = narrow.matches ? 'narrow' : column.matches ? 'column' : 'header'; };
+      sync();
+      [narrow, column].forEach((query) => query.addEventListener?.('change', sync));
+    }
+  }
 })();
