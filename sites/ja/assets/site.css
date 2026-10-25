@@ -126,7 +126,12 @@ h3 { margin: 0 0 8px; font-size: 16px; font-weight: 650; line-height: 1.55; lett
 .term .k { color: var(--code-key); }
 
 /* ── 解説ページ ── */
-.doc-section { padding-block: clamp(36px, 5vw, 56px); border-top: 1px solid var(--line-soft); }
+/* 区切り線の下（次の見出しまで）は上より狭くし、見出しを自分のセクションに寄せる。
+   最後の要素の下マージンを消して、線の上の余白を padding だけで決める。 */
+.doc-section { padding-block: clamp(28px, 3.5vw, 40px) clamp(36px, 5vw, 56px); border-top: 1px solid var(--line-soft); }
+.doc-section > :last-child { margin-bottom: 0; }
+/* 文章の1行は日本語で45字ほどに収める。図・表・コードは列の幅いっぱいを使う。 */
+.page-head .lead, .doc-section > :is(h2, h3, p:not([class]), ul:not([class]), ol:not([class]), .callout, .try) { max-width: 42rem; }
 .doc-section > h2 { margin-bottom: 10px; }
 .doc-section > p, .doc-section > ul { color: var(--muted); }
 .doc-section > p strong, .doc-section li strong { color: var(--ink); }
