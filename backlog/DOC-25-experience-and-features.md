@@ -33,7 +33,7 @@ These pages are read in the reader app they describe, so the chapter asks reader
 Rules:
 
 - Pages only invite the reader to act; the live steps never read or drive the reader app's DOM, even though the unsandboxed same-origin frame would allow it (specification §7). That DOM is not a contract and would break with UI changes. `assets/site.js` reads only the app's route (`window.top.location`) and viewport width (`window.top.matchMedia`) to pick the step wording.
-- Steps are worded for three widths that follow the reader's breakpoints (web v0.4.6): up to 620 px (search button and More menu), 621 to 1199 px (header buttons), 1200 px and wider (right column with Details and Contents).
+- Steps are worded for three widths that follow the reader's breakpoints (unchanged in web v0.4.7): up to 620 px (search button, Contents icon, page hierarchy menu and More menu), 621 to 1199 px (header buttons), 1200 px and wider (right column with the update date, Details and Contents).
 - In a preview, a note says that Pin and production Details are absent and links to the published page.
 - Keyboard steps rely on the specification's guarantee that ⌘ B, ⌘ K and ⌘ ⇧ F work while focus is inside an HTML artifact's frame.
 - Each step has a narrow-screen form: up to 620 px there is no icon rail and secondary actions move to the search button and the More menu, and touch devices have no keyboard.
@@ -45,6 +45,7 @@ Rules:
 
 - Final screen descriptions come after ISSUE-107 (site landing: compact site information, overview / documents / previews, persistent search, Markdown-only overview), ISSUE-108 (right sidebar with Contents and Details at enough width) and ISSUE-109 (previews opened in the app, extra metadata) are shipped; check the released UI before describing it.
 - Every operational detail, constraint and measurement is verified against the implementation or primary sources before it is written.
+- web v0.4.7 (2026-10-25, monorepo #210–#225) redesigned the shell: the sidebar filter became a palette entry (Jump to a page…), the header's site-home button moved into the site menu (Site home / Switch site… / All sites), the right column shows the update date with a Details button, the palette shows mode buttons, folder introductions open as normal pages, and the preview tag opens a Preview menu. The chapter and the reader reference follow v0.4.7.
 
 ## Out of scope
 
