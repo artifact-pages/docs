@@ -81,7 +81,7 @@
           <tr><td><code>aws.region</code></td><td><span class="pill on">必須</span></td><td>バケットのリージョン。</td></tr>
           <tr><td><code>aws.accountId</code></td><td><span class="pill">任意</span></td><td>12桁の文字列。<code>bucket</code>を省くとき、<code>registry setup</code>と<code>registry role-arn</code>では必須。</td></tr>
           <tr><td><code>aws.bucket</code></td><td><span class="pill">任意</span></td><td>既定は<code>artifact-pages-&lt;accountId&gt;-&lt;region&gt;</code>。</td></tr>
-          <tr><td><code>aws.distributionId</code></td><td><span class="pill">任意</span></td><td>CloudFrontのディストリビューション。ないとキャッシュの無効化をしない。</td></tr>
+          <tr><td><code>aws.distributionId</code></td><td><span class="pill">任意</span></td><td>CloudFrontのディストリビューション。CLIはキャッシュの無効化をしないので、公開の動作には影響しない。</td></tr>
           <tr><td><code>aws.namePrefix</code></td><td><span class="pill">任意</span></td><td>IAMロールの名前の先頭。既定は<code>artifact-pages</code>。Terraformの<code>name_prefix</code>と同じにする。</td></tr>
         </tbody>
       </table></div>
@@ -95,7 +95,7 @@
           <tr><td><code>cloudflare.bucket</code></td><td><span class="pill">任意</span></td><td>既定は<code>artifact-pages</code>。</td></tr>
           <tr><td><code>cloudflare.accessKeyIdEnv</code></td><td><span class="pill">任意</span></td><td>R2のアクセスキーIDの環境変数名。既定は<code>CF_R2_ACCESS_KEY_ID</code>。</td></tr>
           <tr><td><code>cloudflare.secretAccessKeyEnv</code></td><td><span class="pill">任意</span></td><td>R2のシークレットの環境変数名。既定は<code>CF_R2_SECRET_ACCESS_KEY</code>。</td></tr>
-          <tr><td><code>cloudflare.apiTokenEnv</code></td><td><span class="pill">任意</span></td><td>APIトークンの環境変数名。既定は<code>CF_API_TOKEN</code>。</td></tr>
+          <tr><td><code>cloudflare.apiTokenEnv</code></td><td><span class="pill">任意</span></td><td>APIトークンの環境変数名。既定は<code>CF_API_TOKEN</code>。R2のキーが2つとも空のとき（トークン1つの方式）だけ読む。</td></tr>
           <tr><td><code>cloudflare.sessionTokenEnv</code></td><td><span class="pill">任意</span></td><td>一時的なR2の認証情報のセッショントークンの環境変数名。R2のキーを明示する方式でだけ使える。</td></tr>
           <tr><td><code>cloudflare.registryReaderAccessKeyIdEnv</code>、<code>registryReaderSecretAccessKeyEnv</code>、<code>registryReaderSessionTokenEnv</code></td><td><span class="pill">任意</span></td><td>サイトの公開とプレビューで、登録情報と閲覧アプリの記録を読むためだけの別の認証情報の環境変数名。キーとシークレットは組で書く。名前を書いて値がなければ、ほかの認証情報で代わりに読むことはしない。</td></tr>
         </tbody>
@@ -131,17 +131,13 @@
       <h2 id="credentials">Cloudflareの認証情報の要否</h2>
       <p>R2のキー（アクセスキーIDとシークレット）を明示する方式と、APIトークン1つから導く方式があります。キーが2つとも設定されていれば明示する方式、2つとも空ならトークン1つの方式です。片方だけは失敗します。</p>
       <div class="table-wrap"><table>
-        <thead><tr><th>操作</th><th>R2のキー</th><th><code>CF_API_TOKEN</code>（明示する方式）</th></tr></thead>
+        <thead><tr><th>操作</th><th>認証情報</th></tr></thead>
         <tbody>
-          <tr><td><code>site sync</code></td><td>要る</td><td>内容が変わる実行と、残ったキャッシュの削除を続けるとき</td></tr>
-          <tr><td><code>preview publish</code></td><td>要る</td><td>通常は要らない。中断したプレビューの片づけを続けるとき</td></tr>
-          <tr><td><code>preview remove</code>、<code>app remove</code></td><td>要る</td><td>実際に削除するとき</td></tr>
-          <tr><td><code>app deploy</code>、<code>registry sync</code></td><td>要る</td><td>実際にキャッシュを削除するとき</td></tr>
-          <tr><td><code>lock inspect</code>、<code>lock recover</code>、<code>config check</code></td><td>要る</td><td>要らない</td></tr>
-          <tr><td><code>index build</code>、<code>config set-default</code>、<code>registry setup</code>、<code>registry role-arn</code></td><td>要らない</td><td>要らない</td></tr>
+          <tr><td><code>site sync</code>、<code>preview publish</code>、<code>preview remove</code>、<code>app deploy</code>、<code>app remove</code>、<code>registry sync</code>、<code>lock inspect</code>、<code>lock recover</code>、<code>config check</code></td><td>要る。試し実行や変更のない実行も含む</td></tr>
+          <tr><td><code>index build</code>、<code>config set-default</code>、<code>registry setup</code>、<code>registry role-arn</code></td><td>要らない</td></tr>
         </tbody>
       </table></div>
-      <p>トークン1つの方式では、配信先に触れるすべての操作で、試し実行や変更のない実行も含めて<code>CF_API_TOKEN</code>が要ります。トークンには、バケットの<code>Workers R2 Storage Bucket Item Write</code>とゾーンの<code>Cache Purge</code>が必要です（「<a href="../02-setup/01-infrastructure/01-cloudflare.html#credentials">Cloudflareに構築する</a>」）。</p>
+      <p>明示する方式では、R2のキー2つだけで足ります。<code>CF_API_TOKEN</code>は読みません。トークン1つの方式では、トークンに、バケットの<code>Workers R2 Storage Bucket Item Write</code>を付けます。CLIは実行のはじめに、トークンが有効かを確かめます。どちらの方式でも、CLIはCDNのキャッシュを削除しないので、ゾーンの<code>Cache Purge</code>は要りません（「<a href="../02-setup/01-infrastructure/01-cloudflare.html#credentials">Cloudflareに構築する</a>」）。</p>
     </section>
 
     <nav class="pager" data-search-ignore aria-label="ページ送り">

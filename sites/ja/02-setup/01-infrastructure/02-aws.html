@@ -70,7 +70,7 @@
       <div class="table-wrap"><table>
         <thead><tr><th>ロール</th><th>名前</th><th>使うジョブとできること</th></tr></thead>
         <tbody>
-          <tr><td>管理用</td><td><code>&lt;name_prefix&gt;-admin-publisher</code></td><td>管理リポジトリのジョブ。閲覧アプリの配置、サイトの登録と登録の取り消し、内部の記録の更新、CloudFrontのキャッシュの無効化。閲覧アプリの配置専用のロールはありません。</td></tr>
+          <tr><td>管理用</td><td><code>&lt;name_prefix&gt;-admin-publisher</code></td><td>管理リポジトリのジョブ。閲覧アプリの配置、サイトの登録と登録の取り消し、内部の記録の更新。閲覧アプリの配置専用のロールはありません。</td></tr>
           <tr><td>サイトごと</td><td><code>&lt;name_prefix&gt;-&lt;サイトID&gt;-publisher</code></td><td>そのサイトを公開するチームのジョブ。自分のサイトの公開と、PRプレビューの公開と削除。書けるのは自分のサイトの領域だけで、ほかのサイト、サイトの登録情報、閲覧アプリには書けません。プレビュー専用のロールはありません。</td></tr>
         </tbody>
       </table></div>
@@ -106,6 +106,12 @@
     <section class="doc-section" aria-labelledby="module">
       <h2 id="module">モジュールを呼び出す</h2>
       <p>呼び出し側のTerraformの設定に、モジュールとプロバイダー、あとで使う出力を書きます。最初のチームのサイトもここで加えておくと、次のステップでそのまま公開まで進めます。リポジトリとサイトは説明用の例です。</p>
+      <div class="callout" role="note">
+        <span class="ico">モジュール0.1.1について</span>
+        <div>
+          <p><strong>いま公開されているAWSのモジュール0.1.1は、CLI 0.6のキャッシュの扱いにまだ合わせていません。</strong>CLI 0.6.1とActions v0.4.0と組み合わせても動きますが、AWSでは実際の環境でまだ確かめていません。また、名前にハッシュの付いた検索データも配信先のキャッシュに60秒しか残らず、使わないキャッシュの無効化の権限もロールに残ります。CLI 0.6に合わせた版は準備中です。</p>
+        </div>
+      </div>
       <div class="term" aria-label="AWSのモジュールを呼び出す">
         <div class="term-head"><span>HCL / main.tf</span><button class="copy-btn" type="button">コピー</button></div>
 <pre><span data-copy><span class="k">provider</span> "aws" {

@@ -61,11 +61,11 @@
           <span class="k">dry-run</span>: ${{ inputs.dry-run }}
         <span class="k">env</span>:
           <span class="k">CF_R2_ACCESS_KEY_ID</span>: ${{ secrets.CF_R2_ACCESS_KEY_ID }}
-          <span class="k">CF_R2_SECRET_ACCESS_KEY</span>: ${{ secrets.CF_R2_SECRET_ACCESS_KEY }}
-          <span class="k">CF_API_TOKEN</span>: ${{ secrets.CF_API_TOKEN }}</span></pre>
+          <span class="k">CF_R2_SECRET_ACCESS_KEY</span>: ${{ secrets.CF_R2_SECRET_ACCESS_KEY }}</span></pre>
       </div>
       <ul>
         <li><code>vX.Y.Z</code>は<a href="https://github.com/artifact-pages/app-deploy-action/releases" target="_blank" rel="noopener">app-deploy-actionのリリース</a>の版です。生成された共通のワークフローと同じように、タグの代わりにコミットのSHAで固定するとより確実です。Actionの版は、置く閲覧アプリの版とは関係ありません。閲覧アプリは<code>web.version</code>で決まります。</li>
+        <li>APIトークン1つの方式では、R2のキー2つの代わりに<code>CF_API_TOKEN</code>を渡します。</li>
         <li>AWSでは<code>env</code>の代わりに、このステップの前に<code>aws-actions/configure-aws-credentials</code>で<code>admin_role_arn</code>のロールを引き受け、ジョブの<code>permissions</code>に<code>id-token: write</code>を足します。</li>
       </ul>
     </section>

@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <meta name="description" content="cli.versionとweb.versionで固定した閲覧アプリとCLIを更新する。通常の手順、形式が変わる更新の順序、1回だけ別のCLIを使う方法、固定のない古い環境の追いつき。">
+  <meta name="description" content="cli.versionとweb.versionで固定した閲覧アプリとCLIを更新する。通常の手順、形式が変わる更新の順序、CLI 0.6への移行、1回だけ別のCLIを使う方法、固定のない古い環境の追いつき。">
   <title>閲覧アプリ・CLI・Actionsを更新する</title>
   <script>
     // Copy the reader app's theme (same-origin parent) before first paint; assets/site.js keeps it in sync.
@@ -36,14 +36,14 @@
       <div class="term" aria-label="版の固定">
         <div class="term-head"><span>artifact-pages.yaml / 管理リポジトリ</span></div>
 <pre><span class="k">cli</span>:
-  <span class="k">version</span>: 0.5.2   <span class="c"># 公開や登録を行うCLI</span>
+  <span class="k">version</span>: 0.6.1   <span class="c"># 公開や登録を行うCLI</span>
 <span class="k">web</span>:
-  <span class="k">version</span>: 0.4.1   <span class="c"># app deploy が置く閲覧アプリ</span></pre>
+  <span class="k">version</span>: 0.4.8   <span class="c"># app deploy が置く閲覧アプリ</span></pre>
       </div>
       <ul>
-        <li>値は<code>0.5.2</code>のような正確な版です。先頭の<code>v</code>、範囲、<code>latest</code>は書けません。</li>
+        <li>値は<code>0.6.1</code>のような正確な版です。先頭の<code>v</code>、範囲、<code>latest</code>は書けません。</li>
         <li>入れてあるCLIは、<code>cli.version</code>が自分と違う版を指していれば、その版をダウンロードし、チェックサムを確かめてから実行を任せます。</li>
-        <li>製品のActionsの版（いまは<code>v0.3.0</code>）は、CLIの版とは別の番号です。各Actionsは、使えるCLIの範囲（<code>v0.3.0</code>では<code>&gt;=0.5.0 &lt;0.6.0</code>）を持っています。</li>
+        <li>製品のActionsの版（いまは<code>v0.4.0</code>）は、CLIの版とは別の番号です。各Actionsは、使えるCLIの範囲（<code>v0.4.0</code>では<code>&gt;=0.6.0 &lt;0.7.0</code>）を持っています。</li>
       </ul>
       <p>いまの版はすべて0.xのプレリリースで、版をまたぐ互換性は約束されていません。ただし、CLIは書き込む前に、配置された閲覧アプリがその形式を読めるかを毎回確かめます。</p>
     </section>
@@ -76,12 +76,33 @@ Config and stored formats are compatible with web.version.
       <p><code>--accept-breaking</code>があるのは<code>registry sync</code>と<code>app deploy</code>だけです。公開し直すまでの間、まだ古い形式のサイトを開くと、閲覧アプリは<strong>This site needs to be republished</strong>と表示します。</p>
     </section>
 
+    <section class="doc-section" aria-labelledby="cli06">
+      <h2 id="cli06">CLI 0.6に移る</h2>
+      <p>CLI 0.6.0から、CLIはCDNのキャッシュを削除しなくなりました。代わりに、書くファイルごとにキャッシュの指示（<code>Cache-Control</code>）を付けます。0.5.2以前から移るときは、配信先に書き込むすべての実行を一度にそろえます。0.6.0以降が書いた再試行の記録と公開の状態を、0.5.2以前のCLIは読めないからです。</p>
+      <div class="callout" role="note">
+        <span class="ico">AWSの場合</span>
+        <div>
+          <p><strong>AWSの既存の環境は、当面CLI 0.5.2、Actions v0.3.0、モジュール0.1.1のまま使い続けてください。</strong>CLI 0.6に合わせたAWSのモジュールがまだ公開されておらず、AWSでの移行もまだ確かめていないためです。CLI 0.6.1がモジュール0.1.1で動かないわけではありません。</p>
+        </div>
+      </div>
+      <ol class="st">
+        <li><span class="st-who" data-kind="admin">管理者</span><b>古い実行を止めて片づける</b><p>公開、プレビュー、登録、閲覧アプリの配置のワークフローと、手元からの公開を止めます。途中で止まった実行があれば、古いCLIのまま成功するまでやり直します。</p></li>
+        <li><span class="st-who" data-kind="admin">管理者</span><b>すべての実行を新しいCLIにする</b><p><code>cli.version</code>を<code>0.6.1</code>以降にし、CLI 0.6.1以降の<code>registry setup</code>で共通のワークフローを作り直します。手で書いたワークフローのActionsは<code>v0.4.0</code>以降に上げます。</p></li>
+        <li><span class="st-who" data-kind="admin">管理者</span><b>対応するモジュールを適用する</b><p>Cloudflareはモジュール<code>0.2.0</code>です。計画を確かめてから適用します。</p></li>
+        <li><span class="st-who" data-kind="admin">管理者</span><b>キャッシュの指示をそろえる</b><p>どれも試し実行で確かめてから、<code>registry sync</code>、登録した各サイトの<code>site sync --reconcile</code>、いまの<code>web.version</code>での<code>app deploy</code>を実行します。これで、古いCLIが書いたファイルのキャッシュの指示が書き換わります。ここまで終われば、ワークフローを再開できます。</p></li>
+        <li><span class="st-who" data-kind="admin">管理者</span><b>プレビューのファイルを直す</b><p>プレビューのリビジョンは公開し直しても書き換わらないので、製品リポジトリにある移行用の補助ツールで、キャッシュの指示だけを書き換えます。</p></li>
+        <li><span class="st-who" data-kind="admin">管理者</span><b>古いキャッシュが切れるのを待つ</b><p>モジュールの変更が配信先に行き渡るのを待ち、そのあと古い指示でのキャッシュが切れるのを待ちます。製品のモジュールでは最大300秒です。CDNを独自に設定している場合は、その設定の値です。キャッシュの削除はしません。</p></li>
+        <li><span class="st-who" data-kind="admin">管理者</span><b>確かめてから、キャッシュの削除用の認証情報を外す</b><p>小さな変更を公開し、新しく読み込んだときに、登録情報や一覧は5秒以内、Artifactはすぐに新しい内容が見えることを確かめます。そのあと、キャッシュの削除のためだけに使っていたAPIトークンをシークレットから消して、失効させます。トークン1つの方式では、トークンは消さずに<code>Cache Purge</code>の権限だけを外します。</p></li>
+      </ol>
+      <p>補助ツールの使い方、確かめる項目、元に戻す手順は、製品の<a href="https://github.com/artifact-pages/artifact-pages/blob/main/docs/guides/cache-policy-migration.md" target="_blank" rel="noopener">Cache policy migration</a>にあります。古いCLIに戻すには、古いモジュールと権限、各サイトの公開の状態も一緒に戻す必要があり、<code>cli.version</code>を戻すだけでは戻りません。</p>
+    </section>
+
     <section class="doc-section" aria-labelledby="override">
       <h2 id="override">1回だけ別のCLIを使う</h2>
       <p>設定を変えずに、1回の実行だけ別のCLIを使えます。優先順は、コマンドの<code>--cli-version</code>、環境変数<code>ARTIFACT_PAGES_CLI_VERSION</code>、製品Actionの入力<code>cli-version</code>、設定の<code>cli.version</code>の順です。</p>
       <div class="term" aria-label="1回だけ別のCLIを使う">
         <div class="term-head"><span>ターミナル</span><button class="copy-btn" type="button">コピー</button></div>
-<pre><span class="p">$</span> <span data-copy>artifact-pages --cli-version 0.5.2 site sync --site sre --config artifact-pages.yaml --dry-run</span></pre>
+<pre><span class="p">$</span> <span data-copy>artifact-pages --cli-version 0.6.1 site sync --site sre --config artifact-pages.yaml --dry-run</span></pre>
       </div>
       <p>互換性の確認とActionsの範囲の確認は、この場合も行われます。管理リポジトリの共通のワークフローには、この指定を渡す入力がありません。チームのジョブで試すには、直接CLIを動かします。</p>
     </section>

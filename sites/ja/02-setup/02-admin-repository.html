@@ -132,7 +132,7 @@
     <section class="doc-section" aria-labelledby="secrets">
       <h2 id="secrets">認証情報を置く</h2>
       <h3 id="cloudflare">Cloudflare</h3>
-      <p>公開ジョブの認証情報（<code>CF_R2_ACCESS_KEY_ID</code>、<code>CF_R2_SECRET_ACCESS_KEY</code>、<code>CF_API_TOKEN</code>）は、それを使うジョブが動くリポジトリのシークレットに置きます。</p>
+      <p>公開ジョブの認証情報（R2のキーなら<code>CF_R2_ACCESS_KEY_ID</code>と<code>CF_R2_SECRET_ACCESS_KEY</code>、APIトークン1つの方式なら<code>CF_API_TOKEN</code>）は、それを使うジョブが動くリポジトリのシークレットに置きます。</p>
       <ul>
         <li><strong>管理リポジトリ。</strong>登録の反映と閲覧アプリの配置に使います。<code>registry.yml</code>はプルリクエストではEnvironmentなしで試し実行し、それ以外では<code>production</code>のEnvironmentで動きます。リポジトリのシークレットに置けば両方から読めます。<code>production</code>のEnvironmentのシークレットだけに置くと、プルリクエストの試し実行が配信先を読めません。</li>
         <li><strong>各チームのリポジトリ。</strong>共通のワークフローは、呼び出したリポジトリのシークレットを使います（呼び出す側に<code>secrets: inherit</code>）。管理リポジトリのシークレットはチームのジョブには届きません。Organizationのシークレットにまとめることもできます。</li>

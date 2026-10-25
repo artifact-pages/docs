@@ -82,7 +82,7 @@
         <li><code>~/.local/bin</code>は一例です。ない場合は先に<code>mkdir -p ~/.local/bin</code>で作り、<code>PATH</code>に含まれていることを確かめます。</li>
         <li>入れたCLIは入口です。設定ファイルに<code>cli.version</code>があれば、ほとんどのコマンドはその版をダウンロードして確かめ、そちらで実行します。</li>
       </ul>
-      <p>コマンドの多くは<code>--dry-run</code>で試し実行ができます。試し実行は配信先を読みますが、書き込み、削除、ロック、キャッシュの変更はしません。結果は通常は文章で、<code>--format json</code>で機械向けに出せます。</p>
+      <p>コマンドの多くは<code>--dry-run</code>で試し実行ができます。試し実行は配信先を読みますが、書き込み、削除、ロックはしません。結果は通常は文章で、<code>--format json</code>で機械向けに出せます。</p>
     </section>
 
     <section class="doc-section" aria-labelledby="local">
