@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <meta name="description" content="AWSのS3とCloudFrontでの構成、大きな一覧の事前の圧縮、キャッシュの無効化の費用、費用のモデルによる月額の見積もりとその前提。">
+  <meta name="description" content="AWSのS3とCloudFrontでの構成、大きな一覧の事前の圧縮、CLI 0.6での費用のモデルによる月額の見積もりとその前提。">
   <title>コストとパフォーマンス：AWS</title>
   <script>
     // Copy the reader app's theme (same-origin parent) before first paint; assets/site.js keeps it in sync.
@@ -28,7 +28,7 @@
         <p class="eyebrow" data-search-ignore>アーキテクチャ · コストとパフォーマンス</p>
         <h1>AWS：構成と最適化</h1>
       </div>
-      <p class="lead">AWSではS3の非公開バケットをCloudFrontで配信します。費用の中心は、CloudFrontから読者への転送と、公開のたびに行うキャッシュの無効化です。</p>
+      <p class="lead">AWSではS3の非公開バケットをCloudFrontで配信します。大きな規模での費用の中心は、CloudFrontが読者から受けるリクエストの回数です。</p>
     </header>
 
     <section class="doc-section" aria-labelledby="shape">
@@ -46,28 +46,25 @@
       <p>一度0.5.0以降で書いたサイトには、それより古いCLIで書き込まないでください。圧縮を止める設定や、自動で元の形式に戻す仕組みはありません。移る手順は「<a href="../03-operations/03-upgrade.html#catch-up">閲覧アプリ・CLI・Actionsを更新する</a>」にあります。</p>
     </section>
 
-    <section class="doc-section" aria-labelledby="invalidation">
-      <h2 id="invalidation">キャッシュの無効化</h2>
-      <p>公開のたびに、変わったURLを無効化します。Artifactとそれが使うファイルの無効化が1,000パスを超えるときなどは、そのサイトの<code>/_artifacts/&lt;site&gt;/*</code>にまとめます。ディストリビューション全体の<code>/*</code>には広げません。</p>
-      <p>CloudFrontの無効化は、アカウント全体で月1,000パスまで無料で、それを超えると1パスごとに課金されます（ワイルドカードは1パスとして数えます）。計測では、初回の公開で1千件、5千件、5万件のサイトがそれぞれ178、353、1,481パス、1つのArtifactの変更で3パスでした。公開の回数が多い環境では、無効化が費用の大きな部分になります。</p>
-    </section>
-
     <section class="doc-section" aria-labelledby="model">
       <h2 id="model">費用のモデル</h2>
-      <p>S3（us-east-1）とCloudFront（PriceClass_100）の2026年10月18日の公開価格を、操作を数えた結果に当てはめた30日の見積もりです。想定（ページ数の代用、公開と検索の回数を含む）はCloudflareのページと同じです。</p>
+      <p>S3（us-east-1）とCloudFront（PriceClass_100）の2026年10月18日の公開価格を当てはめた30日の見積もりです。想定（ページ数の代用、公開と検索の回数を含む）はCloudflareのページと同じです。</p>
       <div class="table-wrap"><table>
-        <thead><tr><th>想定</th><th>キャッシュに当たらない割合10%</th><th>50%</th><th>100%</th></tr></thead>
+        <thead><tr><th>想定</th><th>月額（米国・カナダ）</th><th>内訳（ストレージ / 公開のリクエスト / S3へのリクエスト / 読者のリクエスト / 転送）</th></tr></thead>
         <tbody>
-          <tr><td>S</td><td>$4.05</td><td>$4.21</td><td>$4.42</td></tr>
-          <tr><td>M</td><td>$353.67</td><td>$356.97</td><td>$361.09</td></tr>
-          <tr><td>L</td><td>$1,972.66</td><td>$1,989.16</td><td>$2,009.79</td></tr>
+          <tr><td>S</td><td>$0.10</td><td>$0.00 / $0.04 / $0.06 / $0.00 / $0.00</td></tr>
+          <tr><td>M</td><td>$2.11</td><td>$0.01 / $0.99 / $1.11 / $0.00 / $0.00</td></tr>
+          <tr><td>L</td><td>$37.59</td><td>$0.01 / $1.26 / $5.53 / $30.79 / $0.00</td></tr>
         </tbody>
       </table></div>
       <ul>
-        <li>このモデルでは、読者がArtifactを開くたびに圧縮していない<code>index.json</code>を取得すると仮定しています。転送の費用（Mで約$225、Lで約$1,745）は多めに見積もった上限で、事前の圧縮を入れたいまの配信での予測ではありません。</li>
-        <li>キャッシュの無効化（Mで約$115、Lで約$125）を含みます。圧縮は転送を減らしますが、無効化のパス数は減らしません。</li>
-        <li>CloudFrontのリクエストは、米国・カナダの単価で計算し、無料枠（月1 TB、1,000万リクエスト）をこの用途に使える前提です。PriceClass_100の中で最も高い地域の単価では、キャッシュに当たらない割合10%でMが$355.91、Lが$1,991.89になります。</li>
-        <li>CloudFront Functionsの費用、プレビュー、登録の反映、閲覧アプリの配置、WAFの費用は含みません。</li>
+        <li><strong>CLI 0.6に合わせたモジュールが前提です。</strong>この版はまだ公開されておらず、AWSでは実際の環境でまだ確かめていません。いま公開されているモジュール0.1.1での見積もりは含みません。</li>
+        <li>キャッシュの無効化はしないので、その費用はありません。</li>
+        <li>CloudFrontの無料枠（月1 TB、1,000万リクエスト）をこの用途に使える前提です。Lの転送は約877 GBで、1 TBの枠に近いので、読者が1回の訪問で開くページが少ないと超えます（1回の訪問で1ページだけなら、Lは$240.06）。</li>
+        <li>読者は1回の訪問で3ページ開き、再読み込みはしないと仮定しています。Lで1回の訪問ごとに1回再読み込みすると、一覧が変わっていなければ$48.07、変わっていれば$66.59です。</li>
+        <li>PriceClass_100の中で最も高い地域の単価では、Lが$43.74になります。</li>
+        <li>S3まで届く割合を変えた場合のLは、米国・カナダの単価で、一覧がすべてキャッシュに当たれば$36.39、すべてのリクエストがS3まで届けば$48.37です（最も高い地域の単価では$42.54と$54.53）。どちらも仮定を変えた一例で、予想の幅ではありません。</li>
+        <li>CloudFront Functionsの費用、プレビュー、404、登録の反映、閲覧アプリの配置、WAFの費用は含みません。</li>
       </ul>
       <p>前提と内訳は製品の<a href="https://github.com/artifact-pages/artifact-pages/blob/main/docs/research/hosting-cost-model.md" target="_blank" rel="noopener">費用のモデル（英語）</a>にあります。最新の価格は<a href="https://aws.amazon.com/cloudfront/pricing/" target="_blank" rel="noopener">CloudFront</a>と<a href="https://aws.amazon.com/s3/pricing/" target="_blank" rel="noopener">S3</a>の料金で確かめてください。</p>
     </section>

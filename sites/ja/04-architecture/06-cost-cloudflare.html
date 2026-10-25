@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <meta name="description" content="CloudflareのR2とCloudflare Cacheでの構成、キャッシュの削除のまとめ方、圧縮の扱い、費用のモデルによる月額の見積もりとその前提。">
+  <meta name="description" content="CloudflareのR2とCloudflare Cacheでの構成、キャッシュと404の扱い、圧縮の扱い、CLI 0.6での費用のモデルによる月額の見積もりとその前提。">
   <title>コストとパフォーマンス：Cloudflare</title>
   <script>
     // Copy the reader app's theme (same-origin parent) before first paint; assets/site.js keeps it in sync.
@@ -40,27 +40,28 @@
       </ul>
     </section>
 
-    <section class="doc-section" aria-labelledby="purge">
-      <h2 id="purge">キャッシュの削除</h2>
-      <p>公開のたびに、変わったURLのキャッシュを削除します。同じサイトの公開元のファイルの領域か、一覧と検索のデータの領域で、削除するURLがそれぞれ100件を超えるときは、そのサイトのプレフィックスでの削除にまとめます。ほかのサイト、閲覧アプリ、登録情報には広げません。</p>
+    <section class="doc-section" aria-labelledby="cache">
+      <h2 id="cache">キャッシュの扱い</h2>
+      <p>ゾーンのキャッシュのルールは、CLIが付けたキャッシュの指示に従います。CLIはキャッシュを削除しません。一覧は最大5秒キャッシュに残り、Artifactは読み込むたびにR2に確かめます。モジュール0.2.0は、400番台の応答を配信先にキャッシュしません。そのため、ないファイルへのリクエストは毎回R2まで届き、ファイルを作り直せばすぐに見えます。</p>
     </section>
 
     <section class="doc-section" aria-labelledby="model">
       <h2 id="model">費用のモデル</h2>
-      <p>R2 Standardの公開価格（ストレージ<code>$0.015/GB-月</code>、Class A操作<code>$4.50/100万</code>、Class B操作<code>$0.36/100万</code>、転送は無料）を、操作を数えた結果に当てはめた30日の見積もりです。</p>
+      <p>R2 Standardの公開価格（ストレージ<code>$0.015/GB-月</code>、Class A操作<code>$4.50/100万</code>、Class B操作<code>$0.36/100万</code>、転送は無料）を当てはめた30日の見積もりです。</p>
       <div class="table-wrap"><table>
-        <thead><tr><th>想定</th><th>キャッシュに当たらない割合10%</th><th>50%</th><th>100%</th></tr></thead>
+        <thead><tr><th>想定</th><th>月額</th><th>無料枠の後</th><th>内訳（ストレージ / 公開のClass A / 公開のClass B / 閲覧のリクエスト）</th></tr></thead>
         <tbody>
-          <tr><td>S：5サイト × 各200ページ、1日1,000回閲覧</td><td>$0.09（無料枠の後 $0）</td><td>$0.23（$0）</td><td>$0.42（$0）</td></tr>
-          <tr><td>M：30サイト × 各2,000ページ、1日20,000回閲覧</td><td>$1.86（$0）</td><td>$4.83（$0.35）</td><td>$8.54（$4.07）</td></tr>
-          <tr><td>L：Mに5万ページのサイトを1つ追加、1日100,000回閲覧</td><td>$5.93（$1.22）</td><td>$20.78（$16.07）</td><td>$39.34（$34.63）</td></tr>
+          <tr><td>S：5サイト × 各200ページ、1日1,000回閲覧</td><td>$0.09</td><td>$0</td><td>$0.00 / $0.04 / $0.00 / $0.05</td></tr>
+          <tr><td>M：30サイト × 各2,000ページ、1日20,000回閲覧</td><td>$1.90</td><td>$0</td><td>$0.01 / $0.87 / $0.03 / $1.00</td></tr>
+          <tr><td>L：Mに5万ページのサイトを1つ追加、1日100,000回閲覧</td><td>$6.12</td><td>$1.40</td><td>$0.01 / $1.11 / $0.03 / $4.98</td></tr>
         </tbody>
       </table></div>
       <ul>
         <li>ページ数は、計測した合成サイトで代用しています。Sの200ページは1千件、Mの2,000ページは5千件の計測を使うので、少なめのページ数に対しては多めの見積もりです。公開はSが1サイト1日2回、MとLが5回、検索はSが1日100回、Mが2,000回、Lが10,000回です。</li>
-        <li>無料枠（ストレージ10 GB-月、Class A 100万回、Class B 1,000万回）はアカウントで共有なので、ほかの用途があれば括弧の額より増えます。</li>
-        <li>この見積もりは、端数を課金の単位に切り上げずに計算しています。実際の請求は単位ごとに切り上げられるので、小さな額は特に請求額としては使えません。</li>
-        <li>プレビュー、登録の反映、閲覧アプリの配置、WAFやAccessなどアカウントの費用は含みません。</li>
+        <li>読者は1回の訪問で3ページ開き、再読み込みはしないと仮定しています。R2まで届く割合は、一覧とArtifactを100%、ハッシュ付きの閲覧アプリのファイルを10%、検索のデータの区画を50%と仮定しています（実際のアクセスで測った値ではありません）。</li>
+        <li>R2まで届く割合を変えた場合、Lは、一覧がすべてキャッシュに当たれば$5.04、すべてのリクエストがR2まで届けば$15.82です（無料枠の前）。どちらも仮定を変えた一例で、予想の幅ではありません。</li>
+        <li>無料枠（ストレージ10 GB-月、Class A 100万回、Class B 1,000万回）はアカウントで共有なので、ほかの用途があれば「無料枠の後」の額より増えます。実際の請求は課金の単位ごとに切り上げられ、Lでは$1.44になります。</li>
+        <li>プレビュー、404、登録の反映、閲覧アプリの配置、WAFやAccessなどアカウントの費用は含みません。</li>
       </ul>
       <p>前提と内訳は製品の<a href="https://github.com/artifact-pages/artifact-pages/blob/main/docs/research/hosting-cost-model.md" target="_blank" rel="noopener">費用のモデル（英語）</a>にあります。最新の価格は<a href="https://developers.cloudflare.com/r2/pricing/" target="_blank" rel="noopener">R2の料金</a>で確かめてください。</p>
     </section>

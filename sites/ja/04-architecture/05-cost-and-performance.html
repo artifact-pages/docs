@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <meta name="description" content="Artifact Pagesの費用、処理時間、転送量がどこで生まれるか。キャッシュの設定と、ブラウザの計測、CLIのメモリの計測、費用のモデルの結果と、その条件。">
+  <meta name="description" content="Artifact Pagesの費用、処理時間、転送量がどこで生まれるか。CLIが付けるキャッシュの指示と、ブラウザの計測、CLIのメモリの計測、CLI 0.6での費用のモデルの結果と、その条件。">
   <title>コストとパフォーマンス</title>
   <script>
     // Copy the reader app's theme (same-origin parent) before first paint; assets/site.js keeps it in sync.
@@ -29,7 +29,7 @@
         <h1>コストとパフォーマンス</h1>
       </div>
       <p class="lead">費用と速さは、公開と閲覧の処理のどこで、何がどれだけ動くかで決まります。このページでは共通の要因と、これまでの計測の結果を、計測の条件とあわせて示します。数字は計測した条件での値で、性能や請求額の保証ではありません。</p>
-      <p class="answer"><span class="answer-label">要点</span>費用と時間を決めるのは、Artifactの数とサイトの一覧の大きさ、公開の回数、キャッシュの削除です。数字はすべて計測した条件でのもので、保証値ではありません。</p>
+      <p class="answer"><span class="answer-label">要点</span>費用と時間を決めるのは、Artifactの数とサイトの一覧の大きさ、公開の回数、閲覧の回数です。数字はすべて計測した条件でのもので、保証値ではありません。</p>
     </header>
 
     <section class="doc-section" aria-labelledby="factors">
@@ -38,27 +38,28 @@
         <thead><tr><th>場面</th><th>何が動くか</th></tr></thead>
         <tbody>
           <tr><td>保存</td><td>公開したArtifact、一覧、検索のデータ、プレビューのリビジョン（保持期間の間）、閲覧アプリのファイル</td></tr>
-          <tr><td>公開</td><td>ロックと状態の記録の読み書き、変わったファイルと一覧の書き込み、キャッシュの削除。Artifactが1つ変わっただけでも、サイトの<code>index.json</code>全体を読み書きします。変更がなければ小さな記録の読み書きだけです</td></tr>
-          <tr><td>閲覧</td><td>閲覧アプリ、サイトの一覧、Artifactの取得。キャッシュに当たらなかったリクエストはストレージまで届きます。キャッシュに当たっても、読者への転送の費用がなくなるとは限りません</td></tr>
+          <tr><td>公開</td><td>ロックと状態の記録の読み書き、変わったファイルと一覧の書き込み。Artifactが1つ変わっただけでも、サイトの<code>index.json</code>全体を読み書きします。変更がなければ小さな記録の読み書きだけです</td></tr>
+          <tr><td>閲覧</td><td>閲覧アプリ、サイトの一覧、Artifactの取得。Artifactは、読者のブラウザが読み込むたびに配信先がストレージに確かめます。一覧は配信先のキャッシュに最大5秒残るので、アクセスが少ないサイトほどストレージまで届く割合が高くなります。キャッシュに当たっても、読者への転送の費用がなくなるとは限りません</td></tr>
           <tr><td>検索</td><td>検索のデータのうち、必要な区画だけの取得</td></tr>
         </tbody>
       </table></div>
     </section>
 
     <section class="doc-section" aria-labelledby="cache">
-      <h2 id="cache">キャッシュの設定</h2>
+      <h2 id="cache">キャッシュの指示</h2>
+      <p>CLIは、書くファイルの種類ごとに次のキャッシュの指示を付けます。CDNのキャッシュの削除はしません。</p>
       <div class="table-wrap"><table>
         <thead><tr><th>対象</th><th><code>Cache-Control</code></th></tr></thead>
         <tbody>
-          <tr><td>閲覧アプリの入口のファイル</td><td><code>no-cache, max-age=0, must-revalidate</code></td></tr>
+          <tr><td>閲覧アプリの入口のファイル</td><td><code>no-cache, max-age=0, must-revalidate, stale-if-error=0</code></td></tr>
           <tr><td>ハッシュ付きの閲覧アプリのファイル</td><td><code>public, max-age=31536000, immutable</code></td></tr>
-          <tr><td>登録情報、概要、一覧、検索の目次</td><td><code>public, max-age=0, s-maxage=60, must-revalidate</code></td></tr>
-          <tr><td>公開したArtifact</td><td><code>public, max-age=0, s-maxage=300, must-revalidate</code></td></tr>
+          <tr><td>登録情報、サイトの概要（<code>meta.json</code>）、一覧（<code>index.json</code>）</td><td><code>public, max-age=0, s-maxage=5, must-revalidate, stale-if-error=0</code></td></tr>
+          <tr><td>公開したArtifactとそれが使うファイル、検索の目次、プレビュー</td><td><code>public, max-age=0, s-maxage=0, must-revalidate, stale-if-error=0</code></td></tr>
           <tr><td>検索のデータの区画</td><td><code>public, max-age=31536000, immutable</code></td></tr>
           <tr><td>内部の記録</td><td><code>no-store</code>（読者には返さない）</td></tr>
         </tbody>
       </table></div>
-      <p>CDNは一覧を最大60秒、Artifactを最大300秒キャッシュするので、公開の直後はその間、古い内容が返ることがあります。公開のたびに変わったURLのキャッシュを削除して、これを短くしています。</p>
+      <p>公開したあと、読者のブラウザが新しく読み込めば、一覧は最大5秒、Artifactはすぐに新しい内容になります。その代わり、ストレージまで届くリクエストは、長くキャッシュする場合より増えます。Cloudflareのモジュール0.2.0は、404の応答も配信先にキャッシュしません。</p>
     </section>
 
     <section class="doc-section" aria-labelledby="browser">
@@ -105,21 +106,26 @@
 
     <section class="doc-section" aria-labelledby="model">
       <h2 id="model">費用のモデル</h2>
-      <p>操作の回数を数えるだけの仮の配信先で公開と閲覧を再現し、2026年10月18日の公開価格を当てはめて月額を見積もりました。実際のHTTPのリクエスト数や請求の記録ではありません。プレビュー、登録の反映、閲覧アプリの配置の費用は含めていません。配信先ごとの結果は各ページにあります。</p>
+      <p>CLI 0.6のキャッシュの指示で月額を見積もりました。読者の通信量は、手元で閲覧アプリを動かして計測した値を使い、URLの種類ごとに、ストレージまで届く割合を仮定して当てはめています。公開の操作の回数と保存する量は、CLI 0.6で計測し直しました。価格は2026年10月18日の公開価格です。実際の請求や総予算ではありません。配信先ごとの内訳は各ページにあります。</p>
       <p>想定は3つです。Sは5サイト（各200ページ）を1日1,000回、Mは30サイト（各2,000ページ）を1日20,000回閲覧します。LはMに5万ページのサイトを1つ加え、1日100,000回閲覧します。</p>
       <div class="table-wrap"><table>
-        <thead><tr><th>想定</th><th>Cloudflare（R2）</th><th>AWS（多めの試算）</th></tr></thead>
+        <thead><tr><th>想定</th><th>Cloudflare（R2）</th><th>AWS（S3とCloudFront）</th></tr></thead>
         <tbody>
-          <tr><td>S</td><td>$0.09</td><td>$4.05</td></tr>
-          <tr><td>M</td><td>$1.86</td><td>$353.67</td></tr>
-          <tr><td>L</td><td>$5.93</td><td>$1,972.66</td></tr>
+          <tr><td>S</td><td>$0.09</td><td>$0.10</td></tr>
+          <tr><td>M</td><td>$1.90</td><td>$2.11</td></tr>
+          <tr><td>L</td><td>$6.12</td><td>$37.59</td></tr>
         </tbody>
       </table></div>
-      <p>表の額は、キャッシュに当たらない割合を10%とした月額です。Cloudflareは無料枠を引く前、AWS（S3とCloudFront）は無料枠をこの用途に使える前提の額です。</p>
-      <p>AWSの額は多めの試算です。読者がArtifactを開くたびに、圧縮していない<code>index.json</code>を取得すると仮定しているためです。この転送がMで約$225、Lで約$1,745を占めます。実際の閲覧アプリは、同じサイトを読んでいる間、一度読み込んだ<code>index.json</code>を使い回します。CLI 0.5.0以降は、AWSには圧縮した<code>index.json</code>を置きます。一方、キャッシュの無効化（Mで約$115、Lで約$125）は、この仮定にかかわらずかかります。リクエストの単価は米国・カナダのもので、ほかの地域ではやや高くなります（<a href="07-cost-aws.html">AWSのページ</a>）。</p>
+      <p>Cloudflareは無料枠を引く前の額、AWSは無料枠をこの用途に使える前提で、米国・カナダの単価での額です。キャッシュの削除や無効化の費用はもうありません。</p>
+      <ul>
+        <li>読者は1回の訪問で3ページ開き、再読み込みはしないと仮定しています。</li>
+        <li>ストレージまで届く割合は、一覧とArtifactを100%、ハッシュ付きの閲覧アプリのファイルを10%、検索のデータの区画を50%と仮定しています。一覧の100%は、アクセスが少なくキャッシュに残らない場合を見込んだ多めの仮定です。どれも実際のアクセスで測った値ではありません。</li>
+        <li>AWSの額は、CLI 0.6に合わせたモジュールを前提にしています。この版はまだ公開されていません。AWSでは実際の環境でまだ確かめていません。</li>
+        <li>プレビュー、404、登録の反映、閲覧アプリの配置の費用は含めていません。</li>
+      </ul>
       <ul class="cards two">
-        <li><a class="card" href="06-cost-cloudflare.html"><span class="tag">R2 · Cloudflare Cache</span><h3>Cloudflare</h3><p>構成、キャッシュの削除のまとめ方、見積もり。</p><span class="go">詳しく →</span></a></li>
-        <li><a class="card" href="07-cost-aws.html"><span class="tag">S3 · CloudFront</span><h3>AWS</h3><p>構成、一覧の圧縮、キャッシュの無効化の費用、見積もり。</p><span class="go">詳しく →</span></a></li>
+        <li><a class="card" href="06-cost-cloudflare.html"><span class="tag">R2 · Cloudflare Cache</span><h3>Cloudflare</h3><p>構成、キャッシュの扱い、見積もりと内訳。</p><span class="go">詳しく →</span></a></li>
+        <li><a class="card" href="07-cost-aws.html"><span class="tag">S3 · CloudFront</span><h3>AWS</h3><p>構成、一覧の圧縮、見積もりと内訳。</p><span class="go">詳しく →</span></a></li>
       </ul>
     </section>
 
