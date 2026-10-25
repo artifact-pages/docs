@@ -94,7 +94,8 @@ kbd {
   white-space: nowrap;
 }
 .sr-only { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; }
-.wrap { width: min(1180px, 100%); margin-inline: auto; padding-inline: clamp(20px, 4vw, 56px); }
+/* 本文・枠・図・区切り線が同じ1つの列にそろう。880px から左右の余白を引いた幅で、日本語の本文は1行50字前後。 */
+.wrap { width: min(880px, 100%); margin-inline: auto; padding-inline: clamp(20px, 4vw, 56px); }
 .skip { position: absolute; left: 12px; top: -60px; z-index: 30; padding: 8px 14px; border-radius: 8px; background: var(--ink); color: var(--bg); }
 .skip:focus { top: 10px; }
 
@@ -130,8 +131,6 @@ h3 { margin: 0 0 8px; font-size: 16px; font-weight: 650; line-height: 1.55; lett
    最後の要素の下マージンを消して、線の上の余白を padding だけで決める。 */
 .doc-section { padding-block: clamp(28px, 3.5vw, 40px) clamp(36px, 5vw, 56px); border-top: 1px solid var(--line-soft); }
 .doc-section > :last-child { margin-bottom: 0; }
-/* 文章の1行は日本語で45字ほどに収める。図・表・コードは列の幅いっぱいを使う。 */
-.page-head .lead, .doc-section > :is(h2, h3, p:not([class]), ul:not([class]), ol:not([class]), .callout, .try) { max-width: 42rem; }
 .doc-section > h2 { margin-bottom: 10px; }
 .doc-section > p, .doc-section > ul { color: var(--muted); }
 .doc-section > p strong, .doc-section li strong { color: var(--ink); }
