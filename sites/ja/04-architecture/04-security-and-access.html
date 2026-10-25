@@ -83,11 +83,11 @@
       <div class="table-wrap"><table>
         <thead><tr><th></th><th>AWS</th><th>Cloudflare</th></tr></thead>
         <tbody>
-          <tr><td>管理者</td><td>管理用のIAMロール。登録、閲覧アプリ、全サイトの片づけ、キャッシュの無効化</td><td>管理者が発行したR2のキーとAPIトークン</td></tr>
+          <tr><td>管理者</td><td>管理用のIAMロール。登録、閲覧アプリ、全サイトの片づけ</td><td>管理者が発行したR2のキー、またはAPIトークン1つ</td></tr>
           <tr><td>各チーム</td><td>サイトごとのIAMロール。自分のサイトの領域の読み書きと、登録情報と閲覧アプリの記録の読み取りだけ。ほかのサイト、登録、閲覧アプリには書けない</td><td>通常はバケット全体に書けるキーで、サイトごとには分かれない。分けるには、サイトのプレフィックスに絞った一時的な認証情報を組織の仕組みで発行する（CLIは発行しない）</td></tr>
-          <tr><td>キャッシュの削除</td><td>ディストリビューションへの<code>cloudfront:CreateInvalidation</code></td><td>ゾーンの<code>Cache Purge</code>を持つAPIトークン。R2の権限とは別</td></tr>
         </tbody>
       </table></div>
+      <p>CLIはCDNのキャッシュを削除しないので、キャッシュの削除の権限（CloudFrontの<code>CreateInvalidation</code>、Cloudflareの<code>Cache Purge</code>）はどの認証情報にも要りません。</p>
       <p>サイトごとのロールは、本公開とプレビューの両方に使います。プレビュー専用のロールはありません。プレビューのActionは、フォークからのプルリクエストと<code>pull_request_target</code>を拒否し、プルリクエストのリポジトリとコミットを確かめます。呼び出す側のワークフローでも、同じリポジトリからのプルリクエストに限っておきます。</p>
     </section>
 

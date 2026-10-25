@@ -63,12 +63,12 @@
       <div class="table-wrap"><table>
         <thead><tr><th>止まった操作</th><th>やり直すこと</th></tr></thead>
         <tbody>
-          <tr><td>サイトの公開</td><td>同じ<code>site sync</code>。キャッシュの削除だけが残っていた場合は、変更がなくても結果が<code>synced</code>になります。</td></tr>
+          <tr><td>サイトの公開</td><td>同じ<code>site sync</code>。前回の書き込みの残りを済ませるので、公開元に変更がなくても結果が<code>synced</code>になることがあります。</td></tr>
           <tr><td>登録の反映、サイトの取り下げ</td><td>同じ設定で<code>registry sync</code>。</td></tr>
           <tr><td>閲覧アプリの配置</td><td>同じ<code>app deploy</code>。</td></tr>
         </tbody>
       </table></div>
-      <p>キャッシュの削除に失敗したときのメッセージは<code>site origin synchronized but cache revalidation failed; retry site publish: …</code>です。ここにある<code>site publish</code>は古いコマンド名で、実行するのは<code>site sync</code>です。</p>
+      <p>書き込みの残りを済ませたあと、再試行の記録を消せなかったときのメッセージは<code>site origin transaction recovered; remove journal: …</code>です。配信先の内容はそろっています。同じ<code>site sync</code>をもう一度実行して、記録を消します。</p>
     </section>
 
     <section class="doc-section" aria-labelledby="drift">
@@ -101,10 +101,9 @@
         <tbody>
           <tr><td><code>Cloudflare R2 access key ID and secret must be set together</code></td><td>R2のキーが片方だけ設定されています。両方設定するか、両方外してAPIトークン1つの方式にします。</td></tr>
           <tr><td><code>Cloudflare API token is required to derive R2 credentials</code></td><td>APIトークン1つの方式で、<code>CF_API_TOKEN</code>がありません。</td></tr>
-          <tr><td><code>Cloudflare API token is required for cache invalidation</code></td><td>キャッシュの削除が必要な実行で、<code>CF_API_TOKEN</code>がありません。</td></tr>
         </tbody>
       </table></div>
-      <p>試し実行で確かめられるのは読み取りの権限までです。キャッシュを削除する権限は、実際の実行まで確かめられません。</p>
+      <p>試し実行で確かめられるのは読み取りの権限までです。書き込みの権限は、実際の実行まで確かめられません。</p>
       <h3 id="aws">AWSのロールを引き受けられない</h3>
       <p>次を順に確かめます。Terraformでそのサイトのロールを作ったか、ジョブの<code>sub</code>が<code>satellite_github_subjects</code>の値と完全に一致するか、設定の<code>aws.accountId</code>と<code>aws.namePrefix</code>がTerraformと合っているか。期待するロールのARNは<code>artifact-pages registry role-arn</code>で確かめられます。</p>
       <h3 id="registry">登録と合わない</h3>

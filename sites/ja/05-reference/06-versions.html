@@ -51,7 +51,7 @@
       <div class="table-wrap"><table>
         <thead><tr><th>Actions</th><th>入口のCLI</th><th>使えるCLIの範囲</th></tr></thead>
         <tbody>
-          <tr><td>v0.3.0（4つとも）</td><td><code>0.5.0</code></td><td><code>&gt;=0.5.0 &lt;0.6.0</code></td></tr>
+          <tr><td>v0.4.0（4つとも）</td><td><code>0.6.0</code></td><td><code>&gt;=0.6.0 &lt;0.7.0</code></td></tr>
         </tbody>
       </table></div>
       <p>範囲の外の版を指定すると、ダウンロードの前に終了コード2で止まります。入口のCLIを入れられなかった場合、ジョブの概要には<code>CLI executed: none (installation failed)</code>と出ます。</p>
@@ -59,7 +59,7 @@
 
     <section class="doc-section" aria-labelledby="formats">
       <h2 id="formats">読み書きする形式</h2>
-      <p>CLIが書き、閲覧アプリが読む形式は6つです（登録情報、サイトの概要、Artifactの一覧、本文検索の目次、プレビューの一覧、プレビューのリビジョン）。CLI 0.5.2はすべて形式1で書き、閲覧アプリ0.4.1はすべて形式1を読みます。</p>
+      <p>CLIが書き、閲覧アプリが読む形式は6つです（登録情報、サイトの概要、Artifactの一覧、本文検索の目次、プレビューの一覧、プレビューのリビジョン）。CLI 0.6.1はすべて形式1で書き、閲覧アプリ0.4.8はすべて形式1を読みます。</p>
       <div class="table-wrap"><table>
         <thead><tr><th>確かめる場面</th><th>内容</th></tr></thead>
         <tbody>
@@ -78,6 +78,7 @@
         <li>版を変えても、公開済みの内容は作り直されません。サイトは次の公開で、閲覧アプリは<code>app deploy</code>で新しくなります。</li>
         <li>プレビューは、プルリクエストのbaseの設定から版を選びます。</li>
         <li>AWSで一度CLI 0.5.0以降で公開したサイトには、0.5.0より古いCLIで書き込めません。</li>
+        <li>CLI 0.6.0以降で書き込み始めた配信先で、0.5.2以前のCLIの実行を再開しないでください。0.6.0以降のCLIが書く再試行の記録と公開の状態を、古いCLIは読めません。戻す手順は「<a href="../03-operations/03-upgrade.html#cli06">CLI 0.6に移る</a>」にあります。</li>
       </ul>
       <p>更新の手順は「<a href="../03-operations/03-upgrade.html">閲覧アプリ・CLI・Actionsを更新する</a>」にあります。</p>
     </section>

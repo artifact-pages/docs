@@ -137,10 +137,10 @@
             push:refs/heads/main
         <span class="k">env</span>:
           <span class="k">CF_R2_ACCESS_KEY_ID</span>: ${{ secrets.CF_R2_ACCESS_KEY_ID }}
-          <span class="k">CF_R2_SECRET_ACCESS_KEY</span>: ${{ secrets.CF_R2_SECRET_ACCESS_KEY }}
-          <span class="k">CF_API_TOKEN</span>: ${{ secrets.CF_API_TOKEN }}</span></pre>
+          <span class="k">CF_R2_SECRET_ACCESS_KEY</span>: ${{ secrets.CF_R2_SECRET_ACCESS_KEY }}</span></pre>
       </div>
       <ul>
+        <li>APIトークン1つの方式では、R2のキー2つの代わりに<code>CF_API_TOKEN</code>を渡します。</li>
         <li><code>publish-on</code>に合わないきっかけ（プルリクエストなど）では試し実行になります。</li>
         <li><code>sourcePath</code>は<code>docs</code>のように、Artifactとそれが使うファイルだけのディレクトリにします。リポジトリ全体にすると、設定ファイルやワークフローも公開されます。</li>
         <li>この場合も、登録の反映と閲覧アプリの配置は別のジョブで行います。</li>

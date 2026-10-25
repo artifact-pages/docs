@@ -64,14 +64,14 @@
           <tr><td>モジュール</td><td><code>artifact-pages/artifact-pages/cloudflare</code></td><td><code>artifact-pages/artifact-pages/aws</code></td></tr>
         </tbody>
       </table></div>
-      <p>費用は、保存する量、配信する量、キャッシュの削除、WAFを使うかどうかで変わります。ここでは一律にどちらが安いとは言えません。費用がどこで生まれるかは「<a href="../../04-architecture/05-cost-and-performance.html">コストとパフォーマンス</a>」で説明します。</p>
+      <p>費用は、保存する量、配信する量、キャッシュで返せずにストレージまで届く要求の数、WAFを使うかどうかで変わります。ここでは一律にどちらが安いとは言えません。費用がどこで生まれるかは「<a href="../../04-architecture/05-cost-and-performance.html">コストとパフォーマンス</a>」で説明します。</p>
     </section>
 
     <section class="doc-section" aria-labelledby="flow">
       <h2 id="flow">共通の流れ</h2>
       <p>どちらの配信先でも、手順の形は同じです。自分のTerraformの設定（以下、呼び出し側）からモジュールを呼び出します。</p>
       <ol>
-        <li><strong>モジュールを指定する。</strong>Terraform Registryのアドレスを<code>source</code>に、使うバージョンを<code>version</code>に書きます。バージョンは範囲でなく、<code>0.1.1</code>のように正確に固定します。</li>
+        <li><strong>モジュールを指定する。</strong>Terraform Registryのアドレスを<code>source</code>に、使うバージョンを<code>version</code>に書きます。バージョンは範囲でなく、<code>0.2.0</code>のように正確に固定します。</li>
         <li><strong>プロバイダーと入力を書く。</strong>プロバイダー（<code>cloudflare</code>か<code>aws</code>）の設定は呼び出し側で行います。必須の入力は、どちらのモジュールも4つです。</li>
         <li><strong>計画を確かめて適用する。</strong><code>terraform init</code>、<code>terraform plan</code>で作られるものを確かめてから、<code>terraform apply</code>を実行します。</li>
         <li><strong>出力を取り出す。</strong>モジュールは、CLIの設定ファイルにそのまま貼れる配信先の設定を出力します。呼び出し側でこれを<code>output</code>として公開しておくと、<code>terraform output</code>で読めます。</li>
@@ -85,8 +85,8 @@
       <p>Terraform Registryを使えない環境では、モジュールのGitリポジトリを直接指定できます。その場合は<code>version</code>を書かず、タグを<code>?ref=</code>で固定します。</p>
       <div class="term" aria-label="Gitのソースで指定する">
         <div class="term-head"><span>HCL / Registryの代わりにGitを使う</span><button class="copy-btn" type="button">コピー</button></div>
-<pre><span class="k">source</span> = <span data-copy>"git::https://github.com/artifact-pages/terraform-cloudflare-artifact-pages.git?ref=v0.1.1"</span>
-<span class="c"># AWSは terraform-aws-artifact-pages.git</span></pre>
+<pre><span class="k">source</span> = <span data-copy>"git::https://github.com/artifact-pages/terraform-cloudflare-artifact-pages.git?ref=v0.2.0"</span>
+<span class="c"># AWSは terraform-aws-artifact-pages.git?ref=v0.1.1</span></pre>
       </div>
     </section>
 

@@ -72,7 +72,7 @@
       <h3 id="terraform-token">Terraformが使うAPIトークン</h3>
       <p>モジュールを適用する人（またはジョブ）が使います。呼び出し側のCloudflareプロバイダーに、環境変数<code>CLOUDFLARE_API_TOKEN</code>などで渡します。次の権限が必要です。</p>
       <ul>
-        <li>R2のストレージ、カスタムドメイン、ライフサイクルの管理</li>
+        <li>R2のストレージ、カスタムドメイン、ライフサイクルの管理（アカウントの<code>Workers R2 Storage Write</code>）</li>
         <li>ゾーンの<code>Transform Rules Edit</code>、<code>Cache Rules Edit</code>、<code>Config Rules Edit</code></li>
         <li><a href="#restrict">ホスト名を制限する</a>場合だけ、ゾーンの<code>Zone WAF Edit</code></li>
       </ul>
@@ -82,17 +82,16 @@
       <div class="table-wrap"><table>
         <thead><tr><th>方式</th><th>環境変数</th><th>用意するもの</th></tr></thead>
         <tbody>
-          <tr><td>R2のキーとAPIトークン</td><td><code>CF_R2_ACCESS_KEY_ID</code><br><code>CF_R2_SECRET_ACCESS_KEY</code><br><code>CF_API_TOKEN</code></td><td>R2のAPIトークンで発行したアクセスキーIDとシークレット。キャッシュを削除する実行のために、ゾーンの<code>Cache Purge</code>を持つAPIトークン。</td></tr>
+          <tr><td>R2のキー</td><td><code>CF_R2_ACCESS_KEY_ID</code><br><code>CF_R2_SECRET_ACCESS_KEY</code></td><td>R2のAPIトークンで発行したアクセスキーIDとシークレット。権限は、Artifact Pagesのバケットの<code>Workers R2 Storage Bucket Item Write</code>だけです。</td></tr>
           <tr><td>APIトークン1つ</td><td><code>CF_API_TOKEN</code>だけ</td><td>アカウントのAPIトークン1つ。CLIがこのトークンからR2のキーを導きます。権限は下のとおりです。</td></tr>
         </tbody>
       </table></div>
-      <p>R2のキーが2つとも設定されていればそちらが使われ、片方だけでは失敗します。APIトークン1つの方式では、試し実行（<code>--dry-run</code>）や変更のない実行でもトークンが必要です。R2のキーの方式では、APIトークンはキャッシュを削除する実行でだけ使います。コマンドごとの要否は製品の<a href="https://github.com/artifact-pages/artifact-pages/blob/main/docs/guides/cloudflare-deployment.md#2-configure-the-cli" target="_blank" rel="noopener">Cloudflareの導入ガイド</a>に表があります。</p>
-      <p>APIトークン1つの方式では、アカウントのAPIトークンを作り、次の2つの権限を付けます。</p>
+      <p>R2のキーが2つとも設定されていればそちらが使われ、APIトークンは読みません。片方だけでは失敗します。APIトークン1つの方式では、試し実行（<code>--dry-run</code>）や変更のない実行でもトークンが必要です。CLIは、どの方式でもCDNのキャッシュを削除しません。そのため、ゾーンの<code>Cache Purge</code>は要りません。コマンドごとの要否は製品の<a href="https://github.com/artifact-pages/artifact-pages/blob/main/docs/guides/cloudflare-deployment.md#2-configure-the-cli" target="_blank" rel="noopener">Cloudflareの導入ガイド</a>に表があります。</p>
+      <p>APIトークン1つの方式では、アカウントのAPIトークンを作り、次の権限を付けます。CLIは実行のはじめに、トークンが有効かをCloudflareに問い合わせて確かめます。</p>
       <div class="table-wrap"><table>
         <thead><tr><th>権限</th><th>対象</th></tr></thead>
         <tbody>
           <tr><td><code>Workers R2 Storage Bucket Item Write</code></td><td>Artifact Pagesのバケットだけ。リソースは<code>com.cloudflare.edge.r2.bucket.&lt;アカウントID&gt;_default_&lt;バケット名&gt;</code>です（このモジュールはデータの保存地域の指定（jurisdiction）をしないので<code>default</code>）。</td></tr>
-          <tr><td><code>Cache Purge</code></td><td>ホスト名を置いたゾーンだけ。</td></tr>
         </tbody>
       </table></div>
       <div class="callout" role="note">
@@ -112,7 +111,7 @@
 
 <span class="k">module</span> "artifact_pages" {
   <span class="k">source</span>  = "artifact-pages/artifact-pages/cloudflare"
-  <span class="k">version</span> = "0.1.1"
+  <span class="k">version</span> = "0.2.0"
 
   <span class="k">account_id</span>             = var.cloudflare_account_id
   <span class="k">zone_id</span>                = var.cloudflare_zone_id
