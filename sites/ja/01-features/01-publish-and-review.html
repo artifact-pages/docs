@@ -56,6 +56,18 @@
         <figcaption>チームが持つのは、Artifactと短いワークフローだけです。公開の手順は管理リポジトリの共通のワークフローにまとまり、書き込む先は登録された自分のサイトに限られます。これはCLIが公開の前に行う確認です。ほかのサイトに書けない権限まで分けられるかは配信先の構成で決まります（AWSではサイトごとのロールで分かれ、Cloudflareの通常のキーでは分かれません。「<a href="../04-architecture/04-security-and-access.html#credentials">公開の認証情報の分け方</a>」）。</figcaption>
       </figure>
       <p>公開は試し実行（dry-run）もでき、何が変わるかを書き込まずに確かめられます。ワークフローの書き方は「<a href="../02-setup/05-first-site.html">最初のサイトを公開する</a>」で説明します。</p>
+      <aside class="try" aria-labelledby="try-this-site">
+        <p class="try-head"><span class="try-label" data-search-ignore>ここで試す</span><strong id="try-this-site">このサイトも、この仕組みで公開されています</strong></p>
+        <p class="try-preview">いまはプレビューを開いているので、Pinや、更新日と公開元を示すDetailsなど、本公開のArtifactだけにある操作と表示は出ません。<a class="try-open" target="_top" href="#">本公開のページで試す</a></p>
+        <p class="try-off">閲覧アプリの中でこのページを開くと、ここで実際に試せます。<a class="try-open" target="_top" href="#">閲覧アプリで開く</a></p>
+        <div class="try-steps">
+          <ol>
+          <li><span data-for="column">右の列の上にある<strong>Details</strong>を押します。</span><span data-for="header">上部の<strong>Details</strong>を押します。</span><span data-for="narrow">上部の<strong>…</strong>（More actions）のメニューから<strong>Details</strong>を選びます。</span>公開元は<code>artifact-pages/docs</code>リポジトリの<code>sites/ja/01-features/01-publish-and-review.html</code>です。</li>
+          <li>このサイトの公開ワークフロー<a href="https://github.com/artifact-pages/docs/blob/main/.github/workflows/publish.yml" target="_blank" rel="noopener"><code>.github/workflows/publish.yml</code></a>を開きます。管理リポジトリ<code>artifact-pages/admin</code>の共通の公開ワークフローを、サイトID<code>ja</code>を指定して呼び出しているだけです。</li>
+          </ol>
+          <p class="try-check">このドキュメントのチームが持つのも、Artifactと短いワークフローだけです。</p>
+        </div>
+      </aside>
     </section>
 
     <section class="doc-section" aria-labelledby="independent">
@@ -90,6 +102,19 @@
         <div class="fg-head"><strong id="previews-fig">サイトのPreviews</strong><span class="fg-note">閲覧アプリ（簡略化した見本）</span></div>
         <div class="fg-body"><div class="sc" data-view="preview" aria-hidden="true"><aside class="sc-side"><div class="sc-top"><div class="sc-top-row"><div class="sc-site"><b>S</b><span>SREチーム</span><small>3</small><i class="ic ic-chev s12"></i></div><span class="sc-ibtn"><i class="ic ic-sidebar s16"></i></span></div><div class="sc-filter"><i class="ic ic-search s14"></i><span>Filter pages…</span><kbd>⌘ ⇧ F</kbd></div></div><div class="sc-sb"><div class="sc-h">Browse </div><div class="sc-tree"><div class="sc-dir"><i class="ic ic-chev s11"></i><span>incidents</span><small>4</small></div><div class="sc-dir is-open"><i class="ic ic-chev s11"></i><span>runbooks</span><small>3</small></div><div class="sc-kids"><div class="sc-file">デプロイの戻し方</div><div class="sc-file">オンコール引き継ぎ</div><div class="sc-file">障害対応の手順</div></div><div class="sc-dir"><i class="ic ic-chev s11"></i><span>slo</span><small>2</small></div></div></div><div class="sc-foot"><span>Index generated Oct 21</span><i class="ic ic-monitor s15"></i></div></aside><div class="sc-main"><div class="sc-pv"><h5>Previews </h5><p>Review changed documents, and documents affected by changed resources, from a specific source revision.</p><div class="sc-pgs"><div class="sc-grp"><header><div><span class="sc-ey">Pull request</span> <i class="sc-m is-corner">1</i><h6>PR #482 </h6><span class="sc-meta">3f9a1c2d8b4e · Oct 23, 2026, 10:00 AM GMT+9</span></div></header><div class="sc-pdl"><div><span>デプロイの戻し方</span><code>runbooks/deploy.md</code></div><div><span>障害対応の手順</span><code>runbooks/incident.md</code></div></div></div><div class="sc-grp"><header><div><span class="sc-ey">Manual preview</span> <i class="sc-m is-corner">2</i><h6>Revision 8c01d7ae </h6><span class="sc-meta">8c01d7ae51f2 · Oct 22, 2026, 4:12 PM GMT+9</span></div></header><div class="sc-pdl"><div><span>SLOの見直し</span><code>slo/review.md</code></div></div></div></div></div></div></div><ol class="sc-legend"><li><span>プルリクエストのプレビュー。変わったArtifactが並ぶ。</span></li><li><span>プルリクエストに結び付けないで作ったプレビュー。</span></li></ol></div>
       </figure>
+      <aside class="try" aria-labelledby="try-previews">
+        <p class="try-head"><span class="try-label" data-search-ignore>ここで試す</span><strong id="try-previews">このサイトのプレビューを見る</strong></p>
+        <p class="try-preview">いまはプレビューを開いているので、Pinや、更新日と公開元を示すDetailsなど、本公開のArtifactだけにある操作と表示は出ません。<a class="try-open" target="_top" href="#">本公開のページで試す</a></p>
+        <p class="try-off">閲覧アプリの中でこのページを開くと、ここで実際に試せます。<a class="try-open" target="_top" href="#">閲覧アプリで開く</a></p>
+        <div class="try-steps">
+          <ol>
+          <li><span data-for="header column">上部の、サイトのホームへ戻るボタン（<strong>… home</strong>）を押します。</span><span data-for="narrow">上部の<strong>…</strong>（More actions）のメニューから<strong>… home</strong>を選び、サイトのホームを開きます。</span></li>
+          <li><strong>Previews</strong>を開くと、このドキュメントのプルリクエストのプレビューが並びます。いま有効なプレビューがなければ、一覧は空です。</li>
+          <li>プレビューを開くと、上部に<strong>Preview · PR #…</strong>のような表示が付き、左のサイドバーにはそのプレビューのArtifactだけが並びます。</li>
+          </ol>
+          <p class="try-check">プレビューは本公開の一覧と検索には混ざらないので、ほかのページの見え方は変わりません。</p>
+        </div>
+      </aside>
       <p>プレビューを使えるようにする手順は「<a href="../02-setup/06-pr-previews.html">PRプレビューを使えるようにする</a>」で説明します。</p>
     </section>
 

@@ -23,16 +23,18 @@ Chapter contents, as in structure.md:
 
 ## Live experience (owner, 2026-10-25)
 
-These pages are read in the reader app they describe, so the chapter asks readers to try each feature on the spot instead of showing a simulated demo. This also removes the 2026-10-01 finding that the overview's autoplay palette sample looked identical to the real palette.
+These pages are read in the reader app they describe, so the chapter asks readers to try each feature on the spot, in "ここで試す" blocks next to the simplified screen samples. The samples stay, because they label the parts of the screen and serve readers outside the app; the live step lets the reader see the real thing instead of mistaking a sample for it (the 2026-10-01 finding about the autoplay palette sample).
 
-- 資料を探す: open the palette with ⌘ K and jump to a page of this site; run page text search with ⌘ ⇧ F; pin this page and see it under Pinned; see recently updated pages on the site home.
-- 資料を読む: jump to a heading from Contents; copy a heading link; read this page's Details (updated date, last committer, branch); open its source in `artifact-pages/docs`.
-- 資料を公開・レビューする: readers cannot publish, so the page itself is the example: Details and the source link show that it was published from `artifact-pages/docs` by GitHub Actions. Point to the site's Previews only for what is actually there; do not promise that a preview exists.
+- Artifactを探す: open the palette with ⌘ K and jump to a page of this site; run page text search with ⌘ ⇧ F; pin this page and see it under Pinned; see recently updated pages on the site home.
+- Artifactを読む: jump to a heading from Contents; copy a heading link; read this page's Details (updated date, last committer, branch); open its source in `artifact-pages/docs`.
+- Artifactを公開・レビューする: readers cannot publish, so the page itself is the example: Details and the source link show that it was published from `artifact-pages/docs` by GitHub Actions. Point to the site's Previews only for what is actually there; do not promise that a preview exists.
 - 基盤を提供・運用する: explained only; no live step.
 
 Rules:
 
-- Pages only invite the reader to act; they never read or drive the reader app's DOM, even though the unsandboxed same-origin frame would allow it (specification §7). That DOM is not a contract and would break with UI changes.
+- Pages only invite the reader to act; the live steps never read or drive the reader app's DOM, even though the unsandboxed same-origin frame would allow it (specification §7). That DOM is not a contract and would break with UI changes. `assets/site.js` reads only the app's route (`window.top.location`) and viewport width (`window.top.matchMedia`) to pick the step wording.
+- Steps are worded for three widths that follow the reader's breakpoints (web v0.4.6): up to 620 px (search button and More menu), 621 to 1199 px (header buttons), 1200 px and wider (right column with Details and Contents).
+- In a preview, a note says that Pin and production Details are absent and links to the published page.
 - Keyboard steps rely on the specification's guarantee that ⌘ B, ⌘ K and ⌘ ⇧ F work while focus is inside an HTML artifact's frame.
 - Each step has a narrow-screen form: up to 620 px there is no icon rail and secondary actions move to the search button and the More menu, and touch devices have no keyboard.
 - When a page is not inside the reader app (`window.top === window`, for example opened under `/_artifacts/…`), it replaces the live steps with plain description and a link that opens the page in the app.

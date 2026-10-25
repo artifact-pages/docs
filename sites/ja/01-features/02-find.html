@@ -76,6 +76,19 @@
         </tbody>
       </table></div>
       <p>何も入力していないパレットには、ピン留めしたArtifactと最近読んだArtifactが並びます。</p>
+      <aside class="try" aria-labelledby="try-palette">
+        <p class="try-head"><span class="try-label" data-search-ignore>ここで試す</span><strong id="try-palette">パレットで探してみる</strong></p>
+        <p class="try-preview">いまはプレビューを開いているので、Pinや、更新日と公開元を示すDetailsなど、本公開のArtifactだけにある操作と表示は出ません。<a class="try-open" target="_top" href="#">本公開のページで試す</a></p>
+        <p class="try-off">閲覧アプリの中でこのページを開くと、ここで実際に試せます。<a class="try-open" target="_top" href="#">閲覧アプリで開く</a></p>
+        <div class="try-steps">
+          <ol>
+          <li><span data-for="header column"><kbd>⌘K</kbd>（Windows・Linuxでは<kbd>Ctrl</kbd> <kbd>K</kbd>）を押して、パレットを開きます。</span><span data-for="narrow">上部の検索のボタンを押して、パレットを開きます。</span></li>
+          <li><code>@</code>を入れると、登録されたサイトの一覧に変わります。確かめたら<code>@</code>を消します。</li>
+          <li><code>#</code>だけを入れると、このページの見出しが並びます。<strong>本文を検索する</strong>を選ぶと、その見出しへ移ります。</li>
+          </ol>
+          <p class="try-check">どの操作も、このサイトの中を探しています。ほかのサイトのArtifactは、<code>@</code>でサイトを移ってから探します。</p>
+        </div>
+      </aside>
       <h3 id="fulltext">本文を検索する</h3>
       <p>名前では見つからないときは、本文の言葉で探します。パレットの<strong>Search full text for …</strong>を選ぶか<kbd>⌘</kbd> <kbd>↵</kbd>を押すと、同じ言葉で本文検索の画面が開きます。サイドバーの検索欄でEnterを押しても開きます。</p>
       <figure class="fg" aria-labelledby="search-fig">
@@ -88,6 +101,19 @@
         <li><strong>結果。</strong>一致が500件以下なら、タイトルに一致したArtifact、見出しに一致したArtifact、本文だけに一致したArtifactの順に並びます。500件を超えると、パスの順に20件ずつ表示します。本文に一致したArtifactには抜粋が付きます（タイトルだけの一致などでは付きません）。入力をやめると少しして結果が更新されます。</li>
         <li><strong>開いたあと。</strong>結果からArtifactを開くと、一致した言葉がハイライトされます。検索した状態のURLは共有できます。</li>
       </ul>
+      <aside class="try" aria-labelledby="try-fulltext">
+        <p class="try-head"><span class="try-label" data-search-ignore>ここで試す</span><strong id="try-fulltext">本文を検索してみる</strong></p>
+        <p class="try-preview">いまはプレビューを開いているので、Pinや、更新日と公開元を示すDetailsなど、本公開のArtifactだけにある操作と表示は出ません。<a class="try-open" target="_top" href="#">本公開のページで試す</a></p>
+        <p class="try-off">閲覧アプリの中でこのページを開くと、ここで実際に試せます。<a class="try-open" target="_top" href="#">閲覧アプリで開く</a></p>
+        <div class="try-steps">
+          <ol>
+          <li><span data-for="header column"><kbd>⌘</kbd> <kbd>⇧</kbd> <kbd>F</kbd>（Windows・Linuxでは<kbd>Ctrl</kbd> <kbd>Shift</kbd> <kbd>F</kbd>）で本文検索の画面を開き、「プレフィックス」と入れます。</span><span data-for="narrow">上部の検索のボタンでパレットを開いて「プレフィックス」と入れ、<strong>Search full text for “プレフィックス”</strong>を選びます。</span></li>
+          <li>結果には、この言葉を本文に含むArtifactが、一致した見出しの下の抜粋つきで並びます。フォルダで絞り込むと、章ごとの一致の数が分かります。</li>
+          <li>結果から1つ開くと、ページの中の「プレフィックス」がハイライトされています。</li>
+          </ol>
+          <p class="try-check">タイトルには出てこない言葉でも、本文から見つかります。</p>
+        </div>
+      </aside>
       <p>本文検索のためのデータは、公開のたびに自動で作られます。公開する側で設定は要りません。</p>
       <div class="callout" role="note">
         <span class="ico">大きなサイト</span>
@@ -107,6 +133,20 @@
           <tr><td><strong>Recently updated</strong></td><td>サイトのトップのFiles</td><td>最近更新されたArtifact。Artifactが7つ以上あるサイトで、新しい順に6件。</td></tr>
         </tbody>
       </table></div>
+      <aside class="try" aria-labelledby="try-pin">
+        <p class="try-head"><span class="try-label" data-search-ignore>ここで試す</span><strong id="try-pin">ピン留めして、戻ってくる</strong></p>
+        <p class="try-preview">いまはプレビューを開いているので、Pinや、更新日と公開元を示すDetailsなど、本公開のArtifactだけにある操作と表示は出ません。<a class="try-open" target="_top" href="#">本公開のページで試す</a></p>
+        <p class="try-off">閲覧アプリの中でこのページを開くと、ここで実際に試せます。<a class="try-open" target="_top" href="#">閲覧アプリで開く</a></p>
+        <div class="try-steps">
+          <ol>
+          <li><span data-for="header column">上部の<strong>Pin</strong>を押します。表示が<strong>Pinned</strong>に変わります。</span><span data-for="narrow">上部の<strong>…</strong>（More actions）のメニューから<strong>Pin</strong>を選びます。</span></li>
+          <li>パレットを何も入れずに開くと、<strong>Pinned</strong>にこのページが並びます。左のサイドバーでも、<strong>Browse</strong>の上に<strong>Pinned</strong>が出ます。</li>
+          <li><span data-for="header column">上部の、サイトのホームへ戻るボタン（<strong>… home</strong>）を押します。</span><span data-for="narrow">上部の<strong>…</strong>（More actions）のメニューから<strong>… home</strong>を選び、サイトのホームを開きます。</span>ホームで<strong>Files</strong>を開くと、下に<strong>Recently updated</strong>が並びます。</li>
+          <li>ピン留めを外すときは、このページに戻って同じ操作をもう一度します（<strong>Unpin</strong>）。</li>
+          </ol>
+          <p class="try-check">ピン留めはこのブラウザだけに保存されるので、ほかの人の画面は変わりません。</p>
+        </div>
+      </aside>
       <p>ピン留めと最近読んだArtifactは、読者のブラウザにだけ保存されます。アカウントはないので、別の端末やブラウザには引き継がれず、ほかの人にも見えません。更新を知らせる通知や購読の機能はありません。</p>
     </section>
 

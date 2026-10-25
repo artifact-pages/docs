@@ -160,6 +160,26 @@ td:first-child { white-space: nowrap; font-weight: 600; }
 .callout p { margin: 0; color: var(--muted); font-size: 14px; }
 .callout p + p { margin-top: 8px; }
 .callout strong { color: var(--ink); }
+
+/* ここで試す（.try）：いま開いている閲覧アプリで、説明した機能をその場で試す案内。
+   site.js が <html> に data-reader（app・preview・off）と data-layout（narrow・header・column）を付け、
+   data-for に並べた幅の案内だけを残す。JavaScript がないときは、広い画面（header）の案内を出す。 */
+.try { margin: 24px 0; padding: 16px 18px 18px; border: 1px dashed var(--accent-line); border-radius: 10px; background: var(--paper); }
+.try-head { display: flex; flex-wrap: wrap; align-items: baseline; gap: 2px 12px; margin: 0 0 10px; }
+.try-label { color: var(--accent); font: 600 11px/1.9 var(--mono); letter-spacing: .04em; }
+.try-head strong { color: var(--ink); font-size: 15px; }
+.try ol { margin: 0; padding-left: 1.4em; color: var(--muted); font-size: 14px; }
+.try li + li { margin-top: 6px; }
+.try strong { color: var(--ink); }
+.try-check { margin: 10px 0 0; color: var(--muted); font-size: 14px; }
+.try-off, .try-preview { display: none; margin: 0; color: var(--muted); font-size: 14px; }
+.try-preview { margin-bottom: 10px; }
+html[data-reader="off"] .try-steps { display: none; }
+html[data-reader="off"] .try-off, html[data-reader="preview"] .try-preview { display: block; }
+html[data-layout="narrow"] .try [data-for]:not([data-for~="narrow"]),
+html[data-layout="header"] .try [data-for]:not([data-for~="header"]),
+html[data-layout="column"] .try [data-for]:not([data-for~="column"]),
+html:not([data-layout]) .try [data-for]:not([data-for~="header"]) { display: none; }
 .doc-section > .term { margin-top: 16px; }
 .doc-section > .term + p, .doc-section > .callout + p { margin-top: 16px; }
 .doc-section > .table-wrap + ul { margin-top: 16px; }
