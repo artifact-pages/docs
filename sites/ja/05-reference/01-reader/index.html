@@ -87,7 +87,7 @@
         <tbody>
           <tr><td>HTML</td><td>閲覧アプリと同じオリジンのiframeで表示。</td></tr>
           <tr><td>Markdown</td><td>CommonMarkとGFM（表、チェックリスト、取り消し線、自動リンク、脚注）、Mermaid（strictモード）。埋め込まれたHTMLは、許可していない要素と属性が取り除かれます。</td></tr>
-          <tr><td>ヘッダー</td><td>どの幅でも1段。左にパンくず（620px以下では、いまのArtifactの名前と、サイトのトップ、親のフォルダ、<strong>Show in sidebar</strong>を選ぶメニュー）、右に<strong>Search</strong>、<strong>Pin</strong>、Copy link。</td></tr>
+          <tr><td>ヘッダー</td><td>どの幅でも1段。左にパンくず（620px以下では、いまのArtifactの名前と、サイトのトップ、親のフォルダ、<strong>Show in sidebar</strong>を選ぶメニュー）、右は、620pxより広い画面では<strong>Search</strong>、<strong>Pin</strong>、Copy link（620px以下は次の行の「狭い画面」）。</td></tr>
           <tr><td>右の列</td><td>幅1200px以上では常にあり、上に<strong>Updated</strong>の日付と<strong>Details</strong>のボタン（押すとDetailsのパネル）、下に<strong>Contents</strong>。Markdownでは本文と一緒に日付とDetailsが流れ、Contentsが残ります。HTMLでは右の列だけが別にスクロールします。</td></tr>
           <tr><td>狭い画面</td><td>621〜1199pxでは、ヘッダーの<strong>Contents</strong>と<strong>Details</strong>のボタンでパネルを開きます。620px以下では、ヘッダーに検索と<strong>Contents</strong>のアイコンがあり、Details、Pin、Copy link、テーマは<strong>More actions</strong>のメニューにまとまります。Contentsのパネルは、見出しを選ぶと閉じ、その見出しへ移ります。</td></tr>
           <tr><td>Artifactのメニュー</td><td><strong>Pin</strong> / <strong>Unpin</strong>、<strong>Copy link</strong>、<strong>Open source</strong>、<strong>View history</strong>。どれも公開したArtifactやGitは変えません。</td></tr>
@@ -105,9 +105,9 @@
     <section class="doc-section" aria-labelledby="palette">
       <h2 id="palette">パレット</h2>
       <ul>
-        <li>空の状態では<strong>Pinned</strong>、続いて<strong>Recently read</strong>を並べます（同じArtifactは1回だけ）。その上に<strong>Headings</strong>、<strong>Sites</strong>、<strong>Actions</strong>のボタンがあり、<code>#</code>、<code>@</code>、<code>&gt;</code>を入れたのと同じになります。言葉を入れるとボタンは隠れます。</li>
+        <li>空の状態では<strong>Pinned</strong>、続いて<strong>Recently read</strong>（最大8件）を、あるものだけ並べます（同じArtifactは1回だけ）。どちらもなければ、Artifactの候補を並べます。その上に<strong>Headings</strong>、<strong>Sites</strong>、<strong>Actions</strong>のボタンがあり、<code>#</code>、<code>@</code>、<code>&gt;</code>を入れたのと同じになります。言葉を入れるとボタンは隠れます。</li>
         <li>記号なしでArtifact、<code>@</code>でサイト、<code>#</code>で見出し、<code>&gt;</code>でコマンド。全角の記号も同じように働きます。記号で切り替えたあとは、モードの名前と<strong>Clear mode</strong>が出ます。</li>
-        <li>入力欄の右に範囲を表示します（記号なしは<strong>&lt;サイト名&gt; only</strong>、<code>#</code>だけは<strong>This page</strong>、<code>#言葉</code>は<strong>All pages</strong>、<code>@</code>は<strong>Sites</strong>）。</li>
+        <li>入力欄の右に範囲を表示します（記号なしは<strong>&lt;サイト名&gt; only</strong>、<code>#</code>だけはArtifactを開いているとき<strong>This page</strong>、<code>#言葉</code>は<strong>All pages</strong>、<code>@</code>は<strong>Sites</strong>）。</li>
         <li>コマンドの名前は英語ですが、日本語の別名でも探せます（例：「本文検索」で<strong>Search page text</strong>、「ピン留め」で<strong>Pin artifact</strong>）。</li>
         <li>Artifactの候補の下に<strong>Search full text for …</strong>が出て、本文検索の画面に渡せます。</li>
       </ul>
