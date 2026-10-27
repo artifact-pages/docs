@@ -61,16 +61,13 @@
       </ul>
       <figure class="fg" aria-labelledby="connect-fig">
         <div class="fg-head"><strong id="connect-fig">公開は別々、読む場所はひとつ</strong><span class="fg-note">説明用の例</span></div>
-        <div class="fg-body"><div class="bd"><section class="bd-col"><h4 class="bd-h">チームのリポジトリ</h4><div class="nd" data-kind="team"><b>acme/sre</b></div><div class="nd" data-kind="team"><b>acme/checkout</b></div><div class="nd" data-kind="team"><b>acme/billing</b></div></section><div class="bd-a"><span>それぞれが自分のサイトだけを公開</span></div><section class="bd-col"><h4 class="bd-h">配信先</h4><div class="nd" data-kind="site"><b>サイト<code>sre</code></b></div><div class="nd" data-kind="site"><b>サイト<code>checkout</code></b></div><div class="nd" data-kind="site"><b>サイト<code>billing</code></b></div><div class="nd" data-kind="app"><b>閲覧アプリ</b><small>管理者が置く</small></div></section><div class="bd-a"><span>読む</span></div><section class="bd-col"><h4 class="bd-h">ブラウザ</h4><div class="nd" data-kind="reader"><b>読者</b><small>どのサイトも同じ画面で、サイトを切り替えて読む</small></div></section></div></div>
+        <div class="fg-body"><div class="bd"><section class="bd-col"><h4 class="bd-h">チームのリポジトリ</h4><div class="nd" data-kind="team"><b>acme/sre</b></div><div class="nd" data-kind="team"><b>acme/api</b></div><div class="nd" data-kind="team"><b>acme/billing</b></div></section><div class="bd-a"><span>それぞれが自分のサイトだけを公開</span></div><section class="bd-col"><h4 class="bd-h">配信先</h4><div class="nd" data-kind="site"><b>サイト<code>sre</code></b></div><div class="nd" data-kind="site"><b>サイト<code>api</code></b></div><div class="nd" data-kind="site"><b>サイト<code>billing</code></b></div><div class="nd" data-kind="app"><b>閲覧アプリ</b><small>管理者が置く</small></div></section><div class="bd-a"><span>読む</span></div><section class="bd-col"><h4 class="bd-h">ブラウザ</h4><div class="nd" data-kind="reader"><b>読者</b><small>同じ画面でサイトを切り替える</small></div></section></div></div>
       </figure>
-      <div class="table-wrap"><table>
-        <thead><tr><th>だれが</th><th>何をするか</th><th>どこで</th></tr></thead>
-        <tbody>
-          <tr><td>各チーム</td><td>Artifactを書き、プルリクエストでレビューし、マージで公開する</td><td>自分のリポジトリとGitHub Actions</td></tr>
-          <tr><td>読者</td><td>サイトを選び、Artifactを探して読み、リンクで共有する</td><td>ブラウザで開く閲覧アプリ</td></tr>
-          <tr><td>管理者</td><td>配信環境を用意し、サイトを登録し、閲覧アプリと共通の仕組みを更新する</td><td>管理リポジトリとTerraform</td></tr>
-        </tbody>
-      </table></div>
+      <ul>
+        <li><strong>各チーム</strong>は、Artifactを書き、プルリクエストでレビューし、マージで公開します。使うのは自分のリポジトリとGitHub Actionsです。</li>
+        <li><strong>読者</strong>は、ブラウザで閲覧アプリを開き、サイトを選び、Artifactを探して読み、リンクで共有します。</li>
+        <li><strong>管理者</strong>は、管理リポジトリとTerraformで配信環境を用意し、サイトを登録し、閲覧アプリと共通の仕組みを更新します。</li>
+      </ul>
     </section>
 
     <section class="doc-section" aria-labelledby="how">
@@ -87,13 +84,12 @@
       <h2 id="light">運用の特性</h2>
       <ul class="cards">
         <li><div class="card"><span class="tag">配信</span><h3>常に動かすサーバーがない</h3><p>配信はオブジェクトストレージとCDNだけです。読者のリクエストを処理するアプリケーションサーバーも、データベースもありません。AWSでは、URLの振り分けにCloudFront Functionsを使います。</p></div></li>
-        <li><div class="card"><span class="tag">費用</span><h3>費用の見積もり</h3><p>30サイト・各2,000ページ・1日2万回の閲覧を想定した見積もりで、月額はCloudflareが$1.90、AWSが$2.11です。Cloudflareは無料枠を引く前、AWSは無料枠をこの用途に使える前提の額で、請求額そのものではありません。前提は「<a href="04-architecture/05-cost-and-performance.html">コストとパフォーマンス</a>」にあります。</p></div></li>
+        <li><div class="card"><span class="tag">費用</span><h3>費用の見積もり</h3><p>30サイト・各2,000ページ・1日2万回の閲覧を想定した見積もりで、月額はCloudflareが$1.90、AWSが$2.11です。Cloudflareは無料枠を引く前、AWSは無料枠を使える前提で、まだ公開していない次のAWSモジュールでの額です。どちらも請求額そのものではありません。前提は「<a href="04-architecture/05-cost-and-performance.html">コストとパフォーマンス</a>」にあります。</p></div></li>
         <li><div class="card"><span class="tag">環境</span><h3>自社のCloudflareかAWSに置く</h3><p>配信の環境は、導入する組織のアカウントに、Terraformのモジュールで作ります。Artifactも閲覧アプリも、その環境から配ります。</p></div></li>
         <li><div class="card"><span class="tag">正本</span><h3>中身はGitに残る</h3><p>ArtifactとそのレビューはGitにあります。配信先の中身は、Gitから作り直せる写しです。</p></div></li>
         <li><div class="card"><span class="tag">展開</span><h3>チームを足すときに要るもの</h3><p>チームのリポジトリでは、公開するディレクトリ（いまあるものでも構いません）を決め、共通の公開ワークフローを呼び出す短いワークフロー（例では19行）を足します。ほかに、管理リポジトリでのサイトの登録と、公開の認証情報の用意が要ります。</p></div></li>
         <li><div class="card"><span class="tag">更新</span><h3>閲覧アプリの更新</h3><p>閲覧アプリはArtifactとは別に置くので、新しい版にしても全サイトを公開し直す必要はありません。既存のサイトの保存形式を新しい閲覧アプリが読めなくなる版だけは、全サイトの公開し直しが要ります。</p></div></li>
       </ul>
-      <p>AWSの見積もりは、CLI 0.6に合わせた次のAWSモジュールが前提です。この版はまだ公開していません。</p>
     </section>
 
     <section class="doc-section" aria-labelledby="scope">
@@ -108,12 +104,12 @@
 
     <section class="doc-section" aria-labelledby="next">
       <h2 id="next">次に読むもの</h2>
-      <ul class="cards">
-        <li><a class="card" href="01-features/index.html"><span class="tag">01</span><h3>体験と機能</h3><p>公開する人、読む人、管理する人が、それぞれ何をできるか。</p><span class="go">読む →</span></a></li>
-        <li><a class="card" href="02-setup/index.html"><span class="tag">02</span><h3>導入する</h3><p>環境を作り、最初のチームの公開とPRプレビューまで。</p><span class="go">読む →</span></a></li>
-        <li><a class="card" href="03-operations/index.html"><span class="tag">03</span><h3>社内展開と運用</h3><p>次のチームに広げ、更新し、問題に対処する。</p><span class="go">読む →</span></a></li>
-        <li><a class="card" href="04-architecture/index.html"><span class="tag">04</span><h3>アーキテクチャ</h3><p>なぜこの構成なのか、どこに境界と費用があるか。</p><span class="go">読む →</span></a></li>
-        <li><a class="card" href="05-reference/index.html"><span class="tag">05</span><h3>リファレンス</h3><p>設定、CLI、Actions、Terraform、閲覧アプリの操作。</p><span class="go">読む →</span></a></li>
+      <ul>
+        <li><a href="01-features/index.html">体験と機能</a>：公開する人、読む人、管理する人が、それぞれ何をできるか。</li>
+        <li><a href="02-setup/index.html">導入する</a>：環境を作り、最初のチームの公開とPRプレビューまで。</li>
+        <li><a href="03-operations/index.html">社内展開と運用</a>：次のチームに広げ、更新し、問題に対処する。</li>
+        <li><a href="04-architecture/index.html">アーキテクチャ</a>：なぜこの構成なのか、どこに境界と費用があるか。</li>
+        <li><a href="05-reference/index.html">リファレンス</a>：設定、CLI、Actions、Terraform、閲覧アプリの操作。</li>
       </ul>
     </section>
 

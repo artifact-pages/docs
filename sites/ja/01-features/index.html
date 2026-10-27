@@ -33,7 +33,17 @@
 
     <section class="doc-section" aria-labelledby="groups">
       <h2 id="groups">4つの機能群</h2>
-      <p>読者の画面では、次のように進みます。</p>
+      <ul class="cards two">
+        <li><a class="card" href="01-publish-and-review.html"><span class="tag">公開者</span><h3>Artifactを公開・レビューする</h3><p>チームのリポジトリから、HTMLとMarkdownをそのまま公開します。プルリクエストの変更は、本公開とは別のプレビューで確かめます。</p><span class="go">詳しく →</span></a></li>
+        <li><a class="card" href="02-find.html"><span class="tag">読者</span><h3>Artifactを探す</h3><p>サイトとフォルダをたどる、タイトルやパス、本文の言葉で検索する、ピン留めや最近読んだArtifactから戻る、の3つの探し方があります。</p><span class="go">詳しく →</span></a></li>
+        <li><a class="card" href="03-read.html"><span class="tag">読者</span><h3>Artifactを読む</h3><p>HTMLもMarkdownも同じ画面で読み、目次で見出しへ移り、ページや見出しのURLを共有します。更新日や公開元も確かめられます。</p><span class="go">詳しく →</span></a></li>
+        <li><a class="card" href="04-provide-and-operate.html"><span class="tag">管理者</span><h3>基盤を提供・運用する</h3><p>配信環境をTerraformで作り、サイトを登録し、閲覧アプリをArtifactとは別に更新します。管理者と各チームの担当がはっきり分かれます。</p><span class="go">詳しく →</span></a></li>
+      </ul>
+    </section>
+
+    <section class="doc-section" aria-labelledby="screens">
+      <h2 id="screens">読者の画面で起こること</h2>
+      <p>読者は、サイトを開き、パレットで探し、別のサイトへ移ります。</p>
       <figure class="fg" aria-labelledby="scene1-fig">
         <div class="fg-head"><strong id="scene1-fig">1　サイトを開く</strong><span class="fg-note">閲覧アプリ（簡略化した見本）</span></div>
         <div class="fg-body"><div class="sc" data-view="home" aria-hidden="true"><aside class="sc-side"><div class="sc-top"><div class="sc-top-row"><div class="sc-site"><b>S</b><span>SREチーム</span><small>3</small><i class="ic ic-chev s12"></i></div><span class="sc-ibtn"><i class="ic ic-sidebar s16"></i></span></div><div class="sc-filter"><i class="ic ic-search s14"></i><span>Jump to a page…</span><kbd>⌘ K</kbd></div></div><div class="sc-sb"><div class="sc-h">Browse </div><div class="sc-tree"><div class="sc-dir"><i class="ic ic-chev s11"></i><span>incidents</span><small>4</small></div><div class="sc-dir is-open"><i class="ic ic-chev s11"></i><span>runbooks</span><small>3</small></div><div class="sc-kids"><div class="sc-file">デプロイの戻し方</div><div class="sc-file">オンコール引き継ぎ</div><div class="sc-file">障害対応の手順</div></div><div class="sc-dir"><i class="ic ic-chev s11"></i><span>slo</span><small>2</small></div></div></div><div class="sc-foot"><span></span><i class="ic ic-monitor s15"></i></div></aside><div class="sc-main"><div class="sc-ctx"><div class="sc-crumb"><strong>SREチーム</strong></div><div class="sc-acts"><span class="sc-search"><i class="ic ic-search s15"></i><span class="sc-sl">Search</span> <kbd>⌘ K</kbd></span><span class="sc-ibtn"><i class="ic ic-copy s15"></i></span></div></div><div class="sc-home"><div class="sc-trow"><b>S</b><h4>SREチーム</h4> <code>/sre</code></div><p>障害の振り返り、SLO、オンコール手順（説明用の例）。 </p><p class="sc-meta">12 pages · Updated Oct 21, 2026</p><div class="sc-bar"><nav class="sc-tabs"><span>Overview</span><span class="is-active">Files</span><span>Previews<small>2</small></span> </nav></div><div class="sc-gl">Folders</div><div class="sc-dl"><i class="ic ic-folder"></i><b>incidents</b><time>4 pages · Oct 2, 2026</time></div><div class="sc-dl"><i class="ic ic-folder"></i><b>runbooks</b><time>3 pages · Oct 21, 2026</time></div><div class="sc-dl"><i class="ic ic-folder"></i><b>slo</b><time>2 pages · Sep 28, 2026</time></div><div class="sc-rec"><h6><i class="ic ic-clock s13"></i>Recently updated</h6><div class="sc-row"><span><b>障害対応の手順</b><code>runbooks/incident.md</code></span><time>Oct 21</time></div><div class="sc-row"><span><b>オンコール引き継ぎ</b><code>runbooks/handoff.md</code></span><time>Oct 18</time></div></div></div></div></div></div>
@@ -62,12 +72,6 @@
           <p class="try-check">上の図の見本と同じことを、このサイトで実際に行えます。この章のほかのページにも、その場で試す案内があります。</p>
         </div>
       </aside>
-      <ul class="cards two">
-        <li><a class="card" href="01-publish-and-review.html"><span class="tag">公開者</span><h3>Artifactを公開・レビューする</h3><p>チームのリポジトリから、HTMLとMarkdownをそのまま公開します。プルリクエストの変更は、本公開とは別のプレビューで確かめます。</p><span class="go">詳しく →</span></a></li>
-        <li><a class="card" href="02-find.html"><span class="tag">読者</span><h3>Artifactを探す</h3><p>サイトとフォルダをたどる、タイトルやパス、本文の言葉で検索する、ピン留めや最近読んだArtifactから戻る、の3つの探し方があります。</p><span class="go">詳しく →</span></a></li>
-        <li><a class="card" href="03-read.html"><span class="tag">読者</span><h3>Artifactを読む</h3><p>HTMLもMarkdownも同じ画面で読み、目次で見出しへ移り、ページや見出しのURLを共有します。更新日や公開元も確かめられます。</p><span class="go">詳しく →</span></a></li>
-        <li><a class="card" href="04-provide-and-operate.html"><span class="tag">管理者</span><h3>基盤を提供・運用する</h3><p>配信環境をTerraformで作り、サイトを登録し、閲覧アプリをArtifactとは別に更新します。管理者と各チームの担当がはっきり分かれます。</p><span class="go">詳しく →</span></a></li>
-      </ul>
     </section>
 
     <nav class="pager" data-search-ignore aria-label="ページ送り">
