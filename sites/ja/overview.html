@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <meta name="description" content="Artifact Pagesが何のためにあり、どう動き、組織で運用するときに何が軽いのかを1ページでまとめた概要。">
+  <meta name="description" content="Artifact Pagesが何のためにあり、どう動き、組織で運用するときの特性を1ページでまとめた概要。">
   <title>概要</title>
   <script>
     // Copy the reader app's theme (same-origin parent) before first paint; assets/site.js keeps it in sync.
@@ -31,11 +31,19 @@
       <p class="lead">Artifact Pagesは、各チームがGitのリポジトリで書いたHTMLとMarkdownのArtifactを、社内のひとつの閲覧アプリで探して読めるようにする仕組みです。公開はチームごとに、読む場所はひとつにします。このドキュメントでは、リポジトリから公開して閲覧アプリで1ページとして読むファイルを「Artifact」と呼びます。</p>
     </header>
 
-      <figure class="fg" aria-labelledby="hero-fig">
-        <div class="fg-head"><strong id="hero-fig">閲覧アプリでチームのサイトのFilesを開いたところ</strong><span class="fg-note">閲覧アプリ（簡略化した見本）</span></div>
-        <div class="fg-body"><div class="sc" data-view="home" aria-hidden="true"><aside class="sc-side"><div class="sc-top"><div class="sc-top-row"><div class="sc-site"><b>S</b><span>SREチーム</span><small>3</small><i class="ic ic-chev s12"></i></div><span class="sc-ibtn"><i class="ic ic-sidebar s16"></i></span></div><div class="sc-filter"><i class="ic ic-search s14"></i><span>Jump to a page…</span><kbd>⌘ K</kbd></div></div><div class="sc-sb"><div class="sc-h">Browse </div><div class="sc-tree"><div class="sc-dir"><i class="ic ic-chev s11"></i><span>incidents</span><small>4</small></div><div class="sc-dir is-open"><i class="ic ic-chev s11"></i><span>runbooks</span><small>3</small></div><div class="sc-kids"><div class="sc-file">デプロイの戻し方</div><div class="sc-file">オンコール引き継ぎ</div><div class="sc-file">障害対応の手順</div></div><div class="sc-dir"><i class="ic ic-chev s11"></i><span>slo</span><small>2</small></div></div></div><div class="sc-foot"><span></span><i class="ic ic-monitor s15"></i></div></aside><div class="sc-main"><div class="sc-ctx"><div class="sc-crumb"><strong>SREチーム</strong></div><div class="sc-acts"><span class="sc-search"><i class="ic ic-search s15"></i><span class="sc-sl">Search</span> <kbd>⌘ K</kbd></span><span class="sc-ibtn"><i class="ic ic-copy s15"></i></span></div></div><div class="sc-home"><div class="sc-trow"><b>S</b><h4>SREチーム</h4> <code>/sre</code></div><p>障害の振り返り、SLO、オンコール手順（説明用の例）。 </p><p class="sc-meta">12 pages · Updated Oct 21, 2026</p><div class="sc-bar"><nav class="sc-tabs"><span>Overview</span><span class="is-active">Files</span><span>Previews<small>2</small></span> </nav></div><div class="sc-gl">Folders</div><div class="sc-dl"><i class="ic ic-folder"></i><b>incidents</b><time>4 pages · Oct 2, 2026</time></div><div class="sc-dl"><i class="ic ic-folder"></i><b>runbooks</b><time>3 pages · Oct 21, 2026</time></div><div class="sc-dl"><i class="ic ic-folder"></i><b>slo</b><time>2 pages · Sep 28, 2026</time></div><div class="sc-rec"><h6><i class="ic ic-clock s13"></i>Recently updated</h6><div class="sc-row"><span><b>障害対応の手順</b><code>runbooks/incident.md</code></span><time>Oct 21</time></div><div class="sc-row"><span><b>オンコール引き継ぎ</b><code>runbooks/handoff.md</code></span><time>Oct 18</time></div></div></div></div></div></div>
-        <figcaption>左の<strong>Browse</strong>でフォルダをたどり、上部の<strong>Search</strong>からタイトルやパス、本文の言葉で探します。ほかのチームのサイトにも、同じ画面のまま移れます。</figcaption>
-      </figure>
+      <aside class="try" aria-labelledby="try-here">
+        <p class="try-head"><span class="try-label" data-search-ignore>いま見ている画面</span><strong id="try-here">このページも、閲覧アプリの中で開いています</strong></p>
+        <p class="try-preview">いまはプレビューを開いているので、本公開のArtifactだけにある操作と表示は出ません。<a class="try-open" target="_top" href="#">本公開のページで試す</a></p>
+        <p class="try-off">閲覧アプリの中でこのページを開くと、ここで実際に試せます。<a class="try-open" target="_top" href="#">閲覧アプリで開く</a></p>
+        <div class="try-steps">
+          <ol>
+          <li data-for="header column">左のサイドバーの<strong>Browse</strong>に、このドキュメントのフォルダが並んでいます。公開元のリポジトリのディレクトリと同じ構造です。</li>
+          <li><span data-for="header column"><kbd>⌘K</kbd>（Windows・Linuxでは<kbd>Ctrl</kbd> <kbd>K</kbd>）を押して、パレットを開きます。</span><span data-for="narrow">上部の検索のボタンを押して、パレットを開きます。</span>「コスト」と入れると、コストとパフォーマンスのページが候補に出ます。</li>
+          <li>パレットの入力を<code>@</code>で始めると、登録されたサイトの一覧に変わります。ほかのチームのサイトへは、ここから移ります。</li>
+          </ol>
+          <p class="try-check">どのチームが公開したArtifactも、この画面で同じように探して読みます。</p>
+        </div>
+      </aside>
 
     <section class="doc-section" aria-labelledby="problem">
       <h2 id="problem">書いたものが、リポジトリごとに散らばる</h2>
@@ -70,20 +78,20 @@
       <p>チームのリポジトリでArtifactをマージすると、GitHub Actionsのジョブがそのサイトを配信先へ公開します。読者のブラウザは、CDNから閲覧アプリと公開されたファイルを受け取ります。</p>
       <figure class="fg" aria-labelledby="how-fig">
         <div class="fg-head"><strong id="how-fig">チームのリポジトリから読者まで</strong><span class="fg-note">説明用の例</span></div>
-        <div class="fg-body"><div class="fl"><div class="nd" data-kind="team"><b>チームのリポジトリ</b><small>Artifactを書いてレビューする</small></div><span class="fl-a"><span>マージで公開</span></span><div class="nd" data-kind="cli"><b>GitHub Actions</b><small>自分のサイトだけ</small></div><span class="fl-a"><span>置く</span></span><div class="nd" data-kind="store"><b>オブジェクトストレージ</b><small>R2 / S3</small></div><span class="fl-a"><span>配る</span></span><div class="nd" data-kind="cdn"><b>CDN</b><small>Cloudflare / CloudFront</small></div><span class="fl-a"><span>読む</span></span><div class="nd" data-kind="app"><b>閲覧アプリ</b><small>読者のブラウザ</small></div></div></div>
+        <div class="fg-body"><div class="fl"><div class="nd" data-kind="team"><b>チームのリポジトリ</b><small>Artifactを書いてレビューする</small></div><span class="fl-a"><span>マージで公開</span></span><div class="nd" data-kind="cli"><b>GitHub Actions</b><small>自分のサイトだけ</small></div><span class="fl-a"><span>置く</span></span><div class="nd" data-kind="store"><b>配信先</b><small>R2とCloudflare、またはS3とCloudFront</small></div><span class="fl-a"><span>読む</span></span><div class="nd" data-kind="app"><b>閲覧アプリ</b><small>読者のブラウザ</small></div></div></div>
       </figure>
-      <p>これとは別に、管理リポジトリを1つ置きます。配信先の設定、登録するサイトの一覧、CLIと閲覧アプリのバージョンを持ち、サイトの登録を配信先へ反映し、閲覧アプリを置きます。各チームが呼び出す共通の公開ワークフローも、ここから配ります。詳しくは「<a href="04-architecture/index.html">アーキテクチャ</a>」にあります。</p>
+      <p>環境には、各チームのリポジトリのほかに、管理リポジトリを1つ置きます。管理リポジトリは、配信先の設定、登録するサイトの一覧、CLIと閲覧アプリのバージョンを持ち、サイトの登録を配信先へ反映し、閲覧アプリを置きます。各チームが呼び出す共通の公開ワークフローも、ここから配ります。詳しくは「<a href="04-architecture/index.html">アーキテクチャ</a>」にあります。</p>
     </section>
 
     <section class="doc-section" aria-labelledby="light">
-      <h2 id="light">運用が軽い理由</h2>
+      <h2 id="light">運用の特性</h2>
       <ul class="cards">
         <li><div class="card"><span class="tag">配信</span><h3>常に動かすサーバーがない</h3><p>配信はオブジェクトストレージとCDNだけです。読者のリクエストを処理するアプリケーションサーバーも、データベースもありません。AWSでは、URLの振り分けにCloudFront Functionsを使います。</p></div></li>
-        <li><div class="card"><span class="tag">費用</span><h3>月に数ドルから</h3><p>30サイト・各2,000ページ・1日2万回の閲覧を想定した見積もりで、月額はCloudflareが$1.90、AWSが$2.11です。Cloudflareは無料枠を引く前、AWSは無料枠をこの用途に使える前提の額で、請求額そのものではありません。前提は「<a href="04-architecture/05-cost-and-performance.html">コストとパフォーマンス</a>」にあります。</p></div></li>
-        <li><div class="card"><span class="tag">環境</span><h3>自社のCloudflareかAWSで</h3><p>配信の環境は、導入する組織のアカウントに、Terraformのモジュールで作ります。Artifactも閲覧アプリも、その環境から配ります。</p></div></li>
+        <li><div class="card"><span class="tag">費用</span><h3>費用の見積もり</h3><p>30サイト・各2,000ページ・1日2万回の閲覧を想定した見積もりで、月額はCloudflareが$1.90、AWSが$2.11です。Cloudflareは無料枠を引く前、AWSは無料枠をこの用途に使える前提の額で、請求額そのものではありません。前提は「<a href="04-architecture/05-cost-and-performance.html">コストとパフォーマンス</a>」にあります。</p></div></li>
+        <li><div class="card"><span class="tag">環境</span><h3>自社のCloudflareかAWSに置く</h3><p>配信の環境は、導入する組織のアカウントに、Terraformのモジュールで作ります。Artifactも閲覧アプリも、その環境から配ります。</p></div></li>
         <li><div class="card"><span class="tag">正本</span><h3>中身はGitに残る</h3><p>ArtifactとそのレビューはGitにあります。配信先の中身は、Gitから作り直せる写しです。</p></div></li>
-        <li><div class="card"><span class="tag">展開</span><h3>チームを足すのが軽い</h3><p>チームのリポジトリでは、公開するディレクトリ（いまあるものでも構いません）を決め、共通の公開ワークフローを呼び出す短いワークフロー（例では19行）を足します。ほかに、管理リポジトリでのサイトの登録と、公開の認証情報の用意が要ります。</p></div></li>
-        <li><div class="card"><span class="tag">更新</span><h3>閲覧アプリの更新は一度</h3><p>閲覧アプリはArtifactとは別に置くので、新しい版にしても全サイトを公開し直す必要はありません。既存のサイトの保存形式を新しい閲覧アプリが読めなくなる版だけは、全サイトの公開し直しが要ります。</p></div></li>
+        <li><div class="card"><span class="tag">展開</span><h3>チームを足すときに要るもの</h3><p>チームのリポジトリでは、公開するディレクトリ（いまあるものでも構いません）を決め、共通の公開ワークフローを呼び出す短いワークフロー（例では19行）を足します。ほかに、管理リポジトリでのサイトの登録と、公開の認証情報の用意が要ります。</p></div></li>
+        <li><div class="card"><span class="tag">更新</span><h3>閲覧アプリの更新</h3><p>閲覧アプリはArtifactとは別に置くので、新しい版にしても全サイトを公開し直す必要はありません。既存のサイトの保存形式を新しい閲覧アプリが読めなくなる版だけは、全サイトの公開し直しが要ります。</p></div></li>
       </ul>
       <p>AWSの見積もりは、CLI 0.6に合わせた次のAWSモジュールが前提です。この版はまだ公開していません。</p>
     </section>
