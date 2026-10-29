@@ -427,11 +427,11 @@ html:not([data-layout]) .try [data-for]:not([data-for~="header"]) { display: non
 .sm { container: sm / inline-size; }
 .sm ol { display: grid; grid-template-columns: repeat(6, minmax(0, 1fr)); gap: 0; margin: 0; padding: 0; list-style: none; }
 .sm li { position: relative; min-width: 0; }
-.sm a { position: relative; display: flex; flex-direction: column; align-items: center; gap: 8px; height: 100%; padding: 4px 6px 8px; border-radius: 10px; color: var(--muted); font-size: 12.5px; line-height: 1.5; text-align: center; text-decoration: none; }
+.sm a { position: relative; display: flex; flex-direction: column; align-items: center; gap: 8px; height: 100%; padding: 12px 6px 10px; border-radius: 10px; color: var(--muted); font-size: 12.5px; line-height: 1.5; text-align: center; text-decoration: none; }
 .sm a:hover { background: var(--hover); color: var(--ink); }
 .sm b { font-weight: 600; overflow-wrap: anywhere; }
 .sm-n { position: relative; z-index: 1; display: grid; flex: none; place-items: center; width: 32px; height: 32px; border: 1.5px dashed var(--line-strong); border-radius: 50%; background: var(--paper); color: var(--muted); font: 650 13px/1 var(--mono); }
-.sm li:not(:last-child)::after { content: ""; position: absolute; top: 20px; left: calc(50% + 20px); right: calc(-50% + 20px); height: 1.5px; background: repeating-linear-gradient(90deg, var(--line-strong) 0 4px, transparent 4px 8px); }
+.sm li:not(:last-child)::after { content: ""; position: absolute; top: 28px; left: calc(50% + 20px); right: calc(-50% + 20px); height: 1.5px; background: repeating-linear-gradient(90deg, var(--line-strong) 0 4px, transparent 4px 8px); }
 .sm li.is-done:not(:last-child)::after { background: var(--accent); }
 .sm li.is-done .sm-n { border-style: solid; border-color: var(--accent); color: var(--accent); }
 .sm li.is-done .sm-n::after { content: "✓"; position: absolute; right: -6px; top: -6px; display: grid; place-items: center; width: 15px; height: 15px; border-radius: 50%; background: var(--accent); color: var(--bg); font: 700 9.5px/1 var(--sans); }
