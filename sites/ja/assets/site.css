@@ -773,21 +773,7 @@ html:not([data-layout]) .try [data-for]:not([data-for~="header"]) { display: non
 .sc-pdl > div { display: grid; gap: calc(2 * var(--u)); padding: calc(9 * var(--u)) calc(10 * var(--u)); border-radius: calc(8 * var(--u)); color: var(--ink); }
 .sc-pdl code { color: var(--quiet); font-size: calc(10 * var(--u)); }
 
-/* レビューの道のりの小さな画面（.pr-app）：サイドバーを省いた作業領域だけ。右の列が入らない幅なので、Details は文書の下に置く */
-.sc.is-mini { --u: .8px; display: block; min-height: 0; background: var(--m-surface); }
-.sc.is-mini .sc-main { border-left: 0; }
-.sc.is-mini .sc-doc { padding: calc(22 * var(--u)) calc(22 * var(--u)) calc(12 * var(--u)); }
-.sc.is-mini .sc-title { margin-bottom: calc(14 * var(--u)); font-size: calc(38 * var(--u)); }
-.sc.is-mini .sc-ln { margin: calc(10 * var(--u)) 0; }
-.sc-minidet { padding: calc(12 * var(--u)) calc(22 * var(--u)) calc(16 * var(--u)); border-top: 1px solid var(--line-soft); }
-.sc-minidet h5 { margin: 0 0 calc(8 * var(--u)); color: var(--quiet); font-size: calc(10.5 * var(--u)); font-weight: 500; letter-spacing: .06em; text-transform: uppercase; }
-
-/* アプリの狭い幅の文脈バー（620px 以下）：サイドバーのボタン、プレビューのタグと文書名（または親フォルダと文書名）、検索、More */
-.sc-ctx.is-narrow { height: calc(43 * var(--u)); gap: calc(2 * var(--u)); padding: 0 calc(4 * var(--u)); }
-.sc-ctx.is-narrow .sc-ibtn { width: calc(32 * var(--u)); height: calc(32 * var(--u)); }
-.sc-ctx.is-narrow .sc-crumb { margin-left: calc(2 * var(--u)); font-size: calc(10 * var(--u)); }
-.sc-ctx.is-narrow .sc-crumb > strong { font-size: calc(11 * var(--u)); }
-.sc-ctx.is-narrow .sc-tag { margin-left: calc(2 * var(--u)); }
+/* アプリの文脈バーの右端の操作（検索、More） */
 .sc-acts { display: flex; flex: none; margin-left: auto; }
 
 @container sc (max-width: 760px) {
@@ -865,31 +851,75 @@ html:not([data-layout]) .try [data-for]:not([data-for~="header"]) { display: non
   .tp .tp-row .nd > b { font-size: 12px; }
 }
 
-/* ── レビューの道のり（.fl.pr）：PRのコメント → 閲覧アプリのプレビュー → 本公開。画面は簡略化した見本 ── */
-.fl.pr { align-items: stretch; }
-.fl.pr > .fl-a { align-self: center; min-width: 76px; }
-.pr-step { display: grid; flex: 1 1 0; align-content: start; gap: 8px; min-width: 0; }
-.pr-step > b { display: flex; align-items: center; gap: 8px; font-size: 13px; font-weight: 650; line-height: 1.5; }
-.pr-n { display: inline-grid; flex: none; place-items: center; width: 20px; height: 20px; border-radius: 50%; background: var(--ink); color: var(--bg); font: 650 11px/1 var(--mono); }
-.pr-gh { overflow: hidden; border: 1px solid var(--line-strong); border-radius: 8px; background: var(--paper); font-size: 11.5px; line-height: 1.6; }
-.pr-gh-h { display: flex; align-items: center; gap: 6px; padding: 6px 10px; border-bottom: 1px solid var(--line); background: var(--paper-2); font-weight: 600; }
-.pr-gh-h small { color: var(--quiet); font-weight: 400; }
-.pr-av { flex: none; width: 14px; height: 14px; border-radius: 50%; background: var(--line-strong); }
-.pr-gh-b { padding: 8px 10px; }
-.pr-gh-b p { margin: 4px 0; }
-.pr-gh-b u { color: var(--blue); text-decoration: none; }
-.pr-gh-b table { width: 100%; min-width: 0; margin: 4px 0; border-collapse: collapse; font-size: 11px; }
-.pr-gh-b th, .pr-gh-b td { padding: 2px 6px; border: 1px solid var(--line); background: none; color: inherit; font: inherit; white-space: normal; overflow-wrap: anywhere; }
-.pr-gh-b code { padding: 0; border: 0; background: none; font-size: 1em; }
-.pr-gh-f { color: var(--quiet); font-size: 10.5px; font-style: italic; }
-.pr-meta { margin: 0; color: var(--accent-ink); font-size: 12.5px; font-weight: 600; }
-@container fg (max-width: 760px) {
-  .fl.pr { flex-direction: column; gap: 0; }
-  .fl.pr > .pr-step { flex: none; }
-  .fl.pr > .fl-a { align-self: stretch; grid-template-rows: none; grid-template-columns: 1fr 10px 1fr; justify-items: start; align-items: center; width: 100%; min-width: 0; min-height: 40px;
-    background: linear-gradient(currentColor, currentColor) 50% 0 / 1.5px 100% no-repeat; }
-  .fl.pr > .fl-a > span { grid-column: 3; grid-row: 1; align-self: center; padding: 0 0 0 10px; background: none; text-align: left; }
-  .fl.pr > .fl-a::after { top: auto; bottom: 0; left: calc(50% - 5px); right: auto; width: 10px; height: 8px; clip-path: polygon(0 0, 100% 0, 50% 100%); }
+/* ── プレビューと本公開の置き場所の図（.pf-two）：2つの置き場所。PRの章の図。色はコメント・プレビュー・本公開・人で分ける ── */
+.pf-gh  { --k: var(--gold);   --kl: var(--gold-line);   --kw: var(--gold-wash); }
+.pf-pv  { --k: var(--blue);   --kl: var(--blue-line);   --kw: var(--blue-wash); }
+.pf-pub { --k: var(--accent); --kl: var(--accent-line); --kw: var(--accent-wash); }
+.pf-ppl { --k: var(--muted);  --kl: var(--line-strong); --kw: var(--hover); }
+.pf-bx, .pf-chip { position: relative; z-index: 1; border: 1px solid var(--kl); border-radius: 9px; background: linear-gradient(var(--kw), var(--kw)), var(--paper); font-size: 12px; line-height: 1.5; overflow-wrap: break-word; word-break: auto-phrase; }
+.pf-pv.pf-bx { border-style: dashed; }
+.pf-pub.pf-bx { border-width: 1.5px; }
+.pf-bx b { display: block; font-size: 12.5px; font-weight: 650; line-height: 1.5; }
+.pf-bx small { display: block; color: var(--muted); font-size: 11px; line-height: 1.55; }
+.pf-bx { padding: 8px 10px 8px 28px; }
+.pf-bx::before, .pf-chip::before { content: ""; position: absolute; left: 10px; top: 13px; width: 9px; height: 9px; color: var(--k); }
+.pf-gh.pf-bx::before { background: currentColor; border-radius: 2px; }
+.pf-pv.pf-bx::before { border: 2px solid currentColor; border-radius: 50%; }
+.pf-pub.pf-bx::before { background: currentColor; border-radius: 50%; }
+.pf-ppl.pf-bx::before { border: 1.5px solid currentColor; border-radius: 2px; transform: rotate(45deg) scale(.85); }
+.pf-ar { position: relative; color: var(--muted); pointer-events: none; z-index: 2; }
+.pf-ar::before { content: ""; position: absolute; background: currentColor; }
+.pf-ar::after { content: ""; position: absolute; width: 0; height: 0; border: 4px solid transparent; }
+.pf-ar > span { position: absolute; width: max-content; max-width: 100%; color: var(--muted); font: 11px/1.4 var(--sans); }
+.pf-hr::before, .pf-hl::before { left: 0; right: 0; top: calc(50% - .75px); height: 1.5px; }
+.pf-hr::after { right: 0; top: calc(50% - 4px); border-left: 7px solid currentColor; border-right: 0; }
+.pf-hl::after { left: 0; top: calc(50% - 4px); border-right: 7px solid currentColor; border-left: 0; }
+.pf-hr > span, .pf-hl > span { left: 50%; bottom: calc(50% + 5px); transform: translateX(-50%); text-align: center; }
+.pf-vd::before, .pf-vu::before, .pf-vn::before { top: 0; bottom: 0; left: calc(var(--x, 50%) - .75px); width: 1.5px; }
+.pf-vd::after { bottom: 0; left: calc(var(--x, 50%) - 4px); border-top: 7px solid currentColor; border-bottom: 0; }
+.pf-vu::after { top: 0; left: calc(var(--x, 50%) - 4px); border-bottom: 7px solid currentColor; border-top: 0; }
+.pf-vd > span, .pf-vu > span, .pf-vn > span { top: 50%; left: calc(var(--x, 50%) + 9px); transform: translateY(-50%); }
+.pf-nh::after { display: none; }
+.pf-ds.pf-hr::before, .pf-ds.pf-hl::before { background: repeating-linear-gradient(90deg, currentColor 0 5px, transparent 5px 9px); }
+.pf-ds.pf-vd::before, .pf-ds.pf-vu::before { background: repeating-linear-gradient(180deg, currentColor 0 5px, transparent 5px 9px); }
+.pf-ar.pf-mb { display: none; }
+.pf-two { --rh: 80px; display: grid; position: relative; grid-template-columns: minmax(0,1fr) 88px minmax(0,1.4fr) 128px; grid-template-rows: 32px var(--rh) 44px var(--rh) 12px 40px 30px auto; }
+.pf-pnl { position: relative; border: 1px solid var(--line-strong); border-radius: 10px; background: var(--paper); }
+.pf-pl { position: absolute; top: 7px; left: 12px; color: var(--muted); font-size: 11.5px; font-weight: 650; line-height: 1.6; }
+.pf-repo { grid-area: 1 / 1 / 6 / 2; } .pf-dest { grid-area: 1 / 3 / 6 / 4; } .pf-view { grid-area: 7 / 1 / 9 / 5; }
+.pf-two .pf-b-pr { grid-area: 2 / 1; } .pf-two .pf-b-main { grid-area: 4 / 1; } .pf-two .pf-b-pv { grid-area: 2 / 3; } .pf-two .pf-b-pub { grid-area: 4 / 3; }
+.pf-b-pr, .pf-b-main { align-self: center; height: 56px; display: flex; flex-direction: column; justify-content: center; margin: 0 12px; }
+.pf-b-pv, .pf-b-pub { margin: 0 12px; display: flex; flex-direction: column; justify-content: center; }
+.pf-a-push { grid-area: 2 / 2; margin: 0 -12px; } .pf-a-main { grid-area: 4 / 2; margin: 0 -12px; }
+.pf-a-merge { grid-area: 2 / 1 / 5 / 2; margin-block: calc(var(--rh) / 2 + 28px); z-index: 2; }
+.pf-a-merge > span { left: calc(50% + 9px); }
+.pf-a-push > span, .pf-a-main > span { width: 112px; }
+.pf-l-read { grid-area: 5 / 3 / 8 / 4; }
+.pf-lr1 { grid-area: 2 / 4; margin: 0 50% 0 -12px; } .pf-lr2 { grid-area: 2 / 4 / 8 / 5; margin-top: calc(var(--rh) / 2); }
+.pf-chip { display: flex; align-items: center; align-self: start; padding: 6px 12px 6px 26px; border-radius: 14px; font-size: 11.5px; line-height: 1.45; }
+.pf-chip::before { left: 10px; top: 50%; margin-top: -4px; border-radius: 50%; border: 1.5px solid var(--k); }
+.pf-c-read { grid-area: 8 / 3; margin: 0 12px 10px; } .pf-c-rev { grid-area: 8 / 4; margin: 0 8px 10px; }
+
+@container fg (max-width: 640px) {
+  .pf-two { --rh: auto; grid-template-columns: minmax(0,1fr) 40px minmax(0,1fr); grid-template-rows: 30px auto 12px auto 46px 30px auto 12px 40px 30px auto; }
+  .pf-dk { display: none; }
+  .pf-ar.pf-mb { display: block; }
+  .pf-repo { grid-area: 1 / 1 / 4 / 4; } .pf-dest { grid-area: 6 / 1 / 9 / 4; } .pf-view { grid-area: 10 / 1 / 12 / 4; }
+  .pf-pl { left: 50%; transform: translateX(-50%); white-space: nowrap; }
+  .pf-two .pf-b-pr { grid-area: 2 / 1; } .pf-two .pf-b-main { grid-area: 2 / 3; } .pf-two .pf-b-pv { grid-area: 7 / 1; } .pf-two .pf-b-pub { grid-area: 7 / 3; }
+  .pf-b-pr, .pf-b-main { align-self: stretch; height: auto; margin: 0 0 0 10px; }
+  .pf-b-main { margin: 0 10px 0 0; }
+  .pf-b-pv { margin: 0 0 0 10px; } .pf-b-pub { margin: 0 10px 0 0; }
+  .pf-b-pr, .pf-b-main, .pf-b-pv, .pf-b-pub { justify-content: flex-start; }
+  .pf-a-merge-m { grid-area: 2 / 2; margin: 0; --x: 50%; }
+  .pf-a-merge-m > span { bottom: calc(50% + 5px); left: 50%; top: auto; transform: translateX(-50%); }
+  .pf-a-push-m { grid-area: 5 / 1 / 6 / 2; margin: 0 0 -30px; --x: 50%; }
+  .pf-a-main-m { grid-area: 5 / 3 / 6 / 4; margin: 0 0 -30px; --x: 50%; }
+  .pf-a-push-m, .pf-a-main-m { margin-top: -12px; }
+  .pf-a-push-m > span, .pf-a-main-m > span { width: calc(50% - 12px); max-width: none; }
+  .pf-l-rev-m { grid-area: 8 / 1 / 11 / 2; --x: 50%; } .pf-l-read-m { grid-area: 8 / 3 / 11 / 4; --x: 50%; }
+  .pf-c-rev { grid-area: 11 / 1; margin: 0 4px 10px 10px; } .pf-c-read { grid-area: 11 / 3; margin: 0 10px 10px 4px; }
+  .pf-bx { padding: 8px 8px 8px 24px; }
 }
 
 @media (prefers-reduced-motion: reduce) {
