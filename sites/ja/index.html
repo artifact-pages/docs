@@ -31,6 +31,16 @@
       <p class="lead">Artifact Pagesは、各チームがGitのリポジトリで書いたHTMLとMarkdownのArtifactを、社内のひとつの閲覧アプリで探して読めるようにする仕組みです。公開はチームごとに、読む場所はひとつにします。このドキュメントでは、リポジトリから公開して閲覧アプリで1ページとして読むファイルを「Artifact」と呼びます。</p>
     </header>
 
+    <section class="doc-section" aria-label="読み始める場所">
+      <p>目的に合わせて、次のページから読み始めます。</p>
+      <ul>
+        <li><strong>導入を検討する人：</strong>このページと「<a href="01-features/index.html">体験と機能</a>」で、できることと、しないことを確かめます。</li>
+        <li><strong>環境を作る人：</strong>「<a href="02-setup/index.html">導入する</a>」の順に進めます。</li>
+        <li><strong>チームのArtifactを公開する人：</strong>「<a href="01-features/01-publish-and-review.html">Artifactを公開・レビューする</a>」と、管理者から受け取る「<a href="03-operations/01-onboard-team.html#handoff">チームに伝えること</a>」を読みます。</li>
+        <li><strong>読むだけの人：</strong>「<a href="01-features/02-find.html">Artifactを探す</a>」と「<a href="01-features/03-read.html">Artifactを読む</a>」で、閲覧アプリの使い方を確かめます。</li>
+      </ul>
+    </section>
+
       <aside class="try" aria-labelledby="try-here">
         <p class="try-head"><span class="try-label" data-search-ignore>いま見ている画面</span><strong id="try-here">このページも、閲覧アプリの中で開いています</strong></p>
         <p class="try-preview">いまはプレビューを開いているので、本公開のArtifactだけにある操作と表示は出ません。<a class="try-open" target="_top" href="#">本公開のページで試す</a></p>
@@ -84,7 +94,7 @@
       <h2 id="light">運用の特性</h2>
       <ul class="cards">
         <li><div class="card"><span class="tag">配信</span><h3>常に動かすサーバーがない</h3><p>配信はオブジェクトストレージとCDNだけです。読者のリクエストを処理するアプリケーションサーバーも、データベースもありません。AWSでは、URLの振り分けにCloudFront Functionsを使います。</p></div></li>
-        <li><div class="card"><span class="tag">費用</span><h3>費用の見積もり</h3><p>30サイト・各2,000ページ・1日2万回の閲覧を想定した見積もりで、月額はCloudflareが$1.90、AWSが$2.11です。Cloudflareは無料枠を引く前、AWSは無料枠を使える前提で、まだ公開していない次のAWSモジュールでの額です。どちらも請求額そのものではありません。前提は「<a href="04-architecture/05-cost-and-performance.html">コストとパフォーマンス</a>」にあります。</p></div></li>
+        <li><div class="card"><span class="tag">費用</span><h3>費用の見積もり</h3><p>30サイト・各2,000ページ・1日2万回の閲覧を想定すると、月額はどちらも数ドルです（Cloudflareは$1.90、AWSは$2.11）。ただし前提が違うので、この2つの額は比べられません。Cloudflareは無料枠を引く前の額、AWSは無料枠を使い、まだ公開していない次のAWSモジュールを使う場合の額です。どちらも請求額そのものではありません。前提と規模ごとの額は「<a href="04-architecture/05-cost-and-performance.html">コストとパフォーマンス</a>」にあります。</p></div></li>
         <li><div class="card"><span class="tag">環境</span><h3>自社のCloudflareかAWSに置く</h3><p>配信の環境は、導入する組織のアカウントに、Terraformのモジュールで作ります。Artifactも閲覧アプリも、その環境から配ります。</p></div></li>
         <li><div class="card"><span class="tag">正本</span><h3>中身はGitに残る</h3><p>ArtifactとそのレビューはGitにあります。配信先の中身は、Gitから作り直せる写しです。</p></div></li>
         <li><div class="card"><span class="tag">展開</span><h3>チームを足すときに要るもの</h3><p>チームのリポジトリでは、公開するディレクトリ（いまあるものでも構いません）を決め、共通の公開ワークフローを呼び出す短いワークフロー（例では19行）を足します。ほかに、管理リポジトリでのサイトの登録と、公開の認証情報の用意が要ります。</p></div></li>
@@ -99,6 +109,15 @@
         <li><strong>利用者のアカウント、ログイン、サイトごとの閲覧権限。</strong>社内だけに見せる制限は、配信先のホスト名に対して設定します。CloudflareではIPアドレスの許可リストやCloudflare Access、AWSではAWS WAFによるIPアドレスの制限などを使います。</li>
         <li><strong>全サイトをまとめた検索。</strong>検索は、いま開いているサイトの中で行います。別のサイトのArtifactは、サイトを切り替えてから探します。</li>
         <li><strong>公開されたHTMLどうしの隔離。</strong>HTMLのArtifactは、閲覧アプリと同じオリジンで、信頼されたコードとして動きます。公開できる人は、信頼できる範囲に限ってください。詳しくは「<a href="04-architecture/04-security-and-access.html">セキュリティとアクセス</a>」にあります。</li>
+      </ul>
+    </section>
+
+    <section class="doc-section" aria-labelledby="status">
+      <h2 id="status">ライセンスと開発の状態</h2>
+      <ul>
+        <li><strong>ライセンス。</strong>MIT Licenseです。CLI、閲覧アプリ、GitHub Actions、Terraformのモジュールは、<a href="https://github.com/artifact-pages/artifact-pages" target="_blank" rel="noopener">artifact-pages/artifact-pages</a>で公開しています。</li>
+        <li><strong>開発の状態。</strong>どの部品もまだ0.xのプレリリースです。版をまたぐ互換性は約束していません。修正は各部品の最新のリリースにだけ入り、前の版への取り込みやリリースの時期は約束していません。</li>
+        <li><strong>問い合わせ。</strong>不具合は<a href="https://github.com/artifact-pages/artifact-pages/issues" target="_blank" rel="noopener">GitHubのIssues</a>に書きます。脆弱性はIssuesに書かず、<a href="https://github.com/artifact-pages/artifact-pages/security/advisories/new" target="_blank" rel="noopener">非公開の報告</a>で知らせます。</li>
       </ul>
     </section>
 

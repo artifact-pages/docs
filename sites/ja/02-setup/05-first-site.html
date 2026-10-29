@@ -53,7 +53,7 @@
       <ul>
         <li><strong>そのまま配信できる形にしておきます。</strong>Artifact Pagesは生成やビルドをしません。ほかのツールで生成するなら、公開の前のステップで生成します。</li>
         <li><strong>公開したくないものは入れません。</strong>このディレクトリの中のファイルは、リンクされていなくても、Gitで追跡していなくても公開されます。<code>.html</code>のテンプレートや部分的なファイルもArtifactとして載ります。シンボリックリンクがあると公開は失敗します。<code>.git</code>は公開されません。</li>
-        <li><strong>サイトのトップ。</strong>直下の<code>README.md</code>（なければ<code>index.md</code>）が、サイトのトップのOverviewになります。直下の<code>index.html</code>はその代わりにはならず、<code>/sre/index.html</code>というArtifactとして開きます。</li>
+        <li><strong>サイトのトップ。</strong>直下に<code>README.md</code>、<code>index.md</code>、<code>index.html</code>、<code>index.htm</code>のどれかがあれば、この順で最初のものが、サイトのトップのOverviewになります（大文字と小文字は区別しません）。Overviewになったファイルは、Filesの一覧に並ばず、ほかのファイルやフォルダがあればサイドバーのBrowseにも並びません。どれもないサイトでは、トップにFilesが開きます。</li>
         <li><strong>URL。</strong>ArtifactのURLは<code>/sre/</code>に続けて、このディレクトリからのパスを拡張子まで付けたものです。</li>
       </ul>
     </section>

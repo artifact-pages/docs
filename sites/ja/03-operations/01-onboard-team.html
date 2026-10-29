@@ -138,6 +138,18 @@
       <p>閲覧アプリのサイトの一覧に新しいサイトが出て、Artifactが読めれば受け入れは完了です。</p>
     </section>
 
+    <section class="doc-section" aria-labelledby="handoff">
+      <h2 id="handoff">チームに伝えること</h2>
+      <p>チームの作業は、ワークフローのファイルを置くことと、最初の公開を確かめることだけです。管理者は、次のことをまとめてチームに伝えます。</p>
+      <ul>
+        <li><strong>サイトIDと公開元。</strong>例では<code>billing</code>と<code>acme/billing</code>の<code>docs</code>。読者が開くURLは<code>https://docs.example.com/billing</code>のようになります。</li>
+        <li><strong>置くファイル。</strong>公開の<code>.github/workflows/publish.yml</code>（このページの「<a href="#workflow">3. チームにワークフローを渡す</a>」）と、PRプレビューの<code>.github/workflows/preview.yml</code>（「<a href="../02-setup/06-pr-previews.html#workflow">PRプレビューを使えるようにする</a>」）。どちらも<code>acme/platform-admin</code>の共通のワークフローを呼び出し、<code>site</code>にサイトIDを書きます。</li>
+        <li><strong>チームのリポジトリで用意するもの。</strong>Environmentを使うなら<code>production</code>を作っておくこと。Cloudflareなら公開用の認証情報のシークレット（管理者が入れるか、チームが入れるか）。AWSならワークフローの<code>id-token: write</code>。</li>
+        <li><strong>公開されるもの。</strong>公開元のディレクトリの中のファイルは、リンクしていなくてもすべて公開されます。HTMLのスクリプトは閲覧アプリと同じオリジンで動きます。プレビューにも専用の閲覧の権限はなく、だれが読めるかは配信先の閲覧の制限で決まります（「<a href="../01-features/01-publish-and-review.html">Artifactを公開・レビューする</a>」）。</li>
+        <li><strong>うまくいかないとき。</strong>上の「<a href="#first">4. 最初の公開を確かめる</a>」のメッセージと、「<a href="05-troubleshooting.html">問題を調べ、復旧する</a>」。</li>
+      </ul>
+    </section>
+
     <nav class="pager" data-search-ignore aria-label="ページ送り">
       <a class="prev" href="index.html"><small>前へ</small><strong>社内展開と運用</strong></a>
       <a class="next" href="02-update-shared-workflows.html"><small>次へ</small><strong>共通の公開・プレビューの仕組みを更新する</strong></a>

@@ -46,9 +46,9 @@
   <span class="k">publicBaseURL</span>: https://docs.example.com
   <span class="k">zoneId</span>: fedcba9876543210fedcba9876543210
 <span class="k">cli</span>:
-  <span class="k">version</span>: x.y.z
+  <span class="k">version</span>: 0.6.1
 <span class="k">web</span>:
-  <span class="k">version</span>: x.y.z
+  <span class="k">version</span>: 0.4.9
 <span class="k">sites</span>: {}</span></pre>
       </div>
       <div class="term" aria-label="AWSの設定ファイル">
@@ -62,13 +62,13 @@
   <span class="k">region</span>: us-east-1
 <span class="k">publicBaseURL</span>: https://d111111abcdef8.cloudfront.net   <span class="c"># AWSでは自分で足す</span>
 <span class="k">cli</span>:
-  <span class="k">version</span>: x.y.z
+  <span class="k">version</span>: 0.6.1
 <span class="k">web</span>:
-  <span class="k">version</span>: x.y.z
+  <span class="k">version</span>: 0.4.9
 <span class="k">sites</span>: {}</span></pre>
       </div>
       <ul>
-        <li><strong><code>cli.version</code>と<code>web.version</code></strong>は、<a href="https://github.com/artifact-pages/artifact-pages/releases" target="_blank" rel="noopener">GitHub Releases</a>にあるCLIと閲覧アプリ（<code>web/vx.y.z</code>）の版を、先頭の<code>v</code>を付けずに正確に書きます。2つの版の番号はそろっていなくて構いません。</li>
+        <li><strong><code>cli.version</code>と<code>web.version</code></strong>は、CLIと閲覧アプリのリリースの版を、先頭の<code>v</code>を付けずに正確に書きます。例の値は「<a href="index.html#versions">この章で使う版</a>」の組です。2つの版の番号はそろっていなくて構いません。</li>
         <li><strong>AWSでは<code>publicBaseURL</code>を足します。</strong>Terraformの出力には読者が開くURLが含まれません。これがないと、プレビューのURLを作れずにプレビューが失敗します。独自ドメインを使うならそのURLにします。</li>
         <li><strong>認証情報の値は書きません。</strong>設定ファイルに書けるのは、値を読む環境変数の名前だけです。既定の名前を使うなら、それも書きません。</li>
       </ul>
@@ -96,27 +96,7 @@
         <li>生成したファイルは手で編集しないでください。直したいときは作り直します（「<a href="../03-operations/02-update-shared-workflows.html">共通の公開・プレビューの仕組みを更新する</a>」）。</li>
         <li>対応する配信先はCloudflareとAWSです。設定ファイルは管理リポジトリの中の通常のファイルである必要があります。</li>
       </ul>
-      <p>生成したファイルと設定ファイルをコミットし、<code>main</code>にマージします。生成した登録のワークフローは、プルリクエストと<code>main</code>へのプッシュで動き、配信先を読みます。そのため、プルリクエストを出す前に「<a href="#secrets">認証情報を置く</a>」と「<a href="#environments">Environment</a>」の設定を済ませておきます。</p>
-    </section>
-
-    <section class="doc-section" aria-labelledby="how">
-      <h2 id="how">共通のワークフローの動き方</h2>
-      <p>チームのワークフローが<code>uses: acme/platform-admin/.github/workflows/publish-site.yml@main</code>で呼び出すと、共通のワークフローは、自分と同じコミットにある<code>artifact-pages.yaml</code>を使って、そのチームのリポジトリを公開します。</p>
-      <figure class="fg" aria-labelledby="chain-fig">
-        <div class="fg-head"><strong id="chain-fig">チームが公開するとき、何が何を呼び出すか</strong><span class="fg-note">説明用の例</span></div>
-        <div class="fg-body"><div class="fl"><div class="nd" data-kind="team"><b>チームのワークフロー</b><small>acme/sreの<code>publish.yml</code></small></div><span class="fl-a"><span>呼び出す</span></span><div class="nd" data-kind="admin"><b>共通のワークフロー</b><small><code>publish-site.yml</code></small></div><span class="fl-a"><span>呼び出す</span></span><div class="nd" data-kind="admin"><b>共通のアクション</b><small><code>site-sync</code>：同じコミットの<code>artifact-pages.yaml</code>を渡す</small></div><span class="fl-a"><span>呼び出す</span></span><div class="nd" data-kind="ci"><b>製品のAction</b><small><code>publish-action</code></small></div><span class="fl-a"><span>実行する</span></span><div class="nd" data-kind="cli"><b>CLI</b><small><code>site sync</code></small></div><span class="fl-a"><span>書き込む</span></span><div class="nd" data-kind="store"><b>配信先</b></div></div></div>
-        <figcaption>左から右まで、すべてチームのリポジトリのジョブとして動きます。管理リポジトリが提供するのは手順と設定で、権限、シークレット、OIDCはチームのリポジトリのものです。</figcaption>
-      </figure>
-      <div class="table-wrap"><table>
-        <thead><tr><th>項目</th><th>内容</th></tr></thead>
-        <tbody>
-          <tr><td>入力</td><td><code>site</code>（必須、サイトID）と<code>environment</code>（任意、チームのリポジトリのEnvironmentの名前）。ほかの入力はありません。</td></tr>
-          <tr><td>動く権限</td><td>呼び出したチームのリポジトリの権限、シークレット、OIDCで動きます。</td></tr>
-          <tr><td>本番に書き込むとき</td><td><code>main</code>へのプッシュと、<code>main</code>での手動実行だけ。プルリクエストなど、それ以外は試し実行です。</td></tr>
-          <tr><td>プレビュー</td><td>同じリポジトリのブランチからのプルリクエストだけ。プルリクエストにコメントを付けます。</td></tr>
-          <tr><td>実行環境</td><td>GitHubのホストするUbuntuのランナー。</td></tr>
-        </tbody>
-      </table></div>
+      <p>生成したファイルのコミットは、まだしません。生成した登録のワークフローは、プルリクエストを出した時点で動いて配信先を読むので、先にこのあとの「<a href="#access">Organizationから呼び出せるようにする</a>」と「<a href="#secrets">認証情報を置く</a>」を済ませ、最後に「<a href="#merge">コミットしてマージする</a>」で反映します。</p>
     </section>
 
     <section class="doc-section" aria-labelledby="access">
@@ -141,6 +121,32 @@
       <p>AWSではシークレットを置かず、各ジョブがIAMロールを引き受けます。管理リポジトリのリポジトリ変数<code>ARTIFACT_PAGES_REGISTRY_ADMIN_ROLE_ARN</code>に、Terraformの出力<code>admin_role_arn</code>を設定します（<code>registry setup</code>がコマンドを表示します）。各チームのジョブのロールは、共通のワークフローがサイトIDと設定の<code>aws.accountId</code>から求めるので、チームに設定は要りません。Terraformの<code>admin_github_subjects</code>と<code>satellite_github_subjects</code>に、実際に動くジョブの<code>sub</code>が入っていることを確かめてください。管理リポジトリでは、<code>main</code>のジョブ（<code>…:environment:production</code>）と、プルリクエストでの登録の試し実行（<code>…:pull_request</code>）の2つです（「<a href="01-infrastructure/02-aws.html#subjects">許可するジョブを書く</a>」）。</p>
       <h3 id="environments">Environment</h3>
       <p>本番の書き込みに承認やブランチの制限をかけたい場合は、GitHubのEnvironmentを使います。非公開のリポジトリでEnvironmentを使えるかどうか、承認のルールまで使えるかどうかは、GitHubのプランによって違うので確かめてください。管理リポジトリには<code>production</code>を作ります。チームが<code>environment</code>入力で名前を渡すと、共通のワークフローは呼び出したリポジトリのそのEnvironmentを使います。存在しない名前を渡すとGitHubが制限なしで作ってしまうので、先に作っておきます。このガイドの例では、チームのリポジトリのEnvironmentも<code>production</code>という名前にします。</p>
+    </section>
+
+    <section class="doc-section" aria-labelledby="merge">
+      <h2 id="merge">コミットしてマージする</h2>
+      <p>生成したファイルと設定ファイルをプルリクエストにします。登録のワークフロー（<code>registry.yml</code>）がプルリクエストで試し実行され、配信先を読みます。この試し実行が成功したら、<code>main</code>にマージします。</p>
+      <p>試し実行が配信先を読めずに失敗した場合は、認証情報の置き場所（Cloudflare）か、許可した<code>sub</code>（AWS）を確かめます。</p>
+    </section>
+
+    <section class="doc-section" aria-labelledby="how">
+      <h2 id="how">共通のワークフローの動き方</h2>
+      <p>チームのワークフローが<code>uses: acme/platform-admin/.github/workflows/publish-site.yml@main</code>で呼び出すと、共通のワークフローは、自分と同じコミットにある<code>artifact-pages.yaml</code>を使って、そのチームのリポジトリを公開します。</p>
+      <figure class="fg" aria-labelledby="chain-fig">
+        <div class="fg-head"><strong id="chain-fig">チームが公開するとき、何が何を呼び出すか</strong><span class="fg-note">説明用の例</span></div>
+        <div class="fg-body"><div class="fl"><div class="nd" data-kind="team"><b>チームのワークフロー</b><small>acme/sreの<code>publish.yml</code></small></div><span class="fl-a"><span>呼び出す</span></span><div class="nd" data-kind="admin"><b>共通のワークフロー</b><small><code>publish-site.yml</code></small></div><span class="fl-a"><span>呼び出す</span></span><div class="nd" data-kind="admin"><b>共通のアクション</b><small><code>site-sync</code>：同じコミットの<code>artifact-pages.yaml</code>を渡す</small></div><span class="fl-a"><span>呼び出す</span></span><div class="nd" data-kind="ci"><b>製品のAction</b><small><code>publish-action</code></small></div><span class="fl-a"><span>実行する</span></span><div class="nd" data-kind="cli"><b>CLI</b><small><code>site sync</code></small></div><span class="fl-a"><span>書き込む</span></span><div class="nd" data-kind="store"><b>配信先</b></div></div></div>
+        <figcaption>チームのワークフローから配信先への書き込みまで、すべてチームのリポジトリのジョブとして動きます。管理リポジトリが提供するのは手順と設定で、権限、シークレット、OIDCはチームのリポジトリのものです。</figcaption>
+      </figure>
+      <div class="table-wrap"><table>
+        <thead><tr><th>項目</th><th>内容</th></tr></thead>
+        <tbody>
+          <tr><td>入力</td><td><code>site</code>（必須、サイトID）と<code>environment</code>（任意、チームのリポジトリのEnvironmentの名前）。ほかの入力はありません。</td></tr>
+          <tr><td>動く権限</td><td>呼び出したチームのリポジトリの権限、シークレット、OIDCで動きます。</td></tr>
+          <tr><td>本番に書き込むとき</td><td><code>main</code>へのプッシュと、<code>main</code>での手動実行だけ。プルリクエストなど、それ以外は試し実行です。</td></tr>
+          <tr><td>プレビュー</td><td>同じリポジトリのブランチからのプルリクエストだけ。プルリクエストにコメントを付けます。</td></tr>
+          <tr><td>実行環境</td><td>GitHubのホストするUbuntuのランナー。</td></tr>
+        </tbody>
+      </table></div>
     </section>
 
     <section class="doc-section" aria-labelledby="direct">
@@ -170,7 +176,7 @@
       <h2 id="state">このステップのあとの状態</h2>
       <figure class="fg" aria-labelledby="state-fig">
         <div class="fg-head"><strong id="state-fig">ステップ2のあとの状態</strong><span class="fg-note">説明用の例</span></div>
-        <div class="fg-body"><div class="bd"><section class="bd-col"><h4 class="bd-h">GitHub</h4><div class="nd is-new" data-kind="admin"><b>管理リポジトリ</b><small><code>artifact-pages.yaml</code>、共通のワークフロー</small><span class="nd-badge">このステップ</span></div><div class="nd is-dim" data-kind="team"><b>チームのリポジトリ</b><small>ステップ5で用意</small></div></section><div class="bd-a"><span>書き込む</span></div><section class="bd-col"><h4 class="bd-h">配信先</h4><div class="nd" data-kind="store"><b>ストレージとCDN</b><small>ホスト名、配信の規則、認証情報</small></div><div class="nd is-dim" data-kind="app"><b>閲覧アプリ</b><small>ステップ3で用意</small></div><div class="nd is-dim" data-kind="registry"><b>サイトの登録情報</b><small>ステップ4で用意</small></div><div class="nd is-dim" data-kind="site"><b>サイト<code>sre</code></b><small>ステップ5で用意</small></div><div class="nd is-dim" data-kind="preview"><b>プレビュー</b><small>ステップ6で用意</small></div></section><div class="bd-a"><span>読む</span></div><section class="bd-col"><h4 class="bd-h">ブラウザ</h4><div class="nd is-dim" data-kind="reader"><b>読者</b><small>まだ開けない</small></div></section></div></div>
+        <div class="fg-body"><div class="bd"><section class="bd-col"><h4 class="bd-h">GitHub</h4><div class="nd is-new" data-kind="admin"><b>管理リポジトリ</b><small><code>artifact-pages.yaml</code>、共通のワークフロー</small><span class="nd-badge">このステップ</span></div><div class="nd is-dim" data-kind="team"><b>チームのリポジトリ</b><small>ステップ5で用意</small></div></section><div class="bd-a"><span>書き込む</span></div><section class="bd-col"><h4 class="bd-h">配信先</h4><div class="nd" data-kind="store"><b>ストレージとCDN</b><small>ホスト名、配信の規則、認証情報</small></div><div class="nd is-dim" data-kind="app"><b>閲覧アプリ</b><small>ステップ3で用意</small></div><div class="nd is-new" data-kind="registry"><b>サイトの登録情報</b><small>空（サイトはまだない）</small><span class="nd-badge">このステップ</span></div><div class="nd is-dim" data-kind="site"><b>サイト<code>sre</code></b><small>ステップ5で用意</small></div><div class="nd is-dim" data-kind="preview"><b>プレビュー</b><small>ステップ6で用意</small></div></section><div class="bd-a"><span>読む</span></div><section class="bd-col"><h4 class="bd-h">ブラウザ</h4><div class="nd is-dim" data-kind="reader"><b>読者</b><small>まだ開けない</small></div></section></div></div>
       </figure>
     </section>
 

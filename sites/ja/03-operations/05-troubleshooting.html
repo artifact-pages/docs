@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <meta name="description" content="公開や配置の失敗を切り分け、残ったロックを解き、中断した公開をやり直し、配信先とのずれを直し、設定の読み込みや認証の失敗に対処する。">
+  <meta name="description" content="公開や配置の失敗を切り分け、読者の画面に出る表示から原因をたどり、残ったロックを解き、中断した公開をやり直し、配信先とのずれを直し、誤って公開したものを取り下げ、設定の読み込みや認証の失敗に対処する。">
   <title>問題を調べ、復旧する</title>
   <script>
     // Copy the reader app's theme (same-origin parent) before first paint; assets/site.js keeps it in sync.
@@ -38,6 +38,22 @@
         <li>終了コードを見ます。<code>2</code>は引数や設定の誤り、<code>1</code>は配信先、ダウンロード、互換性の確認などの失敗です。</li>
         <li>同じ操作を<code>--dry-run</code>で動かします。試し実行は読み取りだけを行い、ロックも取らず、何も書き込みません。</li>
       </ol>
+    </section>
+
+    <section class="doc-section" aria-labelledby="screens">
+      <h2 id="screens">読者の画面に出る表示から調べる</h2>
+      <p>読者から「開けない」と言われたときは、閲覧アプリに出ている英語の表示を聞きます。表示ごとの原因と、管理者やチームがすることは次のとおりです。</p>
+      <ul>
+        <li><strong>Site registered, but not published yet：</strong>サイトは登録されているが、配信先にサイトの一覧がない。初めての公開の前に出ます。公開したはずなのに出る場合は、配信先のデータが消えています。正しい公開元から<code>site sync --reconcile</code>を実行します。</li>
+        <li><strong>Site registered, but details are unavailable：</strong>サイトの概要と一覧を読み込めない。まず通信、閲覧の制限、配信先の応答を調べて、読み込み直します。データが消えたり壊れたりしているなら、正しい公開元から<code>site sync --reconcile</code>を実行します。</li>
+        <li><strong>This site needs to be republished：</strong>サイトのデータの形式を、いまの閲覧アプリが読めない。互換性を確かめたうえで、閲覧アプリに合うCLIでそのサイトを<code>site sync</code>します（「<a href="03-upgrade.html#breaking">形式が変わる更新</a>」）。</li>
+        <li><strong>This library needs to be updated：</strong>サイトの登録情報の形式を、いまの閲覧アプリが読めない。管理者が互換性と更新の順番を確かめて<code>registry sync</code>し、各サイトを<code>site sync</code>します。</li>
+        <li><strong>Document unavailable：</strong>Artifactの本文を読み込めない。削除されたか、まだ公開されていないか、通信の問題です。公開元にあるのに配信先にないなら、<code>site sync --reconcile</code>で直します。</li>
+        <li><strong>Page text search is not available：</strong>本文検索のデータなしで公開されたサイト。いまのCLIで<code>site sync</code>すると使えるようになります。</li>
+        <li><strong>Page text search needs to be republished：</strong>本文検索のデータの形式を、いまの閲覧アプリが読めない。閲覧アプリに合うCLIで<code>site sync</code>します。</li>
+        <li><strong>Preview unavailable：</strong>プレビューが削除されたか、保持期間が過ぎて消えた。必要なら、そのプルリクエストでプレビューを作り直します。</li>
+        <li><strong>This preview needs to be republished：</strong>プレビューの形式を、いまの閲覧アプリが読めない。閲覧アプリに合うCLIでプレビューを作り直します。</li>
+      </ul>
     </section>
 
     <section class="doc-section" aria-labelledby="locks">
@@ -82,6 +98,18 @@
       <p><code>--reconcile</code>は、配信先のファイルの一覧とメタデータを公開元と突き合わせ、足りないファイル、余分なファイル、メタデータの違いを直します。ファイルの中身までは読まないので、メタデータを保ったまま中身だけが壊れた場合は見つけられません。公開した内容そのものが間違っている場合は、正しいコミットを取り出して公開し直します。<code>--ref</code>は表示用の情報を変えるだけで、公開する内容は変えません。</p>
     </section>
 
+    <section class="doc-section" aria-labelledby="leak">
+      <h2 id="leak">公開してはいけないものを公開した</h2>
+      <p>秘密の値や、社外に見せてはいけないファイルを公開してしまったときは、次の順に対処します。配信先から消しても、すでに読まれた写しは取り戻せません。漏れた値を無効にすることを最初に行います。</p>
+      <ol>
+        <li><strong>漏れた認証情報やトークンを失効させます。</strong>代わりを発行して、使っている場所のシークレットを入れ替えます。</li>
+        <li><strong>公開元から取り除いて、公開し直します。</strong>正しい状態にしたコミットから<code>site sync</code>を実行すると、公開元からなくなったArtifactは配信先からも削除されます。</li>
+        <li><strong>そのファイルを含むプレビューを削除します。</strong>本公開を直しても、プレビューは残ります。そのファイルを含むプレビューのグループごとに<code>preview remove</code>を実行します（「<a href="04-change-or-retire-site.html#previews">プレビューだけを削除する</a>」）。</li>
+        <li><strong>キャッシュに残った写しを確かめます。</strong>CLI 0.6以降は、Artifactとプレビューを、新しく読み込むたびに配信先へ確かめ直す設定で書きます。ただし、同じURLの写しが0.5以前の設定や独自のCDNの設定でキャッシュに残っていると、公開し直したあとも、その写しが切れるまで（以前の標準の設定では最大300秒）古い内容が返ることがあります。CLIはキャッシュの削除をしません。すぐに消す必要があれば、CloudflareのURLごとの削除やCloudFrontの無効化を手で行えます。読者のブラウザや開いたままの画面にある写しは、消せません。</li>
+        <li><strong>Gitの履歴を確かめます。</strong>今のブランチから消しても、過去のコミットには残ります。リポジトリを読める人の範囲と、履歴の扱いを確かめます。</li>
+      </ol>
+    </section>
+
     <section class="doc-section" aria-labelledby="config">
       <h2 id="config">設定を読めない、認証に失敗する</h2>
       <h3 id="remote">別のリポジトリの設定を読めない</h3>
@@ -118,7 +146,7 @@
 
     <section class="doc-section" aria-labelledby="more">
       <h2 id="more">さらに詳しい手順</h2>
-      <p>内部の記録が壊れた場合の扱いなど、まれな状況の手順は、製品の<a href="https://github.com/artifact-pages/artifact-pages/blob/main/docs/guides/operator-recovery.md" target="_blank" rel="noopener">復旧ガイド（英語）</a>にあります。そこにある手順の多くは、実際の環境ではまだ試されていません。内部の記録を手で消す操作は、そのガイドの条件を満たす場合だけにしてください。</p>
+      <p>内部の記録が壊れた場合の扱いなど、まれな状況の手順は、製品の<a href="https://github.com/artifact-pages/artifact-pages/blob/v0.6.1/docs/guides/operator-recovery.md" target="_blank" rel="noopener">復旧ガイド（英語）</a>にあります。そこにある手順の多くは、実際の環境ではまだ試されていません。内部の記録を手で消す操作は、そのガイドの条件を満たす場合だけにしてください。</p>
     </section>
 
     <nav class="pager" data-search-ignore aria-label="ページ送り">
