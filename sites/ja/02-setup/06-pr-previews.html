@@ -79,6 +79,12 @@
         <li>サイトのトップの<strong>Previews</strong>からも、そのサイトのプレビューの一覧を開けます。</li>
       </ol>
       <p>プレビューに含まれるのは、プルリクエストで追加・変更したArtifactと、変更したCSSや画像を参照しているArtifactです。プレビューの内容は、プルリクエストの先頭のコミットそのものです。削除したArtifactだけの変更など、プレビューするArtifactがない場合は、結果が<code>no-preview</code>になり、正常に終わります。</p>
+      <div class="callout warn" role="note">
+        <span class="ico">注意</span>
+        <div>
+          <p><strong>プレビューは、プルリクエストに参加している人だけに見えるわけではありません。</strong>Artifact Pagesにはプレビュー専用の閲覧の権限がありません。サイトのPreviewsやパレットから、マージ前のプレビューを開けるかどうかは、管理者が配信先に設定した閲覧の制限だけで決まります。閲覧アプリのプレビューのURLと、ファイルのURL（<code>/_previews/</code>以下）の両方に、意図した制限がかかっていることを確かめます。プレビューのHTMLも、本公開と同じく閲覧アプリと同じオリジンで動くので、スクリプトを含むHTMLはマージ前でも信頼できるものに限ります（「<a href="../04-architecture/04-security-and-access.html">セキュリティとアクセス</a>」）。</p>
+        </div>
+      </div>
       <div class="table-wrap"><table>
         <thead><tr><th>URL</th><th>開くもの</th></tr></thead>
         <tbody>

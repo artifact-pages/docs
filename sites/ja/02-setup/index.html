@@ -62,12 +62,27 @@
         <li><strong>CloudflareかAWSのアカウント。</strong>必要な権限は「<a href="01-infrastructure/index.html#prepare">インフラを構築する</a>」にあります。</li>
         <li><strong>GitHubのOrganization。</strong>管理リポジトリとチームのリポジトリを同じOrganizationに置きます。共通のワークフローは同じOrganizationの中から呼び出す前提です。既定のブランチは<code>main</code>にします。共通のワークフローは<code>main</code>からの実行だけを本番の書き込みにします。</li>
         <li><strong>手元のCLI。</strong>管理者の作業（共通のワークフローの生成、試し実行）で使います。</li>
+        <li><strong>だれに読ませるか。</strong>何も制限しないと、作った配信先はインターネットのだれでも読めます。社内だけに見せるなら、IPアドレスの許可リストや認証を、ステップ1で配信先と一緒に用意します（「<a href="01-infrastructure/index.html#prepare">インフラを構築する</a>」）。</li>
       </ul>
+      <h3 id="versions">この章で使う版</h3>
+      <p>この章の例は、次の版の組で書いています。CLIと閲覧アプリは別々にリリースされるので、版の番号はそろっていません。新しい版は<a href="https://github.com/artifact-pages/artifact-pages/releases" target="_blank" rel="noopener">GitHub Releases</a>で確かめます（CLIは<code>vX.Y.Z</code>、閲覧アプリは<code>web/vX.Y.Z</code>のタグです）。</p>
+      <ul>
+        <li><strong>CLI：<code>0.6.1</code>。</strong>手元に入れる版と、設定ファイルの<code>cli.version</code>に書きます。</li>
+        <li><strong>閲覧アプリ：<code>0.4.9</code>。</strong>設定ファイルの<code>web.version</code>に書きます。</li>
+        <li><strong>GitHub Actions：<code>v0.4.0</code>。</strong>閲覧アプリの配置のワークフローに書きます。共通のワークフローには、<code>registry setup</code>がこの版を書き込みます。</li>
+        <li><strong>Terraformモジュール：Cloudflareは<code>0.2.0</code>、AWSは<code>0.1.1</code>。</strong>呼び出し側の<code>version</code>に書きます。</li>
+      </ul>
+      <div class="callout" role="note">
+        <span class="ico">AWS</span>
+        <div>
+          <p><strong>AWSでは、CLI 0.6.1とモジュール0.1.1を組み合わせて使えますが、この組をAWSの実環境で確かめた記録はまだありません。</strong>モジュール0.1.1には、CLI 0.6.1では使わないCloudFrontのキャッシュ削除の権限と、以前のキャッシュの設定が残っています。CLI 0.6に合わせたAWSのモジュールは、まだ公開していません。</p>
+        </div>
+      </div>
       <h3 id="install">CLIを入れる</h3>
-      <p>CLIは<a href="https://github.com/artifact-pages/artifact-pages/releases" target="_blank" rel="noopener">GitHub Releases</a>から、LinuxとmacOS（amd64、arm64）向けの単体のバイナリを入れます。Windows向けはありません。<code>x.y.z</code>は使うリリースの版で、先頭の<code>v</code>は付けません。</p>
+      <p>CLIは<a href="https://github.com/artifact-pages/artifact-pages/releases" target="_blank" rel="noopener">GitHub Releases</a>から、LinuxとmacOS（amd64、arm64）向けの単体のバイナリを入れます。Windows向けはありません。<code>VERSION</code>には、上に挙げたCLIの版を、先頭の<code>v</code>を付けずに書きます。</p>
       <div class="term" aria-label="リリースからCLIを入れる">
         <div class="term-head"><span>ターミナル / インストール</span><button class="copy-btn" type="button">コピー</button></div>
-<pre><span class="p">$</span> <span data-copy>VERSION=x.y.z</span>
+<pre><span class="p">$</span> <span data-copy>VERSION=0.6.1</span>
 <span class="p">$</span> <span data-copy>OS=$(uname -s | tr '[:upper:]' '[:lower:]')</span>
 <span class="p">$</span> <span data-copy>ARCH=$(uname -m | sed -e 's/x86_64/amd64/' -e 's/aarch64/arm64/')</span>
 <span class="p">$</span> <span data-copy>BASE=https://github.com/artifact-pages/artifact-pages/releases/download/v$VERSION</span>
@@ -102,9 +117,9 @@
 <span class="k">local</span>:
   <span class="k">root</span>: .local/storage   <span class="c"># 公開元の外に置く</span>
 <span class="k">cli</span>:
-  <span class="k">version</span>: x.y.z
+  <span class="k">version</span>: 0.6.1
 <span class="k">web</span>:
-  <span class="k">version</span>: x.y.z
+  <span class="k">version</span>: 0.4.9
 <span class="k">sites</span>:
   <span class="k">sre</span>:
     <span class="k">name</span>: SREチーム

@@ -38,7 +38,7 @@
 <pre><span class="k">cli</span>:
   <span class="k">version</span>: 0.6.1   <span class="c"># 公開や登録を行うCLI</span>
 <span class="k">web</span>:
-  <span class="k">version</span>: 0.4.8   <span class="c"># app deploy が置く閲覧アプリ</span></pre>
+  <span class="k">version</span>: 0.4.9   <span class="c"># app deploy が置く閲覧アプリ</span></pre>
       </div>
       <ul>
         <li>値は<code>0.6.1</code>のような正確な版です。先頭の<code>v</code>、範囲、<code>latest</code>は書けません。</li>
@@ -94,7 +94,7 @@ Config and stored formats are compatible with web.version.
         <li><span class="st-who" data-kind="admin">管理者</span><b>古いキャッシュが切れるのを待つ</b><p>モジュールの変更が配信先に行き渡るのを待ち、そのあと古い指示でのキャッシュが切れるのを待ちます。製品のモジュールでは最大300秒です。CDNを独自に設定している場合は、その設定の値です。キャッシュの削除はしません。</p></li>
         <li><span class="st-who" data-kind="admin">管理者</span><b>確かめてから、キャッシュの削除用の認証情報を外す</b><p>小さな変更を公開し、新しく読み込んだときに、登録情報や一覧は5秒以内、Artifactはすぐに新しい内容が見えることを確かめます。そのあと、キャッシュの削除のためだけに使っていたAPIトークンをシークレットから消して、失効させます。トークン1つの方式では、トークンは消さずに<code>Cache Purge</code>の権限だけを外します。</p></li>
       </ol>
-      <p>補助ツールの使い方、確かめる項目、元に戻す手順は、製品の<a href="https://github.com/artifact-pages/artifact-pages/blob/main/docs/guides/cache-policy-migration.md" target="_blank" rel="noopener">Cache policy migration</a>にあります。古いCLIに戻すには、古いモジュールと権限、各サイトの公開の状態も一緒に戻す必要があり、<code>cli.version</code>を戻すだけでは戻りません。</p>
+      <p>補助ツールの使い方、確かめる項目、元に戻す手順は、製品の<a href="https://github.com/artifact-pages/artifact-pages/blob/v0.6.1/docs/guides/cache-policy-migration.md" target="_blank" rel="noopener">Cache policy migration</a>にあります。古いCLIに戻すには、古いモジュールと権限、各サイトの公開の状態も一緒に戻す必要があり、<code>cli.version</code>を戻すだけでは戻りません。</p>
     </section>
 
     <section class="doc-section" aria-labelledby="override">

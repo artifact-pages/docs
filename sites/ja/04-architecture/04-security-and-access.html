@@ -87,7 +87,7 @@
           <tr><td>各チーム</td><td>サイトごとのIAMロール。自分のサイトの領域の読み書きと、登録情報と閲覧アプリの記録の読み取りだけ。ほかのサイト、登録、閲覧アプリには書けない</td><td>通常はバケット全体に書けるキーで、サイトごとには分かれない。分けるには、サイトのプレフィックスに絞った一時的な認証情報を組織の仕組みで発行する（CLIは発行しない）</td></tr>
         </tbody>
       </table></div>
-      <p>CLIはCDNのキャッシュを削除しないので、キャッシュの削除の権限（CloudFrontの<code>CreateInvalidation</code>、Cloudflareの<code>Cache Purge</code>）はどの認証情報にも要りません。</p>
+      <p>CLIはCDNのキャッシュを削除しないので、キャッシュの削除の権限（CloudFrontの<code>CreateInvalidation</code>、Cloudflareの<code>Cache Purge</code>）はどの認証情報にも要りません。ただし、公開しているAWSのモジュール0.1.1は、管理用とサイトごとのロールの両方に<code>CreateInvalidation</code>を付けたままです。CLIは使いませんが、ロールの権限としては残っています。</p>
       <p>サイトごとのロールは、本公開とプレビューの両方に使います。プレビュー専用のロールはありません。プレビューのActionは、フォークからのプルリクエストと<code>pull_request_target</code>を拒否し、プルリクエストのリポジトリとコミットを確かめます。呼び出す側のワークフローでも、同じリポジトリからのプルリクエストに限っておきます。</p>
     </section>
 

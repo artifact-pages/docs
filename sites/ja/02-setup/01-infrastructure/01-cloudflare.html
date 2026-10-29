@@ -41,7 +41,7 @@
         <li><strong>ゾーンのルール。</strong>URLの振り分け、キャッシュ、応答ヘッダー、HTMLを書き換えるCloudflareの機能を止める設定の4種類です。ページのURLは閲覧アプリへ届き、内部用の<code>/_control/</code>以下のURLでもストレージの中身は返りません。</li>
         <li><strong>PRプレビューの保持期間。</strong>バケットのライフサイクルの規則として、<code>_previews/</code>以下を指定日数で削除します。</li>
       </ul>
-      <p>WorkerやPagesは使いません。公開ジョブ用の認証情報もモジュールは作らないので、<a href="#credentials">認証情報</a>で自分で発行します。</p>
+      <p>WorkerやPagesは使いません。公開ジョブ用の認証情報もモジュールは作らないので、下の「<a href="#credentials">認証情報</a>」の手順で自分で発行します。</p>
       <figure class="fg" aria-labelledby="cf-path-fig">
         <div class="fg-head"><strong id="cf-path-fig">読者のリクエストが通る道</strong><span class="fg-note">説明用の例</span></div>
         <div class="fg-body"><div class="fl"><div class="nd" data-kind="reader"><b>読者</b><small><code>https://docs.example.com/…</code></small></div><span class="fl-a"><span>開く</span></span><div class="nd" data-kind="cdn"><b>ホスト名とゾーンのルール</b><small>振り分け、キャッシュ、応答ヘッダー、書き換えの停止</small></div><span class="fl-a"><span>読む</span></span><div class="nd" data-kind="store"><b>R2バケット</b><small>非公開。閲覧アプリと全サイトのファイル</small></div></div></div>
@@ -86,7 +86,8 @@
           <tr><td>APIトークン1つ</td><td><code>CF_API_TOKEN</code>だけ</td><td>アカウントのAPIトークン1つ。CLIがこのトークンからR2のキーを導きます。権限は下のとおりです。</td></tr>
         </tbody>
       </table></div>
-      <p>R2のキーが2つとも設定されていればそちらが使われ、APIトークンは読みません。片方だけでは失敗します。APIトークン1つの方式では、試し実行（<code>--dry-run</code>）や変更のない実行でもトークンが必要です。CLIは、どの方式でもCDNのキャッシュを削除しません。そのため、ゾーンの<code>Cache Purge</code>は要りません。コマンドごとの要否は製品の<a href="https://github.com/artifact-pages/artifact-pages/blob/main/docs/guides/cloudflare-deployment.md#2-configure-the-cli" target="_blank" rel="noopener">Cloudflareの導入ガイド</a>に表があります。</p>
+      <p>迷ったら、R2のキーの方式にします。権限をバケットへの書き込みだけに絞れ、あとでサイトごとのプレフィックスに限った一時的な認証情報（下の「サイトの分離」）に移るときも、同じキーの形で渡せます。APIトークン1つの方式は、用意する値が1つで済みます。</p>
+      <p>R2のキーが2つとも設定されていればそちらが使われ、APIトークンは読みません。片方だけでは失敗します。APIトークン1つの方式では、試し実行（<code>--dry-run</code>）や変更のない実行でもトークンが必要です。CLIは、どの方式でもCDNのキャッシュを削除しません。そのため、ゾーンの<code>Cache Purge</code>は要りません。コマンドごとの要否は製品の<a href="https://github.com/artifact-pages/artifact-pages/blob/v0.6.1/docs/guides/cloudflare-deployment.md#2-configure-the-cli" target="_blank" rel="noopener">Cloudflareの導入ガイド</a>（英語）に表があります。</p>
       <p>APIトークン1つの方式では、アカウントのAPIトークンを作り、次の権限を付けます。CLIは実行のはじめに、トークンが有効かをCloudflareに問い合わせて確かめます。</p>
       <div class="table-wrap"><table>
         <thead><tr><th>権限</th><th>対象</th></tr></thead>
@@ -97,7 +98,7 @@
       <div class="callout" role="note">
         <span class="ico">サイトの分離</span>
         <div>
-          <p><strong>バケット全体に書ける認証情報は、サイトごとに分離されません。</strong>同じ環境変数名を使っても、管理リポジトリと各チームで同じ値を共有する必要はありません。ただし、どちらもバケット全体に書ける認証情報なら、あるチームのジョブがほかのサイトの領域にも書けてしまいます。チームのジョブを自分のサイトの領域だけに限るには、R2の一時的な認証情報を、サイトごとのプレフィックスに絞って発行する構成が必要です。CLIはこの発行や更新をしません。手順は製品ガイドの<a href="https://github.com/artifact-pages/artifact-pages/blob/main/docs/guides/cloudflare-deployment.md#optional-delegated-publisher" target="_blank" rel="noopener">Optional delegated publisher</a>にあります。</p>
+          <p><strong>バケット全体に書ける認証情報は、サイトごとに分離されません。</strong>同じ環境変数名を使っても、管理リポジトリと各チームで同じ値を共有する必要はありません。ただし、どちらもバケット全体に書ける認証情報なら、あるチームのジョブがほかのサイトの領域にも書けてしまいます。チームのジョブを自分のサイトの領域だけに限るには、R2の一時的な認証情報を、サイトごとのプレフィックスに絞って発行する構成が必要です。CLIはこの発行や更新をしません。手順は製品ガイドの<a href="https://github.com/artifact-pages/artifact-pages/blob/v0.6.1/docs/guides/cloudflare-deployment.md#optional-delegated-publisher" target="_blank" rel="noopener">Optional delegated publisher</a>（英語）にあります。</p>
         </div>
       </div>
     </section>
@@ -135,7 +136,7 @@
           <tr><td><code>waf_custom_rules</code></td><td><span class="pill">任意</span></td><td>ホスト名の制限。既定は<code>null</code>で、何も制限しません。<a href="#restrict">下の節</a>を参照してください。</td></tr>
         </tbody>
       </table></div>
-      <p>すべての入力は、モジュールの<a href="https://github.com/artifact-pages/artifact-pages/blob/main/terraform/modules/cloudflare/README.md#inputs" target="_blank" rel="noopener">README</a>にあります。公開ジョブの環境変数名を変えたい場合や、チームごとに読み取り用の認証情報を分ける場合の入力もそこにあります。</p>
+      <p>すべての入力は、モジュールの<a href="https://github.com/artifact-pages/artifact-pages/blob/terraform-cloudflare/v0.2.0/terraform/modules/cloudflare/README.md#inputs" target="_blank" rel="noopener">README</a>にあります。公開ジョブの環境変数名を変えたい場合や、チームごとに読み取り用の認証情報を分ける場合の入力もそこにあります。</p>
     </section>
 
     <section class="doc-section" aria-labelledby="existing">
@@ -147,7 +148,7 @@
         <li><strong>つないであるホスト名。</strong>ホスト名がすでにバケットにつながっている場合は、<code>connect_custom_domain = false</code>にして、つながりとTLSの設定を別に確かめます。</li>
         <li><strong>既存のバケット。</strong>モジュールは毎回バケットを作ります。既存のバケットを使うなら、適用の前に取り込むか、配信とライフサイクルのサブモジュールだけを使います。</li>
       </ul>
-      <p>取り込むときのアドレスとIDは、モジュールの<a href="https://github.com/artifact-pages/artifact-pages/blob/main/terraform/modules/cloudflare/README.md#resource-ownership-and-apply-review" target="_blank" rel="noopener">README（Resource ownership and apply review）</a>にあります。新しいゾーンや、これらのルールがまだないゾーンでは、この節の作業は要りません。</p>
+      <p>取り込むときのアドレスとIDは、モジュールの<a href="https://github.com/artifact-pages/artifact-pages/blob/terraform-cloudflare/v0.2.0/terraform/modules/cloudflare/README.md#resource-ownership-and-apply-review" target="_blank" rel="noopener">README（Resource ownership and apply review、英語）</a>にあります。新しいゾーンや、これらのルールがまだないゾーンでは、この節の作業は要りません。</p>
     </section>
 
     <section class="doc-section" aria-labelledby="restrict">
@@ -185,11 +186,13 @@
 <span class="p">$</span> <span data-copy>terraform plan</span>
 <span class="p">$</span> <span data-copy>terraform apply</span></pre>
       </div>
-      <p>計画では、作られるもののほか、既存のルールセットやライフサイクルの規則が置き換えられたり消えたりしないかを確かめます。適用したら、次の2つを確かめてください。</p>
+      <p>計画では、作られるもののほか、既存のルールセットやライフサイクルの規則が置き換えられたり消えたりしないかを確かめます。適用したら、次を確かめてください。</p>
       <ul>
         <li>バケットの<code>r2.dev</code>のURLが無効になっていること。有効なままだと、ゾーンのルールを通らずにバケットの中身が読めてしまいます。</li>
         <li>ホスト名がバケットにつながり、TLSが有効になっていること。</li>
+        <li>ホスト名へのアクセスを制限した場合は、許可していない場所から開くと拒否されること。</li>
       </ul>
+      <p>閲覧アプリはまだ置いていないので、この時点ではホスト名を開いても閲覧アプリは表示されません。表示の確認は、ステップ3で閲覧アプリを置いたあとに行います。</p>
       <p>プレビューの削除はCloudflareが非同期に行うので、指定した日数ちょうどで消えるとは限りません。プレビューを今すぐ見えなくする手段としては使えません。</p>
     </section>
 
@@ -215,7 +218,7 @@
       <h2 id="state">このステップのあとの状態</h2>
       <figure class="fg" aria-labelledby="state-fig">
         <div class="fg-head"><strong id="state-fig">ステップ1のあとの状態</strong><span class="fg-note">説明用の例</span></div>
-        <div class="fg-body"><div class="bd"><section class="bd-col"><h4 class="bd-h">GitHub</h4><div class="nd is-dim" data-kind="admin"><b>管理リポジトリ</b><small>ステップ2で用意</small></div><div class="nd is-dim" data-kind="team"><b>チームのリポジトリ</b><small>ステップ5で用意</small></div></section><div class="bd-a"><span>書き込む</span></div><section class="bd-col"><h4 class="bd-h">配信先</h4><div class="nd is-new" data-kind="store"><b>ストレージとCDN</b><small>ホスト名、配信の規則、認証情報</small><span class="nd-badge">このステップ</span></div><div class="nd is-dim" data-kind="app"><b>閲覧アプリ</b><small>ステップ3で用意</small></div><div class="nd is-dim" data-kind="registry"><b>サイトの登録情報</b><small>ステップ4で用意</small></div><div class="nd is-dim" data-kind="site"><b>サイト<code>sre</code></b><small>ステップ5で用意</small></div><div class="nd is-dim" data-kind="preview"><b>プレビュー</b><small>ステップ6で用意</small></div></section><div class="bd-a"><span>読む</span></div><section class="bd-col"><h4 class="bd-h">ブラウザ</h4><div class="nd is-dim" data-kind="reader"><b>読者</b><small>まだ開けない</small></div></section></div></div>
+        <div class="fg-body"><div class="bd"><section class="bd-col"><h4 class="bd-h">GitHub</h4><div class="nd is-dim" data-kind="admin"><b>管理リポジトリ</b><small>ステップ2で用意</small></div><div class="nd is-dim" data-kind="team"><b>チームのリポジトリ</b><small>ステップ5で用意</small></div></section><div class="bd-a"><span>書き込む</span></div><section class="bd-col"><h4 class="bd-h">配信先</h4><div class="nd is-new" data-kind="store"><b>ストレージとCDN</b><small>ホスト名、配信の規則、認証情報</small><span class="nd-badge">このステップ</span></div><div class="nd is-dim" data-kind="app"><b>閲覧アプリ</b><small>ステップ3で用意</small></div><div class="nd is-dim" data-kind="registry"><b>サイトの登録情報</b><small>ステップ2で用意</small></div><div class="nd is-dim" data-kind="site"><b>サイト<code>sre</code></b><small>ステップ5で用意</small></div><div class="nd is-dim" data-kind="preview"><b>プレビュー</b><small>ステップ6で用意</small></div></section><div class="bd-a"><span>読む</span></div><section class="bd-col"><h4 class="bd-h">ブラウザ</h4><div class="nd is-dim" data-kind="reader"><b>読者</b><small>まだ開けない</small></div></section></div></div>
       </figure>
     </section>
 

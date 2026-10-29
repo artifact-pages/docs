@@ -8,8 +8,8 @@
   const inFrame = (() => { try { return window.parent !== window; } catch { return true; } })();
   const lang = (document.documentElement.lang || '').toLowerCase().startsWith('ja') ? 'ja' : 'en';
   const T = {
-    ja: { copy: 'コピー', copied: 'コピーしました', selectToCopy: '選択してコピー', play: '自動再生', pause: '一時停止', playOff: '自動再生（動きを減らす設定のため無効）', scene: '場面' },
-    en: { copy: 'Copy', copied: 'Copied', selectToCopy: 'Select to copy', play: 'Play', pause: 'Pause', playOff: 'Play (off: reduced motion is on)', scene: 'Scene' },
+    ja: { copy: 'コピー', copied: 'コピーしました', selectToCopy: '選択してコピー', moreColumns: '横にスクロールすると、ほかの列を見られます →', play: '自動再生', pause: '一時停止', playOff: '自動再生（動きを減らす設定のため無効）', scene: '場面' },
+    en: { copy: 'Copy', copied: 'Copied', selectToCopy: 'Select to copy', moreColumns: 'Scroll sideways to see more columns →', play: 'Play', pause: 'Pause', playOff: 'Play (off: reduced motion is on)', scene: 'Scene' },
   }[lang];
 
   /* ── 0. テーマ ─────────────────────────────
@@ -93,6 +93,99 @@
     if (typeof ResizeObserver === 'function') {
       const observer = new ResizeObserver(refresh);
       bands.forEach((band) => observer.observe(band));
+    } else {
+      addEventListener('resize', refresh);
+    }
+  }
+
+  /* ── 3a. 横にあふれる表（.table-wrap） ──
+     表が幅に収まらないときだけ、端を薄くぼかして「まだ先がある」と示し、キーボードでも動かせるようにする
+     （tabindex と role="region"。名前は直前の見出しから借りる）。収まるときは何もしない。 */
+  const wraps = [...document.querySelectorAll('.table-wrap')];
+  if (wraps.length) {
+    let headingSeq = 0;
+    const nameOf = (wrap) => {
+      let node = wrap;
+      while (node) {
+        for (let sib = node.previousElementSibling; sib; sib = sib.previousElementSibling) {
+          const heading = sib.matches('h2, h3, h4') ? sib : sib.querySelector(':scope > h2, :scope > h3, :scope > h4');
+          if (heading) { if (!heading.id) heading.id = 'tw-h' + (++headingSeq); return heading.id; }
+        }
+        node = node.parentElement;
+        if (!node || node === document.body) break;
+      }
+      return '';
+    };
+    const state = (wrap) => {
+      const max = wrap.scrollWidth - wrap.clientWidth;
+      const scrollable = max > 1;
+      wrap.classList.toggle('has-l', scrollable && wrap.scrollLeft > 1);
+      wrap.classList.toggle('has-r', scrollable && wrap.scrollLeft < max - 1);
+      // 先に列があるあいだだけ、表の上に短い案内を出す。端まで動かすと見えなくなる（高さは保つ）。名前は表の領域が持つので、案内は読み上げない
+      let hint = wrap.previousElementSibling && wrap.previousElementSibling.classList.contains('tw-hint') ? wrap.previousElementSibling : null;
+      if (scrollable && !hint) {
+        hint = document.createElement('div');
+        hint.className = 'tw-hint';
+        hint.setAttribute('aria-hidden', 'true');
+        hint.textContent = T.moreColumns;
+        wrap.before(hint);
+      }
+      if (hint) {
+        hint.classList.toggle('is-on', scrollable);
+        hint.classList.toggle('is-end', scrollable && !wrap.classList.contains('has-r'));
+      }
+      if (scrollable) {
+        wrap.setAttribute('tabindex', '0');
+        wrap.setAttribute('role', 'region');
+        const id = nameOf(wrap);
+        if (id) wrap.setAttribute('aria-labelledby', id);
+      } else {
+        wrap.removeAttribute('tabindex');
+        wrap.removeAttribute('role');
+        wrap.removeAttribute('aria-labelledby');
+      }
+    };
+    wraps.forEach((wrap) => {
+      state(wrap);
+      wrap.addEventListener('scroll', () => state(wrap), { passive: true });
+    });
+    const refreshWraps = () => wraps.forEach(state);
+    if (typeof ResizeObserver === 'function') {
+      const observer = new ResizeObserver(refreshWraps);
+      wraps.forEach((wrap) => { observer.observe(wrap); if (wrap.firstElementChild) observer.observe(wrap.firstElementChild); });
+    } else {
+      addEventListener('resize', refreshWraps);
+    }
+    if (document.fonts && document.fonts.ready) document.fonts.ready.then(refreshWraps);
+  }
+
+  /* ── 3b. フローの向き（.fl） ──
+     フロー全体が図の幅に収まるときは横、収まらないときは縦にする。ノードの数やラベルの長さでは決めない。
+     いったん横にして実際の幅を測り、フローがあふれるか、ノードの中身があふれるか、ノードが細すぎる（MIN_NODE 未満）ときに縦にする。
+     結果は data-fit に "h" か "v" で入れる。JavaScript が無効なときの縦と、読み込み直後（data-fit がまだ無いとき）の仮の向きは CSS 側にある。
+     .is-v を付けたフローと、列（.bd-col）の中のフローは、いつも縦なので測らない。 */
+  const flows = [...document.querySelectorAll('.fl')].filter((fl) => !fl.classList.contains('is-v') && !fl.closest('.bd-col'));
+  if (flows.length) {
+    const MIN_NODE = 88;
+    const widths = new WeakMap();
+    const fit = (fl) => {
+      if (!fl.clientWidth) return; // 非表示のときは測れない
+      widths.set(fl, fl.clientWidth);
+      fl.dataset.fit = 'h';
+      const nodes = [...fl.children].filter((child) => child.matches('.nd, .fl-stack'));
+      const ok = fl.scrollWidth <= fl.clientWidth + 1
+        && nodes.every((node) => node.getBoundingClientRect().width >= MIN_NODE)
+        && [...fl.querySelectorAll('.nd')].every((node) => node.scrollWidth <= node.clientWidth + 1);
+      fl.dataset.fit = ok ? 'h' : 'v';
+    };
+    const refresh = () => flows.forEach((fl) => { if (fl.dataset.fit === undefined || widths.get(fl) !== fl.clientWidth) fit(fl); });
+    const refit = () => flows.forEach(fit);
+    refit();
+    if (document.fonts && document.fonts.ready) document.fonts.ready.then(refit);
+    addEventListener('load', refit);
+    if (typeof ResizeObserver === 'function') {
+      const observer = new ResizeObserver(refresh);
+      new Set(flows.map((fl) => fl.closest('.fg') || fl.parentElement)).forEach((box) => observer.observe(box));
     } else {
       addEventListener('resize', refresh);
     }

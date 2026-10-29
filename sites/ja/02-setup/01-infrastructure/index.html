@@ -53,7 +53,7 @@
 
     <section class="doc-section" aria-labelledby="choose">
       <h2 id="choose">CloudflareとAWSのどちらを選ぶか</h2>
-      <p>できることはほぼ同じで、違いは主に、ホスト名の用意のしかたと、ジョブの認証のしかたです。社内ですでに使っているほうを選ぶのが近道です。</p>
+      <p>できることはほぼ同じで、違いは主に、ホスト名の用意のしかたと、ジョブの認証のしかたです。社内ですでに使っているほうを選ぶのが近道です。どちらでもよい場合は、いまの版の組で本番環境を動かしているCloudflareを選びます。</p>
       <div class="table-wrap"><table>
         <thead><tr><th></th><th>Cloudflare</th><th>AWS</th></tr></thead>
         <tbody>
@@ -62,6 +62,7 @@
           <tr><td>ジョブの認証</td><td>R2のアクセスキーやAPIトークンを自分で発行し、GitHubのシークレットに入れます。モジュールは発行しません。</td><td>モジュールがIAMロールを作り、各ジョブはGitHubのOIDCでそのロールを引き受けます。GitHubに長期のキーは置きません。</td></tr>
           <tr><td>閲覧の制限</td><td>IPアドレスでの制限とHTTPSのみの許可を、モジュールで設定できます。本人の認証にはCloudflare Accessを別に設定します。</td><td>IPアドレスでの制限を、モジュールでAWS WAFとして設定できます。本人の認証は別の仕組みが必要です。</td></tr>
           <tr><td>モジュール</td><td><code>artifact-pages/artifact-pages/cloudflare</code></td><td><code>artifact-pages/artifact-pages/aws</code></td></tr>
+          <tr><td>いまの状態</td><td>モジュール0.2.0とCLI 0.6.1の組で、このドキュメントの本番環境を動かしています。</td><td>公開しているモジュール0.1.1とCLI 0.6.1は組み合わせて使えますが、この組をAWSの実環境で確かめた記録はまだありません。CLI 0.6に合わせたモジュールは、まだ公開していません（「<a href="../index.html#versions">この章で使う版</a>」）。</td></tr>
         </tbody>
       </table></div>
       <p>費用は、保存する量、配信する量、キャッシュで返せずにストレージまで届く要求の数、WAFを使うかどうかで変わります。ここでは一律にどちらが安いとは言えません。費用がどこで生まれるかは「<a href="../../04-architecture/05-cost-and-performance.html">コストとパフォーマンス</a>」で説明します。</p>

@@ -56,17 +56,50 @@
     <span class="k">runs-on</span>: ubuntu-24.04
     <span class="k">environment</span>: production
     <span class="k">steps</span>:
-      - <span class="k">uses</span>: artifact-pages/app-deploy-action@vX.Y.Z
+      - <span class="k">uses</span>: artifact-pages/app-deploy-action@571e4cb82cb14043afc63bbeaf73202b8ff6779c   <span class="c"># v0.4.0</span>
         <span class="k">with</span>:
           <span class="k">dry-run</span>: ${{ inputs.dry-run }}
+          <span class="k">publish-on</span>: workflow_dispatch:refs/heads/main
         <span class="k">env</span>:
           <span class="k">CF_R2_ACCESS_KEY_ID</span>: ${{ secrets.CF_R2_ACCESS_KEY_ID }}
           <span class="k">CF_R2_SECRET_ACCESS_KEY</span>: ${{ secrets.CF_R2_SECRET_ACCESS_KEY }}</span></pre>
       </div>
+      <div class="term" aria-label="閲覧アプリの配置ワークフロー（AWS）">
+        <div class="term-head"><span>.github/workflows/app-deploy.yml / 管理リポジトリ（AWS）</span><button class="copy-btn" type="button">コピー</button></div>
+<pre><span data-copy><span class="k">name</span>: App deploy
+<span class="k">on</span>:
+  <span class="k">workflow_dispatch</span>:
+    <span class="k">inputs</span>:
+      <span class="k">dry-run</span>:
+        <span class="k">description</span>: Plan only, without writes.
+        <span class="k">type</span>: boolean
+        <span class="k">default</span>: true
+<span class="k">permissions</span>:
+  <span class="k">contents</span>: read
+  <span class="k">id-token</span>: write
+<span class="k">concurrency</span>:
+  <span class="k">group</span>: app-deploy
+  <span class="k">cancel-in-progress</span>: false
+<span class="k">jobs</span>:
+  <span class="k">deploy</span>:
+    <span class="k">runs-on</span>: ubuntu-24.04
+    <span class="k">environment</span>: production
+    <span class="k">steps</span>:
+      - <span class="k">uses</span>: aws-actions/configure-aws-credentials@e1253824e5c10ff9df46874f81ed3ec929e19cfd   <span class="c"># v6.3.0</span>
+        <span class="k">with</span>:
+          <span class="k">role-to-assume</span>: ${{ vars.ARTIFACT_PAGES_REGISTRY_ADMIN_ROLE_ARN }}
+          <span class="k">aws-region</span>: us-east-1   <span class="c"># 設定ファイルの aws.region と同じ値</span>
+          <span class="k">role-session-name</span>: artifact-pages-app-deploy
+      - <span class="k">uses</span>: artifact-pages/app-deploy-action@571e4cb82cb14043afc63bbeaf73202b8ff6779c   <span class="c"># v0.4.0</span>
+        <span class="k">with</span>:
+          <span class="k">dry-run</span>: ${{ inputs.dry-run }}
+          <span class="k">publish-on</span>: workflow_dispatch:refs/heads/main</span></pre>
+      </div>
       <ul>
-        <li><code>vX.Y.Z</code>は<a href="https://github.com/artifact-pages/app-deploy-action/releases" target="_blank" rel="noopener">app-deploy-actionのリリース</a>の版です。生成された共通のワークフローと同じように、タグの代わりにコミットのSHAで固定するとより確実です。Actionの版は、置く閲覧アプリの版とは関係ありません。閲覧アプリは<code>web.version</code>で決まります。</li>
+        <li>製品のActionは、生成された共通のワークフローと同じように、タグではなくコミットのSHAで固定します。上の例は<code>v0.4.0</code>のSHAです（「<a href="index.html#versions">この章で使う版</a>」）。Actionの版は、置く閲覧アプリの版とは関係ありません。閲覧アプリは<code>web.version</code>で決まります。</li>
+        <li><code>publish-on</code>で、書き込むのを<code>main</code>からの手動実行だけに限ります。ほかのブランチから動かすと、<code>dry-run</code>を外しても試し実行になります。</li>
         <li>APIトークン1つの方式では、R2のキー2つの代わりに<code>CF_API_TOKEN</code>を渡します。</li>
-        <li>AWSでは<code>env</code>の代わりに、このステップの前に<code>aws-actions/configure-aws-credentials</code>で<code>admin_role_arn</code>のロールを引き受け、ジョブの<code>permissions</code>に<code>id-token: write</code>を足します。</li>
+        <li>AWSでは、シークレットの代わりに、管理リポジトリのリポジトリ変数<code>ARTIFACT_PAGES_REGISTRY_ADMIN_ROLE_ARN</code>（ステップ2で設定したTerraformの出力<code>admin_role_arn</code>）のロールを引き受けます。そのために<code>id-token: write</code>が要ります。ロールは<code>production</code>のEnvironmentのジョブ（<code>…:environment:production</code>）に引き受けを許している必要があります。</li>
       </ul>
     </section>
 
@@ -82,19 +115,30 @@
 <pre><span class="p">$</span> <span data-copy>artifact-pages app deploy --config artifact-pages.yaml --dry-run</span>
 <span class="p">$</span> <span data-copy>artifact-pages app deploy --config artifact-pages.yaml</span></pre>
       </div>
-      <p>配置では、<code>web/vx.y.z</code>のリリースのアーカイブとチェックサムを確かめてから、閲覧アプリのファイル（<code>index.html</code>、<code>assets/</code>など）を書き込みます。サイトのArtifact、一覧、プレビューには触れません。<code>index.html</code>は最後に書き込みますが、すべてのファイルが一瞬で切り替わるわけではありません。</p>
+      <p>配置では、<code>web.version</code>の版のリリース（例では<code>web/v0.4.9</code>）のアーカイブとチェックサムを確かめてから、閲覧アプリのファイル（<code>index.html</code>、<code>assets/</code>など）を書き込みます。サイトのArtifact、一覧、プレビューには触れません。<code>index.html</code>は最後に書き込みますが、すべてのファイルが一瞬で切り替わるわけではありません。</p>
     </section>
 
     <section class="doc-section" aria-labelledby="open">
       <h2 id="open">開いて確かめる</h2>
       <p>配信先のホスト名を開きます。Cloudflareでは<code>publicBaseURL</code>、AWSではCloudFrontのホスト名（独自ドメインならそのホスト名）です。閲覧アプリが表示されれば配置は完了です。まだサイトを登録していないので、サイトの一覧は空です。</p>
+      <p>ターミナルからは、次の応答で確かめられます。<code>HOST</code>は読者が開くホスト名です。閲覧を制限している場合は、許可した場所から実行します。</p>
+      <div class="term" aria-label="配置のあとの応答を確かめる">
+        <div class="term-head"><span>ターミナル</span><button class="copy-btn" type="button">コピー</button></div>
+<pre><span class="p">$</span> <span data-copy>curl -sS -o /dev/null -w '%{http_code}\n' https://HOST/</span>
+<span class="p">$</span> <span data-copy>curl -sS -o /dev/null -w '%{http_code}\n' https://HOST/_indexes/sites.json</span></pre>
+      </div>
+      <ul>
+        <li><strong><code>/</code>は<code>200</code>。</strong>閲覧アプリのHTMLが返ります。<code>404</code>なら、配置が終わっていないか、<code>dry-run</code>のまま動かしています。閲覧を制限している場合は、許可した場所から確かめているかも見直します。制限で止められたときの応答は、<code>403</code>のほか、AWSでは<code>404</code>になることもあります。</li>
+        <li><strong><code>/_indexes/sites.json</code>は<code>200</code>。</strong>ステップ2のマージで登録のワークフローが動き、空のサイトの一覧が置かれています。<code>404</code>なら、そのワークフローがまだ動いていないか、失敗しています。</li>
+      </ul>
+      <p>うまくいかないときは「<a href="../03-operations/05-troubleshooting.html">問題を調べ、復旧する</a>」で、ジョブの概要とエラーの読み方を確かめます。</p>
     </section>
 
     <section class="doc-section" aria-labelledby="state">
       <h2 id="state">このステップのあとの状態</h2>
       <figure class="fg" aria-labelledby="state-fig">
         <div class="fg-head"><strong id="state-fig">ステップ3のあとの状態</strong><span class="fg-note">説明用の例</span></div>
-        <div class="fg-body"><div class="bd"><section class="bd-col"><h4 class="bd-h">GitHub</h4><div class="nd is-new" data-kind="admin"><b>管理リポジトリ</b><small><code>artifact-pages.yaml</code>、共通のワークフロー、配置のワークフロー</small><span class="nd-badge">このステップ</span></div><div class="nd is-dim" data-kind="team"><b>チームのリポジトリ</b><small>ステップ5で用意</small></div></section><div class="bd-a"><span>書き込む</span></div><section class="bd-col"><h4 class="bd-h">配信先</h4><div class="nd" data-kind="store"><b>ストレージとCDN</b><small>ホスト名、配信の規則、認証情報</small></div><div class="nd is-new" data-kind="app"><b>閲覧アプリ</b><small>ホスト名のトップで開く</small><span class="nd-badge">このステップ</span></div><div class="nd is-dim" data-kind="registry"><b>サイトの登録情報</b><small>ステップ4で用意</small></div><div class="nd is-dim" data-kind="site"><b>サイト<code>sre</code></b><small>ステップ5で用意</small></div><div class="nd is-dim" data-kind="preview"><b>プレビュー</b><small>ステップ6で用意</small></div></section><div class="bd-a"><span>読む</span></div><section class="bd-col"><h4 class="bd-h">ブラウザ</h4><div class="nd is-new" data-kind="reader"><b>読者</b><small>閲覧アプリが開く</small><span class="nd-badge">このステップ</span></div></section></div></div>
+        <div class="fg-body"><div class="bd"><section class="bd-col"><h4 class="bd-h">GitHub</h4><div class="nd is-new" data-kind="admin"><b>管理リポジトリ</b><small><code>artifact-pages.yaml</code>、共通のワークフロー、配置のワークフロー</small><span class="nd-badge">このステップ</span></div><div class="nd is-dim" data-kind="team"><b>チームのリポジトリ</b><small>ステップ5で用意</small></div></section><div class="bd-a"><span>書き込む</span></div><section class="bd-col"><h4 class="bd-h">配信先</h4><div class="nd" data-kind="store"><b>ストレージとCDN</b><small>ホスト名、配信の規則、認証情報</small></div><div class="nd is-new" data-kind="app"><b>閲覧アプリ</b><small>ホスト名のトップで開く</small><span class="nd-badge">このステップ</span></div><div class="nd" data-kind="registry"><b>サイトの登録情報</b><small>空（サイトはまだない）</small></div><div class="nd is-dim" data-kind="site"><b>サイト<code>sre</code></b><small>ステップ5で用意</small></div><div class="nd is-dim" data-kind="preview"><b>プレビュー</b><small>ステップ6で用意</small></div></section><div class="bd-a"><span>読む</span></div><section class="bd-col"><h4 class="bd-h">ブラウザ</h4><div class="nd is-new" data-kind="reader"><b>読者</b><small>閲覧アプリが開く</small><span class="nd-badge">このステップ</span></div></section></div></div>
       </figure>
     </section>
 
