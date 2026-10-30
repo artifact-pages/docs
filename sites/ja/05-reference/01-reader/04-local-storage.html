@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <meta name="description" content="閲覧アプリがブラウザに保存するもの（ピン留め、最近読んだArtifact、テーマ）、保存しないもの、端末やブラウザの間の扱い、消し方。">
+  <meta name="description" content="閲覧アプリがブラウザに保存するもの（ピン留め、最近読んだArtifact、テーマ）、保存しないもの、端末やブラウザの間で共有されるか、消し方。">
   <title>ピン留め・閲覧履歴などの保存と扱い</title>
   <script>
     // Copy the reader app's theme (same-origin parent) before first paint; assets/site.js keeps it in sync.
@@ -54,7 +54,7 @@
     </section>
 
     <section class="doc-section" aria-labelledby="clear">
-      <h2 id="clear">消す</h2>
+      <h2 id="clear">保存した内容を消す</h2>
       <p>ピン留めは、Artifactのメニューの<strong>Unpin</strong>で1件ずつ外せます。まとめて消す画面はありません。すべて消すには、閲覧アプリを開いたブラウザで、そのホスト名のサイトデータを消すか、開発者ツールのコンソールで次を実行してから再読み込みします。</p>
       <div class="term" aria-label="保存を消す">
         <div class="term-head"><span>ブラウザのコンソール</span><button class="copy-btn" type="button">コピー</button></div>

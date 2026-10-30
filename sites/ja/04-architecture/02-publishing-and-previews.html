@@ -57,7 +57,7 @@
       <figure class="fg" aria-labelledby="sync-fig">
         <div class="fg-head"><strong id="sync-fig">1回の公開の中で、何がいつ起こるか</strong></div>
         <div class="fg-body"><div class="bn" style="--cols:8"><div class="bn-t"><span>ロック</span><span>登録</span><span>比較</span><span>計画</span><span>記録</span><span>書く</span><span>消す</span><span>終了</span></div><div class="bn-r"><span class="bn-l">サイトのロック</span><span class="bn-b" data-kind="lock" style="--from:1;--to:8">持っている</span></div><div class="bn-r"><span class="bn-l">再試行の記録</span><span class="bn-b" data-kind="cache" style="--from:5;--to:8">残っている</span></div><div class="bn-r"><span class="bn-l">配信先への書き込み</span><span class="bn-b" data-kind="work" style="--from:6;--to:7">新旧が混ざりうる</span></div><div class="bn-r"><span class="bn-l">試し実行</span><span class="bn-b" data-kind="wait" style="--from:2;--to:4">読むだけ（ロックなし）</span></div><ul class="bn-k"><li data-kind="lock">サイトのロックを持つ期間</li><li data-kind="cache">再試行の記録がある期間</li><li data-kind="work">配信先のファイルを書き換える期間</li><li data-kind="wait">試し実行が行う範囲</li></ul></div></div>
-        <figcaption>前回と同じで、プレビューの一覧の手入れや前回の書き込みの続きも残っていなければ、配信用のファイルを組み立てずに<code>no-op</code>で終わります。このときも、ロックの読み書きはあります。「記録」のあとのどこで失敗しても再試行の記録が残り、次の公開が続きを行います。<span class="fg-scroll">図は横にスクロールして見られます。</span></figcaption>
+        <figcaption>前回と同じで、プレビューの一覧の手入れや前回の書き込みの続きも残っていなければ、配信用のファイルを組み立てずに<code>no-op</code>で終わります。このときも、ロックは読み書きします。「記録」のあとのどこで失敗しても再試行の記録が残り、次の公開が続きを進めます。<span class="fg-scroll">図は横にスクロールして見られます。</span></figcaption>
       </figure>
       <ol>
         <li><strong>ロックを取り、登録を確かめる。</strong>サイトのロックを取ってから、配信先の登録を読み直し、公開元のリポジトリとディレクトリが登録どおりかを確かめます。同じサイトの公開、プレビュー、登録の変更は同じロックを使い、別のサイトの公開とは並んで進みます。</li>

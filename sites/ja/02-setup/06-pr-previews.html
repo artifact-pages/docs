@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <meta name="description" content="チームのリポジトリに共通のプレビューのワークフローを呼び出すワークフローを置き、プルリクエストの変更をレビューの前に閲覧アプリで読めるようにする。見えるもの、閉じたあとの扱い、保持期間。">
+  <meta name="description" content="チームのリポジトリに共通のプレビューのワークフローを呼び出すワークフローを置き、プルリクエストの変更をレビューの前に閲覧アプリで読めるようにする。見えるもの、プルリクエストを閉じたあとのプレビュー、保持期間。">
   <title>PRプレビューを使えるようにする</title>
   <script>
     // Copy the reader app's theme (same-origin parent) before first paint; assets/site.js keeps it in sync.
@@ -96,7 +96,7 @@
 
     <section class="doc-section" aria-labelledby="after">
       <h2 id="after">プルリクエストを閉じたあと</h2>
-      <p>プルリクエストをマージしたり閉じたりしても、プレビューは自動では消えません。配信先の保持期間（Terraformの<code>preview_retention_days</code>）が過ぎると、配信先が削除します。削除は配信先が非同期に行うので、ちょうどその日数で消えるとは限りません。</p>
+      <p>プルリクエストをマージしたり閉じたりしても、プレビューは自動では消えません。配信先の保持期間（Terraformの<code>preview_retention_days</code>）が過ぎると、配信先が削除します。配信先は非同期に削除するので、ちょうどその日数で消えるとは限りません。</p>
       <p>期間を待たずに消したい場合は、CLIで削除します。</p>
       <div class="term" aria-label="プレビューを削除する">
         <div class="term-head"><span>ターミナル</span><button class="copy-btn" type="button">コピー</button></div>
@@ -107,14 +107,14 @@
     </section>
 
     <section class="doc-section" aria-labelledby="done">
-      <h2 id="done">導入の完了</h2>
+      <h2 id="done">これで導入は完了です</h2>
       <p>これで、最初のチームが自分のリポジトリからArtifactを公開し、プルリクエストをプレビューで確かめられるようになりました。次のチームを受け入れるときは「<a href="../03-operations/01-onboard-team.html">新しいチーム・サイトを受け入れる</a>」に進みます。</p>
     </section>
 
     <section class="doc-section" aria-labelledby="state">
-      <h2 id="state">このステップのあとの状態</h2>
+      <h2 id="state">このステップが終わったら</h2>
       <figure class="fg" aria-labelledby="state-fig">
-        <div class="fg-head"><strong id="state-fig">ステップ6のあとの状態</strong><span class="fg-note">説明用の例</span></div>
+        <div class="fg-head"><strong id="state-fig">ステップ6が終わったら</strong><span class="fg-note">説明用の例</span></div>
         <div class="fg-body"><div class="bd"><section class="bd-col"><h4 class="bd-h">GitHub</h4><div class="nd" data-kind="admin"><b>管理リポジトリ</b><small><code>artifact-pages.yaml</code>、共通のワークフロー、配置のワークフロー、<code>sites</code>に<code>sre</code></small></div><div class="nd is-new" data-kind="team"><b>チームのリポジトリ</b><small>acme/sre：<code>docs/</code>、公開のワークフロー、プレビューのワークフロー</small><span class="nd-badge">このステップ</span></div><div class="nd is-new" data-kind="ci"><b>プルリクエスト</b><small>プレビューのコメント</small><span class="nd-badge">このステップ</span></div></section><div class="bd-a"><span>書き込む</span></div><section class="bd-col"><h4 class="bd-h">配信先</h4><div class="nd" data-kind="store"><b>ストレージとCDN</b><small>ホスト名、配信の規則、認証情報</small></div><div class="nd" data-kind="app"><b>閲覧アプリ</b><small>ホスト名のトップで開く</small></div><div class="nd" data-kind="registry"><b>サイトの登録情報</b><small><code>sre</code></small></div><div class="nd" data-kind="site"><b>サイト<code>sre</code></b><small>Artifactと一覧、本文検索のデータ</small></div><div class="nd is-new" data-kind="preview"><b>プレビュー</b><small>プルリクエストごと</small><span class="nd-badge">このステップ</span></div></section><div class="bd-a"><span>読む</span></div><section class="bd-col"><h4 class="bd-h">ブラウザ</h4><div class="nd" data-kind="reader"><b>読者</b><small><code>sre</code>のArtifactを読める、プレビューを開ける</small></div></section></div></div>
       </figure>
     </section>

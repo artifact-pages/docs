@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <meta name="description" content="artifact-pages.yamlの選ばれ方と重ね合わせ、全キーの必須性と既定値と制約、github://の指定、認証情報の環境変数と操作ごとの要否。">
+  <meta name="description" content="artifact-pages.yamlの選ばれ方と重ね合わせ、各キーが必須かどうか、既定値と制約、github://の指定、認証情報の環境変数と操作ごとに必要かどうか。">
   <title>設定ファイル</title>
   <script>
     // Copy the reader app's theme (same-origin parent) before first paint; assets/site.js keeps it in sync.
@@ -62,7 +62,7 @@
           <tr><td><code>schemaVersion</code></td><td><span class="pill on">必須</span></td><td>整数の<code>1</code>。</td></tr>
           <tr><td><code>provider</code></td><td><span class="pill on">必須</span></td><td><code>local</code>、<code>aws</code>、<code>cloudflare</code>のどれか（ほかに検証用の<code>gcp-local</code>）。</td></tr>
           <tr><td><code>publicBaseURL</code></td><td><span class="pill">任意</span></td><td>読者が開くURLのオリジン。HTTPS（手元ならHTTPのループバックも可）。パス、クエリ、フラグメントは付けない。プレビューのURLを作るのに使う。</td></tr>
-          <tr><td><code>cli.version</code></td><td><span class="pill">任意</span></td><td>公開を行うCLIの正確な版（<code>MAJOR.MINOR.PATCH</code>）。<code>v</code>、範囲、<code>latest</code>、プレリリースの印は不可。</td></tr>
+          <tr><td><code>cli.version</code></td><td><span class="pill">任意</span></td><td>公開するCLIの正確な版（<code>MAJOR.MINOR.PATCH</code>）。<code>v</code>、範囲、<code>latest</code>、プレリリースの印は不可。</td></tr>
           <tr><td><code>web.version</code></td><td><span class="pill">任意</span></td><td><code>app deploy</code>が置く閲覧アプリの正確な版。互換性の確認にも使う。</td></tr>
           <tr><td><code>sites</code></td><td><span class="pill">任意</span></td><td>登録するサイトのすべて。<code>registry sync</code>と<code>registry setup</code>では必須。</td></tr>
         </tbody>
@@ -128,7 +128,7 @@
     </section>
 
     <section class="doc-section" aria-labelledby="credentials">
-      <h2 id="credentials">Cloudflareの認証情報の要否</h2>
+      <h2 id="credentials">Cloudflareの認証情報の渡し方と、必要な操作</h2>
       <p>R2のキー（アクセスキーIDとシークレット）を明示する方式と、APIトークン1つから導く方式があります。キーが2つとも設定されていれば明示する方式、2つとも空ならトークン1つの方式です。片方だけは失敗します。</p>
       <div class="table-wrap"><table>
         <thead><tr><th>操作</th><th>認証情報</th></tr></thead>

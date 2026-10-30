@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <meta name="description" content="管理リポジトリが配る共通の公開・プレビューのワークフローを作り直し、その変更がいつ各チームに届くかを、参照の固定のしかたごとに確かめる。">
+  <meta name="description" content="管理リポジトリが配る共通の公開・プレビューのワークフローを作り直し、その変更がいつ各チームに届くかを、参照をどう固定しているかに応じて確かめる。">
   <title>共通の公開・プレビューの仕組みを更新する</title>
   <script>
     // Copy the reader app's theme (same-origin parent) before first paint; assets/site.js keeps it in sync.
@@ -36,7 +36,7 @@
       <p>チームのジョブが実際に動かすものは、3か所の固定で決まります。</p>
       <figure class="fg" aria-labelledby="pins-fig">
         <div class="fg-head"><strong id="pins-fig">3か所の固定</strong><span class="fg-note">説明用の例</span></div>
-        <div class="fg-body"><div class="fl"><div class="nd" data-kind="team"><b>チームのワークフロー</b><small>acme/sre</small></div><span class="fl-a"><span>固定1：<code>@main</code>かSHA</span></span><div class="nd" data-kind="admin"><b>共通のワークフローと<code>artifact-pages.yaml</code></b><small>参照したコミットのもの</small></div><span class="fl-a"><span>固定2：ActionのSHA</span></span><div class="nd" data-kind="ci"><b>製品のAction</b><small><code>publish-action</code>、<code>preview-action</code></small></div><span class="fl-a"><span>固定3：<code>cli.version</code></span></span><div class="nd" data-kind="cli"><b>公開を行うCLI</b></div></div></div>
+        <div class="fg-body"><div class="fl"><div class="nd" data-kind="team"><b>チームのワークフロー</b><small>acme/sre</small></div><span class="fl-a"><span>固定1：<code>@main</code>かSHA</span></span><div class="nd" data-kind="admin"><b>共通のワークフローと<code>artifact-pages.yaml</code></b><small>参照したコミットのもの</small></div><span class="fl-a"><span>固定2：ActionのSHA</span></span><div class="nd" data-kind="ci"><b>製品のAction</b><small><code>publish-action</code>、<code>preview-action</code></small></div><span class="fl-a"><span>固定3：<code>cli.version</code></span></span><div class="nd" data-kind="cli"><b>公開するCLI</b></div></div></div>
         <figcaption>チームが<code>@main</code>を参照していれば、管理リポジトリの<code>main</code>の変更は次の実行から届きます。SHAやタグで参照していると、固定1から先はすべて古いままです。</figcaption>
       </figure>
       <div class="table-wrap"><table>
@@ -44,7 +44,7 @@
         <tbody>
           <tr><td>チームのワークフローの<code>uses: …/publish-site.yml@&lt;参照&gt;</code></td><td>どの時点の共通のワークフローと、同じコミットにある<code>artifact-pages.yaml</code>を使うか</td><td><code>@main</code>なら、管理リポジトリの<code>main</code>が変わったあとの次の実行から。コミットのSHAなら、チームが参照を書き換えるまで変わりません。</td></tr>
           <tr><td>共通のワークフローの中の製品Actionの参照</td><td>製品の<code>publish-action</code>と<code>preview-action</code>の版（コミットのSHAで固定）</td><td>新しいActionsの参照を組み込んだCLIで、共通のワークフローを作り直したとき。製品の新しいリリースが出ただけでは変わりません。</td></tr>
-          <tr><td><code>artifact-pages.yaml</code>の<code>cli.version</code></td><td>実際に公開を行うCLIの版</td><td>管理者がこの値を変えたとき。ただし、チームが古いコミットを参照していれば、古い設定の値のままです。</td></tr>
+          <tr><td><code>artifact-pages.yaml</code>の<code>cli.version</code></td><td>実際に公開するCLIの版</td><td>管理者がこの値を変えたとき。ただし、チームが古いコミットを参照していれば、古い設定の値のままです。</td></tr>
         </tbody>
       </table></div>
       <p>共通のワークフローは、自分と同じコミットにある<code>artifact-pages.yaml</code>を製品のActionに渡します。チームのリポジトリに設定ファイルは要らず、管理者が<code>main</code>で設定を変えれば、<code>@main</code>を参照するチームの次の公開からその設定が使われます。</p>

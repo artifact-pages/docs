@@ -28,7 +28,7 @@
         <p class="eyebrow" data-search-ignore>導入する · インフラを構築する</p>
         <h1>Cloudflareに構築する</h1>
       </div>
-      <p class="lead">R2のバケットと、お使いのゾーンのルールで、Artifact Pagesの配信環境を作ります。モジュールの呼び出しはTerraformで行い、公開ジョブの認証情報はCloudflareのダッシュボードで発行します。</p>
+      <p class="lead">R2のバケットと、お使いのゾーンのルールで、Artifact Pagesの配信環境を作ります。モジュールはTerraformで呼び出し、公開ジョブの認証情報はCloudflareのダッシュボードで発行します。</p>
     </header>
 
     <nav class="sm" data-search-ignore aria-label="導入のステップ"><ol><li><a href="../01-infrastructure/index.html" aria-current="step"><span class="sm-n">1</span><b>インフラを構築する</b></a></li><li><a href="../02-admin-repository.html"><span class="sm-n">2</span><b>管理リポジトリを準備する</b></a></li><li><a href="../03-reader-app.html"><span class="sm-n">3</span><b>閲覧アプリをデプロイする</b></a></li><li><a href="../04-register-site.html"><span class="sm-n">4</span><b>サイトを登録する</b></a></li><li><a href="../05-first-site.html"><span class="sm-n">5</span><b>最初のサイトを公開する</b></a></li><li><a href="../06-pr-previews.html"><span class="sm-n">6</span><b>PRプレビューを使えるようにする</b></a></li></ol></nav>
@@ -43,7 +43,7 @@
       </ul>
       <p>WorkerやPagesは使いません。公開ジョブ用の認証情報もモジュールは作らないので、下の「<a href="#credentials">認証情報</a>」の手順で自分で発行します。</p>
       <figure class="fg" aria-labelledby="cf-path-fig">
-        <div class="fg-head"><strong id="cf-path-fig">読者のリクエストが通る道</strong><span class="fg-note">説明用の例</span></div>
+        <div class="fg-head"><strong id="cf-path-fig">読者のリクエストの流れ</strong><span class="fg-note">説明用の例</span></div>
         <div class="fg-body"><div class="fl"><div class="nd" data-kind="reader"><b>読者</b><small><code>https://docs.example.com/…</code></small></div><span class="fl-a"><span>開く</span></span><div class="nd" data-kind="cdn"><b>ホスト名とゾーンのルール</b><small>振り分け、キャッシュ、応答ヘッダー、書き換えの停止</small></div><span class="fl-a"><span>読む</span></span><div class="nd" data-kind="store"><b>R2バケット</b><small>非公開。閲覧アプリと全サイトのファイル</small></div></div></div>
         <figcaption>ページのURLには閲覧アプリが返り、閲覧アプリが一覧やArtifactのファイルを読みます。<code>/_control/</code>以下のURLにストレージの中身は返りません。</figcaption>
       </figure>
@@ -87,7 +87,7 @@
         </tbody>
       </table></div>
       <p>迷ったら、R2のキーの方式にします。権限をバケットへの書き込みだけに絞れ、あとでサイトごとのプレフィックスに限った一時的な認証情報（下の「サイトの分離」）に移るときも、同じキーの形で渡せます。APIトークン1つの方式は、用意する値が1つで済みます。</p>
-      <p>R2のキーが2つとも設定されていればそちらが使われ、APIトークンは読みません。片方だけでは失敗します。APIトークン1つの方式では、試し実行（<code>--dry-run</code>）や変更のない実行でもトークンが必要です。CLIは、どの方式でもCDNのキャッシュを削除しません。そのため、ゾーンの<code>Cache Purge</code>は要りません。コマンドごとの要否は製品の<a href="https://github.com/artifact-pages/artifact-pages/blob/v0.6.1/docs/guides/cloudflare-deployment.md#2-configure-the-cli" target="_blank" rel="noopener">Cloudflareの導入ガイド</a>（英語）に表があります。</p>
+      <p>R2のキーが2つとも設定されていればそちらが使われ、APIトークンは読みません。片方だけでは失敗します。APIトークン1つの方式では、試し実行（<code>--dry-run</code>）や変更のない実行でもトークンが必要です。CLIは、どの方式でもCDNのキャッシュを削除しません。そのため、ゾーンの<code>Cache Purge</code>は要りません。コマンドごとに認証情報が必要かどうかは、製品の<a href="https://github.com/artifact-pages/artifact-pages/blob/v0.6.1/docs/guides/cloudflare-deployment.md#2-configure-the-cli" target="_blank" rel="noopener">Cloudflareの導入ガイド</a>（英語）の表で確認できます。</p>
       <p>APIトークン1つの方式では、アカウントのAPIトークンを作り、次の権限を付けます。CLIは実行のはじめに、トークンが有効かをCloudflareに問い合わせて確かめます。</p>
       <div class="table-wrap"><table>
         <thead><tr><th>権限</th><th>対象</th></tr></thead>
@@ -193,7 +193,7 @@
         <li>ホスト名へのアクセスを制限した場合は、許可していない場所から開くと拒否されること。</li>
       </ul>
       <p>閲覧アプリはまだ置いていないので、この時点ではホスト名を開いても閲覧アプリは表示されません。表示の確認は、ステップ3で閲覧アプリを置いたあとに行います。</p>
-      <p>プレビューの削除はCloudflareが非同期に行うので、指定した日数ちょうどで消えるとは限りません。プレビューを今すぐ見えなくする手段としては使えません。</p>
+      <p>Cloudflareはプレビューを非同期に削除するので、指定した日数ちょうどで消えるとは限りません。プレビューを今すぐ見えなくする手段としては使えません。</p>
     </section>
 
     <section class="doc-section" aria-labelledby="outputs">
@@ -211,13 +211,13 @@
 <span class="k">"schemaVersion"</span>: 1</pre>
       </div>
       <p>この内容を、次のステップで管理リポジトリの<code>artifact-pages.yaml</code>に入れ、CLIと閲覧アプリのバージョン、登録するサイトを書き足します。公開ジョブの環境変数名を既定から変えた場合は、その名前もここに出力されます。</p>
-      <p>閲覧アプリやサイトを置いたあとの動作の確認は、次のステップ以降で行います。</p>
+      <p>閲覧アプリやサイトを置いたあとの動作は、次のステップ以降で確かめます。</p>
     </section>
 
     <section class="doc-section" aria-labelledby="state">
-      <h2 id="state">このステップのあとの状態</h2>
+      <h2 id="state">このステップが終わったら</h2>
       <figure class="fg" aria-labelledby="state-fig">
-        <div class="fg-head"><strong id="state-fig">ステップ1のあとの状態</strong><span class="fg-note">説明用の例</span></div>
+        <div class="fg-head"><strong id="state-fig">ステップ1が終わったら</strong><span class="fg-note">説明用の例</span></div>
         <div class="fg-body"><div class="bd"><section class="bd-col"><h4 class="bd-h">GitHub</h4><div class="nd is-dim" data-kind="admin"><b>管理リポジトリ</b><small>ステップ2で用意</small></div><div class="nd is-dim" data-kind="team"><b>チームのリポジトリ</b><small>ステップ5で用意</small></div></section><div class="bd-a"><span>書き込む</span></div><section class="bd-col"><h4 class="bd-h">配信先</h4><div class="nd is-new" data-kind="store"><b>ストレージとCDN</b><small>ホスト名、配信の規則、認証情報</small><span class="nd-badge">このステップ</span></div><div class="nd is-dim" data-kind="app"><b>閲覧アプリ</b><small>ステップ3で用意</small></div><div class="nd is-dim" data-kind="registry"><b>サイトの登録情報</b><small>ステップ2で用意</small></div><div class="nd is-dim" data-kind="site"><b>サイト<code>sre</code></b><small>ステップ5で用意</small></div><div class="nd is-dim" data-kind="preview"><b>プレビュー</b><small>ステップ6で用意</small></div></section><div class="bd-a"><span>読む</span></div><section class="bd-col"><h4 class="bd-h">ブラウザ</h4><div class="nd is-dim" data-kind="reader"><b>読者</b><small>まだ開けない</small></div></section></div></div>
       </figure>
     </section>

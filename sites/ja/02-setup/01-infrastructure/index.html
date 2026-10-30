@@ -73,7 +73,7 @@
       <p>どちらの配信先でも、手順の形は同じです。自分のTerraformの設定（以下、呼び出し側）からモジュールを呼び出します。</p>
       <ol>
         <li><strong>モジュールを指定する。</strong>Terraform Registryのアドレスを<code>source</code>に、使うバージョンを<code>version</code>に書きます。バージョンは範囲でなく、<code>0.2.0</code>のように正確に固定します。</li>
-        <li><strong>プロバイダーと入力を書く。</strong>プロバイダー（<code>cloudflare</code>か<code>aws</code>）の設定は呼び出し側で行います。必須の入力は、どちらのモジュールも4つです。</li>
+        <li><strong>プロバイダーと入力を書く。</strong>プロバイダー（<code>cloudflare</code>か<code>aws</code>）は呼び出し側で設定します。必須の入力は、どちらのモジュールも4つです。</li>
         <li><strong>計画を確かめて適用する。</strong><code>terraform init</code>、<code>terraform plan</code>で作られるものを確かめてから、<code>terraform apply</code>を実行します。</li>
         <li><strong>出力を取り出す。</strong>モジュールは、CLIの設定ファイルにそのまま貼れる配信先の設定を出力します。呼び出し側でこれを<code>output</code>として公開しておくと、<code>terraform output</code>で読めます。</li>
       </ol>

@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <meta name="description" content="cli.versionとweb.versionで固定した閲覧アプリとCLIを更新する。通常の手順、形式が変わる更新の順序、CLI 0.6への移行、1回だけ別のCLIを使う方法、固定のない古い環境の追いつき。">
+  <meta name="description" content="cli.versionとweb.versionで固定した閲覧アプリとCLIを更新する。通常の手順、形式が変わる更新の順序、CLI 0.6への移行、1回だけ別のCLIを使う方法、版を固定していない古い環境の更新。">
   <title>閲覧アプリ・CLI・Actionsを更新する</title>
   <script>
     // Copy the reader app's theme (same-origin parent) before first paint; assets/site.js keeps it in sync.
@@ -104,11 +104,11 @@ Config and stored formats are compatible with web.version.
         <div class="term-head"><span>ターミナル</span><button class="copy-btn" type="button">コピー</button></div>
 <pre><span class="p">$</span> <span data-copy>artifact-pages --cli-version 0.6.1 site sync --site sre --config artifact-pages.yaml --dry-run</span></pre>
       </div>
-      <p>互換性の確認とActionsの範囲の確認は、この場合も行われます。管理リポジトリの共通のワークフローには、この指定を渡す入力がありません。チームのジョブで試すには、直接CLIを動かします。</p>
+      <p>この場合も、互換性とActionsの範囲は確認されます。管理リポジトリの共通のワークフローには、この指定を渡す入力がありません。チームのジョブで試すには、直接CLIを動かします。</p>
     </section>
 
     <section class="doc-section" aria-labelledby="catch-up">
-      <h2 id="catch-up">固定のない古い環境を追いつかせる</h2>
+      <h2 id="catch-up">版を固定していない古い環境を更新する</h2>
       <ul>
         <li>設定に<code>cli</code>も<code>web</code>もない環境では、入れてあるCLIがそのまま動きます。古いCLIはこれらのキーを知らずに拒否するので、まず使うCLIとActionsを、これらのキーに対応する版に上げます。そのあとで<code>web.version</code>（必要なら<code>cli.version</code>）を書き足します。閲覧アプリとCLIのリリースが分かれたあとのCLIでは、<code>cli.version</code>だけを書いて<code>web.version</code>がないと、<code>app deploy</code>は<code>--archive</code>を指定しない限り閲覧アプリを選べず、終了コード2で止まります。</li>
         <li>版の記録がない古いサイトは、互換かどうか判断できないものとして扱われます。登録を反映し、全サイトを公開し直して記録を作ってから閲覧アプリを置くか、上の「形式が変わる更新」の順で移ります。</li>
@@ -118,7 +118,7 @@ Config and stored formats are compatible with web.version.
 
     <section class="doc-section" aria-labelledby="rollback">
       <h2 id="rollback">前の版に戻す</h2>
-      <p>閲覧アプリは、保存の形式が変わっていなければ、<code>web.version</code>を前の版にして<code>config check</code>と<code>app deploy</code>を行えば戻せます。CLIは、上のAWSの制約のように、新しい版で書いたデータを古い版が扱えない場合があります。設定を元に戻せば必ず安全に戻せる、というわけではないので、戻す前に<code>config check</code>で確かめてください。</p>
+      <p>保存の形式が変わっていなければ、閲覧アプリは戻せます。<code>web.version</code>を前の版にして、<code>config check</code>と<code>app deploy</code>を実行します。CLIは、上のAWSの制約のように、新しい版で書いたデータを古い版が扱えない場合があります。設定を元に戻せば必ず安全に戻せる、というわけではないので、戻す前に<code>config check</code>で確かめてください。</p>
     </section>
 
     <nav class="pager" data-search-ignore aria-label="ページ送り">

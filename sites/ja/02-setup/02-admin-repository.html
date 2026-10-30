@@ -96,7 +96,7 @@
         <li>生成したファイルは手で編集しないでください。直したいときは作り直します（「<a href="../03-operations/02-update-shared-workflows.html">共通の公開・プレビューの仕組みを更新する</a>」）。</li>
         <li>対応する配信先はCloudflareとAWSです。設定ファイルは管理リポジトリの中の通常のファイルである必要があります。</li>
       </ul>
-      <p>生成したファイルのコミットは、まだしません。生成した登録のワークフローは、プルリクエストを出した時点で動いて配信先を読むので、先にこのあとの「<a href="#access">Organizationから呼び出せるようにする</a>」と「<a href="#secrets">認証情報を置く</a>」を済ませ、最後に「<a href="#merge">コミットしてマージする</a>」で反映します。</p>
+      <p>生成したファイルのコミットは、まだしません。生成した登録のワークフローは、プルリクエストを出した時点で動いて配信先を読みます。先にこのあとの「<a href="#access">Organizationから呼び出せるようにする</a>」と「<a href="#secrets">認証情報を置く</a>」を済ませ、最後に「<a href="#merge">コミットしてマージする</a>」で反映します。</p>
     </section>
 
     <section class="doc-section" aria-labelledby="access">
@@ -173,9 +173,9 @@
     </section>
 
     <section class="doc-section" aria-labelledby="state">
-      <h2 id="state">このステップのあとの状態</h2>
+      <h2 id="state">このステップが終わったら</h2>
       <figure class="fg" aria-labelledby="state-fig">
-        <div class="fg-head"><strong id="state-fig">ステップ2のあとの状態</strong><span class="fg-note">説明用の例</span></div>
+        <div class="fg-head"><strong id="state-fig">ステップ2が終わったら</strong><span class="fg-note">説明用の例</span></div>
         <div class="fg-body"><div class="bd"><section class="bd-col"><h4 class="bd-h">GitHub</h4><div class="nd is-new" data-kind="admin"><b>管理リポジトリ</b><small><code>artifact-pages.yaml</code>、共通のワークフロー</small><span class="nd-badge">このステップ</span></div><div class="nd is-dim" data-kind="team"><b>チームのリポジトリ</b><small>ステップ5で用意</small></div></section><div class="bd-a"><span>書き込む</span></div><section class="bd-col"><h4 class="bd-h">配信先</h4><div class="nd" data-kind="store"><b>ストレージとCDN</b><small>ホスト名、配信の規則、認証情報</small></div><div class="nd is-dim" data-kind="app"><b>閲覧アプリ</b><small>ステップ3で用意</small></div><div class="nd is-new" data-kind="registry"><b>サイトの登録情報</b><small>空（サイトはまだない）</small><span class="nd-badge">このステップ</span></div><div class="nd is-dim" data-kind="site"><b>サイト<code>sre</code></b><small>ステップ5で用意</small></div><div class="nd is-dim" data-kind="preview"><b>プレビュー</b><small>ステップ6で用意</small></div></section><div class="bd-a"><span>読む</span></div><section class="bd-col"><h4 class="bd-h">ブラウザ</h4><div class="nd is-dim" data-kind="reader"><b>読者</b><small>まだ開けない</small></div></section></div></div>
       </figure>
     </section>

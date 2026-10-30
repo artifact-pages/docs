@@ -42,7 +42,7 @@
           <tr><td>行う操作</td><td>登録の反映（<code>registry sync</code>）、閲覧アプリの配置（<code>app deploy</code>）</td><td>自分のサイトの公開（<code>site sync</code>）、プレビュー（<code>preview publish</code>）</td></tr>
         </tbody>
       </table></div>
-      <p>サイトIDは配信先での論理的な名前で、リポジトリの名前とは独立しています。いまのモデルでは、1つのサイトの公開元は1つのリポジトリの1つのディレクトリです。複数のリポジトリを1つのサイトに合成する機能はありません。</p>
+      <p>サイトIDは配信先での論理的な名前で、リポジトリの名前とは独立しています。いまのモデルでは、1つのサイトの公開元は、1つのリポジトリの中の1つのディレクトリです。複数のリポジトリを1つのサイトに合成する機能はありません。</p>
       <p>このドキュメント自体も、サテライトとして公開されています。Artifactのリポジトリは管理リポジトリの共通のワークフローを呼び出し、その中で製品の<code>publish-action</code>が動きます。管理リポジトリが配る共通のワークフローと、製品が配るActionsは、別の層です。</p>
     </section>
 
@@ -58,7 +58,7 @@
           <tr><td>サイトのArtifact</td><td><code>site sync</code></td><td>そのサイトのArtifact、一覧、検索のデータ</td></tr>
           <tr><td>サイトの登録</td><td><code>sites</code>を変えて<code>registry sync</code></td><td>サイトの一覧。取り下げたサイトの内容の削除</td></tr>
           <tr><td>閲覧アプリ</td><td><code>web.version</code>を変えて<code>app deploy</code></td><td>閲覧アプリのファイル</td></tr>
-          <tr><td>公開を行うCLI</td><td><code>cli.version</code>を変える</td><td>その設定を使う次の実行</td></tr>
+          <tr><td>公開するCLI</td><td><code>cli.version</code>を変える</td><td>その設定を使う次の実行</td></tr>
           <tr><td>共通のワークフロー</td><td><code>registry setup</code>で作り直す</td><td>それを参照するチームの次の実行</td></tr>
           <tr><td>製品のActions</td><td>共通のワークフローの中の参照を更新する</td><td>同上</td></tr>
         </tbody>

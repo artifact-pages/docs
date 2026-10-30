@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <meta name="description" content="Artifact Pagesを組織に導入し、最初のチームが自分のリポジトリからArtifactを公開してPRプレビューで確かめられるところまで進める。到達する状態、全体の流れ、事前の準備、ローカルでの試し方。">
+  <meta name="description" content="Artifact Pagesを組織に導入し、最初のチームが自分のリポジトリからArtifactを公開してPRプレビューで確かめられるところまで進める。導入後の状態、全体の流れ、事前の準備、ローカルでの試し方。">
   <title>導入する</title>
   <script>
     // Copy the reader app's theme (same-origin parent) before first paint; assets/site.js keeps it in sync.
@@ -32,7 +32,7 @@
     </header>
 
     <section class="doc-section" aria-labelledby="goal">
-      <h2 id="goal">到達する状態</h2>
+      <h2 id="goal">導入後の状態</h2>
       <ul>
         <li>CloudflareかAWSに配信環境があり、閲覧アプリが置かれている。</li>
         <li>管理リポジトリ<code>acme/platform-admin</code>に、設定ファイルと、各チームが呼び出す共通の公開・プレビューのワークフローがある。</li>
@@ -52,7 +52,7 @@
 
     <section class="doc-section" aria-labelledby="repos">
       <h2 id="repos">2種類のリポジトリ</h2>
-      <p>管理リポジトリは環境に1つで、配信先の設定、登録するサイトの一覧、CLIと閲覧アプリのバージョン、共通のワークフローを持ちます。チームのリポジトリ（サテライトリポジトリ）はいくつでもあり、公開するArtifactのディレクトリと、共通のワークフローを呼び出す短いワークフローを持ちます。チームのリポジトリに設定ファイルは置きません。</p>
+      <p>管理リポジトリは環境に1つで、配信先の設定、登録するサイトの一覧、CLIと閲覧アプリのバージョン、共通のワークフローを持ちます。チームのリポジトリ（サテライトリポジトリ）はいくつあってもかまいません。それぞれに、公開するArtifactのディレクトリと、共通のワークフローを呼び出す短いワークフローを置きます。チームのリポジトリに設定ファイルは置きません。</p>
       <p>サイトの登録は、どのリポジトリのどのディレクトリがそのサイトに公開してよいかを決めるものです。読者を限定するものではありません。</p>
     </section>
 

@@ -49,7 +49,7 @@
 
     <section class="doc-section" aria-labelledby="publish">
       <h2 id="publish">チームのリポジトリから公開する</h2>
-      <p>公開は、チームのリポジトリのGitHub Actionsのジョブで行います。チームが書くワークフローは短く、管理リポジトリが用意した共通の公開ワークフローを、サイトIDを指定して呼び出すだけです。共通のワークフローの中で、製品の<code>publish-action</code>が<code>artifact-pages site sync</code>を実行します。</p>
+      <p>チームのリポジトリのGitHub Actionsのジョブで公開します。チームが書くワークフローは短く、管理リポジトリが用意した共通の公開ワークフローを、サイトIDを指定して呼び出すだけです。共通のワークフローの中で、製品の<code>publish-action</code>が<code>artifact-pages site sync</code>を実行します。</p>
       <figure class="fg" aria-labelledby="publish-structure-fig">
         <div class="fg-head"><strong id="publish-structure-fig">各チームは、自分のサイトにだけ公開する</strong><span class="fg-note">説明用の例</span></div>
         <div class="fg-body"><div class="tp"><div class="zn" data-kind="cloud"><span class="zn-l">配信先</span><div class="nd" data-kind="app"><b>閲覧アプリ</b><small>どのサイトも同じ画面で読む</small></div><div class="tp-row"><div class="nd" data-kind="site"><b>チームAのサイト</b></div><div class="nd" data-kind="site"><b>チームBのサイト</b></div><div class="nd" data-kind="site"><b>チームCのサイト</b></div></div></div><div class="tp-row"><div class="fl is-v"><span class="fl-a" data-dir="back"><span>公開</span></span></div><div class="fl is-v"><span class="fl-a" data-dir="back"><span>公開</span></span></div><div class="fl is-v"><span class="fl-a" data-dir="back"><span>公開</span></span></div></div><div class="tp-row"><div class="nd" data-kind="team"><b>チームAのリポジトリ</b><small>Artifactと短いワークフロー</small></div><div class="nd" data-kind="team"><b>チームBのリポジトリ</b><small>Artifactと短いワークフロー</small></div><div class="nd" data-kind="team"><b>チームCのリポジトリ</b><small>Artifactと短いワークフロー</small></div></div><div class="nd" data-kind="admin"><b>管理リポジトリ</b><small>共通の公開ワークフローとサイトの登録。どのチームの公開も、ここのワークフローを通る</small></div></div></div>
@@ -71,8 +71,8 @@
     </section>
 
     <section class="doc-section" aria-labelledby="independent">
-      <h2 id="independent">サイトごとに独立した公開</h2>
-      <p>公開が書き込むのは、そのサイトの公開元のディレクトリのファイルと、一覧と検索のデータだけです。ほかのサイトのArtifactや閲覧アプリには触れません。全部のサイトをまとめて作り直す工程もないので、各チームは自分のArtifactをマージしたときに、自分のサイトだけを公開できます。</p>
+      <h2 id="independent">サイトごとに独立して公開する</h2>
+      <p>公開時に書き込むのは、そのサイトの公開元のディレクトリにあるファイルと、一覧と検索のデータだけです。ほかのサイトのArtifactや閲覧アプリには触れません。全部のサイトをまとめて作り直す工程もないので、各チームは自分のArtifactをマージしたときに、自分のサイトだけを公開できます。</p>
       <figure class="fg" aria-labelledby="independent-fig">
         <div class="fg-head"><strong id="independent-fig">それぞれのタイミングで公開する</strong><span class="fg-note">説明用の例</span></div>
         <div class="fg-body"><div class="tp tp-live"><div class="tp-row"><div class="nd" data-kind="site" data-tp-col="A"><b>チームAのサイト</b></div><div class="nd" data-kind="site" data-tp-col="B"><b>チームBのサイト</b></div><div class="nd" data-kind="site" data-tp-col="C"><b>チームCのサイト</b></div></div><div class="tp-row"><div class="fl is-v"><span class="fl-a is-dashed" data-dir="back" data-tp-col="A"><span>公開</span><i class="tp-dot"></i></span></div><div class="fl is-v"><span class="fl-a is-dashed" data-dir="back" data-tp-col="B"><span>公開</span><i class="tp-dot"></i></span></div><div class="fl is-v"><span class="fl-a is-dashed" data-dir="back" data-tp-col="C"><span>公開</span><i class="tp-dot"></i></span></div></div><div class="tp-row"><div class="nd" data-kind="team"><b>チームAのリポジトリ</b></div><div class="nd" data-kind="team"><b>チームBのリポジトリ</b></div><div class="nd" data-kind="team"><b>チームCのリポジトリ</b></div></div></div></div>
