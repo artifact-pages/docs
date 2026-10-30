@@ -51,7 +51,16 @@
         const sameSite = window.top.location.pathname.split('/')[1] === target.pathname.split('/')[1];
         if (query && sameSite && !target.searchParams.has('q')) target.searchParams.set('q', query);
         const route = target.pathname + target.search + target.hash;
-        window.top.location.assign(route);
+        const top = window.top;
+        const frame = window.frameElement;
+        const shell = top.document.querySelector('.app-shell');
+        if (sameSite && window.parent === top && frame && frame.isConnected && frame.ownerDocument === top.document
+          && shell && frame.closest('.app-shell') === shell && shell.contains(frame)) {
+          top.history.pushState({}, '', route);
+          top.dispatchEvent(new top.PopStateEvent('popstate', { state: top.history.state }));
+        } else {
+          top.location.assign(route);
+        }
         event.preventDefault();
       } catch { /* 別オリジンなど：通常のリンク動作にまかせる */ }
     });
