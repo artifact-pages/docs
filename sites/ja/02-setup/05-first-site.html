@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <meta name="description" content="チームのリポジトリで公開するディレクトリを整え、管理リポジトリの共通のワークフローを呼び出すワークフローを置き、プルリクエストで試し実行してマージで公開する。浅いチェックアウトと日付、管理とサイトが同じリポジトリの場合。">
+  <meta name="description" content="チームのリポジトリで公開するディレクトリを整え、管理リポジトリの共通のワークフローを呼び出すワークフローを置き、プルリクエストで試し実行してマージで公開する。浅いチェックアウトでの更新日、管理とサイトが同じリポジトリの場合。">
   <title>最初のサイトを公開する</title>
   <script>
     // Copy the reader app's theme (same-origin parent) before first paint; assets/site.js keeps it in sync.
@@ -108,7 +108,7 @@
     </section>
 
     <section class="doc-section" aria-labelledby="dates">
-      <h2 id="dates">浅いチェックアウトと日付</h2>
+      <h2 id="dates">浅いチェックアウトでの更新日</h2>
       <p>Artifactの更新日と名前は、Gitの履歴から求めます。GitHub Actionsのチェックアウトは既定で直近の1コミットだけですが、CLIは必要なだけ履歴を取り寄せるので、通常は全履歴があるときと同じ結果になります。</p>
       <p>ただし、前回の公開から内容が同じ状態に戻ったファイル（変更を取り消したコミットなど）は、前回の更新日のまま残ることがあります。どんな場合も履歴どおりの日付にしたいときは、全履歴でチェックアウトします。共通のワークフローは<code>fetch-depth</code>を受け取らないので、その場合は製品の<code>publish-action</code>を直接使う構成にします。</p>
     </section>
@@ -143,14 +143,14 @@
         <li>APIトークン1つの方式では、R2のキー2つの代わりに<code>CF_API_TOKEN</code>を渡します。</li>
         <li><code>publish-on</code>に合わないきっかけ（プルリクエストなど）では試し実行になります。</li>
         <li><code>sourcePath</code>は<code>docs</code>のように、Artifactとそれが使うファイルだけのディレクトリにします。リポジトリ全体にすると、設定ファイルやワークフローも公開されます。</li>
-        <li>この場合も、登録の反映と閲覧アプリの配置は別のジョブで行います。</li>
+        <li>この場合も、登録を反映するジョブと閲覧アプリを配置するジョブは別です。</li>
       </ul>
     </section>
 
     <section class="doc-section" aria-labelledby="state">
-      <h2 id="state">このステップのあとの状態</h2>
+      <h2 id="state">このステップが終わったら</h2>
       <figure class="fg" aria-labelledby="state-fig">
-        <div class="fg-head"><strong id="state-fig">ステップ5のあとの状態</strong><span class="fg-note">説明用の例</span></div>
+        <div class="fg-head"><strong id="state-fig">ステップ5が終わったら</strong><span class="fg-note">説明用の例</span></div>
         <div class="fg-body"><div class="bd"><section class="bd-col"><h4 class="bd-h">GitHub</h4><div class="nd" data-kind="admin"><b>管理リポジトリ</b><small><code>artifact-pages.yaml</code>、共通のワークフロー、配置のワークフロー、<code>sites</code>に<code>sre</code></small></div><div class="nd is-new" data-kind="team"><b>チームのリポジトリ</b><small>acme/sre：<code>docs/</code>、公開のワークフロー</small><span class="nd-badge">このステップ</span></div></section><div class="bd-a"><span>書き込む</span></div><section class="bd-col"><h4 class="bd-h">配信先</h4><div class="nd" data-kind="store"><b>ストレージとCDN</b><small>ホスト名、配信の規則、認証情報</small></div><div class="nd" data-kind="app"><b>閲覧アプリ</b><small>ホスト名のトップで開く</small></div><div class="nd" data-kind="registry"><b>サイトの登録情報</b><small><code>sre</code></small></div><div class="nd is-new" data-kind="site"><b>サイト<code>sre</code></b><small>Artifactと一覧、本文検索のデータ</small><span class="nd-badge">このステップ</span></div><div class="nd is-dim" data-kind="preview"><b>プレビュー</b><small>ステップ6で用意</small></div></section><div class="bd-a"><span>読む</span></div><section class="bd-col"><h4 class="bd-h">ブラウザ</h4><div class="nd is-new" data-kind="reader"><b>読者</b><small><code>sre</code>のArtifactを読める</small><span class="nd-badge">このステップ</span></div></section></div></div>
       </figure>
     </section>

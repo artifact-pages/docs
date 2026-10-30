@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <meta name="description" content="Artifact PagesのCLI、閲覧アプリ、Actions、Terraformモジュールの版の系列と選ばれ方、読み書きする形式の互換性の確かめ方、Actionsとサイトが版に追従する条件。">
+  <meta name="description" content="Artifact PagesのCLI、閲覧アプリ、Actions、Terraformモジュールの部品ごとの版と、その選ばれ方、読み書きする形式の互換性の確かめ方、Actionsとサイトに新しい版が反映される条件。">
   <title>バージョンと互換性</title>
   <script>
     // Copy the reader app's theme (same-origin parent) before first paint; assets/site.js keeps it in sync.
@@ -32,7 +32,7 @@
     </header>
 
     <section class="doc-section" aria-labelledby="series">
-      <h2 id="series">版の系列</h2>
+      <h2 id="series">部品ごとの版と選び方</h2>
       <div class="table-wrap"><table>
         <thead><tr><th>部品</th><th>タグ</th><th>選び方</th></tr></thead>
         <tbody>
@@ -47,7 +47,7 @@
 
     <section class="doc-section" aria-labelledby="actions">
       <h2 id="actions">Actionsが使うCLI</h2>
-      <p>各Actionは、まず自分に組み込まれた入口のCLIを入れ、そのCLIが設定の<code>cli.version</code>の版に切り替えて実行します。Actionの版が、そのまま公開を行うCLIの版になるわけではありません。</p>
+      <p>各Actionは、まず自分に組み込まれた入口のCLIを入れ、そのCLIが設定の<code>cli.version</code>の版に切り替えて実行します。Actionの版が、そのまま公開するCLIの版になるわけではありません。</p>
       <div class="table-wrap"><table>
         <thead><tr><th>Actions</th><th>入口のCLI</th><th>使えるCLIの範囲</th></tr></thead>
         <tbody>
@@ -72,7 +72,7 @@
     </section>
 
     <section class="doc-section" aria-labelledby="follow">
-      <h2 id="follow">追従する条件</h2>
+      <h2 id="follow">版の変更が反映されるとき</h2>
       <ul>
         <li>設定の<code>cli.version</code>を変えると、その設定を使う次の実行から新しいCLIになります。チームのワークフローが管理リポジトリの古いコミットを参照していれば、古い設定のままです。</li>
         <li>版を変えても、公開済みの内容は作り直されません。サイトは次の公開で、閲覧アプリは<code>app deploy</code>で新しくなります。</li>
@@ -85,7 +85,7 @@
 
     <nav class="pager" data-search-ignore aria-label="ページ送り">
       <a class="prev" href="05-terraform.html"><small>前へ</small><strong>Terraform</strong></a>
-      <a class="next" href="../index.html"><small>次へ</small><strong>概要</strong></a>
+      <a class="next" href="../index.html"><small>次へ</small><strong>Artifact Pagesとは</strong></a>
     </nav>
   </main>
 </body>

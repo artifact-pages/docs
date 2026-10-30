@@ -51,7 +51,7 @@
         <thead><tr><th>入力</th><th>既定</th><th>意味</th></tr></thead>
         <tbody>
           <tr><td><code>config</code></td><td><code>""</code></td><td>設定ファイルのパスか、<code>github://</code>の指定1つ。</td></tr>
-          <tr><td><code>cli-version</code></td><td><code>""</code></td><td>1回だけ使うCLIの正確な版。互換性の確認は行う。</td></tr>
+          <tr><td><code>cli-version</code></td><td><code>""</code></td><td>1回だけ使うCLIの正確な版。互換性は確かめる。</td></tr>
           <tr><td><code>dry-run</code></td><td><code>"false"</code></td><td>試し実行にする。</td></tr>
           <tr><td><code>summary</code></td><td><code>"true"</code></td><td>ジョブの概要に結果を書く（失敗のときも）。</td></tr>
           <tr><td><code>checkout</code></td><td><code>auto</code></td><td>Gitのチェックアウトがなければチェックアウトする。<code>true</code>で常に、<code>false</code>でしない。</td></tr>
@@ -59,7 +59,7 @@
           <tr><td><code>publish-on</code></td><td><code>""</code></td><td>publish、registry、app-deployだけ。書き込みを許すきっかけを、改行区切りの<code>event</code>か<code>event:ref</code>で書く（例：<code>push:refs/heads/main</code>）。合わないきっかけでは試し実行になる。空なら制限なし。</td></tr>
         </tbody>
       </table></div>
-      <p>チェックアウトは認証情報を残さない設定で行います。<code>github-token</code>の入力はありません。</p>
+      <p>認証情報を残さない設定でチェックアウトします。<code>github-token</code>の入力はありません。</p>
     </section>
 
     <section class="doc-section" aria-labelledby="specific">
@@ -97,7 +97,7 @@
           <tr><td><code>repository</code></td><td><code>artifact-pages/artifact-pages</code>。</td></tr>
         </tbody>
       </table></div>
-      <p>previewのActionは、チェックアウトをプルリクエストのbaseで行い、CLIの版をbaseの設定から選びます。プルリクエストで設定を書き換えて、書き込むCLIを変えることはできません。<code>pull_request_target</code>とフォークからのプルリクエストは拒否します。</p>
+      <p>previewのActionは、プルリクエストのbaseをチェックアウトし、CLIの版をbaseの設定から選びます。プルリクエストで設定を書き換えて、書き込むCLIを変えることはできません。<code>pull_request_target</code>とフォークからのプルリクエストは拒否します。</p>
     </section>
 
     <section class="doc-section" aria-labelledby="outputs">

@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <meta name="description" content="閲覧アプリのサイトの一覧、サイトのトップ、サイドバー、Artifactの画面、ContentsとDetails、パレット、本文検索の画面、プレビューの画面の仕様。">
+  <meta name="description" content="閲覧アプリのサイトの一覧、サイトのトップ、サイドバー、Artifactの画面、ContentsとDetails、パレット、本文検索の画面、プレビューの画面がどう動くか。">
   <title>閲覧アプリ：画面と操作</title>
   <script>
     // Copy the reader app's theme (same-origin parent) before first paint; assets/site.js keeps it in sync.
@@ -65,7 +65,7 @@
       <ul>
         <li>上に、サイト名のメニュー（<strong>Site home</strong>、<strong>Switch site…</strong>、<strong>All sites</strong>）と、パレットを開く<strong>Jump to a page…</strong>（<kbd>⌘</kbd> <kbd>K</kbd>）。</li>
         <li><strong>Pinned</strong>（折り畳める）と<strong>Browse</strong>のフォルダの構造が並びます。フォルダが先、そのあとにファイルで、どちらもファイル名の順です（数字も文字として比べるので、<code>10-x</code>は<code>2-x</code>より前）。</li>
-        <li>フォルダの名前はフォルダの画面へのリンクで、横の矢印は開閉だけを行います。紹介（下の「フォルダの画面」）にタイトルがあるフォルダは、そのタイトルで表示します。タイトルが空か、ファイル名（拡張子を除いた名前を含む）と同じなら、フォルダの名前で表示します。</li>
+        <li>フォルダの名前はフォルダの画面へのリンクで、横の矢印は開閉だけに使います。紹介（下の「フォルダの画面」）にタイトルがあるフォルダは、そのタイトルで表示します。タイトルが空か、ファイル名（拡張子を除いた名前を含む）と同じなら、フォルダの名前で表示します。</li>
         <li>下にテーマの切り替え。サイドバーを畳むと、左端の細い列に、開くボタン、サイト名のメニュー、検索、テーマが残ります（620px以下では列はなく、ヘッダーのボタンでサイドバーを開きます）。</li>
         <li>幅が860pxより広い画面では初めから開いています。それ以下では、Artifactやフォルダに移ると閉じます。</li>
         <li>1つのフォルダの中は100行、サイドバー全体では400行まで表示します。残りは<strong>N more in …</strong>のリンクになり、押すとそのフォルダの画面が開きます。開いているArtifactの行は、いつも表示します。</li>

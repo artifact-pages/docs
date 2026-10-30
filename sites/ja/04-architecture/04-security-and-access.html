@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <meta name="description" content="HTMLとMarkdownの信頼の扱い、CSPと内部の記録の扱い、閲覧の制限を配信の端で行う理由、管理者とサイトの公開の認証情報の分け方。">
+  <meta name="description" content="HTMLとMarkdownをどこまで信頼するか、CSPと内部の記録をどう扱うか、閲覧を配信の端で制限する理由、管理者とサイトの公開の認証情報の分け方。">
   <title>セキュリティとアクセス</title>
   <script>
     // Copy the reader app's theme (same-origin parent) before first paint; assets/site.js keeps it in sync.
@@ -33,7 +33,7 @@
     </header>
 
     <section class="doc-section" aria-labelledby="html">
-      <h2 id="html">HTMLとMarkdownの信頼</h2>
+      <h2 id="html">HTMLとMarkdownをどこまで信頼するか</h2>
       <figure class="fg" aria-labelledby="origin-fig">
         <div class="fg-head"><strong id="origin-fig">HTMLのArtifactのスクリプトが届く範囲</strong><span class="fg-note">説明用の例</span></div>
         <div class="fg-body"><div class="zn" data-kind="origin"><span class="zn-l">同じオリジン（<code>https://docs.example.com</code>）</span><div class="nd" data-kind="app"><b>閲覧アプリ</b></div><div class="nd is-warn" data-kind="site"><b>HTMLのArtifact</b><small><code>sandbox</code>のないiframe。スクリプトが動く</small></div><div class="nd" data-kind="site"><b>ほかのサイトのArtifact</b></div><div class="nd" data-kind="app"><b>ブラウザの保存領域</b><small>ピン留め、最近読んだArtifact</small></div><div class="nd" data-kind="site"><b>MarkdownのArtifact</b><small>閲覧アプリが描画。スクリプトは動かない</small></div></div></div>
@@ -60,7 +60,7 @@
     </section>
 
     <section class="doc-section" aria-labelledby="viewers">
-      <h2 id="viewers">閲覧の制限</h2>
+      <h2 id="viewers">閲覧を制限する</h2>
       <p>製品には、利用者のアカウント、ログイン、役割、サイトごとの閲覧の設定がありません。サイトを登録しないこと、一覧に出さないこと、推測しにくいURLを使うことは、どれも閲覧の制限になりません。</p>
       <p>読者を限るのは、配信先のホスト名に対する制限です。読者が開く論理的なURLだけでなく、一覧、Artifact、プレビューのファイルのパスにも効き、キャッシュから返す前に判定される必要があります。</p>
       <figure class="fg" aria-labelledby="gate-fig">

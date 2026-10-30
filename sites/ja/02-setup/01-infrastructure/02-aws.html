@@ -43,7 +43,7 @@
       </ul>
       <p>DNSのレコード、ACMの証明書、GitHub ActionsのOIDCプロバイダー、GitHubのEnvironmentとシークレットは、モジュールが作りません。</p>
       <figure class="fg" aria-labelledby="aws-path-fig">
-        <div class="fg-head"><strong id="aws-path-fig">読者のリクエストが通る道</strong><span class="fg-note">説明用の例</span></div>
+        <div class="fg-head"><strong id="aws-path-fig">読者のリクエストの流れ</strong><span class="fg-note">説明用の例</span></div>
         <div class="fg-body"><div class="fl"><div class="nd" data-kind="reader"><b>読者</b><small><code>https://docs.example.com/…</code></small></div><span class="fl-a"><span>開く</span></span><div class="nd" data-kind="cdn"><b>CloudFront</b><small>振り分け、キャッシュ、応答ヘッダー</small></div><span class="fl-a"><span>読む</span></span><div class="nd" data-kind="store"><b>S3バケット</b><small>非公開。CloudFrontだけが読める</small></div></div></div>
         <figcaption>ページのURLには閲覧アプリが返り、閲覧アプリが一覧やArtifactのファイルを読みます。Artifactのファイルを直接指すURLで、そのファイルがなければ404です。</figcaption>
       </figure>
@@ -214,7 +214,7 @@
       <p>計画で、作られるバケット、ディストリビューション、ロールとそのポリシーを確かめます。WAFを使わずサイトが1つの場合、作られるリソースは22個です。CloudFrontの変更は、適用が終わってから全体に行き渡るまでに時間がかかります。</p>
       <p>S3とCloudFrontは使った分だけ課金されます。適用の前に、想定する量で<a href="https://aws.amazon.com/s3/pricing/" target="_blank" rel="noopener">S3</a>と<a href="https://aws.amazon.com/cloudfront/pricing/" target="_blank" rel="noopener">CloudFront</a>の料金を確かめてください。費用の生まれ方は「<a href="../../04-architecture/07-cost-aws.html">コストとパフォーマンス：AWS</a>」で説明します。</p>
       <p>適用したら、CloudFrontのホスト名（独自ドメインを付けたならそのホスト名）にHTTPSで届くことを確かめます。閲覧を制限した場合は、許可していない場所から開くと拒否されることも確かめます。閲覧アプリはまだ置いていないので、この時点では閲覧アプリは表示されず、モジュールが置く404のページが返ります。</p>
-      <p>プレビューの削除はS3が非同期に行うので、指定した日数ちょうどで消えるとは限りません。プレビューを今すぐ見えなくする手段としては使えません。</p>
+      <p>S3はプレビューを非同期に削除するので、指定した日数ちょうどで消えるとは限りません。プレビューを今すぐ見えなくする手段としては使えません。</p>
     </section>
 
     <section class="doc-section" aria-labelledby="outputs">
@@ -242,13 +242,13 @@
           <tr><td><code>distribution_domain_name</code></td><td>読者が開くホスト名。独自ドメインではCNAMEの向け先。</td></tr>
         </tbody>
       </table></div>
-      <p>ロールのARNは設定ファイルには書かず、ジョブの設定で使います。次のステップで、設定ファイルにCLIと閲覧アプリのバージョン、登録するサイトを書き足し、ジョブを用意します。閲覧アプリやサイトを置いたあとの動作の確認も、次のステップ以降で行います。</p>
+      <p>ロールのARNは設定ファイルには書かず、ジョブの設定で使います。次のステップで、設定ファイルにCLIと閲覧アプリのバージョン、登録するサイトを書き足し、ジョブを用意します。閲覧アプリやサイトを置いたあとの動作も、次のステップ以降で確かめます。</p>
     </section>
 
     <section class="doc-section" aria-labelledby="state">
-      <h2 id="state">このステップのあとの状態</h2>
+      <h2 id="state">このステップが終わったら</h2>
       <figure class="fg" aria-labelledby="state-fig">
-        <div class="fg-head"><strong id="state-fig">ステップ1のあとの状態</strong><span class="fg-note">説明用の例</span></div>
+        <div class="fg-head"><strong id="state-fig">ステップ1が終わったら</strong><span class="fg-note">説明用の例</span></div>
         <div class="fg-body"><div class="bd"><section class="bd-col"><h4 class="bd-h">GitHub</h4><div class="nd is-dim" data-kind="admin"><b>管理リポジトリ</b><small>ステップ2で用意</small></div><div class="nd is-dim" data-kind="team"><b>チームのリポジトリ</b><small>ステップ5で用意</small></div></section><div class="bd-a"><span>書き込む</span></div><section class="bd-col"><h4 class="bd-h">配信先</h4><div class="nd is-new" data-kind="store"><b>ストレージとCDN</b><small>ホスト名、配信の規則、認証情報</small><span class="nd-badge">このステップ</span></div><div class="nd is-dim" data-kind="app"><b>閲覧アプリ</b><small>ステップ3で用意</small></div><div class="nd is-dim" data-kind="registry"><b>サイトの登録情報</b><small>ステップ2で用意</small></div><div class="nd is-dim" data-kind="site"><b>サイト<code>sre</code></b><small>ステップ5で用意</small></div><div class="nd is-dim" data-kind="preview"><b>プレビュー</b><small>ステップ6で用意</small></div></section><div class="bd-a"><span>読む</span></div><section class="bd-col"><h4 class="bd-h">ブラウザ</h4><div class="nd is-dim" data-kind="reader"><b>読者</b><small>まだ開けない</small></div></section></div></div>
       </figure>
     </section>
