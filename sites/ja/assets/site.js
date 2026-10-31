@@ -51,7 +51,19 @@
         const sameSite = window.top.location.pathname.split('/')[1] === target.pathname.split('/')[1];
         if (query && sameSite && !target.searchParams.has('q')) target.searchParams.set('q', query);
         const route = target.pathname + target.search + target.hash;
-        window.top.location.assign(route);
+        const top = window.top;
+        if (sameSite && window.parent === top) {
+          try {
+            const navigation = new top.CustomEvent('artifact-pages:navigate:v1', {
+              detail: { source: window, href: route }, cancelable: true,
+            });
+            if (!top.dispatchEvent(navigation)) {
+              event.preventDefault();
+              return;
+            }
+          } catch { /* 古い閲覧アプリなど：通常の遷移に戻す */ }
+        }
+        top.location.assign(route);
         event.preventDefault();
       } catch { /* 別オリジンなど：通常のリンク動作にまかせる */ }
     });
